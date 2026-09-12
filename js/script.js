@@ -216,23 +216,15 @@
   },{threshold:.15});
   revealEls.forEach(el=>io.observe(el));
 
-  // Rail progress + active node
-  const railDot = document.getElementById('railDot');
-  const nodes = document.querySelectorAll('.rail-node');
-  const sections = document.querySelectorAll('section');
+  // Progreso de scroll (barra superior, estilo Odoo)
+  const progressBar = document.getElementById('scrollProgress');
   function onScroll(){
+    if(!progressBar) return;
     const doc = document.documentElement;
     const scrolled = doc.scrollTop || document.body.scrollTop;
     const height = doc.scrollHeight - doc.clientHeight;
     const pct = Math.min(1, Math.max(0, scrolled/height));
-    railDot.style.top = (pct*100)+'%';
-
-    let idx = 0;
-    sections.forEach((s,i)=>{
-      const r = s.getBoundingClientRect();
-      if(r.top < window.innerHeight*0.5) idx = i;
-    });
-    nodes.forEach(n=>n.classList.toggle('active', parseInt(n.dataset.i)===idx));
+    progressBar.style.width = (pct*100)+'%';
   }
   document.addEventListener('scroll', ()=>window.requestAnimationFrame(onScroll));
   onScroll();
