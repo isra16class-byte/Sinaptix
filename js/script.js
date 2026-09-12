@@ -3,17 +3,23 @@
     netlifyIdentity.init();
 
     const btnLogin = document.getElementById('btnLogin');
+    const btnAcceder = document.getElementById('btnAcceder');
     const miPlan = document.getElementById('miPlan');
     const btnLogout = document.getElementById('btnLogout');
 
     function setLoginButton(user){
-      if(!btnLogin) return;
-      if(user){
-        btnLogin.textContent = user.user_metadata && user.user_metadata.full_name
-          ? user.user_metadata.full_name
-          : 'Mi cuenta';
-      } else {
-        btnLogin.textContent = 'Iniciar sesión';
+      if(btnLogin){
+        if(user){
+          btnLogin.textContent = user.user_metadata && user.user_metadata.full_name
+            ? user.user_metadata.full_name
+            : 'Mi cuenta';
+        } else {
+          btnLogin.textContent = 'Iniciar sesión';
+        }
+      }
+      // "Acceder" solo tiene sentido para quien todavía no tiene cuenta/sesión
+      if(btnAcceder){
+        btnAcceder.classList.toggle('hidden', !!user);
       }
     }
 
