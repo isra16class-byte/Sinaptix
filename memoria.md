@@ -6,6 +6,25 @@
 > Actualízalo en cada patch que generes (ver "Reglas de esta memoria" al
 > final).
 
+## Ramas: `main` es de trabajo, `master` es producción
+
+- **`main`**: rama donde se aplican los patches de cada sesión (`git am`) y
+  se hace push normalmente. Es donde vive el trabajo más reciente.
+- **`master`**: rama de **producción**, es la que Netlify tiene configurada
+  para desplegar. **No recibe patches directamente.**
+- Flujo para que un cambio llegue a producción, después de aplicar los
+  patches de la sesión en `main` y hacer `git push origin main`:
+  ```bash
+  git checkout main
+  git push origin main:master
+  ```
+  Esto es un fast-forward (mismos commits, sin nuevo historial), así que
+  **no requiere un patch aparte** — es un paso manual que hace el usuario
+  cuando quiere publicar lo que ya está validado en `main`.
+- Si en algún momento `master` tiene commits que `main` no tiene (o al
+  revés), avisar antes de asumir que un simple `push main:master` va a
+  funcionar limpio (podría no ser fast-forward).
+
 ## Quién soy en este repo (autoría de commits)
 
 Todos los commits de este proyecto deben quedar autoreados como:

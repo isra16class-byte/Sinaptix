@@ -5,7 +5,17 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
-## Sin fecha (sesión en curso) — Memoria y changelog
+## Sin fecha (sesión en curso) — Aclaración de ramas main/master
+
+- Se documenta en `memoria.md` que `main` es la rama de trabajo (recibe los
+  patches de cada sesión) y `master` es la rama de **producción**
+  desplegada en Netlify.
+- Se confirma con el usuario que `master` sigue atrasada respecto a `main`
+  (le faltan el rediseño Odoo y la creación de memoria/changelog) y que la
+  sincronización `git push origin main:master` es un paso manual del
+  usuario, no algo que requiera un patch.
+
+## Sesión anterior — Memoria y changelog
 
 - Se crean `memoria.md` y `changelog.md` para que futuras sesiones retomen
   el trabajo sin contexto adicional.
