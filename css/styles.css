@@ -94,7 +94,7 @@
   .nav-btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
   .nav-btn-solid{background:var(--gold);color:var(--ink);font-weight:500}
   .nav-btn-solid:hover{background:#F7C55A;transform:translateY(-1px)}
-  @media(max-width:520px){.nav-btn-ghost{display:none}.nav{padding:12px 20px}.nav .mark{font-size:15px}.nav .mark img{width:28px;height:28px}}
+  @media(max-width:520px){.nav{padding:12px 20px}.nav .mark{font-size:15px}.nav .mark img{width:28px;height:28px}}
 
   /* ---------- RAIL (signature synaptic thread) ---------- */
   .rail{
