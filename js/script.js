@@ -61,12 +61,23 @@
     else if(imc>=25 && imc<30) cat='sobrepeso';
     else if(imc>=30) cat='rango a vigilar';
 
-    // Guardado real de los datos en el navegador (persisten entre visitas)
+    // Guardado local (persiste entre visitas en este navegador)
     localStorage.setItem('sinaptix_antropometria', JSON.stringify({peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()}));
 
     res.style.display='block';
     res.style.color='';
-    res.textContent = sexo+', '+edad+' años — IMC estimado: '+imc.toFixed(1)+' ('+cat+'). Datos guardados para calibrar tu plan. ✓';
+    res.textContent = sexo+', '+edad+' años — IMC estimado: '+imc.toFixed(1)+' ('+cat+'). Abriendo tu correo para enviar estos datos al equipo… ✓';
+
+    // Envía los datos al equipo de SINAPTIX por correo, igual que los demás formularios
+    const asunto = encodeURIComponent('Datos antropométricos — nuevo registro');
+    const cuerpo = encodeURIComponent(
+      'Peso: '+peso+' kg\n'+
+      'Talla: '+tallaCm+' cm\n'+
+      'Edad: '+edad+'\n'+
+      'Sexo: '+sexo+'\n'+
+      'IMC estimado: '+imc.toFixed(1)+' ('+cat+')'
+    );
+    window.location.href = 'mailto:hola@sinaptix.com?subject='+asunto+'&body='+cuerpo;
   });
 
   // Formulario de contacto: envía un correo real a hola@sinaptix.com
