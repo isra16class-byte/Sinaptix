@@ -147,6 +147,9 @@
       'Objetivo cognitivo principal: '+objetivo
     );
 
+    // Guardado local, igual que los datos antropométricos (usado en "Mi plan")
+    localStorage.setItem('sinaptix_objetivo', JSON.stringify({objetivo, email, fecha: new Date().toISOString()}));
+
     window.location.href = 'mailto:hola@sinaptix.com?subject='+asunto+'&body='+cuerpo;
     const res = document.getElementById('nutriResultado');
     res.style.display='block';
