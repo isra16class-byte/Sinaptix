@@ -113,6 +113,18 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 - El contenido/copy en español **no cambió**, solo el sistema visual.
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
+- **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: se
+  agregaron 4 ilustraciones nuevas en `svg/deco-blob-*.svg` — un blob suave
+  en color de marca (opacity baja) con una fruta/fruto seco flat-illustration
+  encima (arándanos, aguacate, naranja, nuez) — colocadas detrás de los
+  títulos de Hero, Visión (02), Pilares (04) y Beneficios (05) como acento
+  visual relacionado con neuroalimentación. Clase CSS `.deco-fruit` (en
+  `css/styles.css`) les da flotación suave (`animation:float`, reusa el
+  keyframe del hero) con distintos `animation-delay` (`.d2`, `.d3`) para que
+  no floten sincronizadas, y se ocultan en móvil (`max-width:720px`) para no
+  saturar el layout angosto. Siguen el mismo patrón que los `.deco`
+  existentes: hijos directos de la `<section>`, `position:absolute`,
+  `z-index:0`, por lo que quedan detrás del `.wrap` (que tiene `z-index:1`).
 
 **Estructura de archivos** (sin cambios respecto al README): `index.html`
 (todo el markup, secciones `lam-01` a `lam-06`), `css/styles.css`,

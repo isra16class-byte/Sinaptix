@@ -5,6 +5,24 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Blobs con frutas detrás de los títulos (más "vida" tipo odoo.com)
+
+- Se agregan 4 ilustraciones nuevas (`svg/deco-blob-berries.svg`,
+  `svg/deco-blob-avocado.svg`, `svg/deco-blob-orange.svg`,
+  `svg/deco-blob-walnut.svg`): un blob tipo brochazo en color de marca con
+  una fruta/fruto seco flat-illustration encima (arándanos, aguacate,
+  naranja, nuez), buscando un look más vivo y menos corporativo, en línea
+  con el estilo ilustrado de odoo.com.
+- Se colocan detrás del título del Hero (nuez), Visión/02 (arándanos),
+  Pilares/04 (aguacate) y Beneficios/05 (naranja).
+- Nueva clase `.deco-fruit` en `css/styles.css`: flotación suave
+  (reutiliza el keyframe `float` del hero) con `animation-delay`
+  escalonado (`.d2`, `.d3`) y se ocultan en móvil (`max-width:720px`) para
+  no saturar el layout angosto.
+- Archivos tocados: `index.html`, `css/styles.css`,
+  `svg/deco-blob-berries.svg`, `svg/deco-blob-avocado.svg`,
+  `svg/deco-blob-orange.svg`, `svg/deco-blob-walnut.svg`.
+
 ## Sin fecha (sesión en curso) — Aclaración de ramas main/master
 
 - Se documenta en `memoria.md` que `main` es la rama de trabajo (recibe los
