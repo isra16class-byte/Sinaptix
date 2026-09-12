@@ -1,4 +1,41 @@
-// Modales
+// Netlify Identity — login / logout
+  if(window.netlifyIdentity){
+    netlifyIdentity.init();
+
+    const btnLogin = document.getElementById('btnLogin');
+
+    function setLoginButton(user){
+      if(!btnLogin) return;
+      if(user){
+        btnLogin.textContent = user.user_metadata && user.user_metadata.full_name
+          ? user.user_metadata.full_name
+          : 'Mi cuenta';
+      } else {
+        btnLogin.textContent = 'Iniciar sesión';
+      }
+    }
+
+    if(btnLogin){
+      btnLogin.addEventListener('click', function(e){
+        e.preventDefault();
+        const current = netlifyIdentity.currentUser();
+        if(current){
+          netlifyIdentity.open('user'); // ya con sesión: abre panel de cuenta
+        } else {
+          netlifyIdentity.open('login'); // el modal de Identity también permite "Sign up"
+        }
+      });
+    }
+
+    netlifyIdentity.on('init', user => setLoginButton(user));
+    netlifyIdentity.on('login', user => {
+      setLoginButton(user);
+      netlifyIdentity.close();
+    });
+    netlifyIdentity.on('logout', () => setLoginButton(null));
+  }
+
+  // Modales
   function openModal(id){
     document.getElementById(id).classList.add('open');
     document.body.style.overflow='hidden';
