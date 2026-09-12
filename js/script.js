@@ -3,6 +3,8 @@
     netlifyIdentity.init();
 
     const btnLogin = document.getElementById('btnLogin');
+    const miPlan = document.getElementById('miPlan');
+    const btnLogout = document.getElementById('btnLogout');
 
     function setLoginButton(user){
       if(!btnLogin) return;
@@ -13,6 +15,44 @@
       } else {
         btnLogin.textContent = 'Iniciar sesión';
       }
+    }
+
+    function pintarMiPlan(user){
+      if(!miPlan) return;
+
+      document.getElementById('miPlanEmail').textContent = 'Sesión iniciada como '+user.email;
+
+      const antro = localStorage.getItem('sinaptix_antropometria');
+      if(antro){
+        try{
+          const d = JSON.parse(antro);
+          document.getElementById('miPlanImc').textContent = d.imc.toFixed(1);
+          document.getElementById('miPlanImcLab').textContent = 'IMC estimado (última medición registrada)';
+        }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
+      }
+
+      const objetivo = localStorage.getItem('sinaptix_objetivo');
+      if(objetivo){
+        try{
+          const o = JSON.parse(objetivo);
+          document.getElementById('miPlanObjetivo').textContent = o.objetivo;
+        }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
+      }
+    }
+
+    function mostrarMiPlan(user){
+      if(!miPlan) return;
+      pintarMiPlan(user);
+      miPlan.classList.remove('hidden');
+    }
+
+    function ocultarMiPlan(){
+      if(!miPlan) return;
+      miPlan.classList.add('hidden');
+    }
+
+    if(btnLogout){
+      btnLogout.addEventListener('click', ()=>netlifyIdentity.logout());
     }
 
     if(btnLogin){
@@ -27,12 +67,19 @@
       });
     }
 
-    netlifyIdentity.on('init', user => setLoginButton(user));
+    netlifyIdentity.on('init', user => {
+      setLoginButton(user);
+      if(user) mostrarMiPlan(user); else ocultarMiPlan();
+    });
     netlifyIdentity.on('login', user => {
       setLoginButton(user);
+      mostrarMiPlan(user);
       netlifyIdentity.close();
     });
-    netlifyIdentity.on('logout', () => setLoginButton(null));
+    netlifyIdentity.on('logout', () => {
+      setLoginButton(null);
+      ocultarMiPlan();
+    });
   }
 
   // Modales

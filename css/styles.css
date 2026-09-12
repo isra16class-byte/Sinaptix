@@ -79,6 +79,8 @@
   .nav .mark img{width:34px;height:34px;object-fit:contain;display:block}
   .nav-links{list-style:none;display:flex;gap:26px}
   .nav-right{display:flex;align-items:center;gap:22px}
+  .hidden{display:none !important}
+
   @media(max-width:940px){.nav-links{display:none}}
 
   .nav-cta{display:flex;gap:10px;align-items:center}

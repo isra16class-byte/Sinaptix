@@ -256,6 +256,32 @@
   </div>
 </section>
 
+<!-- ============ MI PLAN — visible solo con sesión iniciada ============ -->
+<section class="dark hidden" id="miPlan">
+  <div class="wrap">
+    <span class="eyebrow reveal in">Mi plan</span>
+    <h2 class="lam-title reveal in d1" style="max-width:16ch">Tu progreso con SINAPTIX</h2>
+    <p class="lam-text reveal in d1" id="miPlanEmail" style="color:var(--panel-text)"></p>
+
+    <div class="stat-grid reveal in d2" style="margin-top:30px">
+      <div class="stat-box">
+        <div class="num" id="miPlanImc">—</div>
+        <div class="lab" id="miPlanImcLab">Aún no registras tus datos antropométricos</div>
+      </div>
+      <div class="stat-box">
+        <div class="num" style="font-size:20px" id="miPlanObjetivo">—</div>
+        <div class="lab">Objetivo cognitivo principal</div>
+      </div>
+    </div>
+
+    <p class="lam-text reveal in d3" style="margin-top:26px">Tu plan de neuroalimentación está siendo preparado por el equipo de SINAPTIX. Te escribiremos a tu correo en cuanto esté listo.</p>
+
+    <div class="btn-row reveal in d3" style="margin-top:10px">
+      <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+    </div>
+  </div>
+</section>
+
 <div class="modal-overlay" id="modalNutricion">
   <div class="modal-card">
     <button type="button" class="modal-close" data-close>×</button>
