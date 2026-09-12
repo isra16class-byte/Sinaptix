@@ -220,7 +220,7 @@
 
   .method-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:58px;padding-top:44px;border-top:1px solid var(--panel-line)}
   .signal-wave{margin:6px 0 40px;opacity:.55}
-  .signal-wave svg{width:100%;height:44px;display:block}
+  .signal-wave img{width:100%;height:44px;display:block}
 
   /* ---------- 04 PILARES ---------- */
   .pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:64px}
