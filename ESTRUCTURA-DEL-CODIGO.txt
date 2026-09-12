@@ -1,0 +1,239 @@
+SINAPTIX — ESTRUCTURA Y FLUJO DEL CODIGO
+==========================================
+(Referencia técnica de qué hace cada archivo y cada módulo del sitio)
+
+
+1. VISION GENERAL
+------------------
+Es un sitio de una sola página (single-page), 100% estático (HTML/CSS/JS
+puro, sin framework ni build step). No hay backend propio: los formularios
+mandan correos vía "mailto:" y, desde que se integró Netlify Identity, hay
+login de usuarios con datos que hoy se guardan solo en el localStorage del
+navegador (no en una base de datos — ver limitación al final).
+
+Árbol de archivos:
+
+  index.html                 Todo el markup de la página (una sola)
+  css/styles.css              Todos los estilos
+  js/script.js                 Toda la lógica de interacción
+  img/
+    sinaptix-icon.png          Ícono / favicon / logo chico del nav
+    sinaptix-badge.png         Logo grande (badge) del hero
+  svg/
+    deco-circles-vision.svg     Decoración de fondo, sección 02 (Visión)
+    deco-leaf-beneficios.svg    Decoración de fondo, sección 05 (Beneficios)
+    deco-dots-contacto.svg      Decoración de fondo, sección 06 (Contacto)
+    signal-wave.svg             Ilustración de onda, sección 04 (Pilares)
+  netlify.toml                Config de build/deploy en Netlify
+  README.md                    Documentación general del proyecto
+  ESTRUCTURA-DEL-CODIGO.txt    Este archivo
+
+
+2. INDEX.HTML — SECCIONES DE LA PAGINA
+----------------------------------------
+Cada sección tiene un id "lam-0X" (por "lámina X") y corresponde a un nodo
+del riel de navegación lateral (la línea vertical con puntos, a la izquierda,
+visible solo en desktop >900px).
+
+  <nav>                    Barra superior fija: logo, links de anclas
+                            (#lam-02..#lam-06) y botones de sesión:
+                              - #btnLogin  ("Iniciar sesión" / nombre de
+                                usuario / "Mi cuenta" según haya sesión)
+                              - #btnAcceder ("Acceder", se oculta con
+                                sesión iniciada; sin sesión hace scroll
+                                a la sección de contacto)
+
+  #lam-01 (HERO)            Titular principal, botones "Solicitar
+                            asesoría" / "Ver el método", e ilustración
+                            SVG animada de "sinapsis".
+
+  #lam-02 (MANIFIESTO)      Texto de la visión de la marca + grid de
+                            4 estadísticas (stat-box).
+
+  #lam-03 (METODO)          Timeline de 4 fases del método, y 2 botones
+                            que abren modales:
+                              - #btnNutricion       -> abre #modalNutricion
+                              - #btnAntropometria   -> abre #modalAntropometria
+
+  #lam-04 (PILARES)         4 tarjetas (pillar) con los pilares
+                            nutricionales, más la ilustración
+                            signal-wave.svg.
+
+  #lam-05 (BENEFICIOS)      Lista de a quién está dirigido el servicio
+                            + 2 tarjetas de testimonios (quote-card).
+                            (No tiene botones.)
+
+  #lam-06 (CONTACTO)        Datos de contacto, redes sociales, y el
+                            formulario #formContacto. Incluye el footer
+                            del sitio.
+
+  #miPlan (MI PLAN)         Sección agregada para usuarios con sesión
+                            iniciada (ver punto 4). Oculta por defecto
+                            con la clase ".hidden". Muestra:
+                              - #miPlanEmail      correo del usuario
+                              - #miPlanImc        último IMC guardado
+                              - #miPlanImcLab     etiqueta del IMC (o
+                                                  el placeholder si no
+                                                  hay datos aún)
+                              - #miPlanObjetivo   objetivo cognitivo
+                                                  elegido
+                              - #btnLogout        botón "Cerrar sesión"
+
+  #modalNutricion           Modal con el formulario #formNutricion
+                            (objetivo cognitivo + correo).
+
+  #modalAntropometria        Modal con el formulario #formAntro
+                            (peso, talla, edad, sexo).
+
+
+3. CSS/STYLES.CSS — BLOQUES PRINCIPALES
+-----------------------------------------
+El archivo está organizado en bloques comentados, en este orden:
+
+  :root                    Variables de color/tipografía (--paper, --ink,
+                            --green, --gold, --navy-bright, --panel-*,
+                            fuentes --font-d/--font-b/--font-m).
+
+  Reset básico + .wrap      Reglas generales (*, body, a, ::selection) y
+                            el contenedor centrado .wrap.
+
+  NAV                       Barra superior fija y sus botones
+                            (.nav-btn, .nav-btn-ghost, .nav-btn-solid).
+
+  RAIL                      El riel lateral de navegación con los puntos
+                            (.rail, .rail-dot, .rail-node), oculto en
+                            móvil (<900px).
+
+  HERO                      Estilos de la sección 01, incluida la
+                            animación SVG de sinapsis.
+
+  02 MANIFIESTO             Grid de estadísticas (.stat-grid, .stat-box).
+
+  03 PROCESO                Timeline del método (.timeline, .tl-item).
+
+  04 PILARES                Grid de pilares (.pillar-grid, .pillar).
+
+  05 BENEFICIOS             Lista de a quién va dirigido (.ben-list) y
+                            tarjetas de testimonios (.quote-card).
+
+  06 CONTACTO               Formulario de contacto, lista de redes
+                            (.social-row), botón grande de email
+                            (.big-email) y footer.
+
+  MODALES                   Overlay y tarjeta de los modales
+                            (.modal-overlay, .modal-card, .modal-input),
+                            y el botón de cerrar (.modal-close).
+
+  Botones genéricos (.btn)  Usados en varias secciones:
+                              .btn-solid  fondo dorado, texto oscuro
+                              .btn-ghost  borde blanco, fondo transparente
+                                          (fix reciente: antes no tenía
+                                          background explícito, así que
+                                          en elementos <button> el
+                                          navegador le ponía un fondo
+                                          gris/blanco por defecto,
+                                          dejando el texto blanco
+                                          invisible encima).
+
+  .hidden                   Utilidad genérica (display:none !important)
+                            usada para ocultar #miPlan y #btnAcceder
+                            según el estado de sesión.
+
+
+4. JS/SCRIPT.JS — FLUJO DE EJECUCION
+--------------------------------------
+El script se ejecuta de arriba a abajo apenas carga la página (no hay
+"DOMContentLoaded" explícito; el <script> está al final del <body>, así
+que el DOM ya existe). El flujo, en orden:
+
+  A) NETLIFY IDENTITY (login/logout)
+     - Si el widget de Identity está cargado (window.netlifyIdentity):
+       - netlifyIdentity.init() arranca el widget.
+       - setLoginButton(user): cambia el texto de #btnLogin y muestra u
+         oculta #btnAcceder según si "user" existe.
+       - pintarMiPlan(user): lee "sinaptix_antropometria" y
+         "sinaptix_objetivo" de localStorage y llena los campos de
+         #miPlan (si no hay datos, deja los placeholders del HTML).
+       - mostrarMiPlan(user) / ocultarMiPlan(): agregan o quitan la
+         clase .hidden de #miPlan.
+       - Click en #btnLogout -> netlifyIdentity.logout().
+       - Click en #btnLogin -> si ya hay sesión abre el panel de cuenta
+         ('user'); si no, abre el modal de login ('login'), que también
+         permite registrarse (Sign up) desde el mismo modal.
+       - Eventos escuchados del widget:
+           'init'   -> se dispara al cargar la página; sincroniza el
+                       estado visual con la sesión que ya existiera.
+           'login'  -> actualiza botón, pinta y muestra "Mi plan",
+                       cierra el modal.
+           'logout' -> vuelve todo al estado sin sesión.
+
+  B) MODALES GENERICOS
+     - openModal(id) / closeModal(el): agregan/quitan la clase .open y
+       bloquean/desbloquean el scroll del body.
+     - #btnNutricion abre #modalNutricion; #btnAntropometria abre
+       #modalAntropometria.
+     - Cualquier elemento con [data-close] cierra el modal donde esté.
+     - Click fuera de la tarjeta del modal (en el overlay) lo cierra.
+     - Tecla Escape cierra cualquier modal abierto.
+
+  C) FORMULARIO #formAntro (datos antropométricos)
+     - Valida peso (1-400kg), talla (1-250cm), edad (1-120) y sexo.
+     - Si algo es inválido, muestra el error en #antroResultado y corta
+       la ejecución (return) sin enviar nada.
+     - Si todo es válido: calcula IMC = peso / (talla_m)^2 y una
+       categoría textual (bajo peso / peso saludable / sobrepeso /
+       rango a vigilar).
+     - Guarda el resultado en localStorage bajo la key
+       "sinaptix_antropometria" (usado luego por "Mi plan").
+     - Arma un mailto: con los datos y redirige el navegador a él
+       (esto abre el cliente de correo del usuario).
+
+  D) FORMULARIO #formContacto
+     - Toma nombre, email y mensaje, arma un mailto: y redirige.
+     - Cambia el texto del botón a "Abriendo tu correo…".
+
+  E) FORMULARIO #formNutricion
+     - Toma el objetivo cognitivo elegido y el email.
+     - Guarda {objetivo, email, fecha} en localStorage bajo la key
+       "sinaptix_objetivo" (usado luego por "Mi plan").
+     - Arma un mailto: y redirige.
+
+  F) REVEAL ON SCROLL
+     - Usa IntersectionObserver sobre todos los elementos .reveal que
+       no tengan ya la clase .in.
+     - Cuando un elemento entra en el viewport (15% visible), le agrega
+       la clase .in (dispara la animación de aparición vía CSS) y deja
+       de observarlo.
+
+  G) RAIL PROGRESS (riel lateral)
+     - onScroll(): calcula qué tan avanzado está el scroll de la página
+       (0 a 1) y mueve #railDot verticalmente en esa proporción.
+     - Además determina qué <section> está más cerca del centro de la
+       pantalla y le pone la clase .active al .rail-node
+       correspondiente (resaltando el punto/label activo del riel).
+     - Se llama en cada evento de scroll (con requestAnimationFrame
+       para no sobrecargar) y una vez al cargar la página.
+
+
+5. NETLIFY.TOML
+-----------------
+Configuración de despliegue:
+  - publish = "."        el sitio se sirve desde la raíz del repo
+  - command = ""          no hay build step (sitio ya está "compilado")
+  - NODE_VERSION = "20"   versión de Node usada por Netlify si llegara a
+                          hacer falta en el futuro (por ejemplo, cuando
+                          se agreguen Netlify Functions)
+
+
+6. LOCALSTORAGE — KEYS USADAS HOY
+------------------------------------
+  sinaptix_antropometria   { peso, tallaCm, edad, sexo, imc, fecha }
+  sinaptix_objetivo         { objetivo, email, fecha }
+
+Estas keys viven solo en el navegador donde se llenó el formulario. Si
+el mismo usuario inicia sesión desde otro dispositivo o navegador, "Mi
+plan" no va a mostrar estos datos porque no existen ahí. Esa es la
+limitación que se resuelve en la siguiente fase del proyecto,
+agregando Netlify Database + Netlify Functions para que estos datos se
+guarden asociados a la cuenta del usuario (JWT) en vez de solo al
+navegador local. Ver README.md, sección "Próximos pasos".
