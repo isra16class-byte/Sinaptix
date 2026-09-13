@@ -5,6 +5,73 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Hero: más decoraciones flotantes, glow lila y tipografía del título tipo "marcador"
+
+- **Más elementos decorativos en `#lam-01` (hero)**: se agregan 6 `<img
+  class="deco">` nuevos reutilizando SVGs ya existentes en `svg/` (mismo
+  criterio que el resto del sitio, sin generar assets nuevos):
+  `deco-blob-orange.svg` y `deco-blob-avocado.svg` (más fruta a los
+  costados, densidad extra sobre lo que ya había con `deco-blob-walnut` y
+  `deco-blob-berries`), un `deco-espiga.svg` y un `deco-leaf-beneficios.svg`
+  chicos y muy sutiles (`opacity:.5`/`.55`) cerca de la parte superior
+  central, `deco-blob-kiwi.svg` abajo al centro, y `svg/signal-wave.svg`
+  (la línea tipo electrocardiograma que ya se usaba como separador en
+  `#lam-04`) como "señal de vida" en el centro del hero, entre el bloque de
+  texto y la ilustración del cerebro.
+  - Todos estos `<img class="deco">` están fuera del `.wrap` del hero y
+    por lo tanto quedan **detrás** del contenido (`.deco{z-index:0}` vs.
+    `.wrap{z-index:1}`), así que se ubicaron a propósito en los huecos
+    visuales del layout (el gap entre las dos columnas del grid, debajo
+    del párrafo, encima de los botones, cerca del pie) para que no queden
+    tapados ni choquen con el texto/CTA/cerebro. Verificado con captura
+    real (Playwright, que esta sesión sí pudo instalar — ver nota abajo).
+  - Los del centro usan `left:50%` + `transform:translateX(-50%)`
+    combinado con la rotación, en vez de solo `left/right` como las
+    decoraciones de los costados, porque `.wrap` está centrado en el
+    viewport independientemente del ancho de pantalla, así que `left:50%`
+    cae siempre en el eje central del layout.
+  - Igual que el resto de `.deco-fruit`/`.deco-scribble`, estos elementos
+    nuevos se ocultan solos en `max-width:720px` (reglas ya existentes en
+    `css/styles.css`), no hizo falta agregar código responsive nuevo.
+- **Glow lila diluido a la derecha del hero**: `.hero.dark` tenía un solo
+  `radial-gradient` de fondo (`--panel` → `--paper`, arriba a la derecha).
+  Se le agrega una segunda capa de `radial-gradient` **encima** con
+  `rgba(113,75,103,.16)` (el mismo `--purple` de marca, `#714B67`, pero en
+  rgba para poder diluirlo) que se desvanece a transparente
+  (`rgba(113,75,103,0)`) al 72% — o sea, tinte lila muy sutil concentrado
+  cerca del borde derecho, se pierde antes de llegar al texto de la
+  izquierda. `--purple` es el único morado que ya existía en `:root`
+  (`css/styles.css`), no se agregó ninguna variable de color nueva.
+- **Tipografía del `<h1>` del hero = misma familia que los títulos de
+  `#lam-03`/`#lam-04`**: `.hero h1` pasa de `font-family:var(--font-d)`
+  (Fraunces, heredado de la regla genérica `h1,h2,h3`) a
+  `font-family:var(--font-hand)` (Caveat, cursiva/manuscrita), mismo
+  `font-weight:700` y `letter-spacing:0` que usa la regla
+  `#lam-03 .lam-title, #lam-04 .lam-title`. Como Caveat visualmente "pesa"
+  menos que Fraunces al mismo tamaño en px, se subió el `clamp()` de
+  `clamp(44px,6.4vw,80px)` a `clamp(58px,8.2vw,104px)` y se ajustó
+  `line-height` de `1.02` a `1.08` para que no se vea chico ni apretado
+  comparado con antes. También se quita el `font-style:italic` de
+  `.hero h1 em` (queda `normal`): Caveat solo está cargado en dos pesos
+  (`600;700`, ver `<link>` de Google Fonts en `index.html`) sin variante
+  itálica real, así que el navegador estaba sintetizando una itálica falsa
+  sobre una fuente ya cursiva — con `--font-hand` puesto, la palabra
+  "claridad" se distingue por el color `--purple` nada más, no hace falta
+  inclinarla.
+- **Nota de entorno — Playwright sí funcionó esta sesión**: a diferencia de
+  sesiones anteriores (ver pendientes de verificación visual más abajo en
+  este mismo archivo), esta vez `playwright install`/el Chromium ya
+  presente en el entorno **sí pudo lanzarse**, así que se verificó con
+  capturas de pantalla reales (servidor local `python -m http.server` +
+  `page.screenshot`) que las decoraciones nuevas no chocan con nada. La
+  fuente Google (`fonts.googleapis.com`) sigue bloqueada por la lista
+  blanca de red del entorno de esta sesión — para confirmar el cambio de
+  tipografía se instaló Caveat manualmente como fuente de sistema solo
+  para la captura de prueba (no se tocó ningún archivo del repo para
+  esto). En el sitio real, servido con acceso normal a internet, Google
+  Fonts carga sin problema porque `index.html` ya tenía el `<link>`
+  correspondiente desde antes.
+
 ## 2026-09-13 — Iconos ilustrados en secciones 02 y 04
 
 - Se reemplazan los iconos de dos secciones de `index.html` por un set de

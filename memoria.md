@@ -1117,6 +1117,82 @@ a WebP si el peso se vuelve un problema real de rendimiento).
   de la imagen para que el posicionamiento siga funcionando aunque el
   contenedor cambie de tamaño.
 
+## Decoraciones extra, glow lila y tipografía manuscrita en el Hero (`lam-01`)
+
+Sesión que sumó densidad decorativa al hero, un tinte de color a la
+derecha, y unificó la tipografía del `<h1>` con la de los títulos
+manuscritos de Método/Pilares (ver sección "Títulos manuscritos tipo
+'marcador'..." más arriba en este archivo — es la misma fuente, `--font-
+hand`, aplicada ahora también acá).
+
+- **Decoraciones nuevas**: además de las que ya había (walnut abajo-
+  izquierda, berries arriba-derecha, 6 `deco-espiga`), se agregaron 6
+  `<img class="deco">` más, reutilizando SVGs de `svg/` que ya existían
+  pero no se usaban en el hero: `deco-blob-orange`, `deco-blob-avocado`,
+  `deco-blob-kiwi`, `deco-leaf-beneficios`, un `deco-espiga` extra, y
+  `svg/signal-wave.svg` (la línea tipo electrocardiograma que hasta ahora
+  solo se usaba como separador en `#lam-04`) a modo de "señal de vida" en
+  el centro del hero.
+  - **Por qué se pudo poner cosas "en el centro" sin que choquen con el
+    texto ni con el cerebro**: `.deco` tiene `z-index:0` y `.wrap` (donde
+    vive todo el contenido real) tiene `z-index:1` — todo lo que se agregue
+    como `.deco` queda automáticamente detrás del contenido. Esto significa
+    que una decoración "en el centro" no tapa nada mientras se ubique en un
+    hueco visual real del layout (el gap de 60px entre las dos columnas del
+    `.hero-grid`, el espacio entre el párrafo y los botones, encima del
+    `btn-row`, cerca del `hero-foot`), pero **si se pusiera detrás de texto
+    sólido quedaría invisible** — no vale la pena agregar una decoración
+    ahí porque no se va a ver. Antes de agregar una decoración nueva en el
+    centro del hero, ubicarla mentalmente (o revisando en pantalla) en un
+    hueco, no debajo de una línea de texto.
+  - Las decoraciones centradas usan `left:50%` + `transform:translateX
+    (-50%) rotate(...)` en vez de `left`/`right` en px como las de los
+    costados — funciona porque `.wrap` está `margin:0 auto` (centrado en
+    el viewport sea cual sea el ancho de pantalla), entonces `left:50%`
+    del `<section>` cae siempre sobre el eje central del contenido.
+  - No hizo falta tocar ningún media query: las reglas ya existentes
+    `@media(max-width:720px){.deco-fruit{display:none}}` y
+    `.deco-scribble{display:none}` ocultan también las piezas nuevas en
+    mobile (todas llevan esas mismas clases).
+  - Si se pide "más densidad" todavía en el futuro, quedan sin usar en el
+    hero: `deco-blob-almonds.svg`, `deco-dots-contacto.svg`, y por
+    supuesto se puede repetir cualquiera de las ya usadas con otra
+    posición/rotación (como ya se hace en el resto del sitio).
+- **Glow lila diluido a la derecha**: `.hero.dark` ya tenía un
+  `radial-gradient` de fondo (`--panel`→`--paper`). Se le puso **encima**
+  una segunda capa `radial-gradient(55% 60% at 96% 30%,rgba(113,75,103,.16)
+  0%,rgba(113,75,103,0) 72%)` — `rgba(113,75,103,...)` es el mismo
+  `--purple` de marca (`#714B67`) expresado en rgba para poder diluirlo a
+  `.16` de opacidad y que se apague del todo (`,0)`) antes de llegar al
+  bloque de texto de la izquierda. No se creó ninguna variable de color
+  nueva; si se quiere más o menos intensidad, tocar solo el `.16` (subirlo
+  se nota más morado, bajarlo se pierde).
+- **`<h1>` del hero ahora usa `--font-hand` (Caveat)**, igual que
+  `#lam-03 .lam-title`/`#lam-04 .lam-title`: mismo `font-weight:700` y
+  `letter-spacing:0`. Como Caveat "pesa" visualmente menos que la Fraunces
+  que usaba antes (heredada de la regla genérica `h1,h2,h3`), se subió el
+  `clamp()` de tamaño de `44px–80px` a `58px–104px` y el `line-height` de
+  `1.02` a `1.08` para compensar — si en el futuro se cambia de fuente acá
+  otra vez, revisar si hace falta un ajuste de tamaño parecido, Caveat no
+  es 1:1 con una serif al mismo `font-size`. También se sacó el
+  `font-style:italic` de `.hero h1 em` (queda `normal`): Caveat solo está
+  cargado en pesos `600;700` sin itálica real (ver el `<link>` de Google
+  Fonts en `<head>` de `index.html`), y una itálica sintética sobre una
+  fuente ya cursiva se veía forzada — la palabra "claridad" se distingue
+  con el color `--purple` nada más.
+- **Verificación visual**: a diferencia de sesiones anteriores (ver notas
+  de "pendiente de verificación visual real" en otras secciones de este
+  archivo), en esta sesión Playwright **sí pudo instalar/lanzar Chromium**
+  y se confirmó con capturas reales (servidor local +
+  `page.screenshot`) que ninguna decoración nueva choca con texto, botones
+  ni con la imagen del cerebro. La fuente de Google (`fonts.googleapis.
+  com`) seguía bloqueada por la red restringida de *esta sesión de
+  trabajo*, así que para confirmar el cambio de tipografía se instaló
+  Caveat como fuente de sistema únicamente para tomar la captura de
+  prueba — no se tocó ningún archivo del repo por esto, y en el sitio real
+  (con internet normal) el `<link>` de Google Fonts que ya existía en
+  `index.html` la carga sin problema.
+
 ## Identidad visual de "Mi plan" alineada con el resto del sitio (`mi-plan.html`)
 
 Pedido del usuario: que "Mi plan" (`mi-plan.html`) tenga el mismo estilo
