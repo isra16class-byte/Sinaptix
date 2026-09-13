@@ -107,8 +107,24 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
   stat-box, valor de "Mi plan") usan `Fraunces` en peso 800, normal e
   itálica (`--font-d`), elegida para dar un aire editorial/cálido que
   conecte con lo nutricional sin perder seriedad — incluye el `<em>` de
-  "con *claridad*" en el H1 del Hero, que queda en Fraunces itálica. Sin
-  mayúsculas ni tracking tipo monoespaciado en los eyebrows.
+  "con *claridad*" en el H1 del Hero, que queda en Fraunces itálica
+  (`.hero h1 em{font-style:italic}`; antes de la sesión de los trazos tipo
+  marcador este selector tenía `font-style:normal` heredado de la época de
+  Inter, así que en realidad nunca se veía en itálica — se corrigió).
+  Sin mayúsculas ni tracking tipo monoespaciado en los eyebrows.
+- **Trazos tipo marcador (sesión "acentos tipo Odoo")**: dos SVG nuevos en
+  verde de marca `#2E7D5B` inspirados en los trazos hechos a mano de
+  `odoo.com`: `svg/deco-mark.svg` (trazo suelto ondulado, clase
+  `.deco-mark`, se dispersa como acento de fondo — uno o dos por sección,
+  las 6 secciones principales) y `svg/deco-underline.svg` (subrayado
+  ondulado más grueso, usado vía `background` en el `::after` de la clase
+  `.title-mark`, que envuelve una palabra clave dentro de cada `h1`/`h2`
+  de sección: "claridad" (Hero, en el `<em>`), "alimenta" (Visión),
+  "cuatro fases" (Método), "trabajo" (Pilares), "carga alta" (Beneficios),
+  "asesoría" (Contacto)). `.deco-mark` sigue el mismo patrón que
+  `.deco-fruit`: se oculta en móvil (`max-width:720px`) para no saturar el
+  layout angosto, pero sin la animación de flotación (son trazos estáticos,
+  no ilustraciones "vivas").
 - **Componentes**: botones tipo píldora (`border-radius: 999px`), tarjetas
   redondeadas con sombra suave (`--radius`, `--shadow`, `--shadow-lg`) para
   stats, pilares nutricionales y testimonios, nav fijo blanco con blur y una

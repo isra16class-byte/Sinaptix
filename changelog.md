@@ -5,6 +5,33 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Trazos tipo marcador inspirados en odoo.com (verde de marca)
+
+- El usuario muestra una captura de odoo.com con trazos hechos a mano
+  (rayas sueltas + subrayado ondulado bajo una palabra del título) y pide
+  replicar ese recurso. Se define con el usuario: color **verde**
+  (`#2E7D5B`) y aplicación **en todo el sitio, densidad similar a Odoo**.
+- Se crean 2 SVG nuevos, ambos en `#2E7D5B`:
+  - `svg/deco-mark.svg`: trazo suelto ondulado (acento de fondo).
+  - `svg/deco-underline.svg`: subrayado ondulado más grueso, pensado para
+    ir debajo de una palabra.
+- Se agrega clase `.deco-mark` en `css/styles.css` (mismo patrón que
+  `.deco-fruit`: oculta en móvil bajo `max-width:720px`, pero sin
+  animación de flotación) y se colocan 1–2 `<img class="deco deco-mark">`
+  por sección (Hero, Visión, Método, Pilares, Beneficios, Contacto).
+- Se agrega clase `.title-mark` (`position:relative` + `::after` con
+  `background:url('../svg/deco-underline.svg')`) y se envuelve una
+  palabra clave por título de sección: "claridad" (Hero), "alimenta"
+  (Visión), "cuatro fases" (Método), "trabajo" (Pilares), "carga alta"
+  (Beneficios), "asesoría" (Contacto).
+- **Fix de paso**: se corrige `.hero h1 em`, que tenía `font-style:normal`
+  heredado de antes del cambio a Fraunces — por eso "claridad" nunca se
+  veía en itálica pese a que la memoria ya lo daba por hecho. Ahora es
+  `font-style:italic` de verdad.
+- Archivos tocados: `index.html`, `css/styles.css`, `memoria.md`,
+  `changelog.md`, `svg/deco-mark.svg` (nuevo), `svg/deco-underline.svg`
+  (nuevo).
+
 ## 2026-09-12 — Tipografía de títulos: Fraunces (editorial y cálida)
 
 - Se evalúan 3 combinaciones de tipografía para títulos (manteniendo Inter
