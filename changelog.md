@@ -5,6 +5,27 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Corrección de los trazos tipo marcador (finos, en pareja, anclados)
+
+- El usuario prueba el patch anterior en el navegador y reporta que "no
+  quedó bien": en el Hero un trazo quedaba flotando solo, sin nada cerca
+  (el Hero es `100vh` con el contenido centrado por flex, así que un
+  `%` de posición no cae junto a ningún elemento real como sí pasa en las
+  demás secciones), y en general los trazos se veían gruesos/redondeados
+  tipo "mancha" en vez de finos como en odoo.com.
+- Se rehace `svg/deco-mark.svg` más fino (`stroke-width` de 9 a 5, menos
+  amplitud de onda) y se crea `svg/deco-mark-sm.svg`, una versión corta
+  para usar en pareja (un trazo largo + uno corto, como hace odoo.com).
+- Se reposicionan **todos** los trazos de las 6 secciones en parejas,
+  pegados a un punto de contenido real (eyebrow, título, botones, pie del
+  hero) — se elimina el trazo huérfano del Hero y se reemplaza por un
+  trazo corto anclado a la leyenda del pie del hero.
+- Se adelgaza también `svg/deco-underline.svg` (`stroke-width` de 14 a
+  11) para que combine mejor con los trazos más finos.
+- Archivos tocados: `index.html`, `svg/deco-mark.svg`,
+  `svg/deco-underline.svg`, `svg/deco-mark-sm.svg` (nuevo), `memoria.md`,
+  `changelog.md`.
+
 ## 2026-09-12 — Trazos tipo marcador inspirados en odoo.com (verde de marca)
 
 - El usuario muestra una captura de odoo.com con trazos hechos a mano
