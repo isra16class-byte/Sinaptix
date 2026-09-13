@@ -183,15 +183,19 @@ Ahora:
 **Encabezados centrados en Método y Pilares (lam-03, lam-04)**: el usuario
 pidió que los títulos de esas dos secciones (antes alineados a la
 izquierda, como el resto) quedaran centrados. Se envolvió el bloque
-`eyebrow + h2` (y también el `<p class="lam-text">` en el caso de
-Pilares) en un `<div class="sec-head-center">` nuevo, con la clase
+`eyebrow + h2` en un `<div class="sec-head-center">` nuevo, con la clase
 `.sec-head-center{text-align:center}` en `css/styles.css` (más
-`margin-left/right:auto` en `.lam-title`/`.lam-text` dentro de ese
-contenedor, porque son bloques con `max-width` propio y necesitan margen
-automático para centrarse). El timeline de Método y el `pillar-grid` /
-`signal-wave` de Pilares quedan **fuera** de ese contenedor y siguen su
-layout de grilla normal, sin cambios. El resto de secciones (02, 05, 06)
-no se tocó y sigue con sus títulos alineados a la izquierda.
+`margin-left/right:auto` en `.lam-title` dentro de ese contenedor, porque
+es un bloque con `max-width` propio y necesita margen automático para
+centrarse). El timeline de Método y el `pillar-grid` / `signal-wave` de
+Pilares quedan **fuera** de ese contenedor y siguen su layout de grilla
+normal, sin cambios. El resto de secciones (02, 05, 06) no se tocó y
+sigue con sus títulos alineados a la izquierda.
+
+**Nota (sesión posterior, ver `changelog.md` "Párrafo de Pilares movido
+debajo de la ola")**: el `<p class="lam-text">` de Pilares ya **no** vive
+dentro de `sec-head-center` — se movió después del `.signal-wave`, ver
+más abajo.
 
 **Rayón pegado al título en Método y Pilares**: además del centrado, el
 usuario pidió (mostrando de nuevo su referencia visual) que el
@@ -461,17 +465,37 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   alta por el timeline/pilar-grid de cada sección) — son hijos de un
   contenedor nuevo, `.lam-title-frame` (`position:relative`, en
   `css/styles.css`), que envuelve únicamente el `.sec-head-center`
-  (eyebrow + h2 + `.title-scribble` + `.lam-text` si existe). Esto es
-  a propósito: así los valores `top`/`bottom` quedan relativos a la
-  altura del bloque de título, no a la de toda la sección, y los
-  rayones quedan pegados al título en vez de aparecer sueltos cerca
-  del CTA final (que es lo que pasaba antes de este ajuste, con los
-  mismos 7 rayones como hijos directos de `<section>`). Sigue
-  ocultándose en móvil (`max-width:720px`) por la regla ya existente
-  de `.deco-scribble`. Si se quiere aplicar este mismo tratamiento a
-  otra sección en el futuro, reusar `.lam-title-frame` + este mismo
-  set de 7 posiciones (ver `index.html`, secciones `lam-03`/`lam-04`)
-  en vez de inventar uno nuevo, para mantener el "marco" consistente.
+  (eyebrow + h2 + `.title-scribble` — **ya no incluye el `<p
+  class="lam-text">` de Pilares**, ver nota del párrafo movido más
+  abajo). Esto es a propósito: así los valores `top`/`bottom` quedan
+  relativos a la altura del bloque de título, no a la de toda la
+  sección, y los rayones quedan pegados al título en vez de aparecer
+  sueltos cerca del CTA final (que es lo que pasaba antes de este
+  ajuste, con los mismos 7 rayones como hijos directos de
+  `<section>`). Sigue ocultándose en móvil (`max-width:720px`) por la
+  regla ya existente de `.deco-scribble`. Si se quiere aplicar este
+  mismo tratamiento a otra sección en el futuro, reusar
+  `.lam-title-frame` + este mismo set de 7 posiciones (ver
+  `index.html`, secciones `lam-03`/`lam-04`) en vez de inventar uno
+  nuevo, para mantener el "marco" consistente.
+- **Párrafo de Pilares movido debajo de la ola** (sesión posterior, ver
+  `changelog.md` "Párrafo de Pilares movido debajo de la ola"): el
+  usuario vio en una captura real que el `<p class="lam-text">` de
+  Pilares (dentro de `sec-head-center` en ese momento) quedaba
+  apretado contra el `.signal-wave` y con uno de los rayones del
+  `.lam-title-frame` cruzándole el texto encima. Se sacó ese `<p>` de
+  `sec-head-center`/`lam-title-frame` y se movió como hermano
+  independiente, **después** de `.signal-wave` y **antes** de
+  `.pillar-grid`, con una clase nueva `.lam-text-center` (en
+  `css/styles.css`: `text-align:center;margin:-16px auto 44px`, se
+  suma a `.lam-text` base que ya da `max-width:52ch`) para mantenerlo
+  centrado igual que antes, ahora que ya no está dentro de
+  `.sec-head-center`. Efecto secundario esperado y correcto: al salir
+  el `<p>` de `.lam-title-frame`, ese contenedor quedó más bajo (ya
+  no incluye la altura del párrafo), así que los rayones de abajo
+  terminan pegados justo bajo el subrayado del título — más cerca
+  todavía, igual que en `lam-03` que nunca tuvo `<p>` ahí. `lam-03`
+  no tiene este párrafo, así que no se tocó.
 - **Nota de verificación**: `fonts.googleapis.com` no es accesible desde
   el entorno de trabajo (sandbox con lista blanca de dominios), así que
   la fuente no se veía en las capturas de Playwright tomadas ahí

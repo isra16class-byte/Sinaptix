@@ -5,6 +5,30 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Párrafo de Pilares movido debajo de la ola
+
+- El usuario probó el patch anterior en local (Live Server) y mandó una
+  captura de `lam-04` (Pilares): el párrafo debajo del título quedaba
+  apretado justo encima del `.signal-wave` (la línea celeste ondulada),
+  con uno de los rayones del `.lam-title-frame` cruzándole el texto por
+  encima, y preguntó si convenía bajar el párrafo debajo de esa línea.
+- Se sacó el `<p class="lam-text">` de Pilares de dentro de
+  `.sec-head-center`/`.lam-title-frame` y se movió como bloque
+  independiente entre `.signal-wave` y `.pillar-grid`. Se agregó la
+  clase `.lam-text-center` en `css/styles.css`
+  (`text-align:center;margin:-16px auto 44px`) para que siga centrado
+  igual que antes.
+- Efecto colateral esperado: al salir el párrafo de `.lam-title-frame`,
+  ese contenedor bajó de altura y los rayones inferiores quedaron más
+  pegados al subrayado del título (ya no tienen que "saltar" la altura
+  del párrafo) — coincide ahora con cómo se ven en `lam-03`, que nunca
+  tuvo párrafo ahí.
+- `lam-03` (Método) no tiene este párrafo, así que no se tocó.
+- Verificado con Playwright (inyectando `Caveat` temporalmente, igual
+  que en las sesiones anteriores) en 1600px: la ola queda libre de
+  texto y rayones, el párrafo se lee centrado y con espacio antes de
+  las tarjetas de pilares.
+
 ## 2026-09-13 — Rayones reagrupados junto al título (Método y Pilares)
 
 - El usuario mandó una captura del resultado de la sesión anterior y
