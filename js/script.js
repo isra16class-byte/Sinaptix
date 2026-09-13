@@ -243,15 +243,11 @@
   // (no existía una segunda medición real hasta la sesión que agregó esto,
   // y el gráfico se rediseñó de radar a anillos tipo gauge en la sesión
   // siguiente, a pedido del usuario).
-  function gaugeFechaCorta(iso){
-    try{
-      return new Date(iso).toLocaleDateString('es-AR', {day:'2-digit', month:'short'});
-    }catch(err){ return ''; }
-  }
-
-  // gaugeComputeAreas, gaugeColorForPercent y sus helpers de color viven
-  // ahora en js/nutricion-planes.js (compartidos con el gráfico de barras
-  // de mi-plan.html) — ese script se carga antes que este.
+  // gaugeComputeAreas, gaugeColorForPercent (y sus helpers de color),
+  // gaugeFechaCorta y gaugeDeltaHtml viven ahora en js/nutricion-planes.js
+  // (compartidos con el gráfico de barras de mi-plan.html, que desde esta
+  // sesión también muestra la comparación antes/después) — ese script se
+  // carga antes que este.
 
   function gaugeArc(cx, cy, r, strokeWidth, pct, color){
     const circumference = 2*Math.PI*r;
@@ -267,16 +263,6 @@
   // concéntrico pegado al primero, que en el tamaño real de la tarjeta
   // quedaba demasiado apretado contra el anillo externo y se leía como un
   // glitch en vez de una comparación clara (ver memoria.md).
-  function gaugeDeltaHtml(antesPct, despuesPct){
-    if(despuesPct == null) return '';
-    const delta = despuesPct - antesPct;
-    let deltaText, deltaColor;
-    if(delta > 0){ deltaText = '+'+delta+' pts'; deltaColor = 'var(--green)'; }
-    else if(delta < 0){ deltaText = delta+' pts'; deltaColor = '#B3261E'; }
-    else { deltaText = 'sin cambios'; deltaColor = 'var(--ink-faint)'; }
-    return '<p class="gauge-delta">Antes: '+antesPct+'% <span style="color:'+deltaColor+'">('+deltaText+')</span></p>';
-  }
-
   function gaugeBuildItem(label, antesPct, despuesPct){
     const cx=60, cy=60;
     const current = (despuesPct==null) ? antesPct : despuesPct;

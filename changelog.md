@@ -5,6 +5,43 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Gráfico de barras de "Mi plan" ahora compara antes/después con la reevaluación de "Método"
+
+- Punto 2 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2): el gráfico
+  "Tu estado actual" (Foco/Memoria/Energía/Calma) de `mi-plan.html` era una
+  sola foto fija de la encuesta inicial. Ahora, si existe una reevaluación
+  guardada (`sinaptix_reevaluacion`, ya se generaba desde el modal de
+  "Método" en `index.html` pero no se usaba acá), cada barra muestra el
+  valor más reciente y debajo un texto "Antes: X% (+/- N pts)" — mismo
+  criterio visual que ya usan los anillos de "Método". Sin reevaluación
+  guardada, el gráfico se ve exactamente igual que antes.
+- `nutriBuildBarChartHTML` (en `js/nutricion-planes.js`) cambió de firma:
+  `nutriBuildBarChartHTML(encuesta)` → `nutriBuildBarChartHTML(objetivo,
+  reeval)` (recibe el objeto `sinaptix_objetivo` completo, no solo
+  `.encuesta`, porque ahora necesita `.fecha` para la leyenda). `js/mi-
+  plan.js` (`pintarMiPlan`) actualizado para leer `sinaptix_reevaluacion` de
+  `localStorage` y pasarlo.
+- `gaugeFechaCorta` y `gaugeDeltaHtml` se movieron de `js/script.js` a
+  `js/nutricion-planes.js` (compartidas), ya que ahora las usan tanto los
+  anillos de "Método" como el gráfico de barras de "Mi plan", con el mismo
+  criterio de color/formato de fecha.
+- CSS: nuevo wrapper `.bar-item` por fila (antes el margen entre filas
+  vivía en `.bar-row`, ahora en `.bar-item` para poder meter el delta
+  debajo sin romper el espaciado), `.bar-item .gauge-delta` (indentado
+  para alinear bajo el track) y `.bar-chart-dates` (reusa `.gauge-dates`).
+- Paso 6 del wizard ("Cómo te sentís día a día", `index.html` y `mi-
+  plan.html`): se agregó una frase al `.nutri-hint` explicando que esas 4
+  preguntas alimentan este gráfico y se podrán comparar más adelante —
+  responde a por qué se siguen preguntando aunque ya se eligió un
+  objetivo (sección 4.2 del mismo documento).
+- Verificado con un script de Node que carga `js/nutricion-planes.js` en un
+  contexto `vm` y llama `nutriBuildBarChartHTML` con datos de prueba, con y
+  sin reevaluación (deltas y colores correctos en ambos casos) — no se
+  pudo hacer una verificación visual con Playwright en esta sesión porque
+  la descarga del navegador (`deb.nodesource.com`) no está en la lista de
+  dominios permitidos del entorno; queda pendiente una revisión visual
+  rápida cuando el usuario aplique el patch.
+
 ## 2026-09-13 — Asterisco rojo en campos obligatorios de la encuesta de nutrición (se saca la palabra "opcional")
 
 - El usuario pidió reemplazar la palabra "(opcional)" (que aparecía en el

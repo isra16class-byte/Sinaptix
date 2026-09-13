@@ -173,12 +173,41 @@ function gaugeColorForPercent(pct){
   return gaugeRgbToHex({r:gaugeLerp(mid.r,high.r,t), g:gaugeLerp(mid.g,high.g,t), b:gaugeLerp(mid.b,high.b,t)});
 }
 
+// gaugeFechaCorta y gaugeDeltaHtml viven acá (compartidos entre los
+// anillos de "Método", en script.js, y el gráfico de barras de "Mi plan",
+// más abajo) porque ambos necesitan formatear fechas y pintar la misma
+// leyenda de diferencia "antes → después" con el mismo criterio de color.
+function gaugeFechaCorta(iso){
+  try{
+    return new Date(iso).toLocaleDateString('es-AR', {day:'2-digit', month:'short'});
+  }catch(err){ return ''; }
+}
+
+function gaugeDeltaHtml(antesPct, despuesPct){
+  if(despuesPct == null) return '';
+  const delta = despuesPct - antesPct;
+  let deltaText, deltaColor;
+  if(delta > 0){ deltaText = '+'+delta+' pts'; deltaColor = 'var(--green)'; }
+  else if(delta < 0){ deltaText = delta+' pts'; deltaColor = '#B3261E'; }
+  else { deltaText = 'sin cambios'; deltaColor = 'var(--ink-faint)'; }
+  return '<p class="gauge-delta">Antes: '+antesPct+'% <span style="color:'+deltaColor+'">('+deltaText+')</span></p>';
+}
+
 // Arma el gráfico de barras de "Mi plan" (foco/memoria/energía/calma) a
-// partir de la encuesta guardada — un solo punto en el tiempo (el estado
-// actual), sin comparación con una reevaluación posterior (eso solo existe
-// hoy en los anillos de "Método", en index.html).
-function nutriBuildBarChartHTML(encuesta){
-  const areas = gaugeComputeAreas(encuesta);
+// partir del objetivo guardado (`sinaptix_objetivo`, con la encuesta
+// inicial adentro) y, si existe, la reevaluación posterior
+// (`sinaptix_reevaluacion`, las mismas 4 preguntas respondidas de nuevo
+// más adelante desde la sección "Método" de index.html). Sin reevaluación
+// se comporta igual que antes (una sola foto del estado actual); con
+// reevaluación, cada barra muestra el valor más reciente y debajo la
+// comparación "antes: X% (+/- N pts)" — mismo criterio visual que ya usan
+// los anillos de progreso de "Método" (`gaugeDeltaHtml`), para que la
+// experiencia sea consistente entre ambas pantallas.
+function nutriBuildBarChartHTML(objetivo, reeval){
+  const encuesta = objetivo && objetivo.encuesta;
+  if(!encuesta) return '';
+  const antes = gaugeComputeAreas(encuesta);
+  const despues = reeval ? gaugeComputeAreas(reeval) : null;
   const items = [
     {key:'foco', label:'Foco'},
     {key:'memoria', label:'Memoria'},
@@ -188,13 +217,22 @@ function nutriBuildBarChartHTML(encuesta){
   let html = '<h4 class="bar-chart-title">Tu estado actual</h4>'+
     '<p class="bar-chart-text">Según lo que respondiste en la encuesta — foco, memoria, energía y calma, de 0 a 100.</p>';
   items.forEach(function(item){
-    const pct = Math.round((areas[item.key]/5)*100);
+    const antesPct = Math.round((antes[item.key]/5)*100);
+    const despuesPct = despues ? Math.round((despues[item.key]/5)*100) : null;
+    const pct = despuesPct==null ? antesPct : despuesPct;
     const color = gaugeColorForPercent(pct);
-    html += '<div class="bar-row">'+
-      '<span class="bar-label">'+item.label+'</span>'+
-      '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
-      '<span class="bar-pct">'+pct+'%</span>'+
-      '</div>';
+    html += '<div class="bar-item">'+
+      '<div class="bar-row">'+
+        '<span class="bar-label">'+item.label+'</span>'+
+        '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+        '<span class="bar-pct">'+pct+'%</span>'+
+      '</div>'+
+      gaugeDeltaHtml(antesPct, despuesPct)+
+    '</div>';
   });
+  if(despues){
+    html += '<p class="gauge-dates bar-chart-dates">Diagnóstico inicial · '+gaugeFechaCorta(objetivo.fecha)+
+      ' &nbsp;→&nbsp; Última actualización · '+gaugeFechaCorta(reeval.fecha)+'</p>';
+  }
   return html;
 }

@@ -178,10 +178,8 @@ separada, `mi-plan.html`, con su propia URL. Si se retoma trabajo sobre
 - **Gráfico de barras en "Mi plan"** (`#miPlanBarras`, en `mi-plan.html`):
   a pedido del usuario, se agregó un gráfico de barras horizontales con el
   "estado actual" (Foco, Memoria, Energía, Calma), calculado a partir de la
-  encuesta guardada. **No** es una comparación antes/después (eso solo
-  existe en los anillos de "Método", en `index.html`) — es un solo punto
-  en el tiempo. Reutiliza exactamente el mismo cálculo y la misma escala
-  de color que ya usaban los anillos de "Método", para que ambos
+  encuesta guardada. Reutiliza exactamente el mismo cálculo y la misma
+  escala de color que ya usaban los anillos de "Método", para que ambos
   coincidan si se miran los dos.
   - `gaugeComputeAreas`, `gaugeColorForPercent` y sus helpers de color
     (`gaugeHexToRgb`, `gaugeLerp`, `gaugeRgbToHex`, `GAUGE_LOW/MID/HIGH`)
@@ -189,20 +187,52 @@ separada, `mi-plan.html`, con su propia URL. Si se retoma trabajo sobre
     — son funciones puras de cálculo, sin DOM, así que no hubo que
     duplicar nada. `js/script.js` conserva solo lo que sí es específico de
     los anillos SVG de índice (`gaugeArc`, `gaugeBuildItem`,
-    `gaugeDeltaHtml`, `gaugeFechaCorta`, `renderMethodGauges`).
-  - Nueva función `nutriBuildBarChartHTML(encuesta)` en
-    `js/nutricion-planes.js`: arma el HTML de las 4 barras a partir de
-    `gaugeComputeAreas`. Se llama desde `pintarMiPlan(user)` en
-    `js/mi-plan.js`, igual que `nutriBuildResumenHTML`.
-  - Estilos nuevos en `css/styles.css`: `.bar-chart-card`,
-    `.bar-chart-title`, `.bar-chart-text`, `.bar-row`, `.bar-label`,
-    `.bar-track`, `.bar-fill`, `.bar-pct` — reutilizan las variables de
-    color/tipografía existentes (`--paper-2`, `--line`, `--panel-line`,
-    `--font-d`, `--font-m`), no hay ninguna librería de gráficos nueva
-    (Chart.js, etc.): son `<div>` con `width` en porcentaje, simple CSS.
-  - Se muestra/oculta igual que el resto de "Mi plan": si todavía no hay
+    `renderMethodGauges`).
+  - **Comparación "antes → después" (sesión que conectó `sinaptix_reevaluacion`
+    con este gráfico)**: al igual que los anillos de "Método", el gráfico de
+    barras ya **no** es un solo punto en el tiempo. `gaugeFechaCorta` y
+    `gaugeDeltaHtml` (antes solo en `js/script.js`, específicas de los
+    anillos) también se movieron a `js/nutricion-planes.js` porque ahora
+    las usan ambas pantallas con el mismo criterio visual (texto "Antes:
+    X% (+N pts)" en verde/rojo/gris según la diferencia).
+  - `nutriBuildBarChartHTML(objetivo, reeval)` en `js/nutricion-planes.js`
+    **cambió de firma**: antes recibía solo la encuesta
+    (`nutriBuildBarChartHTML(encuesta)`), ahora recibe el objeto completo
+    `sinaptix_objetivo` (`objetivo`, necesita `objetivo.fecha` para la
+    leyenda) y, opcional, el objeto `sinaptix_reevaluacion` completo
+    (`reeval`, o `null`/`undefined` si no existe). Si `reeval` es
+    `null`/`undefined`, se comporta exactamente igual que antes (una sola
+    foto). Si existe, cada barra muestra el valor de la reevaluación como
+    "actual" y debajo un `<p class="gauge-delta">` con el valor previo y
+    la diferencia; al final se agrega una leyenda de fechas
+    (`.gauge-dates.bar-chart-dates`, reutiliza la clase `.gauge-dates` de
+    los anillos). Se llama desde `pintarMiPlan(user)` en `js/mi-plan.js`,
+    que ahora lee `localStorage.getItem('sinaptix_reevaluacion')` (mismo
+    patrón try/catch que `renderMethodGauges` en `script.js` para datos
+    corruptos) y se lo pasa como segundo argumento.
+  - Estilos nuevos/ajustados en `css/styles.css`: `.bar-chart-card`,
+    `.bar-chart-title`, `.bar-chart-text`, `.bar-item` (wrapper nuevo por
+    fila, para poder meter el `.gauge-delta` debajo de cada `.bar-row` sin
+    romper el `margin-bottom` entre filas), `.bar-row`, `.bar-label`,
+    `.bar-track`, `.bar-fill`, `.bar-pct`, y `.bar-item .gauge-delta`
+    (indenta el delta para que quede alineado bajo el track, no bajo el
+    label) — reutilizan las variables de color/tipografía existentes
+    (`--paper-2`, `--line`, `--panel-line`, `--font-d`, `--font-m`), no
+    hay ninguna librería de gráficos nueva (Chart.js, etc.): son `<div>`
+    con `width` en porcentaje, simple CSS.
+  - Se muestra/oculta igual que antes: si todavía no hay
     `sinaptix_objetivo` guardado, `#miPlanBarras` queda oculto (no hay
-    datos que graficar todavía).
+    datos que graficar todavía). La reevaluación sigue siendo opcional —
+    solo se genera desde el modal `#modalReevaluacion` en la sección
+    "Método" de `index.html` (no hay, todavía, una forma de reevaluar
+    directamente desde `mi-plan.html`).
+  - **Paso 6 del wizard** (`.nutri-hint` de "Cómo te sentís día a día", en
+    `index.html` y `mi-plan.html`): se le agregó una segunda oración
+    explicando que esas 4 preguntas alimentan este gráfico y se van a
+    poder comparar más adelante — para que quede claro por qué se siguen
+    preguntando aunque ya se haya elegido un objetivo (justificación en
+    `plan-mejoras-mi-plan-y-encuesta.md`, sección 4.2, que el usuario
+    subió como documento de planeación previo a esta sesión).
   (`#formNutricion`) está duplicado entre `index.html` (dentro del modal) y
   `mi-plan.html` (inline) — es contenido estático, no hay motor de
   templates en este sitio (sin build step), así que si se agrega/cambia un

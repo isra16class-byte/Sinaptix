@@ -43,7 +43,16 @@ if(window.netlifyIdentity){
         const objetivoEl = document.getElementById('miPlanObjetivo');
         if(objetivoEl) objetivoEl.textContent = o.objetivo;
         if(o.encuesta && miPlanBarrasEl && typeof nutriBuildBarChartHTML === 'function'){
-          miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o.encuesta);
+          // Si ya se reevaluó desde "Método" (index.html), el gráfico
+          // muestra el estado más reciente y la comparación contra la
+          // encuesta inicial — mismo dato (`sinaptix_reevaluacion`) que
+          // usan los anillos de progreso, ver js/nutricion-planes.js.
+          let reeval = null;
+          try{
+            const r = localStorage.getItem('sinaptix_reevaluacion');
+            if(r) reeval = JSON.parse(r);
+          }catch(err){ /* dato corrupto: se ignora, se muestra sin comparación */ }
+          miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o, reeval);
           miPlanBarrasEl.classList.remove('hidden');
         }
         if(miPlanDetalleEl && o.encuesta && typeof nutriBuildResumenHTML === 'function'){
