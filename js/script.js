@@ -1,3 +1,26 @@
+// Ancho real del viewport (fix sangrado de rayones al borde de pantalla)
+  //
+  // Los rayones decorativos que "sangran" al borde real de la pantalla usan
+  // un truco calc(50% - 50vw). El problema: en navegadores con scrollbar
+  // clásica (no overlay, ej. Windows/Chrome), la unidad `vw` se calcula
+  // sobre el ancho TOTAL del viewport (incluye el hueco del scrollbar),
+  // mientras que `.wrap{margin:0 auto}` centra usando el ancho VISIBLE del
+  // documento (sin el scrollbar). Esa diferencia (~15-17px) hace que el
+  // rayón derecho se quede corto y no llegue al borde real.
+  //
+  // Fix: en vez de `50vw`, usamos una variable CSS `--vw100` actualizada
+  // por JS con `document.documentElement.clientWidth` (el ancho visible
+  // real, el mismo que usa `.wrap` para centrarse), así el cálculo siempre
+  // coincide sin importar si hay scrollbar o no.
+  function setViewportWidthVar(){
+    document.documentElement.style.setProperty(
+      '--vw100',
+      document.documentElement.clientWidth + 'px'
+    );
+  }
+  setViewportWidthVar();
+  window.addEventListener('resize', setViewportWidthVar);
+
 // Netlify Identity — login / logout
   if(window.netlifyIdentity){
     netlifyIdentity.init();

@@ -5,6 +5,44 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Fix robusto de sangrado + segundo rayón superior que faltaba
+
+- El usuario volvió a comparar contra una captura de referencia distinta
+  (título "Optimizado para mejorar la productividad") y señaló dos
+  problemas en `lam-03`/`lam-04`:
+  1. Faltaba un rayón: en la referencia, el cluster superior derecho
+     tiene **dos** rayones que sangran al borde real (uno grande arriba,
+     uno chico debajo), pero en el sitio solo el grande sangraba — el
+     chico (`right:-4px;top:-10px;width:110px`) se quedaba cerca del
+     borde del `.lam-title-frame`, lejos del borde real de la pantalla.
+  2. El truco `calc(50% - 50vw)` que ya se usaba para sangrar al borde no
+     llegaba al borde real en un navegador con scrollbar clásica (no
+     overlay, ej. Windows/Chrome): la unidad `vw` se calcula sobre el
+     ancho **total** del viewport (incluye el hueco del scrollbar),
+     mientras que `.wrap{margin:0 auto}` centra usando el ancho
+     **visible** del documento (`clientWidth`, sin el scrollbar). Esa
+     diferencia (~15-17px) hacía que sobre todo el lado derecho se
+     quedara corto.
+- **Fix del sangrado** (robusto, independiente del navegador): se agregó
+  en `js/script.js` una función `setViewportWidthVar()` que fija una
+  variable CSS `--vw100` con `document.documentElement.clientWidth` (el
+  mismo ancho que usa `.wrap` para centrarse), actualizada al cargar y en
+  cada `resize`. En `index.html`, los 6 rayones que sangraban con
+  `calc(50% - 50vw)` ahora usan
+  `calc(50% - (var(--vw100, 100vw) / 2))` — con `100vw` como fallback
+  antes de que corra el JS. Al usar la misma base (`clientWidth`) que el
+  centrado de `.wrap`, el cálculo coincide siempre, con o sin scrollbar
+  visible.
+- **Rayón superior chico que faltaba**: se reemplazó
+  `right:-4px;top:-10px;width:110px;transform:rotate(5deg)` por
+  `right:calc(50% - (var(--vw100, 100vw) / 2));top:-6px;width:100px;
+  transform:rotate(6deg)` en `lam-03` y `lam-04` — ahora es un segundo
+  rayón que sangra al borde real, debajo del rayón grande existente,
+  igual que en la referencia.
+- Verificado con Playwright en 1920px: los 3 rayones del cluster superior
+  derecho y el rayón inferior izquierdo llegan exactamente al borde real
+  del viewport (`x=0` / `x=ancho de pantalla`).
+
 ## 2026-09-13 — Rayones del lado derecho también sangran al borde real + aguacate reubicado
 
 - El usuario volvió a comparar contra la captura de referencia y avisó

@@ -559,6 +559,38 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   Verificado con Playwright en 1917px, 1600px y 1280px de ancho en
   `lam-04`, y en 1600px en `lam-03` (que no tiene fruta arriba, así que
   no necesitó ajuste de posición).
+- **Sangrado al borde real: fix robusto con variable CSS + JS** (sesión
+  posterior, ver `changelog.md` "Fix robusto de sangrado + segundo rayón
+  superior que faltaba"): el truco `calc(50% - 50vw)` usado para que los
+  rayones "sangraran" hasta el borde real de la pantalla **no era
+  confiable en navegadores con scrollbar clásica** (no overlay, ej.
+  Windows/Chrome): `vw` se calcula sobre el ancho total del viewport
+  (incluye el hueco del scrollbar), pero `.wrap{margin:0 auto}` centra
+  usando `clientWidth` (ancho visible, sin scrollbar) — esa diferencia
+  (~15-17px) hacía que el sangrado, sobre todo del lado derecho, se
+  quedara corto del borde real. **Ya no se usa `50vw` directo.** En
+  `js/script.js`, `setViewportWidthVar()` fija una variable CSS
+  `--vw100` con `document.documentElement.clientWidth` (la misma base
+  que usa `.wrap` para centrarse), actualizada al cargar y en cada
+  `resize`. Los 6 rayones que sangran en `.lam-title-frame` (`lam-03` y
+  `lam-04`) usan ahora `calc(50% - (var(--vw100, 100vw) / 2))` en vez de
+  `calc(50% - 50vw)` — `100vw` queda solo como fallback antes de que
+  corra el JS. **Si se agrega un nuevo elemento que deba sangrar al
+  borde real en el futuro, usar este mismo patrón (`var(--vw100, 100vw)`
+  en vez de `50vw` a secas), no volver al truco viejo.**
+- **Segundo rayón del cluster superior derecho (el que faltaba)** (misma
+  sesión): comparando contra una captura de referencia externa, el
+  cluster superior derecho de `.lam-title-frame` debía tener **dos**
+  rayones sangrando al borde real (uno grande arriba, uno chico justo
+  debajo), pero el sitio solo tenía el grande — el rayón chico
+  (`right:-4px;top:-10px;width:110px`) se quedaba pegado al borde del
+  `.lam-title-frame`, lejos del borde real de la pantalla. Se reemplazó
+  por `right:calc(50% - (var(--vw100, 100vw) / 2));top:-6px;width:100px;
+  transform:rotate(6deg)` en `lam-03` y `lam-04`, así el cluster superior
+  derecho queda con 3 rayones en total (uno "flotante" cerca del texto +
+  dos que sangran al borde real, uno arriba del otro), igual que el
+  cluster inferior. El resto del set de 7 rayones de `.lam-title-frame`
+  no se tocó (el usuario ya los había validado como correctos).
 - **Título de Pilares en una sola línea en desktop** (misma sesión,
   captura de `lam-04`): el usuario notó que el título "Cuatro frentes de
   trabajo" se partía en dos líneas ("Cuatro frentes" / "de trabajo")
