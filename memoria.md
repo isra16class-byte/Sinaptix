@@ -472,6 +472,24 @@ más un botón final `#nutriSubmit` en el paso 8.
     hace click en "Actualizar", `nutriCollectData()` sigue leyendo el
     mismo peso/talla que ya tenía guardado — no hace falta ninguna rama
     especial en el submit del formulario.
+  - **Sentido inverso (sesión "Auto-guardar antropometría desde la
+    encuesta de nutrición"): si NO hay `sinaptix_antropometria` guardada
+    pero sí se completa peso/talla en este paso 2**, al enviar la
+    encuesta (paso 8) esos datos se guardan automáticamente como
+    `sinaptix_antropometria` — así no hace falta ir aparte a "Registrar
+    datos antropométricos" para que el medidor de IMC de "Mi plan"
+    aparezca. Función compartida `nutriGuardarAntropometriaSiFalta(d)` en
+    `js/nutricion-planes.js` (recibe el objeto de `nutriCollectData()`,
+    valida los mismos rangos que `#formAntro` en `js/script.js`, y solo
+    guarda si no había un registro previo — nunca pisa uno ya existente).
+    Se llama justo antes de `localStorage.setItem('sinaptix_objetivo', ...)`
+    en los dos handlers de `submit` del wizard (`js/script.js` para
+    `index.html`, `js/mi-plan.js` para la encuesta inline de "Mi plan").
+    Si peso/talla quedaron vacíos (son opcionales) o fuera de rango, no
+    guarda nada. Esto es independiente del punto anterior (prellenar
+    desde antropometría ya existente): uno cubre "ya tengo mis datos, no
+    me los vuelvas a pedir", este cubre "recién los puse acá, no me hagas
+    repetirlos en el otro formulario".
   - El click en `#btnNutriAntroEditar` solo alterna las clases `hidden`
     (mismo patrón `classList.toggle`/`add`/`remove` que el resto del
     sitio) para volver a mostrar los inputs; no hay forma de "volver" al

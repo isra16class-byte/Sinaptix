@@ -207,6 +207,45 @@ function imcGaugeAngulo(imc){
   return 180 - (v - IMC_GAUGE_MIN) / (IMC_GAUGE_MAX - IMC_GAUGE_MIN) * 180;
 }
 
+// ===================== Guardar antropometría automáticamente desde la encuesta =====================
+// Si la persona todavía no tiene "datos antropométricos" guardados
+// (sinaptix_antropometria — normalmente se registran aparte en
+// #modalAntropometria) pero sí completó peso y talla en el paso 2 de la
+// encuesta de nutrición (son campos opcionales ahí, ver nutricion-wizard.js),
+// aprovechamos esos mismos datos para no pedírselos dos veces: así "Mi plan"
+// puede mostrar el medidor de IMC apenas se genera el plan, sin que la
+// persona tenga que ir aparte a "Registrar datos antropométricos" a mano.
+// Se llama desde el submit de la encuesta tanto en js/script.js
+// (index.html) como en js/mi-plan.js (mi-plan.html), justo antes de guardar
+// sinaptix_objetivo. Si ya existe un registro previo de antropometría, no
+// se toca (para no pisar una medición hecha a propósito, más reciente o más
+// precisa, con ese formulario dedicado).
+function nutriGuardarAntropometriaSiFalta(d){
+  if(localStorage.getItem('sinaptix_antropometria')) return false;
+
+  const peso = parseFloat(d.peso);
+  const tallaCm = parseFloat(d.talla);
+  const edad = parseInt(d.edad, 10);
+  const sexo = d.sexo;
+
+  // Mismos rangos de validación que #formAntro en js/script.js — si algo no
+  // luce como un dato real (vacío, fuera de rango), no se guarda nada: se
+  // deja que la persona lo complete cuando quiera desde el formulario
+  // dedicado, en vez de guardar un IMC basado en datos incompletos.
+  if(!peso || peso<=0 || peso>400) return false;
+  if(!tallaCm || tallaCm<=0 || tallaCm>250) return false;
+  if(!edad || edad<=0 || edad>120) return false;
+  if(!sexo) return false;
+
+  const talla = tallaCm/100;
+  const imc = peso/(talla*talla);
+
+  localStorage.setItem('sinaptix_antropometria', JSON.stringify({
+    peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()
+  }));
+  return true;
+}
+
 // ===================== Áreas de bienestar (Foco / Memoria / Energía / Calma) =====================
 // Compartido entre los anillos de "Método" (index.html) y el gráfico de
 // barras de "Mi plan" (mi-plan.html): ambos parten de la misma encuesta

@@ -145,6 +145,14 @@ if(window.netlifyIdentity){
       const d = nutriCollectData();
       const objetivos = nutriResolverObjetivo(d);
 
+      // Si no había datos antropométricos guardados todavía, pero acá se
+      // completó peso y talla (paso 2), los usamos para no pedirlos de
+      // nuevo en "Registrar datos antropométricos" — así el medidor de IMC
+      // de "Mi plan" puede aparecer ni bien se pinta de nuevo más abajo, sin
+      // que la persona tenga que volver a index.html a completarlos aparte.
+      // Ver nutriGuardarAntropometriaSiFalta en js/nutricion-planes.js.
+      nutriGuardarAntropometriaSiFalta(d);
+
       localStorage.setItem('sinaptix_objetivo', JSON.stringify({
         objetivo: objetivos.join(' + '),
         email: d.email,

@@ -5,6 +5,42 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Auto-guardar antropometría desde la encuesta de nutrición
+
+- Pedido del usuario: si en el paso 2 de "Generar nutrición especializada"
+  ya se completa peso y talla, no debería hacer falta ir aparte a
+  "Registrar datos antropométricos" para que "Mi plan" muestre el medidor
+  de IMC — antes, si la persona nunca había usado ese formulario dedicado,
+  el gauge quedaba oculto aunque acabara de generar su plan con esos
+  mismos datos a mano.
+- Nueva función compartida `nutriGuardarAntropometriaSiFalta(d)` en
+  `js/nutricion-planes.js`: si **no** existe todavía
+  `sinaptix_antropometria` en `localStorage` y los datos de la encuesta
+  (`peso`, `talla`, `edad`, `sexo`) son válidos (mismos rangos que
+  `#formAntro`), arma el mismo objeto que ese formulario y lo guarda. Si
+  ya había un registro previo, no lo toca (para no pisar una medición más
+  reciente o más precisa hecha a propósito con el formulario dedicado). Si
+  faltan datos o están fuera de rango (peso/talla son opcionales en el
+  paso 2), no guarda nada — se deja que la persona los complete cuando
+  quiera desde "Registrar datos antropométricos".
+- Se llama desde ambos handlers de `submit` del wizard, justo antes de
+  guardar `sinaptix_objetivo`: en `js/script.js` (modal de `index.html`) y
+  en `js/mi-plan.js` (encuesta inline de "Mi plan"). En `mi-plan.html` el
+  efecto es inmediato: como el mismo `submit` vuelve a llamar a
+  `pintarMiPlan(user)` sin recargar, el medidor de IMC aparece apenas se
+  genera el plan, sin volver a `index.html` a poner los datos de nuevo.
+- Este es el único cambio de esta entrada — no afecta el flujo inverso ya
+  existente (prellenar peso/talla en el paso 2 desde antropometría ya
+  guardada, ver `resetNutriWizard` en `js/nutricion-wizard.js`), que
+  sigue igual.
+- Verificado con Playwright: prueba unitaria de la función nueva (guarda
+  con datos válidos y sin registro previo; no pisa un registro existente;
+  no guarda con peso/talla vacíos; no guarda con datos fuera de rango) y
+  una corrida end-to-end sobre `mi-plan.html` (login stub de Netlify
+  Identity, encuesta completa sin antropometría previa) confirmando que
+  tras enviar el plan el gauge de IMC aparece con el valor y la categoría
+  correctos.
+
 ## 2026-09-13 — Medidor de IMC tipo velocímetro en "Mi plan"
 
 - El IMC en "Mi plan" era solo un número (`#miPlanImc`) sin contexto. Se
