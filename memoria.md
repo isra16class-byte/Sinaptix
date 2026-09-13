@@ -89,10 +89,10 @@ asesoría en neuroalimentación (nutrición para rendimiento cognitivo). Sitio
 Identity, sección "Mi plan", limitación de `localStorage`, próximos pasos de
 backend).
 
-**Estilo visual (vigente desde el commit "Adaptar el estilo visual al look
-de la página pública de Odoo")**: el sitio se rediseñó a partir del look de
-`https://www.odoo.com/es`. Antes tenía un tema oscuro/navy con tipografía
-editorial (Space Grotesk + IBM Plex Mono). Ahora:
+**Estilo visual (vigente desde el rediseño visual del sitio)**: el sitio se
+rediseñó a partir de una referencia visual clara y editorial. Antes tenía un
+tema oscuro/navy con tipografía editorial (Space Grotesk + IBM Plex Mono).
+Ahora:
 
 - **Paleta** (definida en `css/styles.css`, bloque `:root`): fondo blanco
   (`--paper:#FFFFFF`) / lavanda muy claro para secciones alternadas
@@ -126,7 +126,7 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
   `.deco-scribble`, opacidad base `.85` en `css/styles.css`), siguiendo el
   mismo patrón `.deco` (position:absolute, z-index:0, detrás del `.wrap`)
   que ya usan los blobs de fruta. **Forma del trazo (2do ajuste)**: la
-  referencia del usuario (captura de odoo.com) usa líneas prácticamente
+  referencia visual que dio el usuario usa líneas prácticamente
   rectas con una sola curva suave, no un garabato ondulado con varias
   jorobas — el primer path (`C ... C ... C ...`, tres curvas) se veía
   "tembleque" y el usuario lo rechazó explícitamente ("no se los hagas
@@ -147,7 +147,7 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
     servidor local (`python3 -m http.server` sobre el repo) y tomar
     capturas con Playwright para confirmar cómo se ve realmente, en vez de
     asumir por el código.
-- **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: hay 6
+- **Capa de "vida" ilustrada (sesión posterior al rediseño visual)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima
   (arándanos, aguacate, naranja, nuez, almendras, kiwi). Clase CSS
@@ -194,7 +194,7 @@ layout de grilla normal, sin cambios. El resto de secciones (02, 05, 06)
 no se tocó y sigue con sus títulos alineados a la izquierda.
 
 **Rayón pegado al título en Método y Pilares**: además del centrado, el
-usuario pidió (mostrando de nuevo la referencia de odoo.com) que el
+usuario pidió (mostrando de nuevo su referencia visual) que el
 título tuviera un rayón subrayando la última palabra clave + una línea
 completa debajo de todo el título, no solo rayones sueltos de fondo. Se
 resolvió con dos piezas nuevas en `css/styles.css`, pensadas para ser
@@ -225,7 +225,7 @@ robustas ante cambios de texto (no usan coordenadas absolutas):
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos
   antropométricos y el objetivo cognitivo solo viven en `localStorage`.
 - **Descartado**: trazos tipo "marcador" dispersos por el sitio (estilo
-  odoo.com, en verde de marca). Se probó en una sesión, se revirtió por no
+  ilustrado, en verde de marca). Se probó en una sesión, se revirtió por no
   convencer visualmente y por romper el layout del título de Visión al
   envolver una palabra en un `<span>` dentro de un `h2` con
   `display:flex` (ver `changelog.md`, entrada "Revertidos los trazos tipo

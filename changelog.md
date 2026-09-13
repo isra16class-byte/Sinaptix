@@ -9,7 +9,7 @@ archivo.
 
 - El usuario aclara (con nueva captura) que no quería solo rayones sueltos
   de fondo cerca del título: quería el mismo tratamiento que la
-  referencia de odoo.com, con un rayón subrayando la palabra final del
+  referencia visual del usuario, con un rayón subrayando la palabra final del
   título y una línea completa justo debajo de todo el título.
 - Se agregan dos clases en `css/styles.css`: `.title-mark` (subrayado vía
   `background-image` sobre un `<span>`, se adapta al ancho real de la
@@ -39,7 +39,7 @@ archivo.
   segmentos en "C" (varias jorobas, efecto garabato) a una sola curva
   Bézier cuadrática `M8,17 Q200,9 392,13`: prácticamente una línea recta
   con una leve inclinación, igual a como se ven los trazos en la
-  referencia de odoo.com.
+  referencia visual del usuario.
 - No se tocan tamaños, posiciones, color ni opacidad (eso ya había
   quedado bien en el ajuste anterior); solo la forma del trazo.
 - Verificado con capturas Playwright headless antes de generar el patch.
@@ -66,7 +66,7 @@ archivo.
 - El usuario manda una captura de pantalla del sitio ya con el patch
   anterior aplicado, señalando "te pedí que sea igual pero tú hiciste otra
   cosa": los trazos se veían demasiado finos y tenues comparados con la
-  referencia de odoo.com.
+  referencia visual del usuario.
 - Se detecta la causa revisando con capturas reales (Playwright headless +
   servidor local): el SVG usaba un viewBox chico con `stroke-width:6` y
   varias instancias tenían `opacity` baja (.35–.4) y tamaños pequeños
@@ -86,7 +86,7 @@ archivo.
 
 ## 2026-09-12 — Trazos tipo marcador de fondo (nueva versión, sin tocar títulos)
 
-- El usuario pide recuperar el look de rayones de fondo tipo odoo.com,
+- El usuario pide recuperar el look de rayones de fondo,
   mostrando una captura de referencia (clúster de trazos amarillo/naranja
   dispersos, incluyendo uno de subrayado bajo texto).
 - Se crea `svg/deco-scribble.svg`: un trazo único ondulado tipo marcador
@@ -110,7 +110,7 @@ archivo.
 
 ## 2026-09-12 — Revertidos los trazos tipo marcador (rompían el layout y no convencieron)
 
-- Se habían probado trazos tipo "marcador" estilo odoo.com en dos
+- Se habían probado trazos tipo "marcador" en dos
   iteraciones (trazos sueltos + subrayado bajo palabra clave en cada
   título; luego una corrección con trazos más finos en pareja). El
   usuario prueba ambas versiones en el navegador y decide revertir todo:
@@ -189,14 +189,14 @@ archivo.
 - Archivos tocados: `index.html`, `memoria.md`, `changelog.md`,
   `svg/deco-blob-almonds.svg`, `svg/deco-blob-kiwi.svg`.
 
-## 2026-09-12 — Blobs con frutas detrás de los títulos (más "vida" tipo odoo.com)
+## 2026-09-12 — Blobs con frutas detrás de los títulos (más "vida" ilustrada)
 
 - Se agregan 4 ilustraciones nuevas (`svg/deco-blob-berries.svg`,
   `svg/deco-blob-avocado.svg`, `svg/deco-blob-orange.svg`,
   `svg/deco-blob-walnut.svg`): un blob tipo brochazo en color de marca con
   una fruta/fruto seco flat-illustration encima (arándanos, aguacate,
   naranja, nuez), buscando un look más vivo y menos corporativo, en línea
-  con el estilo ilustrado de odoo.com.
+  con un estilo ilustrado y cálido.
 - Se colocan detrás del título del Hero (nuez), Visión/02 (arándanos),
   Pilares/04 (aguacate) y Beneficios/05 (naranja).
 - Nueva clase `.deco-fruit` en `css/styles.css`: flotación suave
@@ -213,7 +213,7 @@ archivo.
   patches de cada sesión) y `master` es la rama de **producción**
   desplegada en Netlify.
 - Se confirma con el usuario que `master` sigue atrasada respecto a `main`
-  (le faltan el rediseño Odoo y la creación de memoria/changelog) y que la
+  (le falta el rediseño visual y la creación de memoria/changelog) y que la
   sincronización `git push origin main:master` es un paso manual del
   usuario, no algo que requiera un patch.
 
@@ -225,10 +225,10 @@ archivo.
   autoría `isra16class-byte <isra16class@gmail.com>`, actualización
   obligatoria de estos dos archivos en cada patch.
 
-## 2026-09-12 — Rediseño visual al estilo Odoo (`afec65e`)
+## 2026-09-12 — Rediseño visual del sitio (`afec65e`)
 
-- Se adapta todo el sistema visual del sitio al look de
-  `https://www.odoo.com/es`: paleta clara con morado de marca (`#714B67`),
+- Se adapta todo el sistema visual del sitio a un nuevo look de referencia:
+  paleta clara con morado de marca (`#714B67`),
   tipografía unificada en Inter, botones tipo píldora, tarjetas redondeadas
   con sombra para stats/pilares/testimonios, nav blanco fijo con blur y
   barra de progreso de scroll.
