@@ -1,10 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
   <path d="M42,10 C78,-10 132,0 162,32 C190,62 186,116 156,146 C127,175 70,184 36,161 C4,139 -8,93 6,58 C14,38 22,22 42,10 Z" fill="#2E7D5B" opacity=".14"/>
+  <defs>
+    <linearGradient id="avSkin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4C7A3A"/>
+      <stop offset="1" stop-color="#2F5220"/>
+    </linearGradient>
+    <linearGradient id="avFlesh1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A9CE72"/>
+      <stop offset="1" stop-color="#7DAA4E"/>
+    </linearGradient>
+    <linearGradient id="avFlesh2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DCEBB4"/>
+      <stop offset="1" stop-color="#C7DE9B"/>
+    </linearGradient>
+    <radialGradient id="avPit" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#A67D4E"/>
+      <stop offset="1" stop-color="#6B4C2A"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="150" rx="38" ry="9" fill="#26161F" opacity=".08"/>
   <g transform="translate(58,42)">
-    <path d="M42 2C64 2 82 26 82 56C82 84 64 104 42 104C20 104 2 84 2 56C2 26 20 2 42 2Z" fill="#3F6B2E"/>
-    <path d="M42 10C60 10 74 30 74 56C74 80 60 96 42 96C24 96 10 80 10 56C10 30 24 10 42 10Z" fill="#8FBB5C"/>
-    <path d="M42 16C57 16 68 33 68 56C68 77 57 90 42 90C27 90 16 77 16 56C16 33 27 16 42 16Z" fill="#C7DE9B"/>
-    <circle cx="42" cy="58" r="17" fill="#7B5B3A"/>
-    <ellipse cx="37" cy="52" rx="5" ry="4" fill="#9C7A52" opacity=".7"/>
+    <path d="M42 2C64 2 82 26 82 56C82 84 64 104 42 104C20 104 2 84 2 56C2 26 20 2 42 2Z" fill="url(#avSkin)"/>
+    <path d="M42 10C60 10 74 30 74 56C74 80 60 96 42 96C24 96 10 80 10 56C10 30 24 10 42 10Z" fill="url(#avFlesh1)"/>
+    <path d="M42 16C57 16 68 33 68 56C68 77 57 90 42 90C27 90 16 77 16 56C16 33 27 16 42 16Z" fill="url(#avFlesh2)"/>
+    <circle cx="42" cy="58" r="17" fill="url(#avPit)"/>
+    <ellipse cx="36" cy="51" rx="5.5" ry="4.5" fill="#D2A876" opacity=".8"/>
+    <path d="M18 24c-2 6-2 12 0 18" stroke="#EFF6DC" stroke-width="2" stroke-linecap="round" opacity=".5"/>
   </g>
 </svg>

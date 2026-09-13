@@ -5,6 +5,24 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Pulido visual de los 6 íconos de fruta (degradados + sombra + nuez rediseñada)
+
+- El usuario reporta (con captura) que el ícono de nuez no se reconocía
+  como fruta ("ese café que está a la izquierda no parece una fruta") y
+  pide que en general se vean "más bonitos".
+- Se rediseña `svg/deco-blob-walnut.svg` con un contorno lobulado tipo
+  cerebro (en vez de un óvalo liso) para que se lea de inmediato como nuez
+  partida.
+- Se aplica un pase de pulido a los 6 SVG (`berries`, `avocado`, `orange`,
+  `almonds`, `kiwi`, `walnut`): rellenos con degradado (`linearGradient` /
+  `radialGradient`) en vez de color plano, más un óvalo de sombra
+  semitransparente debajo de cada fruta para dar sensación de volumen y
+  apoyo sobre el blob.
+- Archivos tocados: `svg/deco-blob-walnut.svg`, `svg/deco-blob-berries.svg`,
+  `svg/deco-blob-avocado.svg`, `svg/deco-blob-orange.svg`,
+  `svg/deco-blob-almonds.svg`, `svg/deco-blob-kiwi.svg`, `memoria.md`,
+  `changelog.md`.
+
 ## 2026-09-12 — Posiciones estratégicas para los blobs con frutas (patrón Z / puntos de atención)
 
 - Se investigan patrones de lectura visual en landing pages (Z-pattern,

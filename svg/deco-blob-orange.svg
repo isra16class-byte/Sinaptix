@@ -1,8 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
   <path d="M48,6 C82,-12 134,0 162,30 C190,60 190,114 160,146 C131,177 74,186 40,162 C8,140 -6,94 8,58 C16,36 26,18 48,6 Z" fill="#C1703B" opacity=".16"/>
+  <defs>
+    <radialGradient id="orPeel" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#F0AE55"/>
+      <stop offset="1" stop-color="#D08A2E"/>
+    </radialGradient>
+    <radialGradient id="orFlesh" cx="35%" cy="30%" r="75%">
+      <stop offset="0" stop-color="#FBD589"/>
+      <stop offset="1" stop-color="#F4B95E"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="150" rx="40" ry="9" fill="#26161F" opacity=".08"/>
   <g transform="translate(55,45)">
-    <circle cx="45" cy="45" r="44" fill="#E8A33D"/>
-    <circle cx="45" cy="45" r="36" fill="#F4C463"/>
+    <circle cx="45" cy="45" r="44" fill="url(#orPeel)"/>
+    <circle cx="45" cy="45" r="36" fill="url(#orFlesh)"/>
     <g stroke="#E8A33D" stroke-width="2.4" opacity=".9">
       <path d="M45 9 L45 81"/>
       <path d="M9 45 L81 45"/>
@@ -12,5 +23,6 @@
       <path d="M45 9 C35 20 35 70 45 81"/>
     </g>
     <circle cx="45" cy="45" r="6" fill="#FBEAC7"/>
+    <path d="M20 18c-4 5-6 11-5 17" stroke="#FCE3AE" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>
   </g>
 </svg>

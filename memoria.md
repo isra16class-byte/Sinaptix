@@ -134,6 +134,13 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
     formulario de contacto (CTA final). La idea es que cada fruta viva
     cerca de un punto de atención real (título, CTA, dato clave), no solo
     decorativa al azar.
+  - **Nivel de acabado**: los 6 SVG usan degradados (`linearGradient` /
+    `radialGradient`) en vez de rellenos planos, y una sombra de apoyo
+    (`ellipse` semitransparente) debajo de cada fruta para que no se vean
+    "pegadas" sino con volumen. La nuez en particular tiene un contorno
+    lobulado (no un óvalo liso) para que se lea de inmediato como nuez —
+    el usuario reportó que la primera versión (óvalo tostado simple) no se
+    reconocía como fruta/fruto seco.
 
 **Estructura de archivos** (sin cambios respecto al README): `index.html`
 (todo el markup, secciones `lam-01` a `lam-06`), `css/styles.css`,
