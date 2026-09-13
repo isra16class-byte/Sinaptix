@@ -5,6 +5,22 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Centrar títulos de Método y Pilares (lam-03, lam-04)
+
+- El usuario pide que los títulos de las secciones 03 (Método) y 04
+  (Pilares) queden centrados en vez de alineados a la izquierda.
+- Se agrega la clase `.sec-head-center` en `css/styles.css`
+  (`text-align:center`, más `margin:auto` para `.lam-title`/`.lam-text`
+  dentro de ella, ya que ambas tienen `max-width` propio y no se centran
+  solas con `text-align` del padre).
+- Se envuelve `eyebrow + h2` en `lam-03`, y `eyebrow + h2 + p` en `lam-04`,
+  dentro de un `<div class="sec-head-center">`. El timeline (03) y el
+  `signal-wave` + `pillar-grid` (04) quedan fuera de ese div y no cambian.
+- Verificado con capturas de pantalla (Playwright headless) antes de
+  generar el patch.
+- Archivos tocados: `index.html`, `css/styles.css`, `memoria.md`,
+  `changelog.md`.
+
 ## 2026-09-12 — Corrección de los trazos de marcador: más gruesos, grandes y visibles
 
 - El usuario manda una captura de pantalla del sitio ya con el patch

@@ -181,6 +181,19 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 (todo el markup, secciones `lam-01` a `lam-06`), `css/styles.css`,
 `js/script.js`, `img/`, `svg/`, `netlify.toml`.
 
+**Encabezados centrados en Método y Pilares (lam-03, lam-04)**: el usuario
+pidió que los títulos de esas dos secciones (antes alineados a la
+izquierda, como el resto) quedaran centrados. Se envolvió el bloque
+`eyebrow + h2` (y también el `<p class="lam-text">` en el caso de
+Pilares) en un `<div class="sec-head-center">` nuevo, con la clase
+`.sec-head-center{text-align:center}` en `css/styles.css` (más
+`margin-left/right:auto` en `.lam-title`/`.lam-text` dentro de ese
+contenedor, porque son bloques con `max-width` propio y necesitan margen
+automático para centrarse). El timeline de Método y el `pillar-grid` /
+`signal-wave` de Pilares quedan **fuera** de ese contenedor y siguen su
+layout de grilla normal, sin cambios. El resto de secciones (02, 05, 06)
+no se tocó y sigue con sus títulos alineados a la izquierda.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

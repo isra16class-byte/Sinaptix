@@ -198,6 +198,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .lead{text-align:left}
 .pillar p,.tl-item p,.quote-card p{text-align:left}
 
+.sec-head-center{text-align:center}
+.sec-head-center .lam-title,.sec-head-center .lam-text{margin-left:auto;margin-right:auto}
+
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}
 .stat-box:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
