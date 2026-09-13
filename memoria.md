@@ -119,20 +119,35 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
 - **Trazos tipo "marcador" de fondo (recuperados, versión distinta a la
-  revertida)**: hay un nuevo `svg/deco-scribble.svg` — un único trazo
-  ondulado tipo marcador (`stroke:#E3A23B`, hand-drawn, sin relleno) que se
-  reutiliza como `<img>` varias veces por sección con distinto tamaño,
-  rotación y opacidad (clase `.deco-scribble`, ver `css/styles.css`),
-  siguiendo el mismo patrón `.deco` (position:absolute, z-index:0, detrás
-  del `.wrap`) que ya usan los blobs de fruta y demás decoraciones. A
-  diferencia del intento anterior (ver `changelog.md`, "Revertidos los
-  trazos tipo marcador"), **no** envuelve palabras dentro de títulos ni
-  toca ningún `h2`/`span` — son solo rayones de fondo sueltos, sin relación
-  con el texto, así que no repite el problema de layout que causó la
-  reversión. Se ocultan en móvil (`max-width:720px`) igual que
-  `.deco-fruit`. Distribución: 4 en el Hero (imitando el clúster superior
-  del ejemplo de referencia) y 2 por cada una de las otras 5 secciones
-  (`lam-02` a `lam-06`).
+  revertida — ajustados tras feedback de "no se parece a la referencia")**:
+  hay un `svg/deco-scribble.svg` — un único trazo ondulado tipo marcador
+  (`stroke:#EDA23A`, `stroke-width:11` en un viewBox de 400×36, hand-drawn,
+  sin relleno) que se reutiliza como `<img>` varias veces por sección con
+  distinto tamaño (150–340px), rotación y posición (clase `.deco-scribble`,
+  opacidad base `.85` en `css/styles.css`), siguiendo el mismo patrón
+  `.deco` (position:absolute, z-index:0, detrás del `.wrap`) que ya usan
+  los blobs de fruta. Primer intento de esta sesión salió demasiado fino y
+  tenue (viewBox chico, stroke-width 6, opacidades bajas de .35–.4,
+  tamaños de 90–220px) y el usuario mandó captura señalando que no se
+  parecía a la referencia; se corrigió aumentando el grosor de trazo, el
+  tamaño de las instancias y subiendo la opacidad base, y verificando con
+  capturas de pantalla (Playwright headless, ver nota abajo) antes de
+  entregar el patch. A diferencia del intento anterior que sí se revirtió
+  (ver `changelog.md`, "Revertidos los trazos tipo marcador"), **no**
+  envuelve palabras dentro de títulos ni toca ningún `h2`/`span` — son
+  solo rayones de fondo sueltos, sin relación con el texto. Se ocultan en
+  móvil (`max-width:720px`) igual que `.deco-fruit`. Distribución: 6 en el
+  Hero (clúster arriba-derecha + acentos sueltos) y 2 por cada una de las
+  otras 5 secciones (`lam-02` a `lam-06`), reposicionados para no quedar
+  detrás de tarjetas opacas (pillars, quote-cards, stat-boxes) ni cruzar
+  el texto del footer del Hero.
+  - **Verificación visual**: en este entorno hay Chromium + Playwright
+    instalados; antes de entregar un patch de este tipo (decoración visual
+    de fondo/tamaños/posiciones) conviene levantar un servidor local
+    (`python3 -m http.server` sobre el repo) y tomar capturas con
+    Playwright para confirmar cómo se ve realmente, en vez de asumir por
+    el código. Así se detectó el problema de que los trazos eran
+    demasiado finos/tenues y que uno cruzaba el texto del footer.
 - **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima

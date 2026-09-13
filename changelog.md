@@ -5,6 +5,29 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Corrección de los trazos de marcador: más gruesos, grandes y visibles
+
+- El usuario manda una captura de pantalla del sitio ya con el patch
+  anterior aplicado, señalando "te pedí que sea igual pero tú hiciste otra
+  cosa": los trazos se veían demasiado finos y tenues comparados con la
+  referencia de odoo.com.
+- Se detecta la causa revisando con capturas reales (Playwright headless +
+  servidor local): el SVG usaba un viewBox chico con `stroke-width:6` y
+  varias instancias tenían `opacity` baja (.35–.4) y tamaños pequeños
+  (90–220px), lo que resultaba en líneas de ~2-4px efectivos en pantalla.
+- Se rehace `svg/deco-scribble.svg` con un viewBox más grande (400×36) y
+  `stroke-width:11`, se sube la opacidad base de `.deco-scribble` a `.85`
+  en `css/styles.css`, y se reposicionan/agrandan las instancias (150 a
+  340px, antes 90 a 220px), agregando más densidad en el Hero (6 en vez de
+  4) para imitar el clúster de la referencia.
+- Se corrige además un trazo que quedaba cruzando el texto del footer del
+  Hero ("Guayaquil, Ecuador — Consultas online y presenciales").
+- Se verifica el resultado con capturas de pantalla reales (Chromium vía
+  Playwright, ya instalado en el entorno) antes de generar el patch, en
+  vez de asumir el resultado solo por el código.
+- Archivos tocados: `svg/deco-scribble.svg`, `css/styles.css`,
+  `index.html`, `memoria.md`, `changelog.md`.
+
 ## 2026-09-12 — Trazos tipo marcador de fondo (nueva versión, sin tocar títulos)
 
 - El usuario pide recuperar el look de rayones de fondo tipo odoo.com,
