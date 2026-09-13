@@ -503,12 +503,34 @@ más un botón final `#nutriSubmit` en el paso 8.
 mismos 4 objetivos que ya existían en el select (`Mejorar concentración`,
 `Reducir fatiga mental`, `Sostener memoria de trabajo`, `Manejo de estrés
 mental`), ahora con contenido real por plan (`NUTRI_PLANES` en
-`js/script.js`): enfoque, nutrientes clave, alimentos a priorizar y a
-moderar. Se agregó una quinta opción al select, `"No estoy seguro / varios
+`js/nutricion-planes.js` — **no** en `js/script.js`, se movió ahí cuando
+se extrajo la lógica compartida entre `index.html` y `mi-plan.html`, ver
+más arriba): enfoque, nutrientes clave, alimentos a priorizar, a moderar
+y, desde la sesión que implementó el punto 4 de
+`plan-mejoras-mi-plan-y-encuesta.md` (sección 4.3), un **"día tipo"**
+(`diaTipo`, 4 entradas `{momento, detalle}`: Desayuno/Snack/Almuerzo/Cena)
+por plan. Se agregó una quinta opción al select, `"No estoy seguro / varios
 objetivos"`, que **no es un plan nuevo**: dispara
 `nutriResolverObjetivo`, que compara las 4 escalas del paso 6 y devuelve
 el/los plan(es) existentes con puntaje más alto (si hay empate, muestra
-más de uno).
+más de uno, cada uno con su propio "día tipo").
+
+- **"Un día tipo" en el resumen del plan** (`nutriBuildResumenHTML`, en
+  `js/nutricion-planes.js`): se agregó como cuarto bloque dentro de cada
+  plan (después de "Moderar"), renderizado como una grilla
+  (`.nutri-dia-tipo` → `.dia-tipo-item` × 4, `grid-template-columns:
+  repeat(auto-fit,minmax(130px,1fr))`) en vez de una lista más — se
+  envuelve sola según el ancho disponible (2 columnas en el modal angosto
+  de `index.html`, hasta 4 en el panel más ancho de `mi-plan.html`), sin
+  necesitar JS de resize como el truco de sangrado de `.lam-title-frame`
+  (ver más abajo). El contenido de cada `diaTipo` **no es información
+  nutricional nueva**: son combinaciones de los mismos alimentos que ya
+  estaban en `priorizar`/`moderar` de cada plan, organizados por momento
+  del día — no se inventó ningún alimento o nutriente que no estuviera ya
+  en la tabla de contenido de los 4 planes. Si el objetivo es "No estoy
+  seguro" y hay empate, cada plan combinado muestra su propio "día tipo"
+  por separado (no se mezclan las comidas de los dos planes en una sola
+  grilla).
 
 **Tabla de conexiones** (`nutriConstruirAjustes` / `nutriConstruirAvisos`
 en `js/script.js`) — así es como las respuestas modifican el plan antes

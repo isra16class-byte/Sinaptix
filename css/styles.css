@@ -484,6 +484,13 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
 }
 .nutri-summary ul{margin:0;padding-left:18px}
 .nutri-summary li{margin-bottom:3px}
+/* Un día tipo: línea de tiempo horizontal por plan (se envuelve solo vía
+   grid auto-fit, sin JS de resize) — ver plan-mejoras-mi-plan-y-encuesta.md,
+   sección 4.3 ("Timeline del día tipo"). */
+.nutri-dia-tipo{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:2px}
+.dia-tipo-item{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px}
+.dia-tipo-momento{display:block;font-family:var(--font-m);font-size:10.5px;font-weight:700;color:var(--purple-dark);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.dia-tipo-detalle{font-family:var(--font-b);font-size:12.5px;line-height:1.4;color:var(--ink);margin:0}
 .nutri-note{
   font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--gold);
   background:var(--gold-soft);border-radius:var(--radius-sm);padding:10px 12px;

@@ -5,6 +5,35 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Un día tipo" en el resultado de cada plan de nutrición
+
+- Punto 4 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.3): cada uno
+  de los 4 planes de `NUTRI_PLANES` (`js/nutricion-planes.js`) ahora tiene
+  un campo `diaTipo` (4 entradas: Desayuno, Snack, Almuerzo, Cena) que se
+  arma solo con alimentos que ya estaban en `priorizar`/`moderar` de ese
+  mismo plan, organizados por momento del día — sin agregar ningún
+  nutriente ni alimento nuevo. Se armó a partir del contenido ya
+  existente en el repo (no había un documento de origen con el detalle
+  por comida disponible en esta sesión).
+- `nutriBuildResumenHTML` renderiza un cuarto bloque "Un día tipo" por
+  plan (después de "Moderar"), como una grilla `.nutri-dia-tipo` en vez
+  de una lista más — se envuelve sola con `grid-template-columns:
+  repeat(auto-fit,minmax(130px,1fr))`, sin JS de resize. Si el objetivo es
+  "No estoy seguro" y hay empate entre 2 planes, cada uno muestra su
+  propio "día tipo" por separado.
+- CSS nuevo: `.nutri-dia-tipo`, `.dia-tipo-item`, `.dia-tipo-momento`,
+  `.dia-tipo-detalle`.
+- Aprovechando el cambio, se corrigió una referencia desactualizada en
+  `memoria.md` que decía que `NUTRI_PLANES` vivía en `js/script.js` (se
+  había movido a `js/nutricion-planes.js` en una sesión anterior, la
+  memoria no se había actualizado en ese punto puntual).
+- Probado con un script de Node (`vm` + `nutriBuildResumenHTML`) en dos
+  escenarios: un plan único (4 `diaTipo` items) y un empate "No estoy
+  seguro" con 2 planes (8 items en total, 4 por plan) — ambos arman el
+  HTML esperado. Sigue pendiente una revisión visual en navegador real
+  (Playwright no se pudo instalar en este entorno, ver entradas
+  anteriores del changelog).
+
 ## 2026-09-13 — Paso 2 del wizard: resumen + "Actualizar" en vez de reingresar peso/talla ya guardados
 
 - Punto 3 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2): si ya hay
