@@ -348,8 +348,15 @@ chart (ver `changelog.md`, entrada "Radar de progreso..."). El usuario lo
 vio, pidió algo más llamativo, se le mostraron 3 mockups (A: dumbbell
 conectado antes/después, B: anillos tipo gauge, C: barras agrupadas) y
 eligió **B**, pidiendo además que **el color de cada anillo cambie según
-su propio porcentaje**. Esta sección describe el resultado final (estado
-actual), no el radar — si algo menciona "radar" en el código es solo un
+su propio porcentaje**. Se implementó primero con **dos anillos
+concéntricos por área** (externo = estado actual, interno = diagnóstico
+inicial), pero el usuario mandó una captura real: a ese tamaño los dos
+anillos quedaban demasiado pegados, y cuando el valor inicial era bajo
+(rojo/dorado) se leía como un glitch pegado al anillo externo verde en vez
+de una comparación clara — **se descartó el doble anillo** por ese
+motivo (ver `changelog.md`, entrada de la sesión que lo corrigió). Esta
+sección describe el resultado final vigente, no ninguna de las dos
+versiones anteriores — si algo menciona "radar" en el código es solo un
 comentario histórico explicando el origen del dato.
 
 - **De dónde salen las 4 áreas**: se reutilizan las mismas 4 escalas 1-5
@@ -359,28 +366,37 @@ comentario histórico explicando el origen del dato.
   `js/script.js`) para que un valor más alto sea siempre "mejor":
   dificultad de concentración → **Foco**, olvidos → **Memoria**, fatiga →
   **Energía**, estrés → **Calma**. Luego se convierten a porcentaje
-  (`valor/5*100`), que da siempre 20/40/60/80/100% sin decimales.
+  (`valor/5*100`), que da siempre 20/40/60/80/100% sin decimales — si
+  alguna vez todas las áreas muestran 100%, no es un bug: significa que se
+  contestó la opción "mejor" en las 4 preguntas de esa medición.
+- **Un solo anillo por área** (`gaugeBuildItem` en `js/script.js`): dibuja
+  el estado más reciente (la reevaluación si existe, si no el diagnóstico
+  inicial), coloreado según su propio porcentaje
+  (`gaugeColorForPercent`). Cuando hay reevaluación guardada, debajo del
+  anillo se agrega una línea de texto (`gaugeDeltaHtml`, clase
+  `.gauge-delta`) con el valor inicial y la diferencia, p.ej. "Antes: 20%
+  (+80 pts)" en verde si mejoró, en rojo `#B3261E` si empeoró, o "sin
+  cambios" en gris si quedó igual. Esto reemplaza al anillo interno que
+  había antes.
 - **Estados de la tarjeta** (función `renderMethodGauges`, se llama al
   cargar la página y después de guardar un diagnóstico o una
   reevaluación):
   1. Sin `sinaptix_objetivo.encuesta` guardado → estado vacío con CTA
      "Generar mi diagnóstico" (`#btnGaugeDiagnostico`) que abre el wizard
      de nutrición normal.
-  2. Con diagnóstico inicial → cada uno de los 4 anillos muestra un solo
-     anillo (radio 46) con ese porcentaje + botón "Actualizar mi estado".
-  3. Con una reevaluación posterior guardada → cada anillo pasa a mostrar
-     dos: uno externo más grueso (radio 46, estado actual) y uno interno
-     más fino (radio 33, diagnóstico inicial), leyenda con ambas fechas, y
-     el botón pasa a "Actualizar mi estado otra vez".
+  2. Con diagnóstico inicial → cada uno de los 4 anillos muestra ese
+     porcentaje, sin línea de delta debajo + botón "Actualizar mi estado".
+  3. Con una reevaluación posterior guardada → el anillo muestra el valor
+     de la reevaluación, con la línea de delta debajo, y el botón pasa a
+     "Actualizar mi estado otra vez".
 - **Color dinámico por porcentaje** (`gaugeColorForPercent`, interpolación
   RGB continua): rojo `#B3261E` (0% — mismo rojo que ya usan los mensajes
   de error de los formularios del sitio, reutilizado a propósito) → dorado
-  `var(--gold)` (50%) → verde `var(--green)` (100%). **Cada anillo se
-  colorea según su propio valor**, no según si es "antes" o "después" —
-  esa distinción ahora es por grosor/posición del anillo (externo/interno),
-  no por color. Hay una leyenda de escala (`.gauge-scale`) que explica el
-  significado de los 3 tramos de color ("Necesita atención" / "En
-  progreso" / "Sólido").
+  `var(--gold)` (50%) → verde `var(--green)` (100%). Hay una leyenda de
+  escala (`.gauge-scale`) que explica el significado de los 3 tramos de
+  color ("Necesita atención" / "En progreso" / "Sólido"), y una línea
+  aparte con las fechas (`.gauge-dates`, ya no habla de anillo
+  externo/interno porque ya no hay doble anillo).
 - **Reevaluación = segunda medición real** (sin cambios respecto al radar
   original): botón "Actualizar mi estado" (`#btnReevaluar`, dentro de la
   tarjeta), abre el modal `#modalReevaluacion` con las mismas 4 preguntas
@@ -392,19 +408,15 @@ comentario histórico explicando el origen del dato.
 - Depende únicamente de `localStorage` (`sinaptix_objetivo` y
   `sinaptix_reevaluacion`), no de sesión de Netlify Identity — funciona
   igual con o sin login, igual que "Mi plan".
-- **Pendiente de verificación visual real**: en esta sesión, Playwright no
-  pudo instalar Chromium (la descarga del navegador sale del dominio
-  permitido en la configuración de red de este entorno, así que el
-  `install` no completó). Se validó la lógica por separado en Node
-  (interpolación de color rojo→dorado→verde en varios cortes de
-  porcentaje, y que la conversión de escala 1-5 da siempre múltiplos de
-  20%), pero **no hay capturas de cómo se ve realmente el layout de la
-  grilla 2×2 ni el tamaño de los anillos en el navegador**. Si una sesión
-  futura tiene acceso para instalar Playwright, conviene tomar capturas
-  (desktop y móvil 380px) antes de dar esto por definitivamente cerrado
-  visualmente — en particular confirmar que el texto de porcentaje y el
-  label no se corten dentro del `viewBox` de 120×120, y que la grilla 2×2
-  se vea bien en el ancho real de la tarjeta en móvil.
+- **Pendiente de verificación visual real**: en este entorno, Playwright
+  no pudo instalar Chromium (la descarga del navegador sale de un dominio
+  no permitido en la configuración de red de este entorno). El diagnóstico
+  y el ajuste del doble anillo a un solo anillo + texto de delta se
+  hicieron a partir de una captura de pantalla que mandó el usuario, no de
+  una verificación propia en navegador. Si una sesión futura tiene acceso
+  a Playwright, conviene confirmar con capturas (desktop y móvil 380px)
+  que el anillo único + la línea de delta se ven bien, sobre todo con
+  nombres de área más largos o valores negativos de delta.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 

@@ -5,6 +5,34 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Corregido: un solo anillo por área en vez de doble anillo pegado
+
+- El usuario mandó una captura real de la tarjeta de progreso: con dos
+  anillos concéntricos por área (externo = estado actual, interno =
+  diagnóstico inicial), al tamaño real de la tarjeta quedaban demasiado
+  pegados entre sí — cuando el valor inicial era bajo (rojo/dorado) se
+  veía como un glitch pegado al anillo externo verde, no como una
+  comparación clara antes/después.
+- Se simplifica a **un solo anillo por área** (el valor más reciente:
+  reevaluación si existe, si no el diagnóstico inicial), coloreado según
+  su propio porcentaje igual que antes. Cuando hay reevaluación, se
+  agrega debajo del anillo una línea de texto (`gaugeDeltaHtml`, clase
+  `.gauge-delta`) con el valor inicial y la diferencia en puntos
+  porcentuales (verde si mejoró, rojo si empeoró, gris si sin cambios),
+  en vez de un segundo anillo.
+- Leyenda simplificada: ya no explica anillo externo/interno
+  (`.gauge-legend-ring*`, eliminadas); ahora una sola línea con las fechas
+  (`.gauge-dates`) y se mantiene la leyenda de escala de color
+  (`.gauge-scale`) sin cambios.
+- Aclaración de dato, no de código: si las 4 áreas muestran 100% a la vez
+  (como en la captura del usuario), es el resultado esperado si se
+  contestó la opción "mejor" en las 4 preguntas de esa medición — no es
+  un bug de cálculo, se verificó con casos de prueba en Node.
+- Sin verificación en navegador real en esta sesión (mismo motivo que la
+  entrada anterior: no se pudo instalar Playwright/Chromium en este
+  entorno); el diagnóstico y el ajuste se basaron en la captura de
+  pantalla que aportó el usuario, no en una revisión visual propia.
+
 ## 2026-09-13 — Reemplazo del radar por anillos de progreso con color dinámico
 
 - El usuario pidió reemplazar el radar/spider chart de la tarjeta de

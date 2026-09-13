@@ -568,23 +568,33 @@
       'stroke-dasharray="'+len.toFixed(1)+' '+circumference.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
   }
 
-  // Un anillo tipo "Apple Watch" por área. Si hay reevaluación, el anillo
-  // externo (más grueso) muestra el estado actual y uno interno más fino
-  // muestra el diagnóstico inicial como referencia — ambos coloreados según
-  // su propio porcentaje, no con un color fijo por serie.
+  // Un anillo tipo "Apple Watch" por área, coloreado según su propio
+  // porcentaje. Si hay reevaluación, se agrega debajo una línea de texto
+  // con el valor inicial y la diferencia — en vez de un segundo anillo
+  // concéntrico pegado al primero, que en el tamaño real de la tarjeta
+  // quedaba demasiado apretado contra el anillo externo y se leía como un
+  // glitch en vez de una comparación clara (ver memoria.md).
+  function gaugeDeltaHtml(antesPct, despuesPct){
+    if(despuesPct == null) return '';
+    const delta = despuesPct - antesPct;
+    let deltaText, deltaColor;
+    if(delta > 0){ deltaText = '+'+delta+' pts'; deltaColor = 'var(--green)'; }
+    else if(delta < 0){ deltaText = delta+' pts'; deltaColor = '#B3261E'; }
+    else { deltaText = 'sin cambios'; deltaColor = 'var(--ink-faint)'; }
+    return '<p class="gauge-delta">Antes: '+antesPct+'% <span style="color:'+deltaColor+'">('+deltaText+')</span></p>';
+  }
+
   function gaugeBuildItem(label, antesPct, despuesPct){
     const cx=60, cy=60;
     const current = (despuesPct==null) ? antesPct : despuesPct;
+    const color = gaugeColorForPercent(current);
     let svg = '<svg viewBox="0 0 120 120" role="img" aria-label="'+label+': '+current+'%'+
-      (despuesPct!=null ? ' (inicial '+antesPct+'%)' : '')+'">';
-    if(despuesPct!=null){
-      svg += gaugeArc(cx, cy, 33, 8, antesPct, gaugeColorForPercent(antesPct));
-    }
-    svg += gaugeArc(cx, cy, 46, 10, current, gaugeColorForPercent(current));
+      (despuesPct!=null ? ' (antes '+antesPct+'%)' : '')+'">';
+    svg += gaugeArc(cx, cy, 46, 12, current, color);
     svg += '<text x="60" y="57" text-anchor="middle" style="font-family:var(--font-d);font-size:24px;font-weight:800;fill:var(--ink)">'+current+'%</text>';
     svg += '<text x="60" y="75" text-anchor="middle" style="font-family:var(--font-m);font-size:10px;font-weight:700;fill:var(--ink-faint);letter-spacing:.02em">'+label+'</text>';
     svg += '</svg>';
-    return '<div class="gauge-item">'+svg+'</div>';
+    return '<div class="gauge-item">'+svg+gaugeDeltaHtml(antesPct, despuesPct)+'</div>';
   }
 
   function renderMethodGauges(){
@@ -636,17 +646,14 @@
       '<span><i style="background:'+GAUGE_HIGH+'"></i>Sólido</span>'+
       '</div>';
 
-    let legend = '<div class="gauge-legend">';
+    let legend = '<p class="gauge-dates">';
     if(despues){
-      legend += '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--outer"></i>Estado actual'+
-        (despuesReeval.fecha ? ' · '+gaugeFechaCorta(despuesReeval.fecha) : '')+'</span>'+
-        '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--inner"></i>Diagnóstico inicial'+
-        (antesObjetivo.fecha ? ' · '+gaugeFechaCorta(antesObjetivo.fecha) : '')+'</span>';
+      legend += 'Diagnóstico inicial · '+gaugeFechaCorta(antesObjetivo.fecha)+
+        ' &nbsp;→&nbsp; Última actualización · '+gaugeFechaCorta(despuesReeval.fecha);
     } else {
-      legend += '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--outer"></i>Diagnóstico inicial'+
-        (antesObjetivo.fecha ? ' · '+gaugeFechaCorta(antesObjetivo.fecha) : '')+'</span>';
+      legend += 'Diagnóstico inicial · '+gaugeFechaCorta(antesObjetivo.fecha);
     }
-    legend += '</div>';
+    legend += '</p>';
 
     const cta = '<button type="button" class="btn btn-ghost" id="btnReevaluar">'+
       (despues ? 'Actualizar mi estado otra vez' : 'Actualizar mi estado')+'</button>';
