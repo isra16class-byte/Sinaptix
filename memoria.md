@@ -333,62 +333,78 @@ nuevo estando logueado (mensaje, cierre de modal, scroll a Mi plan, plan
 visible) — todo sin errores de JS y confirmado también en viewport móvil
 (380px).
 
-## Radar de progreso en Método (`#methodRadar`)
+## Anillos de progreso en Método (`#methodGauges`)
 
 La sección 03 (Método) ya no es solo el `.timeline` a ancho completo: ahora
-`.timeline` y una tarjeta nueva, `.method-radar` (`#methodRadar`), viven
+`.timeline` y una tarjeta nueva, `.method-gauges` (`#methodGauges`), viven
 lado a lado dentro de `.method-body` (grid de 2 columnas, se apila en
-móvil ≤900px). La tarjeta muestra un radar/spider chart en SVG puro
-(generado a mano en `js/script.js`, sin librería de gráficos — el sitio no
-tiene build step) con 4 ejes: **Foco, Memoria, Energía, Calma**.
+móvil ≤900px). La tarjeta muestra 4 anillos de progreso tipo "Apple Watch"
+en una grilla 2×2 (`.gauge-grid`), uno por área: **Foco, Memoria, Energía,
+Calma**. Todo en SVG puro (`js/script.js`, sin librería de gráficos — el
+sitio no tiene build step).
 
-- **De dónde salen los 4 ejes**: se reutilizan las mismas 4 escalas 1-5
+**Historial de esta tarjeta**: primero se implementó como radar/spider
+chart (ver `changelog.md`, entrada "Radar de progreso..."). El usuario lo
+vio, pidió algo más llamativo, se le mostraron 3 mockups (A: dumbbell
+conectado antes/después, B: anillos tipo gauge, C: barras agrupadas) y
+eligió **B**, pidiendo además que **el color de cada anillo cambie según
+su propio porcentaje**. Esta sección describe el resultado final (estado
+actual), no el radar — si algo menciona "radar" en el código es solo un
+comentario histórico explicando el origen del dato.
+
+- **De dónde salen las 4 áreas**: se reutilizan las mismas 4 escalas 1-5
   del paso 6 del wizard de nutrición (estrés, fatiga, dificultad de
   concentración, olvidos) — no se agregó ninguna pregunta nueva a la
-  encuesta. Se invierten (`6 - valor`, `radarComputeAreas` en
-  `js/script.js`) para que en el radar "más afuera" sea siempre "mejor" en
-  las 4 áreas: dificultad de concentración → **Foco**, olvidos →
-  **Memoria**, fatiga → **Energía**, estrés → **Calma**. Es un cambio de
-  etiqueta/orientación nada más, el dato de origen no cambió — si en algún
-  momento se prefieren los nombres literales de las preguntas en el eje,
-  es cuestión de tocar el array `labels` de `radarBuildSvg`.
-- **Estados de la tarjeta** (función `renderMethodRadar`, se llama al
+  encuesta. Se invierten (`6 - valor`, `gaugeComputeAreas` en
+  `js/script.js`) para que un valor más alto sea siempre "mejor":
+  dificultad de concentración → **Foco**, olvidos → **Memoria**, fatiga →
+  **Energía**, estrés → **Calma**. Luego se convierten a porcentaje
+  (`valor/5*100`), que da siempre 20/40/60/80/100% sin decimales.
+- **Estados de la tarjeta** (función `renderMethodGauges`, se llama al
   cargar la página y después de guardar un diagnóstico o una
   reevaluación):
   1. Sin `sinaptix_objetivo.encuesta` guardado → estado vacío con CTA
-     "Generar mi diagnóstico" que abre el wizard de nutrición normal.
-  2. Con diagnóstico inicial → un solo polígono morado ("Antes", con la
-     fecha del diagnóstico) + botón "Actualizar mi estado".
-  3. Con una reevaluación posterior guardada → se agrega un segundo
-     polígono verde ("Después") superpuesto, leyenda con ambas fechas, y
+     "Generar mi diagnóstico" (`#btnGaugeDiagnostico`) que abre el wizard
+     de nutrición normal.
+  2. Con diagnóstico inicial → cada uno de los 4 anillos muestra un solo
+     anillo (radio 46) con ese porcentaje + botón "Actualizar mi estado".
+  3. Con una reevaluación posterior guardada → cada anillo pasa a mostrar
+     dos: uno externo más grueso (radio 46, estado actual) y uno interno
+     más fino (radio 33, diagnóstico inicial), leyenda con ambas fechas, y
      el botón pasa a "Actualizar mi estado otra vez".
-- **Reevaluación = segunda medición real, dato nuevo**: antes de esta
-  sesión no existía ninguna forma de capturar un "después" real para
-  comparar contra el diagnóstico inicial (por eso el radar antes/después
-  no se podía hacer solo con datos existentes). Se agregó el botón
-  "Actualizar mi estado" (`#btnReevaluar`, dentro de la tarjeta del
-  radar), que abre el modal `#modalReevaluacion` — mismas 4 preguntas de
-  escala 1-5 que el paso 6 del wizard (mismo componente
-  `.scale-row`/`.scale-opt`, inputs con prefijo `reeval` para no chocar
-  con los `name` del wizard). Al enviar (`#formReevaluacion`), se guarda
-  en una key de `localStorage` **nueva y separada**,
+- **Color dinámico por porcentaje** (`gaugeColorForPercent`, interpolación
+  RGB continua): rojo `#B3261E` (0% — mismo rojo que ya usan los mensajes
+  de error de los formularios del sitio, reutilizado a propósito) → dorado
+  `var(--gold)` (50%) → verde `var(--green)` (100%). **Cada anillo se
+  colorea según su propio valor**, no según si es "antes" o "después" —
+  esa distinción ahora es por grosor/posición del anillo (externo/interno),
+  no por color. Hay una leyenda de escala (`.gauge-scale`) que explica el
+  significado de los 3 tramos de color ("Necesita atención" / "En
+  progreso" / "Sólido").
+- **Reevaluación = segunda medición real** (sin cambios respecto al radar
+  original): botón "Actualizar mi estado" (`#btnReevaluar`, dentro de la
+  tarjeta), abre el modal `#modalReevaluacion` con las mismas 4 preguntas
+  de escala 1-5 del paso 6 (inputs con prefijo `reeval`). Al enviar
+  (`#formReevaluacion`), se guarda en `localStorage` bajo
   `sinaptix_reevaluacion` (`{estres, fatiga, concentracion, olvidos,
-  fecha}`). **Solo guarda la última reevaluación** (se sobrescribe cada
-  vez, igual que `sinaptix_antropometria`) — no hay historial de múltiples
-  reevaluaciones todavía; si se necesita eso a futuro, hay que pasar esa
-  key a un array.
-- El radar depende únicamente de `localStorage` (`sinaptix_objetivo` y
+  fecha}`), sobrescribiendo cualquier reevaluación anterior (no hay
+  historial de más de una todavía).
+- Depende únicamente de `localStorage` (`sinaptix_objetivo` y
   `sinaptix_reevaluacion`), no de sesión de Netlify Identity — funciona
   igual con o sin login, igual que "Mi plan".
-- **Verificado con Playwright** en este entorno (servidor local +
-  capturas): los 3 estados de la tarjeta, apertura del wizard desde el
-  botón del estado vacío, apertura y guardado completo del modal de
-  reevaluación (persiste en `localStorage`, cierra el modal, hace scroll
-  de vuelta al radar), y layout en viewport móvil (380px). Ojo con el
-  tamaño del `viewBox` del SVG (300×300, `cx=150,cy=150,maxR=80`): con
-  valores más chicos las etiquetas laterales "Memoria" y "Calma" quedaban
-  cortadas contra el borde de la tarjeta — si se lo vuelve a tocar,
-  confirmar con captura que el texto no se corte.
+- **Pendiente de verificación visual real**: en esta sesión, Playwright no
+  pudo instalar Chromium (la descarga del navegador sale del dominio
+  permitido en la configuración de red de este entorno, así que el
+  `install` no completó). Se validó la lógica por separado en Node
+  (interpolación de color rojo→dorado→verde en varios cortes de
+  porcentaje, y que la conversión de escala 1-5 da siempre múltiplos de
+  20%), pero **no hay capturas de cómo se ve realmente el layout de la
+  grilla 2×2 ni el tamaño de los anillos en el navegador**. Si una sesión
+  futura tiene acceso para instalar Playwright, conviene tomar capturas
+  (desktop y móvil 380px) antes de dar esto por definitivamente cerrado
+  visualmente — en particular confirmar que el texto de porcentaje y el
+  label no se corten dentro del `viewBox` de 120×120, y que la grilla 2×2
+  se vea bien en el ancho real de la tarjeta en móvil.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 

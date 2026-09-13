@@ -5,6 +5,43 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Reemplazo del radar por anillos de progreso con color dinámico
+
+- El usuario pidió reemplazar el radar/spider chart de la tarjeta de
+  progreso en Método por algo más llamativo. Se propusieron 3 mockups
+  (dumbbell antes/después, anillos tipo gauge, barras agrupadas); eligió
+  los **anillos**, con el pedido explícito de que el color de cada anillo
+  cambie según su propio porcentaje.
+- Tarjeta renombrada de `#methodRadar`/`.method-radar` a
+  `#methodGauges`/`.method-gauges` (junto con todas las funciones y
+  variables internas en `js/script.js`: `renderMethodGauges`,
+  `gaugeComputeAreas`, `gaugeColorForPercent`, `gaugeArc`,
+  `gaugeBuildItem`, etc.) para que el código no siga hablando de "radar"
+  sin que exista ningún spider chart.
+- Nuevo layout: grilla 2×2 (`.gauge-grid`) con un anillo SVG por área
+  (Foco, Memoria, Energía, Calma), dibujado con `<circle>` +
+  `stroke-dasharray` (sin librerías). Con diagnóstico + reevaluación, cada
+  gauge dibuja un anillo externo grueso (estado actual) y uno interno fino
+  (diagnóstico inicial), ambos coloreados según su propio valor — la
+  distinción antes/después pasa a ser por grosor/posición del anillo, no
+  por color como en el radar (que usaba morado/verde fijos por serie).
+- Color por porcentaje (`gaugeColorForPercent`): interpolación RGB continua
+  rojo `#B3261E` (0%, reutiliza el rojo de validación que ya existía en el
+  sitio) → dorado `var(--gold)` (50%) → verde `var(--green)` (100%). Se
+  agregó `.gauge-scale`, una leyenda que explica los 3 tramos de color.
+- Mismos 3 estados de la tarjeta que el radar (vacío / solo diagnóstico /
+  diagnóstico + reevaluación), mismo origen de datos (paso 6 del wizard +
+  `sinaptix_reevaluacion`), y el modal `#modalReevaluacion` /
+  `#btnReevaluar` no cambiaron.
+- **Sin verificación visual con Playwright en esta sesión**: el `install`
+  de Chromium no completó porque la descarga del navegador sale de un
+  dominio no permitido en la configuración de red de este entorno
+  (timeout). Se validó por separado en Node.js la interpolación de color
+  (transición correcta y continua en los cortes 0/20/40/50/60/80/100%) y
+  la conversión de escala 1-5 a porcentaje (siempre 20/40/60/80/100%, sin
+  decimales). Falta confirmar visualmente (desktop + móvil 380px) en una
+  sesión con acceso a Playwright, o con una captura que aporte el usuario.
+
 ## 2026-09-13 — Radar de progreso (antes/después) en Método, con reevaluación
 
 - Sección 03 (Método): el `.timeline` ahora comparte fila con una tarjeta

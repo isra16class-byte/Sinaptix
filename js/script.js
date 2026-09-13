@@ -487,7 +487,7 @@
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
 
         res.textContent = 'Tu plan quedó guardado en tu cuenta. Te llevamos a "Mi plan". ✓';
-        renderMethodRadar();
+        renderMethodGauges();
         setTimeout(function(){
           closeModal(document.getElementById('modalNutricion'));
           if(miPlanEl) miPlanEl.scrollIntoView({behavior:'smooth'});
@@ -496,7 +496,7 @@
         // Sin sesión: queda guardado en este navegador, pero para verlo
         // completo y no perderlo, invitamos a iniciar sesión (o crear cuenta).
         res.textContent = 'Guardamos tu propuesta en este navegador. Iniciá sesión para verla completa, guardada y lista cada vez que entres. ✓';
-        renderMethodRadar();
+        renderMethodGauges();
         if(window.netlifyIdentity){
           setTimeout(function(){ netlifyIdentity.open('login'); }, 900);
         }
@@ -504,22 +504,23 @@
     });
   }
 
-  // ===================== Radar de progreso (Método) =====================
+  // ===================== Anillos de progreso (Método) =====================
   // Compara la medición inicial de la encuesta (paso 6: estrés, fatiga,
   // dificultad de concentración, olvidos) contra una reevaluación posterior
   // opcional, guardada aparte en 'sinaptix_reevaluacion'. Ver memoria.md,
-  // sección "Radar de progreso", para la justificación de esta decisión
-  // (no existía una segunda medición real hasta esta sesión).
-  function radarFechaCorta(iso){
+  // sección "Anillos de progreso", para la justificación de esta decisión
+  // (no existía una segunda medición real hasta la sesión que agregó esto,
+  // y el gráfico se rediseñó de radar a anillos tipo gauge en la sesión
+  // siguiente, a pedido del usuario).
+  function gaugeFechaCorta(iso){
     try{
       return new Date(iso).toLocaleDateString('es-AR', {day:'2-digit', month:'short'});
     }catch(err){ return ''; }
   }
 
   // Invierte cada escala 1-5 (donde 5 = peor) a un puntaje de bienestar
-  // 1-5 (donde 5 = mejor), para que en el radar "más afuera" sea siempre
-  // "mejor" en las 4 áreas, sin importar cómo se formuló la pregunta.
-  function radarComputeAreas(d){
+  // 1-5 (donde 5 = mejor), sin importar cómo se formuló la pregunta.
+  function gaugeComputeAreas(d){
     return {
       foco: 6 - (parseInt(d.concentracion, 10) || 3),
       memoria: 6 - (parseInt(d.olvidos, 10) || 3),
@@ -528,57 +529,66 @@
     };
   }
 
-  function radarPoint(cx, cy, r, angleDeg){
-    const rad = (Math.PI/180)*angleDeg;
-    return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
+  function gaugeHexToRgb(hex){
+    const h = hex.replace('#','');
+    return {
+      r: parseInt(h.substring(0,2),16),
+      g: parseInt(h.substring(2,4),16),
+      b: parseInt(h.substring(4,6),16)
+    };
+  }
+  function gaugeLerp(a, b, t){ return a + (b-a)*t; }
+  function gaugeRgbToHex(rgb){
+    const toHex = v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0');
+    return '#'+toHex(rgb.r)+toHex(rgb.g)+toHex(rgb.b);
   }
 
-  function radarBuildSvg(antes, despues){
-    const cx=150, cy=150, maxR=80;
-    const labels = ['Foco','Memoria','Energía','Calma'];
-    const angleFor = i => -90 + i*90;
-
-    const grid = [0.25,0.5,0.75,1].map(function(frac){
-      const pts = [0,1,2,3].map(function(i){
-        const p = radarPoint(cx, cy, maxR*frac, angleFor(i));
-        return p.x.toFixed(1)+','+p.y.toFixed(1);
-      }).join(' ');
-      return '<polygon points="'+pts+'" style="fill:none;stroke:var(--panel-line)" stroke-width="1"/>';
-    }).join('');
-
-    const axisLines = [0,1,2,3].map(function(i){
-      const p = radarPoint(cx, cy, maxR, angleFor(i));
-      return '<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" style="stroke:var(--panel-line)" stroke-width="1"/>';
-    }).join('');
-
-    const labelPos = [
-      {x:cx, y:cy-maxR-16, anchor:'middle'},
-      {x:cx+maxR+14, y:cy+4, anchor:'start'},
-      {x:cx, y:cy+maxR+24, anchor:'middle'},
-      {x:cx-maxR-14, y:cy+4, anchor:'end'}
-    ];
-    const axisLabels = labels.map(function(lab, i){
-      return '<text x="'+labelPos[i].x+'" y="'+labelPos[i].y+'" text-anchor="'+labelPos[i].anchor+'" style="fill:var(--ink-soft);font-family:var(--font-m);font-size:11px;font-weight:600">'+lab+'</text>';
-    }).join('');
-
-    function polyFor(vals, color){
-      const pts = [0,1,2,3].map(function(i){
-        const v = Math.max(0, Math.min(5, vals[i]));
-        const p = radarPoint(cx, cy, (v/5)*maxR, angleFor(i));
-        return p.x.toFixed(1)+','+p.y.toFixed(1);
-      }).join(' ');
-      return '<polygon points="'+pts+'" style="fill:'+color+';fill-opacity:.16;stroke:'+color+'" stroke-width="2"/>';
+  // Color dinámico según el porcentaje: rojo (necesita atención) → dorado
+  // (en progreso) → verde (sólido), interpolado en RGB para que el cambio
+  // de color sea gradual y no un salto brusco entre 3 colores fijos.
+  const GAUGE_LOW = '#B3261E';   // mismo rojo que ya se usa para validaciones
+  const GAUGE_MID = '#C1703B';  // var(--gold)
+  const GAUGE_HIGH = '#2E7D5B'; // var(--green)
+  function gaugeColorForPercent(pct){
+    const p = Math.max(0, Math.min(100, pct));
+    const low = gaugeHexToRgb(GAUGE_LOW), mid = gaugeHexToRgb(GAUGE_MID), high = gaugeHexToRgb(GAUGE_HIGH);
+    if(p <= 50){
+      const t = p/50;
+      return gaugeRgbToHex({r:gaugeLerp(low.r,mid.r,t), g:gaugeLerp(low.g,mid.g,t), b:gaugeLerp(low.b,mid.b,t)});
     }
-
-    let polys = '';
-    if(antes) polys += polyFor([antes.foco, antes.memoria, antes.energia, antes.calma], 'var(--purple)');
-    if(despues) polys += polyFor([despues.foco, despues.memoria, despues.energia, despues.calma], 'var(--green)');
-
-    return '<svg viewBox="0 0 300 300" role="img" aria-label="Gráfico de foco, memoria, energía y calma">'+grid+axisLines+polys+axisLabels+'</svg>';
+    const t = (p-50)/50;
+    return gaugeRgbToHex({r:gaugeLerp(mid.r,high.r,t), g:gaugeLerp(mid.g,high.g,t), b:gaugeLerp(mid.b,high.b,t)});
   }
 
-  function renderMethodRadar(){
-    const el = document.getElementById('methodRadar');
+  function gaugeArc(cx, cy, r, strokeWidth, pct, color){
+    const circumference = 2*Math.PI*r;
+    const len = (Math.max(0, Math.min(100, pct))/100)*circumference;
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--panel-line)" stroke-width="'+strokeWidth+'"/>'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" '+
+      'stroke-dasharray="'+len.toFixed(1)+' '+circumference.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+  }
+
+  // Un anillo tipo "Apple Watch" por área. Si hay reevaluación, el anillo
+  // externo (más grueso) muestra el estado actual y uno interno más fino
+  // muestra el diagnóstico inicial como referencia — ambos coloreados según
+  // su propio porcentaje, no con un color fijo por serie.
+  function gaugeBuildItem(label, antesPct, despuesPct){
+    const cx=60, cy=60;
+    const current = (despuesPct==null) ? antesPct : despuesPct;
+    let svg = '<svg viewBox="0 0 120 120" role="img" aria-label="'+label+': '+current+'%'+
+      (despuesPct!=null ? ' (inicial '+antesPct+'%)' : '')+'">';
+    if(despuesPct!=null){
+      svg += gaugeArc(cx, cy, 33, 8, antesPct, gaugeColorForPercent(antesPct));
+    }
+    svg += gaugeArc(cx, cy, 46, 10, current, gaugeColorForPercent(current));
+    svg += '<text x="60" y="57" text-anchor="middle" style="font-family:var(--font-d);font-size:24px;font-weight:800;fill:var(--ink)">'+current+'%</text>';
+    svg += '<text x="60" y="75" text-anchor="middle" style="font-family:var(--font-m);font-size:10px;font-weight:700;fill:var(--ink-faint);letter-spacing:.02em">'+label+'</text>';
+    svg += '</svg>';
+    return '<div class="gauge-item">'+svg+'</div>';
+  }
+
+  function renderMethodGauges(){
+    const el = document.getElementById('methodGauges');
     if(!el) return;
 
     let antesObjetivo = null;
@@ -596,32 +606,52 @@
     }catch(err){ /* dato corrupto: se ignora */ }
 
     const header = '<span class="eyebrow">Tu progreso</span>'+
-      '<h3 class="method-radar-title">Foco, memoria, energía y calma</h3>';
+      '<h3 class="method-gauges-title">Foco, memoria, energía y calma</h3>';
 
     if(!antesObjetivo){
       el.innerHTML = header+
-        '<p class="method-radar-text">Generá tu diagnóstico de nutrición especializada y vas a ver acá, de un vistazo, cómo está hoy tu foco, tu memoria, tu energía y tu calma.</p>'+
-        '<button type="button" class="btn btn-ghost" id="btnRadarDiagnostico">Generar mi diagnóstico</button>';
+        '<p class="method-gauges-text">Generá tu diagnóstico de nutrición especializada y vas a ver acá, de un vistazo, cómo está hoy tu foco, tu memoria, tu energía y tu calma.</p>'+
+        '<button type="button" class="btn btn-ghost" id="btnGaugeDiagnostico">Generar mi diagnóstico</button>';
       return;
     }
 
-    const antes = radarComputeAreas(antesObjetivo.encuesta);
-    const despues = despuesReeval ? radarComputeAreas(despuesReeval) : null;
-    const svg = radarBuildSvg(antes, despues);
+    const antes = gaugeComputeAreas(antesObjetivo.encuesta);
+    const despues = despuesReeval ? gaugeComputeAreas(despuesReeval) : null;
 
-    let legend = '<div class="radar-legend">'+
-      '<span class="radar-legend-item"><i style="background:var(--purple)"></i>Diagnóstico inicial'+
-      (antesObjetivo.fecha ? ' · '+radarFechaCorta(antesObjetivo.fecha) : '')+'</span>';
+    const areas = [
+      {key:'foco', label:'Foco'},
+      {key:'memoria', label:'Memoria'},
+      {key:'energia', label:'Energía'},
+      {key:'calma', label:'Calma'}
+    ];
+    const grid = areas.map(function(a){
+      const antesPct = Math.round((antes[a.key]/5)*100);
+      const despuesPct = despues ? Math.round((despues[a.key]/5)*100) : null;
+      return gaugeBuildItem(a.label, antesPct, despuesPct);
+    }).join('');
+
+    const scale = '<div class="gauge-scale">'+
+      '<span><i style="background:'+GAUGE_LOW+'"></i>Necesita atención</span>'+
+      '<span><i style="background:'+GAUGE_MID+'"></i>En progreso</span>'+
+      '<span><i style="background:'+GAUGE_HIGH+'"></i>Sólido</span>'+
+      '</div>';
+
+    let legend = '<div class="gauge-legend">';
     if(despues){
-      legend += '<span class="radar-legend-item"><i style="background:var(--green)"></i>Última actualización'+
-        (despuesReeval.fecha ? ' · '+radarFechaCorta(despuesReeval.fecha) : '')+'</span>';
+      legend += '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--outer"></i>Estado actual'+
+        (despuesReeval.fecha ? ' · '+gaugeFechaCorta(despuesReeval.fecha) : '')+'</span>'+
+        '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--inner"></i>Diagnóstico inicial'+
+        (antesObjetivo.fecha ? ' · '+gaugeFechaCorta(antesObjetivo.fecha) : '')+'</span>';
+    } else {
+      legend += '<span class="gauge-legend-item"><i class="gauge-legend-ring gauge-legend-ring--outer"></i>Diagnóstico inicial'+
+        (antesObjetivo.fecha ? ' · '+gaugeFechaCorta(antesObjetivo.fecha) : '')+'</span>';
     }
     legend += '</div>';
 
     const cta = '<button type="button" class="btn btn-ghost" id="btnReevaluar">'+
       (despues ? 'Actualizar mi estado otra vez' : 'Actualizar mi estado')+'</button>';
 
-    el.innerHTML = header+'<div class="radar-svg">'+svg+'</div>'+legend+cta;
+    el.innerHTML = header+'<div class="gauge-grid">'+grid+'</div>'+scale+legend+cta;
   }
 
   function resetReevalForm(){
@@ -631,10 +661,10 @@
     if(res){ res.style.display='none'; res.textContent=''; }
   }
 
-  const methodRadarEl = document.getElementById('methodRadar');
-  if(methodRadarEl){
-    methodRadarEl.addEventListener('click', function(e){
-      if(e.target.closest('#btnRadarDiagnostico')){
+  const methodGaugesEl = document.getElementById('methodGauges');
+  if(methodGaugesEl){
+    methodGaugesEl.addEventListener('click', function(e){
+      if(e.target.closest('#btnGaugeDiagnostico')){
         resetNutriWizard();
         openModal('modalNutricion');
       } else if(e.target.closest('#btnReevaluar')){
@@ -668,17 +698,17 @@
       res.style.display='block';
       res.style.color='';
       res.textContent = 'Actualización guardada. Así se ve tu progreso. ✓';
-      renderMethodRadar();
+      renderMethodGauges();
 
       setTimeout(function(){
         closeModal(document.getElementById('modalReevaluacion'));
-        const target = document.getElementById('methodRadar');
+        const target = document.getElementById('methodGauges');
         if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
       }, 900);
     });
   }
 
-  renderMethodRadar();
+  renderMethodGauges();
 
   // Reveal on scroll
   const revealEls = document.querySelectorAll('.reveal:not(.in)');
