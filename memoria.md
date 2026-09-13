@@ -1117,6 +1117,75 @@ a WebP si el peso se vuelve un problema real de rendimiento).
   de la imagen para que el posicionamiento siga funcionando aunque el
   contenedor cambie de tamaño.
 
+## Identidad visual de "Mi plan" alineada con el resto del sitio (`mi-plan.html`)
+
+Pedido del usuario: que "Mi plan" (`mi-plan.html`) tenga el mismo estilo
+visual que ya tiene el resto del sitio (`index.html`), no solo comparta
+`css/styles.css` de forma genérica. Antes de esta sesión, `#miPlan` era la
+única sección `.dark` de todo el sitio **sin una sola decoración SVG** —
+`index.html` tiene entre 2 y 7 elementos `.deco` por sección (frutas,
+espigas de trigo, círculos, puntos), pero `mi-plan.html` no tenía
+ninguno — se veía plana/genérica en comparación.
+
+- **Decoraciones agregadas** (como hijos directos de `<section
+  id="miPlan">`, antes de `.wrap`, mismo patrón que cualquier sección de
+  `index.html` — no se creó ningún asset nuevo, todo reutiliza
+  `svg/*.svg` ya existente):
+  - `deco-circles-vision.svg` (los mismos círculos de fondo de la sección
+    Manifiesto), muy sutil (`opacity:.12`), arriba a la derecha — encaja
+    con el tono de "panel/dashboard" de esta pantalla mejor que una fruta.
+  - `deco-blob-kiwi.svg` abajo a la izquierda.
+  - Dos `deco-espiga.svg` (espigas de trigo) en esquinas opuestas,
+    ángulos distintos — mismo criterio de "2 espigas cruzadas" que usan
+    lam-02/04/05/06.
+  - Se **evitó a propósito** el tratamiento `.title-mark` (subrayado tipo
+    marcador debajo de una palabra del título) que sí usan los `<h2>` de
+    `index.html`: la sección "Pendientes conocidos" de este mismo archivo
+    ya documenta que esa idea se probó y se revirtió una vez por romper
+    el wrapping dentro de contenedores `flex`; no vale la pena
+    reintroducir ese riesgo en un título que además es left-aligned acá
+    (el patrón existente es para títulos centrados en `.sec-head-center`).
+- **Fix de contraste real, no solo decorativo**: `#miPlan` es una sección
+  `.dark` (fondo `--panel`, `#F7F1F5`). Las tarjetas que ya vivían ahí
+  (`.stat-box`, `.bar-chart-card`) usan `--paper-2` (`#FAF7F9`, un tono
+  casi idéntico a `--panel`) y `.nutri-summary` usa `--panel` **directo**
+  (el mismo color exacto, sin borde propio) — en `index.html` esto no se
+  nota porque esas mismas clases se usan sobre fondo blanco (`stat-grid`
+  de Manifiesto, que no es `.dark`) o dentro del modal blanco
+  (`.nutri-summary` en `#modalNutricion`, `.modal-card` usa `--paper`).
+  En "Mi plan" sí se notaba: las tarjetas casi no se distinguían del
+  fondo de la sección, y la tarjeta de resumen del plan
+  (`#miPlanDetalle`/`#nutriResumen`, ambas `.nutri-summary`) quedaba
+  **sin ningún borde ni contraste**, prácticamente invisible como
+  tarjeta. Se agregó en `css/styles.css`:
+  ```css
+  #miPlan .stat-box,
+  #miPlan .bar-chart-card{background:var(--paper)}
+  #miPlan .nutri-summary{background:var(--paper);border:1px solid var(--line)}
+  ```
+  Mismo tratamiento que ya usa `.method-gauges` (blanco puro `--paper`)
+  sobre su propia sección oscura en Método — no se tocó ninguna de estas
+  clases fuera de `#miPlan`, así que `index.html` sigue exactamente
+  igual.
+- Si se agrega una tarjeta nueva a "Mi plan" en el futuro, aplicar el
+  mismo criterio: fondo `--paper` (blanco puro) cuando la tarjeta vive
+  dentro de una sección `.dark`, no `--paper-2` ni `--panel` (ambos se
+  confunden con el fondo de la sección en ese contexto).
+- **Pendiente de verificación visual real**: mismo problema de red que
+  el resto de esta sesión — Playwright no pudo instalar Chromium. Se
+  verificó con jsdom que las 4 imágenes decorativas quedan como hijas
+  directas de `#miPlan` (antes de `.wrap`, mismo nivel que en
+  `index.html`) y que el selector `#miPlan .nutri-summary` alcanza tanto
+  a `#miPlanDetalle` como a `#nutriResumen`, y con la librería `css` que
+  la hoja de estilos sigue parseando sin errores tras el cambio — pero no
+  hay captura de pantalla real confirmando que las decoraciones y el
+  contraste se ven bien en el navegador. Si una sesión futura tiene
+  Playwright, conviene revisar sobre todo el espaciado del blob
+  `deco-blob-kiwi` cerca del botón "Cerrar sesión" del estado sin plan
+  generado, y el responsive ≤900px (las clases `.deco-fruit`/
+  `.deco-scribble` ya se ocultan solas en `max-width:720px`, pero no se
+  vio en pantalla real).
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

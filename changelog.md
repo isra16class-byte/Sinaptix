@@ -5,6 +5,42 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Identidad visual de "Mi plan" alineada con el resto del sitio
+
+- Pedido del usuario: que "Mi plan" (`mi-plan.html`) tenga el mismo estilo
+  visual que ya tiene el resto del sitio, "y que quede incluso mejor".
+- `mi-plan.html` era la única sección `.dark` de todo el sitio sin
+  ninguna decoración SVG (`index.html` tiene entre 2 y 7 por sección). Se
+  agregaron 4 (reusando SVGs ya existentes, sin crear assets nuevos):
+  `deco-circles-vision.svg` sutil arriba a la derecha,
+  `deco-blob-kiwi.svg` abajo a la izquierda, y 2 `deco-espiga.svg` en
+  esquinas opuestas — mismo patrón que ya usan lam-02/04/05/06. No se
+  agregó el subrayado tipo "marcador" (`.title-mark`) de los `<h2>` de
+  `index.html` a propósito: esa idea ya se había revertido antes en el
+  sitio (ver entrada "Revertidos los trazos tipo marcador" más abajo en
+  este changelog) por romper el wrapping en contenedores flex, y el
+  título de "Mi plan" además es left-aligned, no el patrón centrado para
+  el que existe ese tratamiento.
+- **Fix de contraste real** (no solo decorativo): dentro de la sección
+  `.dark` de "Mi plan" (fondo `--panel`), las tarjetas `.stat-box` y
+  `.bar-chart-card` (fondo `--paper-2`, casi el mismo tono que `--panel`)
+  y sobre todo `.nutri-summary` (fondo `--panel`, el mismo color exacto,
+  sin borde) casi no se distinguían del fondo — la tarjeta de resumen del
+  plan quedaba prácticamente invisible como tarjeta. Se sobreescribió a
+  `--paper` (blanco puro) + borde en `#miPlan .stat-box`,
+  `#miPlan .bar-chart-card` y `#miPlan .nutri-summary`, mismo tratamiento
+  que ya usa `.method-gauges` sobre su propia sección oscura en Método.
+  No afecta el uso de esas mismas clases en `index.html` (stat-grid de
+  Manifiesto sobre fondo blanco, o `.nutri-summary` dentro del modal
+  blanco de nutrición), solo se scopeó a `#miPlan`.
+- Verificado: la hoja de estilos sigue parseando sin errores (librería
+  `css` de Node) y, simulando el DOM con jsdom, las 4 decoraciones quedan
+  como hijas directas de `#miPlan` (mismo nivel que en `index.html`) y el
+  selector `#miPlan .nutri-summary` alcanza tanto a `#miPlanDetalle` como
+  a `#nutriResumen`. Pendiente de verificación visual real en navegador
+  (Playwright no se pudo instalar por la misma restricción de red de
+  sesiones anteriores) — ver detalle en `memoria.md`.
+
 ## 2026-09-13 — Interruptor "Mi progreso" / "Mi IMC" en la sección Método
 
 - Pedido del usuario: en la sección `03 — Cómo trabajamos` (Método) de

@@ -289,6 +289,22 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-dot-saludable{background:var(--green)}
 .imc-dot-vigilar{background:var(--red)}
 
+/* "Mi plan" (mi-plan.html) es una sección .dark: su fondo es --panel
+   (#F7F1F5). .stat-box/.bar-chart-card usan --paper-2 (#FAF7F9, casi el
+   mismo tono) y .nutri-summary usa --panel directamente (el mismo color
+   exacto, sin borde propio) — en index.html eso no se nota porque esas
+   mismas clases viven sobre fondo blanco (stat-grid de Manifiesto) o
+   dentro de un modal blanco (nutri-summary en #modalNutricion), pero acá
+   las tarjetas quedaban casi sin contraste contra el fondo de la
+   sección, la de resumen del plan directamente invisible. Se
+   sobreescribe a blanco puro (--paper) solo en este contexto, mismo
+   tratamiento que ya usa la tarjeta de Método (.method-gauges) sobre su
+   propia sección oscura — no afecta el uso de estas clases en otras
+   páginas/secciones.*/
+#miPlan .stat-box,
+#miPlan .bar-chart-card{background:var(--paper)}
+#miPlan .nutri-summary{background:var(--paper);border:1px solid var(--line)}
+
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
 @media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}
