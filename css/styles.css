@@ -340,6 +340,25 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #miPlan .bar-chart-card{background:var(--paper)}
 #miPlan .nutri-summary{background:var(--paper);border:1px solid var(--line)}
 
+/* "Mi plan" es una pantalla de utilidad (dashboard), no una sección tipo
+   "slide" de landing como lam-01..06 — el padding vertical genérico de
+   `section` (130px arriba / 110px abajo, pensado para esas secciones
+   grandes) y el `margin-top:100px` del `footer` dejaban un scroll enorme
+   acá sin necesidad. Se recorta solo en este contexto (no se toca
+   `section`/`footer` en general, así que index.html sigue igual). */
+#miPlan{padding:104px 0 56px}
+#miPlan footer{margin-top:48px}
+#miPlanConSesion .sec-head-center .lam-title{margin:14px 0 6px}
+#miPlanConSesion .sec-head-center .lam-text{margin:0}
+#miPlan .miplan-subhead{margin-bottom:12px}
+#miPlan .stat-box,
+#miPlan .bar-chart-card,
+#miPlan .miplan-cierre{padding:20px 20px}
+#miPlan .nutri-summary{padding:20px 20px}
+#miPlan .miplan-grid,
+#miPlan .miplan-col,
+#miPlan .miplan-detalle-grid{gap:14px}
+
 /* ---------- "Mi plan": layout tipo dashboard (Datos clave / Detalle) ----------
    Reordena los mismos componentes que ya existían (medidor de IMC, tarjeta de
    objetivo, gráfico de barras, resumen del plan, botones) en una grilla más

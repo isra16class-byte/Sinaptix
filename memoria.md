@@ -1041,6 +1041,24 @@ neuroalimentación") — siguen en Fraunces. Si se quiere aplicar Caveat a
 algún otro título puntual en el futuro, reusar `.title-hand` en vez de
 acoplar el cambio a un `id` de sección.
 
+**Espaciado vertical recortado, menos scroll** (sesión posterior, feedback
+contra la imagen de referencia: "en la de nosotros se nos va casi toda la
+pantalla"): `#miPlan` heredaba el padding vertical genérico de `section`
+(`130px 0 110px`, pensado para las secciones tipo slide de `index.html`)
+y el `margin-top:100px` de `footer` — mucho más aire del que necesita una
+pantalla de utilidad/dashboard como esta. Se recortó **solo para
+`#miPlan`** (`section`/`footer` genéricos no se tocaron, `index.html`
+sigue igual): `#miPlan{padding:104px 0 56px}`,
+`#miPlan footer{margin-top:48px}`, menos margen alrededor del título/email
+del header (`#miPlanConSesion .sec-head-center .lam-title`/`.lam-text`),
+`.miplan-subhead` con menos `margin-bottom`, el segundo subhead con
+`margin-top:26px` en vez de `40px` (en `mi-plan.html`), y el padding
+interno de `.stat-box`/`.bar-chart-card`/`.miplan-cierre`/`.nutri-summary`
+bajado de `26-28px` a `20px` dentro de `#miPlan`. **Importante**: esta
+sesión fue exclusivamente sobre espaciado — la tipografía del título
+(`.title-hand`, Caveat) de la sesión anterior no se tocó ni se discutió,
+sigue vigente.
+
 ## Layout tipo dashboard de "Mi plan" (`.miplan-*`, `mi-plan.html`)
 
 A partir de una imagen de referencia que trajo el usuario (mockup de "Mi

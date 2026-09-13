@@ -5,6 +5,45 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Mi plan": layout más compacto, menos scroll (sin tocar la tipografía)
+
+- El usuario aclaró que el pedido anterior **no** era sobre la tipografía
+  del título (esa parte quedó bien) sino sobre lo apretado/ordenado que se
+  ve todo en la imagen de referencia comparado con cómo quedó el sitio
+  real: acá se iba "casi toda la pantalla" y hacía falta bastante scroll
+  para ver el mismo contenido que en la referencia entra sin apenas
+  desplazarse. **No se tocó ningún commit anterior de tipografía** (el
+  patch que revertía Caveat→Fraunces del intento anterior queda
+  descartado, no se generó de nuevo).
+- Causa principal: `#miPlan` es una pantalla de utilidad (dashboard), pero
+  heredaba el padding vertical genérico de `section` (`130px` arriba /
+  `110px` abajo, pensado para las secciones tipo "slide" de `index.html`)
+  y el `margin-top:100px` de `footer` (mismo criterio, pensado para
+  secciones largas) — sumado, dejaban más de 300px de aire vertical sin
+  contenido real.
+- **Se recorta solo para `#miPlan`** (no se toca `section`/`footer` en
+  general, así que `index.html` sigue exactamente igual):
+  - `#miPlan{padding:104px 0 56px}` (antes heredaba `130px 0 110px`).
+  - `#miPlan footer{margin-top:48px}` (antes heredaba `100px`).
+  - `#miPlanConSesion .sec-head-center .lam-title{margin:14px 0 6px}` y
+    `.lam-text{margin:0}` en ese mismo bloque — recorta el aire entre el
+    título y el email de sesión, sin cambiar tamaño de fuente ni el resto
+    del tratamiento tipográfico.
+  - `#miPlan .miplan-subhead{margin-bottom:12px}` (antes `16px`), y el
+    `margin-top` del segundo subhead ("Detalle del plan de nutrición") en
+    `mi-plan.html` bajó de `40px` a `26px`.
+  - Padding interno de las tarjetas recortado de `26-28px` a `20px`:
+    `#miPlan .stat-box`, `#miPlan .bar-chart-card`, `#miPlan .miplan-cierre`,
+    `#miPlan .nutri-summary`.
+  - `gap` de `.miplan-grid`/`.miplan-col`/`.miplan-detalle-grid` de `16px`
+    a `14px`.
+- Verificado con la librería `css` de npm que `css/styles.css` sigue
+  parseando sin errores tras el cambio. Sigue pendiente la verificación
+  visual real (Playwright no puede instalar Chromium en este entorno, ver
+  entradas anteriores) — conviene confirmar que con esto el contenido de
+  "Mi plan" entra con bastante menos scroll, comparando contra la imagen
+  de referencia.
+
 ## 2026-09-13 — "Mi plan": título en una línea con tipografía manuscrita, sin el eyebrow "Mi plan"
 
 - El usuario vio el layout tipo dashboard recién aplicado y pidió dos
