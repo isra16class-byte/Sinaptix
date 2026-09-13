@@ -120,28 +120,32 @@
       <img aria-hidden="true" class="title-scribble" src="svg/deco-scribble.svg" alt="">
     </div>
 
-    <div class="timeline reveal d2">
-      <div class="tl-line"></div>
-      <div class="tl-item">
-        <div class="tl-num">01</div>
-        <h3>Evaluación cognitiva y alimentaria</h3>
-        <p>Revisamos tus hábitos actuales, tu carga mental (trabajo, estudio, estrés) y tu relación con la comida a lo largo del día.</p>
+    <div class="method-body">
+      <div class="timeline reveal d2">
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-num">01</div>
+          <h3>Evaluación cognitiva y alimentaria</h3>
+          <p>Revisamos tus hábitos actuales, tu carga mental (trabajo, estudio, estrés) y tu relación con la comida a lo largo del día.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-num">02</div>
+          <h3>Plan de neuroalimentación personalizado</h3>
+          <p>Diseñamos pautas concretas, qué, cuándo y en qué combinación comer, alineadas a tus horarios de mayor exigencia cognitiva.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-num">03</div>
+          <h3>Acompañamiento y ajustes</h3>
+          <p>Seguimiento quincenal para ajustar el plan según tu energía, tu sueño y tus resultados reales, no según una tabla fija.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-num">04</div>
+          <h3>Reevaluación de resultados</h3>
+          <p>Medimos avances en foco, memoria de trabajo y fatiga mental percibida, y definimos el siguiente ciclo.</p>
+        </div>
       </div>
-      <div class="tl-item">
-        <div class="tl-num">02</div>
-        <h3>Plan de neuroalimentación personalizado</h3>
-        <p>Diseñamos pautas concretas, qué, cuándo y en qué combinación comer, alineadas a tus horarios de mayor exigencia cognitiva.</p>
-      </div>
-      <div class="tl-item">
-        <div class="tl-num">03</div>
-        <h3>Acompañamiento y ajustes</h3>
-        <p>Seguimiento quincenal para ajustar el plan según tu energía, tu sueño y tus resultados reales, no según una tabla fija.</p>
-      </div>
-      <div class="tl-item">
-        <div class="tl-num">04</div>
-        <h3>Reevaluación de resultados</h3>
-        <p>Medimos avances en foco, memoria de trabajo y fatiga mental percibida, y definimos el siguiente ciclo.</p>
-      </div>
+
+      <aside class="method-radar reveal d2" id="methodRadar" aria-live="polite"></aside>
     </div>
 
     <div class="method-cta reveal d3">
@@ -662,6 +666,59 @@
       </div>
       <button type="submit" class="btn btn-solid" style="align-self:flex-start;margin-top:4px">Guardar datos</button>
       <p class="modal-result" id="antroResultado"></p>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalReevaluacion">
+  <div class="modal-card">
+    <button type="button" class="modal-close" data-close>×</button>
+    <span class="eyebrow" style="color:var(--purple)">Actualizar mi estado</span>
+    <h3>¿Cómo estás ahora?</h3>
+    <p class="modal-text">Respondé estas 4 preguntas de nuevo para comparar tu progreso contra tu diagnóstico inicial en el gráfico de Método.</p>
+    <form class="modal-form" id="formReevaluacion">
+      <div class="nutri-group">
+        <span class="nutri-field-label">Nivel de estrés percibido</span>
+        <div class="scale-row" data-scale="reevalEstres">
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Fatiga mental durante el día</span>
+        <div class="scale-row" data-scale="reevalFatiga">
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Dificultad para concentrarte</span>
+        <div class="scale-row" data-scale="reevalConcentracion">
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Olvidos o dificultad para retener información</span>
+        <div class="scale-row" data-scale="reevalOlvidos">
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-solid" style="align-self:flex-start;margin-top:4px">Guardar actualización</button>
+      <p class="modal-result" id="reevalResultado"></p>
     </form>
   </div>
 </div>

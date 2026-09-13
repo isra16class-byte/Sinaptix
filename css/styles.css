@@ -223,7 +223,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-box .lab{font-family:var(--font-m);font-size:13px;color:var(--ink-soft);margin-top:8px;letter-spacing:0;font-weight:500}
 
 /* ---------- 03 PROCESO ---------- */
-.timeline{position:relative;margin-top:70px}
+.method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
+@media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}
+.timeline{position:relative}
 .tl-line{position:absolute;left:27px;top:10px;bottom:10px;width:1px;background:var(--panel-line)}
 .tl-item{position:relative;padding-left:76px;padding-bottom:56px}
 .tl-item:last-child{padding-bottom:0}
@@ -238,6 +240,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .tl-item p{color:var(--panel-text);max-width:56ch;font-size:15.5px}
 
 .method-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:58px;padding-top:44px;border-top:1px solid var(--panel-line)}
+
+.method-radar{background:var(--paper);border-radius:var(--radius);padding:28px 26px;box-shadow:var(--shadow)}
+.method-radar-title{font-family:var(--font-d);font-size:19px;font-weight:800;color:var(--ink);margin:10px 0 12px;max-width:none}
+.method-radar-text{color:var(--ink-soft);font-size:14px;margin-bottom:18px}
+.radar-svg{margin:4px 0 16px}
+.radar-svg svg{display:block;width:100%;height:auto}
+.radar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.radar-legend-item{display:flex;align-items:center;gap:7px;font-family:var(--font-m);font-size:12px;color:var(--ink-soft)}
+.radar-legend-item i{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
 .signal-wave{margin:6px 0 40px;opacity:.6}
 .signal-wave img{width:100%;height:44px;display:block}
 

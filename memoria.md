@@ -333,6 +333,63 @@ nuevo estando logueado (mensaje, cierre de modal, scroll a Mi plan, plan
 visible) — todo sin errores de JS y confirmado también en viewport móvil
 (380px).
 
+## Radar de progreso en Método (`#methodRadar`)
+
+La sección 03 (Método) ya no es solo el `.timeline` a ancho completo: ahora
+`.timeline` y una tarjeta nueva, `.method-radar` (`#methodRadar`), viven
+lado a lado dentro de `.method-body` (grid de 2 columnas, se apila en
+móvil ≤900px). La tarjeta muestra un radar/spider chart en SVG puro
+(generado a mano en `js/script.js`, sin librería de gráficos — el sitio no
+tiene build step) con 4 ejes: **Foco, Memoria, Energía, Calma**.
+
+- **De dónde salen los 4 ejes**: se reutilizan las mismas 4 escalas 1-5
+  del paso 6 del wizard de nutrición (estrés, fatiga, dificultad de
+  concentración, olvidos) — no se agregó ninguna pregunta nueva a la
+  encuesta. Se invierten (`6 - valor`, `radarComputeAreas` en
+  `js/script.js`) para que en el radar "más afuera" sea siempre "mejor" en
+  las 4 áreas: dificultad de concentración → **Foco**, olvidos →
+  **Memoria**, fatiga → **Energía**, estrés → **Calma**. Es un cambio de
+  etiqueta/orientación nada más, el dato de origen no cambió — si en algún
+  momento se prefieren los nombres literales de las preguntas en el eje,
+  es cuestión de tocar el array `labels` de `radarBuildSvg`.
+- **Estados de la tarjeta** (función `renderMethodRadar`, se llama al
+  cargar la página y después de guardar un diagnóstico o una
+  reevaluación):
+  1. Sin `sinaptix_objetivo.encuesta` guardado → estado vacío con CTA
+     "Generar mi diagnóstico" que abre el wizard de nutrición normal.
+  2. Con diagnóstico inicial → un solo polígono morado ("Antes", con la
+     fecha del diagnóstico) + botón "Actualizar mi estado".
+  3. Con una reevaluación posterior guardada → se agrega un segundo
+     polígono verde ("Después") superpuesto, leyenda con ambas fechas, y
+     el botón pasa a "Actualizar mi estado otra vez".
+- **Reevaluación = segunda medición real, dato nuevo**: antes de esta
+  sesión no existía ninguna forma de capturar un "después" real para
+  comparar contra el diagnóstico inicial (por eso el radar antes/después
+  no se podía hacer solo con datos existentes). Se agregó el botón
+  "Actualizar mi estado" (`#btnReevaluar`, dentro de la tarjeta del
+  radar), que abre el modal `#modalReevaluacion` — mismas 4 preguntas de
+  escala 1-5 que el paso 6 del wizard (mismo componente
+  `.scale-row`/`.scale-opt`, inputs con prefijo `reeval` para no chocar
+  con los `name` del wizard). Al enviar (`#formReevaluacion`), se guarda
+  en una key de `localStorage` **nueva y separada**,
+  `sinaptix_reevaluacion` (`{estres, fatiga, concentracion, olvidos,
+  fecha}`). **Solo guarda la última reevaluación** (se sobrescribe cada
+  vez, igual que `sinaptix_antropometria`) — no hay historial de múltiples
+  reevaluaciones todavía; si se necesita eso a futuro, hay que pasar esa
+  key a un array.
+- El radar depende únicamente de `localStorage` (`sinaptix_objetivo` y
+  `sinaptix_reevaluacion`), no de sesión de Netlify Identity — funciona
+  igual con o sin login, igual que "Mi plan".
+- **Verificado con Playwright** en este entorno (servidor local +
+  capturas): los 3 estados de la tarjeta, apertura del wizard desde el
+  botón del estado vacío, apertura y guardado completo del modal de
+  reevaluación (persiste en `localStorage`, cierra el modal, hace scroll
+  de vuelta al radar), y layout en viewport móvil (380px). Ojo con el
+  tamaño del `viewBox` del SVG (300×300, `cx=150,cy=150,maxR=80`): con
+  valores más chicos las etiquetas laterales "Memoria" y "Calma" quedaban
+  cortadas contra el borde de la tarjeta — si se lo vuelve a tocar,
+  confirmar con captura que el texto no se corte.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

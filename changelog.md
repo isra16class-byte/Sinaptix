@@ -5,6 +5,55 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Radar de progreso (antes/después) en Método, con reevaluación
+
+- Sección 03 (Método): el `.timeline` ahora comparte fila con una tarjeta
+  nueva a la derecha, `.method-radar` (`#methodRadar`), dentro de un grid
+  de dos columnas (`.method-body`, se apila en móvil ≤900px). La tarjeta
+  muestra un radar/spider SVG (generado en `js/script.js`, sin librerías)
+  con 4 ejes: **Foco**, **Memoria**, **Energía** y **Calma**.
+- **Origen de los datos y por qué se renombraron los ejes**: los 4 ejes
+  vienen de las escalas 1-5 ya recolectadas en el paso 6 del wizard de
+  nutrición (estrés, fatiga, dificultad de concentración, olvidos), pero
+  **invertidas** (`6 - valor`) para que en el radar "más afuera" sea
+  siempre "mejor" en las 4 áreas — de ahí que "dificultad de
+  concentración" pase a llamarse "Foco", "olvidos" a "Memoria", "fatiga"
+  a "Energía" y "estrés" a "Calma" (`radarComputeAreas` en
+  `js/script.js`). Si se prefieren los nombres literales de las
+  preguntas, es un cambio menor de labels, no de datos.
+- **Estados de la tarjeta** (`renderMethodRadar`):
+  - Sin ningún `sinaptix_objetivo.encuesta` guardado: estado vacío con
+    texto explicativo y botón "Generar mi diagnóstico" que abre el mismo
+    wizard de nutrición (`#btnNutricion`).
+  - Con diagnóstico inicial guardado: dibuja el polígono "Antes" (morado)
+    con la fecha del diagnóstico, y un botón "Actualizar mi estado".
+  - Con una reevaluación posterior guardada: agrega un segundo polígono
+    "Después" (verde) superpuesto, leyenda con las dos fechas, y el botón
+    pasa a decir "Actualizar mi estado otra vez".
+- **Reevaluación (dato nuevo, no existía antes)**: como no había ninguna
+  segunda medición real para comparar contra el diagnóstico inicial, se
+  agregó el botón "Actualizar mi estado" (`#btnReevaluar`, dentro de la
+  tarjeta del radar) que abre un modal nuevo, `#modalReevaluacion`, con
+  las mismas 4 preguntas de escala 1-5 del paso 6 (mismo componente
+  `.scale-row`/`.scale-opt`, distinto `name` con prefijo `reeval` para no
+  chocar con el wizard). Al guardar (`#formReevaluacion`), se escribe en
+  `localStorage` bajo la key nueva **`sinaptix_reevaluacion`**
+  (`{estres, fatiga, concentracion, olvidos, fecha}`, se sobrescribe cada
+  vez — no guarda historial de más de una reevaluación por ahora), se
+  vuelve a renderizar el radar, y se cierra el modal con scroll de vuelta
+  a la tarjeta.
+- El radar también se refresca apenas se guarda un diagnóstico nuevo
+  desde el wizard (`nutriForm` submit, con y sin sesión iniciada), sin
+  esperar a recargar la página.
+- Verificado con Playwright en este entorno (servidor local + capturas):
+  los 3 estados de la tarjeta (vacío, solo "antes", "antes" + "después"),
+  apertura del wizard desde el botón del estado vacío, apertura y envío
+  completo del modal de reevaluación (guarda en `localStorage`, cierra el
+  modal), y layout en viewport móvil (380px, se apila debajo del
+  timeline). Sin errores de JS propios (los únicos errores de consola
+  observados son 403 del widget de Netlify Identity al intentar salir a
+  la red, no relacionados con este cambio).
+
 ## 2026-09-13 — Reemplazo del correo por login: el plan se guarda en "Mi plan"
 
 - El paso final del wizard de nutrición (`#modalNutricion`) ya no envía

@@ -487,6 +487,7 @@
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
 
         res.textContent = 'Tu plan quedó guardado en tu cuenta. Te llevamos a "Mi plan". ✓';
+        renderMethodRadar();
         setTimeout(function(){
           closeModal(document.getElementById('modalNutricion'));
           if(miPlanEl) miPlanEl.scrollIntoView({behavior:'smooth'});
@@ -495,12 +496,189 @@
         // Sin sesión: queda guardado en este navegador, pero para verlo
         // completo y no perderlo, invitamos a iniciar sesión (o crear cuenta).
         res.textContent = 'Guardamos tu propuesta en este navegador. Iniciá sesión para verla completa, guardada y lista cada vez que entres. ✓';
+        renderMethodRadar();
         if(window.netlifyIdentity){
           setTimeout(function(){ netlifyIdentity.open('login'); }, 900);
         }
       }
     });
   }
+
+  // ===================== Radar de progreso (Método) =====================
+  // Compara la medición inicial de la encuesta (paso 6: estrés, fatiga,
+  // dificultad de concentración, olvidos) contra una reevaluación posterior
+  // opcional, guardada aparte en 'sinaptix_reevaluacion'. Ver memoria.md,
+  // sección "Radar de progreso", para la justificación de esta decisión
+  // (no existía una segunda medición real hasta esta sesión).
+  function radarFechaCorta(iso){
+    try{
+      return new Date(iso).toLocaleDateString('es-AR', {day:'2-digit', month:'short'});
+    }catch(err){ return ''; }
+  }
+
+  // Invierte cada escala 1-5 (donde 5 = peor) a un puntaje de bienestar
+  // 1-5 (donde 5 = mejor), para que en el radar "más afuera" sea siempre
+  // "mejor" en las 4 áreas, sin importar cómo se formuló la pregunta.
+  function radarComputeAreas(d){
+    return {
+      foco: 6 - (parseInt(d.concentracion, 10) || 3),
+      memoria: 6 - (parseInt(d.olvidos, 10) || 3),
+      energia: 6 - (parseInt(d.fatiga, 10) || 3),
+      calma: 6 - (parseInt(d.estres, 10) || 3)
+    };
+  }
+
+  function radarPoint(cx, cy, r, angleDeg){
+    const rad = (Math.PI/180)*angleDeg;
+    return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
+  }
+
+  function radarBuildSvg(antes, despues){
+    const cx=150, cy=150, maxR=80;
+    const labels = ['Foco','Memoria','Energía','Calma'];
+    const angleFor = i => -90 + i*90;
+
+    const grid = [0.25,0.5,0.75,1].map(function(frac){
+      const pts = [0,1,2,3].map(function(i){
+        const p = radarPoint(cx, cy, maxR*frac, angleFor(i));
+        return p.x.toFixed(1)+','+p.y.toFixed(1);
+      }).join(' ');
+      return '<polygon points="'+pts+'" style="fill:none;stroke:var(--panel-line)" stroke-width="1"/>';
+    }).join('');
+
+    const axisLines = [0,1,2,3].map(function(i){
+      const p = radarPoint(cx, cy, maxR, angleFor(i));
+      return '<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" style="stroke:var(--panel-line)" stroke-width="1"/>';
+    }).join('');
+
+    const labelPos = [
+      {x:cx, y:cy-maxR-16, anchor:'middle'},
+      {x:cx+maxR+14, y:cy+4, anchor:'start'},
+      {x:cx, y:cy+maxR+24, anchor:'middle'},
+      {x:cx-maxR-14, y:cy+4, anchor:'end'}
+    ];
+    const axisLabels = labels.map(function(lab, i){
+      return '<text x="'+labelPos[i].x+'" y="'+labelPos[i].y+'" text-anchor="'+labelPos[i].anchor+'" style="fill:var(--ink-soft);font-family:var(--font-m);font-size:11px;font-weight:600">'+lab+'</text>';
+    }).join('');
+
+    function polyFor(vals, color){
+      const pts = [0,1,2,3].map(function(i){
+        const v = Math.max(0, Math.min(5, vals[i]));
+        const p = radarPoint(cx, cy, (v/5)*maxR, angleFor(i));
+        return p.x.toFixed(1)+','+p.y.toFixed(1);
+      }).join(' ');
+      return '<polygon points="'+pts+'" style="fill:'+color+';fill-opacity:.16;stroke:'+color+'" stroke-width="2"/>';
+    }
+
+    let polys = '';
+    if(antes) polys += polyFor([antes.foco, antes.memoria, antes.energia, antes.calma], 'var(--purple)');
+    if(despues) polys += polyFor([despues.foco, despues.memoria, despues.energia, despues.calma], 'var(--green)');
+
+    return '<svg viewBox="0 0 300 300" role="img" aria-label="Gráfico de foco, memoria, energía y calma">'+grid+axisLines+polys+axisLabels+'</svg>';
+  }
+
+  function renderMethodRadar(){
+    const el = document.getElementById('methodRadar');
+    if(!el) return;
+
+    let antesObjetivo = null;
+    let despuesReeval = null;
+    try{
+      const obj = localStorage.getItem('sinaptix_objetivo');
+      if(obj){
+        const o = JSON.parse(obj);
+        if(o && o.encuesta) antesObjetivo = o;
+      }
+    }catch(err){ /* dato corrupto: se ignora */ }
+    try{
+      const reeval = localStorage.getItem('sinaptix_reevaluacion');
+      if(reeval) despuesReeval = JSON.parse(reeval);
+    }catch(err){ /* dato corrupto: se ignora */ }
+
+    const header = '<span class="eyebrow">Tu progreso</span>'+
+      '<h3 class="method-radar-title">Foco, memoria, energía y calma</h3>';
+
+    if(!antesObjetivo){
+      el.innerHTML = header+
+        '<p class="method-radar-text">Generá tu diagnóstico de nutrición especializada y vas a ver acá, de un vistazo, cómo está hoy tu foco, tu memoria, tu energía y tu calma.</p>'+
+        '<button type="button" class="btn btn-ghost" id="btnRadarDiagnostico">Generar mi diagnóstico</button>';
+      return;
+    }
+
+    const antes = radarComputeAreas(antesObjetivo.encuesta);
+    const despues = despuesReeval ? radarComputeAreas(despuesReeval) : null;
+    const svg = radarBuildSvg(antes, despues);
+
+    let legend = '<div class="radar-legend">'+
+      '<span class="radar-legend-item"><i style="background:var(--purple)"></i>Diagnóstico inicial'+
+      (antesObjetivo.fecha ? ' · '+radarFechaCorta(antesObjetivo.fecha) : '')+'</span>';
+    if(despues){
+      legend += '<span class="radar-legend-item"><i style="background:var(--green)"></i>Última actualización'+
+        (despuesReeval.fecha ? ' · '+radarFechaCorta(despuesReeval.fecha) : '')+'</span>';
+    }
+    legend += '</div>';
+
+    const cta = '<button type="button" class="btn btn-ghost" id="btnReevaluar">'+
+      (despues ? 'Actualizar mi estado otra vez' : 'Actualizar mi estado')+'</button>';
+
+    el.innerHTML = header+'<div class="radar-svg">'+svg+'</div>'+legend+cta;
+  }
+
+  function resetReevalForm(){
+    const form = document.getElementById('formReevaluacion');
+    if(form) form.reset();
+    const res = document.getElementById('reevalResultado');
+    if(res){ res.style.display='none'; res.textContent=''; }
+  }
+
+  const methodRadarEl = document.getElementById('methodRadar');
+  if(methodRadarEl){
+    methodRadarEl.addEventListener('click', function(e){
+      if(e.target.closest('#btnRadarDiagnostico')){
+        resetNutriWizard();
+        openModal('modalNutricion');
+      } else if(e.target.closest('#btnReevaluar')){
+        resetReevalForm();
+        openModal('modalReevaluacion');
+      }
+    });
+  }
+
+  const formReeval = document.getElementById('formReevaluacion');
+  if(formReeval){
+    formReeval.addEventListener('submit', function(e){
+      e.preventDefault();
+      const res = document.getElementById('reevalResultado');
+      const estres = parseInt(nutriGetRadio('reevalEstres')||'0', 10);
+      const fatiga = parseInt(nutriGetRadio('reevalFatiga')||'0', 10);
+      const concentracion = parseInt(nutriGetRadio('reevalConcentracion')||'0', 10);
+      const olvidos = parseInt(nutriGetRadio('reevalOlvidos')||'0', 10);
+
+      if(!estres || !fatiga || !concentracion || !olvidos){
+        res.style.display='block';
+        res.style.color='#B3261E';
+        res.textContent = 'Respondé las 4 preguntas para poder comparar tu progreso.';
+        return;
+      }
+
+      localStorage.setItem('sinaptix_reevaluacion', JSON.stringify({
+        estres, fatiga, concentracion, olvidos, fecha: new Date().toISOString()
+      }));
+
+      res.style.display='block';
+      res.style.color='';
+      res.textContent = 'Actualización guardada. Así se ve tu progreso. ✓';
+      renderMethodRadar();
+
+      setTimeout(function(){
+        closeModal(document.getElementById('modalReevaluacion'));
+        const target = document.getElementById('methodRadar');
+        if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 900);
+    });
+  }
+
+  renderMethodRadar();
 
   // Reveal on scroll
   const revealEls = document.querySelectorAll('.reveal:not(.in)');
