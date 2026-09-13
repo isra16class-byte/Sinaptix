@@ -377,15 +377,43 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-detalle-grid .nutri-summary{margin:0}
 .miplan-cierre{
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  padding:24px 22px;display:flex;flex-direction:column;gap:14px;align-self:stretch;
+  padding:24px 22px;display:flex;flex-direction:column;gap:14px;
 }
 .miplan-cierre-title{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--purple-dark)}
 .miplan-cierre p.lam-text{font-size:14px;max-width:none;margin:0}
-.miplan-cierre-btns{flex-direction:column;align-items:stretch;margin-top:auto}
-.miplan-cierre-btns .btn{width:100%;text-align:center}
+.miplan-cierre-btns{flex-direction:row}
+.miplan-cierre-btns .btn{flex:1;text-align:center}
 @media(max-width:900px){
   .miplan-grid,.miplan-detalle-grid{grid-template-columns:1fr}
 }
+
+/* El detalle del plan (#miPlanDetalle / #nutriResumen, mismo HTML que arma
+   nutriBuildResumenHTML en js/nutricion-planes.js) es una sola columna
+   larga con varias listas (nutrientes, priorizar, moderar, día tipo,
+   ajustes, avisos) — en el modal angosto de index.html eso está bien,
+   pero en "Mi plan" (columna mucho más ancha) se veía como un bloque
+   larguísimo de scroll, muy distinto de la referencia (que agrupa ese
+   mismo contenido en pares de columnas más densos) y dejaba la tarjeta
+   "Cierre" de al lado con un montón de aire vacío. Se resuelve en CSS,
+   sin tocar nutriBuildResumenHTML (sigue siendo la misma función/HTML
+   compartida con el paso 8 del wizard): en el ancho de "Mi plan" se pinta
+   en 2 columnas tipo diario (column-count), y se evita que un título
+   quede separado de su lista o que una lista se parta a la mitad entre
+   columnas. Escala solo a partir de 680px de ancho de viewport — más
+   angosto que eso (mobile), sigue en una sola columna. */
+@media(min-width:680px){
+  #miPlan .nutri-summary{
+    display:block;
+    column-count:2;column-gap:28px;
+  }
+  #miPlan .nutri-summary > div,
+  #miPlan .nutri-summary > p{margin:0 0 12px;break-inside:avoid-column}
+  #miPlan .nutri-summary h4{break-after:avoid-column}
+  #miPlan .nutri-summary .nutri-block-title{break-after:avoid-column;margin-top:12px}
+  #miPlan .nutri-summary ul{break-inside:avoid-column}
+  #miPlan .nutri-summary .nutri-dia-tipo{break-inside:avoid-column;grid-template-columns:1fr 1fr}
+}
+
 
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}

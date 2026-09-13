@@ -5,6 +5,58 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Mi plan": dos bugs reales que impedían que se pareciera a la referencia
+
+- El usuario pidió explícitamente diagnosticar por qué el resultado no se
+  parecía a la imagen de referencia, en vez de seguir ajustando a ciegas.
+  Se encontraron **dos problemas concretos** (no de tipografía ni de
+  padding general, ya resueltos en sesiones anteriores):
+  1. **`.miplan-cierre` tenía `align-self:stretch`** (agregado en la
+     sesión que armó el dashboard, sin que se hubiera pedido): eso
+     forzaba a la tarjeta "Cierre" a estirarse hasta igualar la altura de
+     `#miPlanDetalle` (la columna de al lado), que es mucho más alta —
+     el resultado era un cuadro "Cierre" con montón de aire vacío arriba
+     de los botones (empujados al fondo con `margin-top:auto`). La
+     referencia no hace esto: la tarjeta "Cierre" es compacta, del alto
+     de su propio contenido. **Se sacó `align-self:stretch`** — el grid
+     padre (`.miplan-detalle-grid`) ya tenía `align-items:start`, que es
+     lo que se necesitaba.
+  2. **`#miPlanDetalle` (`.nutri-summary`) se pintaba en una sola columna
+     larga**, con todas las listas (nutrientes, priorizar, moderar, día
+     tipo, ajustes, avisos) apiladas una debajo de la otra — de ahí que
+     esa columna terminara siendo altísima comparada con la referencia,
+     que agrupa el mismo tipo de contenido en pares de columnas más
+     densos (Enfoque+Priorizar, Suplementos+Aviso). Esa era la causa real
+     de "se nos va casi toda la pantalla": no era el padding general
+     (ya se había ajustado antes), era que el contenido en sí ocupaba
+     mucho más alto de lo necesario en una sola columna.
+- **Diagnóstico de por qué no se había resuelto antes**: en las dos
+  sesiones anteriores se evitó tocar el HTML interno que arma
+  `nutriBuildResumenHTML()` (compartido con el paso 8 del wizard en
+  `index.html`), por precaución de no romper ese otro uso — pero eso
+  significó no atacar la causa real (la altura de esa columna), solo
+  ajustar el padding alrededor. La solución no requería tocar esa
+  función: se resuelve en CSS, scoped a `#miPlan .nutri-summary`.
+- **Fix aplicado, ambos en `css/styles.css`**:
+  - `.miplan-cierre` pierde `align-self:stretch`; los dos botones de
+    `.miplan-cierre-btns` pasan de apilados verticalmente a lado a lado
+    (`flex-direction:row`, `flex:1` cada uno) — con la tarjeta ya
+    compacta, apilarlos ocupaba más alto del que hacía falta.
+  - `@media(min-width:680px){ #miPlan .nutri-summary{ display:block;
+    column-count:2; column-gap:28px } ... }`: reparte el mismo HTML de
+    siempre (sin tocar `nutriBuildResumenHTML`) en 2 columnas tipo
+    diario dentro de "Mi plan" únicamente — el modal de `index.html`
+    (`#nutriResumen`, 640px de ancho) no se ve afectado porque el
+    selector está scoped a `#miPlan`. Se agregan `break-after:avoid-
+    column` en los títulos de bloque (`h4`, `.nutri-block-title`) y
+    `break-inside:avoid-column` en las listas/`.nutri-dia-tipo`/notas
+    para que un título no quede separado de su contenido ni una lista se
+    parta a la mitad entre columnas. Por debajo de 680px de viewport
+    sigue en una columna (mobile).
+- No se tocó ningún `id` ni el HTML de `mi-plan.html` en este fix — es
+  100% CSS. Verificado con jsdom (ids intactos) y con la librería `css`
+  de npm (sigue parseando bien con las reglas nuevas).
+
 ## 2026-09-13 — "Mi plan": layout más compacto, menos scroll (sin tocar la tipografía)
 
 - El usuario aclaró que el pedido anterior **no** era sobre la tipografía

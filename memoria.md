@@ -1059,6 +1059,27 @@ sesión fue exclusivamente sobre espaciado — la tipografía del título
 (`.title-hand`, Caveat) de la sesión anterior no se tocó ni se discutió,
 sigue vigente.
 
+**Dos bugs reales corregidos tras diagnóstico contra la referencia**: la
+tarjeta `.miplan-cierre` tenía `align-self:stretch` (se sacó — la
+referencia la muestra compacta, del alto de su contenido, no estirada
+para igualar la columna de al lado) y `#miPlanDetalle`/`#nutriResumen`
+(`.nutri-summary`) se pintaba en una sola columna larga con todas las
+listas apiladas, mucho más alta que en la referencia (que agrupa el
+mismo contenido en pares de columnas). Se resolvió **sin tocar
+`nutriBuildResumenHTML`** (sigue siendo el mismo HTML/función
+compartida con el paso 8 del wizard de `index.html`): a partir de
+`680px` de viewport, `#miPlan .nutri-summary` pasa a `column-count:2`
+(CSS multi-columna tipo diario) con `break-after`/`break-inside:avoid-
+column` en títulos y listas para que no se corten a la mitad — scoped a
+`#miPlan`, así que el modal angosto de `index.html` no se ve afectado.
+Los botones de "Cierre" pasan de apilados a lado a lado
+(`flex-direction:row`), porque con la tarjeta ya compacta apilarlos no
+hacía falta. **Lección para sesiones futuras**: si un ajuste de padding
+"alrededor" de un bloque no achica el scroll como se esperaba, revisar
+primero si el contenido *adentro* de ese bloque es el que está ocupando
+más alto del necesario (como acá) antes de seguir recortando márgenes
+por fuera.
+
 ## Layout tipo dashboard de "Mi plan" (`.miplan-*`, `mi-plan.html`)
 
 A partir de una imagen de referencia que trajo el usuario (mockup de "Mi
