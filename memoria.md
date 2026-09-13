@@ -523,9 +523,42 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   resoluciones). Se subió el `width` de ese rayón de 140px a 170px para
   que se note más al nacer del borde. Verificado con Playwright en 1600px
   y 1280px de ancho: en ambos casos el rayón sigue naciendo del borde
-  real. El resto de los 6 rayones de `.lam-title-frame` (los del cluster
-  superior derecho y los inferiores derechos) no se tocaron — el pedido
-  fue puntual sobre el rayón izquierdo.
+  real. En esta sesión solo se tocó el rayón izquierdo — ver nota
+  siguiente sobre el lado derecho, corregido en una sesión posterior tras
+  feedback adicional del usuario (comparando de nuevo contra la
+  referencia, dijo explícitamente que aún no se veía la diferencia
+  porque solo el lado izquierdo sangraba al borde).
+- **Rayones del lado derecho también sangran al borde real** (sesión
+  posterior, mismo feedback de la referencia): el usuario insistió en
+  que las rayas "tienen que aparecer del borde de la pantalla" — el
+  primer fix solo cubrió el rayón izquierdo, pero en la referencia
+  también el rayón más externo del cluster superior derecho y el más
+  externo del cluster inferior derecho nacen del borde derecho real.
+  Se aplicó el mismo truco en `index.html` (`lam-03` y `lam-04`) a esos
+  dos rayones (los que tenían `right:-10px`, los más pegados al borde
+  del `.lam-title-frame` de cada cluster): ahora usan
+  `right:calc(50% - 50vw)` en vez de un valor fijo, análogo al
+  `left:calc(50% - 50vw)` del rayón izquierdo, así que su borde derecho
+  cae siempre en el borde real del viewport sin importar el ancho de
+  pantalla. Se les subió un poco el `width` (120→150px arriba, 170→190px
+  abajo) para que se noten más al nacer del borde. El resto de los
+  rayones del cluster (los más centrales/largos) se dejaron igual — en
+  la referencia esos no llegan al borde, solo los extremos.
+- **Aguacate de Pilares movido al lado izquierdo** (misma sesión): al
+  hacer que el rayón superior derecho sangrara hasta el borde real, ese
+  rayón quedaba cruzando por encima de `svg/deco-blob-avocado.svg` (la
+  fruta decorativa de `lam-04`, que vive pegada a la esquina superior
+  derecha de la `<section>`, fuera de `.lam-title-frame`). El usuario
+  mismo sugirió mover la fruta si estorbaba. Se cambió su posición de
+  `right:-20px` a `left:-20px` (con `top:0px` igual que antes, solo se
+  invirtió la rotación de `-5deg` a `5deg` para que el espejo se vea
+  natural) — ahora el aguacate vive en la esquina superior izquierda y
+  el rayón derecho queda limpio. Ninguna otra sección tiene este
+  conflicto (el fruto de `lam-03`, almendras, vive abajo a la derecha,
+  lejos de donde sangra el rayón superior).
+  Verificado con Playwright en 1917px, 1600px y 1280px de ancho en
+  `lam-04`, y en 1600px en `lam-03` (que no tiene fruta arriba, así que
+  no necesitó ajuste de posición).
 - **Título de Pilares en una sola línea en desktop** (misma sesión,
   captura de `lam-04`): el usuario notó que el título "Cuatro frentes de
   trabajo" se partía en dos líneas ("Cuatro frentes" / "de trabajo")

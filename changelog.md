@@ -5,6 +5,26 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Rayones del lado derecho también sangran al borde real + aguacate reubicado
+
+- El usuario volvió a comparar contra la captura de referencia y avisó
+  que todavía no se veía la diferencia: el fix anterior solo cubría el
+  rayón inferior izquierdo, pero en la referencia el rayón más externo
+  de cada cluster (arriba a la derecha y abajo a la derecha) también
+  nace del borde real de la pantalla.
+- Se aplicó el mismo truco `calc(50% - 50vw)` (esta vez en `right`) a los
+  dos rayones más externos de `.lam-title-frame` en `lam-03` y `lam-04`
+  (los que tenían `right:-10px`), subiendo un poco su `width` para que
+  se noten más. Los rayones centrales/largos del cluster se dejaron
+  igual, como en la referencia.
+- Al sangrar hasta el borde real, el rayón superior derecho de `lam-04`
+  quedaba cruzando el aguacate decorativo (`deco-blob-avocado.svg`,
+  pegado a la esquina superior derecha de la sección). Se movió esa
+  fruta a la esquina superior izquierda (`right:-20px` → `left:-20px`,
+  rotación espejada) siguiendo la sugerencia del usuario. `lam-03` no
+  tiene fruta arriba, así que no necesitó este ajuste.
+- Verificado con Playwright en 1917px, 1600px y 1280px de ancho.
+
 ## 2026-09-13 — Título de Pilares entra en una sola línea en desktop
 
 - El usuario mandó una captura de `lam-04` (Pilares) donde el título
