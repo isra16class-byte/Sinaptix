@@ -606,6 +606,47 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   1917px, 1600px, 1280px, 900px (una sola línea) y 380px (dos líneas,
   sin cortes raros).
 
+- **Grosor y cruce corregido en los 7 rayones de `lam-04` (Pilares)** (sesión
+  posterior, feedback contra una imagen de referencia externa que mostraba
+  el patrón deseado de rayones): el usuario mostró una captura de
+  referencia (no de este repo, un mock de otra sección con el mismo
+  lenguaje visual) donde el cluster de rayones de fondo tiene un patrón
+  reconocible: **una raya larga y fina** "flotante" (no sangra al borde) +
+  **dos rayas cortas y gruesas** que sangran al borde real, sin cruzarse
+  entre sí. En `lam-04` los 7 `<img class="deco-scribble">` heredan el
+  grosor del trazo por *aspect-ratio* natural del SVG (`viewBox 400x30`,
+  `stroke-width:11`) — al no llevar `height` explícito en el `style`
+  inline, un `width` chico (100-190px, los que sangran al borde) da un
+  trazo fino, y un `width` grande (300-320px, los "flotantes") da un trazo
+  grueso: **exactamente al revés** de lo que pedía la referencia. Además,
+  el cluster superior derecho tenía las dos rayas de sangrado con
+  `rotate` de signo opuesto (`-4deg` y `6deg`), por lo que visualmente se
+  cruzaban formando una V/flecha en vez de quedar paralelas.
+  - **Fix**: se agregó `height` explícito (en px) a los 7 `style` inline
+    de `lam-04`, independiente del `width`, para desacoplar el grosor
+    visual del largo del trazo (el `<img>` ya no preserva el aspect-ratio
+    del SVG al tener ambas dimensiones fijadas, así que se puede pedir un
+    trazo largo-y-fino o corto-y-grueso a voluntad): los 2 "flotantes"
+    (top:-24px width:300px y bottom:14px width:320px, ambos cerca del
+    título) bajaron a `height:10px` (más finos); los 5 que sangran al
+    borde o son el acento chico subieron a `height:14-15px` (más gruesos).
+    Se unificó el signo del `rotate` de las dos rayas del cluster superior
+    derecho a `-3deg` ambas (antes `-4deg`/`6deg`) para que queden
+    paralelas y no se crucen. La raya chica del cluster inferior central
+    (antes `right:70px;bottom:-18px;width:90px`, pegada/solapada con la
+    raya larga de al lado) se movió a `right:-10px;bottom:-16px;width:100px`
+    para dejar un hueco claro entre ambas, igual que en la referencia.
+  - **Patrón a seguir si se repite en otras secciones** (`lam-03` usa el
+    mismo esquema de 7 rayones en `.lam-title-frame` y **no** se tocó en
+    esta sesión — el usuario solo pidió el ajuste en Pilares/`lam-04`):
+    si se quiere replicar esta corrección ahí, aplicar el mismo criterio
+    (rayas "flotantes" largas y finas vía `height` chico, rayas de
+    sangrado/acento cortas y gruesas vía `height` más grande, rotaciones
+    del mismo signo dentro de un mismo cluster para que no se crucen).
+  - Verificado con Playwright (servidor local + captura) a 1600px de
+    ancho de viewport, comparando contra la imagen de referencia que dio
+    el usuario.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

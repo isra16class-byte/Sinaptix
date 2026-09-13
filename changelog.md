@@ -5,6 +5,40 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Grosor y cruce corregido en los rayones de Pilares (lam-04)
+
+- El usuario mostró una captura de referencia externa (mock de otra
+  sección, título "Optimizado para mejorar la productividad") con el
+  patrón de rayones deseado y pidió que Pilares (`lam-04`) quedara igual
+  en cantidad y posición. Comparando contra el sitio, se detectaron dos
+  problemas:
+  1. **Grosor invertido**: los 2 rayones "flotantes" (no sangran al
+     borde, `width:300px`/`320px`) se veían gruesos, y los 5 rayones
+     cortos (sangrado + acento chico, `width:90-190px`) se veían finos —
+     al revés de la referencia (flotantes finos, cortos gruesos). Causa:
+     los `<img class="deco-scribble">` solo llevaban `width` en el
+     `style` inline, así que el navegador escalaba el grosor del trazo
+     proporcional al ancho (SVG con aspect-ratio natural 400:30).
+  2. **Cruce en el cluster superior derecho**: las dos rayas que sangran
+     al borde tenían `rotate` de signo opuesto (`-4deg`/`6deg`) y se
+     cruzaban formando una V, en vez de quedar paralelas.
+  3. La raya chica del cluster inferior central quedaba pegada/solapada
+     con la raya larga de al lado, sin el hueco que muestra la
+     referencia.
+- **Fix** (`index.html`, los 7 `<img class="deco-scribble">` dentro de
+  `#lam-04 .lam-title-frame`): se agregó `height` explícito en px a cada
+  una (desacoplado del `width`) — los 2 flotantes bajaron a
+  `height:10px` (más finos), los 5 cortos subieron a `height:14-15px`
+  (más gruesos). Se unificó el `rotate` de las dos rayas del cluster
+  superior derecho a `-3deg` en ambas para que queden paralelas. Se
+  separó la raya chica inferior (`right:70px→right:-10px`) para dejar un
+  hueco claro respecto a la raya larga de al lado.
+- No se tocó `lam-03`, que usa el mismo esquema de 7 rayones — el usuario
+  solo pidió el ajuste en Pilares. Ver `memoria.md` para el patrón a
+  seguir si se replica ahí.
+- Verificado con Playwright (servidor local, captura a 1600px de ancho)
+  comparando contra la imagen de referencia del usuario.
+
 ## 2026-09-13 — Fix robusto de sangrado + segundo rayón superior que faltaba
 
 - El usuario volvió a comparar contra una captura de referencia distinta
@@ -622,3 +656,4 @@ archivo.
 - Archivos tocados: `css/styles.css`, `index.html`, `js/script.js`,
   `svg/deco-circles-vision.svg`, `svg/deco-dots-contacto.svg`,
   `svg/deco-leaf-beneficios.svg`, `svg/signal-wave.svg`.
+
