@@ -118,35 +118,49 @@ Ahora:
 - El contenido/copy en español **no cambió**, solo el sistema visual.
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
-- **Trazos tipo "marcador" de fondo (recuperados, versión distinta a la
-  revertida — ajustados dos veces tras feedback)**: hay un
-  `svg/deco-scribble.svg` — un único trazo tipo marcador (`stroke:#EDA23A`,
-  `stroke-width:11`) que se reutiliza como `<img>` varias veces por
-  sección con distinto tamaño (150–340px), rotación y posición (clase
-  `.deco-scribble`, opacidad base `.85` en `css/styles.css`), siguiendo el
-  mismo patrón `.deco` (position:absolute, z-index:0, detrás del `.wrap`)
-  que ya usan los blobs de fruta. **Forma del trazo (2do ajuste)**: la
-  referencia visual que dio el usuario usa líneas prácticamente
-  rectas con una sola curva suave, no un garabato ondulado con varias
-  jorobas — el primer path (`C ... C ... C ...`, tres curvas) se veía
-  "tembleque" y el usuario lo rechazó explícitamente ("no se los hagas
-  temblecosos"). El path actual es una sola curva Bézier cuadrática
-  (`M8,17 Q200,9 392,13`), casi recta con una leve inclinación, que es la
-  que hay que seguir usando como base para este elemento — no volver a un
-  path con múltiples curvas/ondas. A diferencia del intento anterior que sí
-  se revirtió (ver `changelog.md`, "Revertidos los trazos tipo marcador"),
-  **no** envuelve palabras dentro de títulos ni toca ningún `h2`/`span` —
-  son solo rayones de fondo sueltos, sin relación con el texto. Se ocultan
-  en móvil (`max-width:720px`) igual que `.deco-fruit`. Distribución: 6 en
-  el Hero (clúster arriba-derecha + acentos sueltos) y 2 por cada una de
-  las otras 5 secciones (`lam-02` a `lam-06`), reposicionados para no
-  quedar detrás de tarjetas opacas ni cruzar texto.
+- **Trazos de fondo: espiga de trigo (Hero/Visión/Para quién es/Contacto) +
+  marcador original (Método/Pilares)**: hay dos SVG de rayón de fondo que
+  conviven, mismo patrón `.deco` (position:absolute, z-index:0, detrás del
+  `.wrap`, clase `.deco-scribble` en `css/styles.css`, opacidad base
+  `.85`, oculto en móvil `max-width:720px`) que ya usan los blobs de
+  fruta, pero **con dos SVG distintos según la sección**:
+  - `svg/deco-scribble.svg` (trazo tipo marcador liso, `stroke:#EDA23A`,
+    `stroke-width:11`, un único path `M8,17 Q200,9 392,13`, sin
+    ondulaciones — el usuario rechazó explícitamente una versión con
+    varias curvas por verse "tembleque"): sigue en uso, pero **solo**
+    en `lam-03` (Método) y `lam-04` (Pilares) — tanto en los `.deco
+    .deco-scribble` propios de esas dos secciones como en el mecanismo
+    `.title-mark`/`.title-scribble` (ver más abajo, "Rayón pegado al
+    título"). No tocar el path de este archivo si se retoma esa idea en
+    otro lado; es la forma ya validada para el look "marcador" clásico.
+  - `svg/deco-espiga.svg` (nuevo): una espiga de trigo en línea —un
+    trazo curvo central (`M10,50 Q200,36 390,44`) más una serie de
+    "aristas"/bristles cortas alternadas a los costados (`<line>`),
+    todo en `stroke`, sin relleno, color `#D9A441` (dorado trigo, más
+    amarillo que el naranja `#EDA23A` original) — usado en `lam-01`
+    (Hero), `lam-02` (Visión), `lam-05` (Para quién es) y `lam-06`
+    (Contacto), en los mismos `<img class="deco deco-scribble">` que
+    antes apuntaban a `deco-scribble.svg` (mismo viewBox ancho/bajo,
+    pensado para usarse rotado y escalado igual que antes — solo cambió
+    el `src`). El usuario pidió este cambio mostrando una referencia de
+    imágenes de granos (trigo/avena/cebada/centeno) para que el rayón se
+    sintiera más ligado a la temática de neuroalimentación, mantuvo el
+    estilo lineal/outline del trazo original y solo cambió a un dorado
+    más amarillo. **Si se agregan nuevas instancias de este trazo en el
+    futuro, usar `deco-espiga.svg` por defecto — `deco-scribble.svg`
+    queda reservado para Método/Pilares y para el subrayado de título.**
+  - Distribución (sin cambios de cantidad/posición respecto a antes, solo
+    cambió el archivo referenciado donde corresponde): 6 en el Hero
+    (clúster arriba-derecha + acentos sueltos) y 2 por cada una de las
+    otras 5 secciones (`lam-02` a `lam-06`).
   - **Verificación visual**: en este entorno hay Chromium + Playwright
     instalados; antes de entregar un patch de este tipo (decoración visual
-    de fondo/tamaños/posiciones/forma de un trazo) conviene levantar un
-    servidor local (`python3 -m http.server` sobre el repo) y tomar
+    de fondo/tamaños/posiciones/forma/color de un trazo) conviene levantar
+    un servidor local (`python3 -m http.server` sobre el repo) y tomar
     capturas con Playwright para confirmar cómo se ve realmente, en vez de
-    asumir por el código.
+    asumir por el código — incluyendo confirmar que las secciones que
+    NO debían cambiar (p.ej. Método/Pilares en este caso) efectivamente
+    siguen igual.
 - **Capa de "vida" ilustrada (sesión posterior al rediseño visual)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima

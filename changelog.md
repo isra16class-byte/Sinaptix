@@ -5,6 +5,34 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Trazos naranjas reemplazados por espiga de trigo lineal (excepto Método/Pilares)
+
+- El usuario mostró una captura del hero con los trazos tipo "marcador"
+  naranjas (`.deco-scribble`) y una búsqueda de imágenes de granos
+  (trigo, avena, cebada, centeno) preguntando si convenía cambiar esos
+  trazos por algo con esa temática, **menos en las secciones 3 y 4**
+  (Método y Pilares, `lam-03`/`lam-04`), que ya estaban validadas.
+- Se preguntó estilo (lineal/outline simple, en el mismo espíritu que el
+  trazo actual) y color (dorado más "trigo", más amarillo que el naranja
+  original `#EDA23A`) antes de tocar código.
+- Se creó `svg/deco-espiga.svg`: una espiga de trigo en línea (un trazo
+  curvo central + una serie de "aristas"/bristles alternados a los
+  costados, todo en `stroke`, sin relleno), en `#D9A441` (dorado trigo).
+  Mismo espíritu decorativo que `deco-scribble.svg` (viewBox ancho y
+  bajo, pensado para usarse rotado y escalado como fondo), pero
+  reconocible como grano en vez de un garabato abstracto.
+- En `index.html` se reemplazó `src="svg/deco-scribble.svg"` por
+  `src="svg/deco-espiga.svg"` únicamente en las instancias `.deco
+  .deco-scribble` de `lam-01` (Hero), `lam-02` (Visión), `lam-05` (Para
+  quién es) y `lam-06` (Contacto). **No se tocó** `lam-03` ni `lam-04`
+  (siguen con `deco-scribble.svg`, incluidos sus `.title-scribble`), tal
+  como pidió el usuario.
+- `svg/deco-scribble.svg` no se borró: sigue existiendo y en uso en
+  `lam-03`/`lam-04` y en `.title-mark`/`.title-scribble`.
+- Verificado con Playwright (servidor local + capturas) en el hero
+  (`lam-01`), `lam-02`, `lam-05`, `lam-06` con la espiga nueva, y en
+  `lam-03`/`lam-04` confirmando que siguen con el trazo original.
+
 ## 2026-09-13 — Imagen del Hero reemplazada por ilustración de cerebro con chispas de neuronas
 
 - El usuario pidió reemplazar el logotipo flotante del Hero (`lam-01`,
