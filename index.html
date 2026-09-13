@@ -163,7 +163,14 @@
         </div>
       </div>
 
-      <aside class="method-gauges reveal d2" id="methodGauges" aria-live="polite"></aside>
+      <aside class="method-gauges reveal d2" id="methodGauges" aria-live="polite">
+        <div class="gauges-switch" id="gaugesSwitch" role="tablist" aria-label="Elegí qué gráfica ver">
+          <button type="button" class="gauges-switch-btn is-active" id="btnVerProgreso" role="tab" aria-selected="true">Mi progreso</button>
+          <button type="button" class="gauges-switch-btn" id="btnVerImc" role="tab" aria-selected="false">Mi IMC</button>
+        </div>
+        <div id="methodGaugesProgreso" role="tabpanel"></div>
+        <div id="methodGaugesImc" class="hidden" role="tabpanel"></div>
+      </aside>
     </div>
 
     <div class="method-cta reveal d3">

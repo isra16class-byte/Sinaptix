@@ -5,6 +5,43 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Interruptor "Mi progreso" / "Mi IMC" en la sección Método
+
+- Pedido del usuario: en la sección `03 — Cómo trabajamos` (Método) de
+  `index.html`, poder elegir entre ver los anillos de progreso o el
+  medidor de IMC, con "Mi progreso" siempre activo por defecto.
+- Nuevo interruptor tipo pestañas (`.gauges-switch`, dos botones
+  `#btnVerProgreso` / `#btnVerImc`) dentro de la tarjeta `.method-gauges`
+  (`#methodGauges`), que ahora contiene dos paneles en vez de uno:
+  `#methodGaugesProgreso` (el contenido que antes se pintaba directo en
+  `#methodGauges`, sin cambios de lógica, solo se movió el target de
+  `renderMethodGauges()`) y `#methodGaugesImc` (nuevo).
+- `renderMethodImc()` en `js/script.js`: pinta el mismo medidor
+  semicircular de IMC que ya existía en "Mi plan" (arcos de color fijos +
+  aguja), reusando `imcCategoria`/`imcGaugeAngulo` de
+  `js/nutricion-planes.js` — no se duplicó el cálculo ni los umbrales. Lee
+  `sinaptix_antropometria` de `localStorage`; si no hay datos, muestra un
+  estado vacío con botón para abrir "Registrar datos antropométricos"
+  (`#modalAntropometria`).
+- `setGaugesView(view)` alterna la visibilidad de los dos paneles y el
+  estado `is-active`/`aria-selected` de los botones. Se llama
+  `setGaugesView('progreso')` una sola vez al cargar la página — el
+  interruptor arranca siempre ahí, nunca en "Mi IMC", incluso si la
+  persona ya tiene un IMC guardado.
+- `renderMethodImc()` se vuelve a llamar (además de al cargar) cada vez
+  que se guardan datos antropométricos nuevos (`#formAntro`) y en ambas
+  ramas del guardado del plan de nutrición (por si
+  `nutriGuardarAntropometriaSiFalta` guardó antropometría por primera vez
+  ahí), para que el panel de IMC no quede desactualizado sin recargar la
+  página.
+- Verificado simulando el DOM de `index.html` con jsdom (Playwright no
+  pudo instalarse en esta sesión por restricción de red del sandbox):
+  estado inicial con "Mi progreso" visible y activo; click en "Mi IMC"
+  alterna los paneles y el estado de los botones correctamente; al
+  guardar un IMC de prueba en `localStorage` y repintar,
+  `renderMethodImc()` muestra el número, la categoría y el color
+  correctos; volver a "Mi progreso" alterna de nuevo sin problemas.
+
 ## 2026-09-13 — Auto-guardar antropometría desde la encuesta de nutrición
 
 - Pedido del usuario: si en el paso 2 de "Generar nutrición especializada"

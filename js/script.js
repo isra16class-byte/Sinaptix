@@ -143,6 +143,7 @@
 
     // Guardado local (persiste entre visitas en este navegador)
     localStorage.setItem('sinaptix_antropometria', JSON.stringify({peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()}));
+    if(typeof renderMethodImc === 'function') renderMethodImc();
 
     res.style.display='block';
     res.style.color='';
@@ -224,6 +225,7 @@
         // alcanza con llevar ahí a la persona.
         res.textContent = 'Tu plan quedó guardado en tu cuenta. Te llevamos a "Mi plan". ✓';
         renderMethodGauges();
+        renderMethodImc();
         setTimeout(function(){
           closeModal(document.getElementById('modalNutricion'));
           window.location.href = 'mi-plan.html';
@@ -233,6 +235,7 @@
         // completo y no perderlo, invitamos a iniciar sesión (o crear cuenta).
         res.textContent = 'Guardamos tu propuesta en este navegador. Iniciá sesión para verla completa, guardada y lista cada vez que entres. ✓';
         renderMethodGauges();
+        renderMethodImc();
         if(window.netlifyIdentity){
           setTimeout(function(){ netlifyIdentity.open('login'); }, 900);
         }
@@ -282,7 +285,7 @@
   }
 
   function renderMethodGauges(){
-    const el = document.getElementById('methodGauges');
+    const el = document.getElementById('methodGaugesProgreso');
     if(!el) return;
 
     let antesObjetivo = null;
@@ -345,6 +348,91 @@
     el.innerHTML = header+'<div class="gauge-grid">'+grid+'</div>'+scale+legend+cta;
   }
 
+  // ===================== Interruptor "Mi progreso" / "Mi IMC" (Método) =====================
+  // La sección 03 (Método) mostraba solo los anillos de progreso. Ahora
+  // conviven dos gráficas dentro de la misma tarjeta `.method-gauges`,
+  // alternadas con un interruptor tipo pestañas, siempre arrancando en
+  // "Mi progreso" (ver llamada a setGaugesView('progreso') en el arranque,
+  // más abajo). Reusa imcCategoria/imcGaugeAngulo de nutricion-planes.js,
+  // el mismo medidor semicircular que ya existía en "Mi plan".
+  function renderMethodImc(){
+    const el = document.getElementById('methodGaugesImc');
+    if(!el) return;
+
+    const header = '<span class="eyebrow">Tu progreso</span>'+
+      '<h3 class="method-gauges-title">Tu IMC</h3>';
+
+    let antro = null;
+    try{
+      const raw = localStorage.getItem('sinaptix_antropometria');
+      if(raw) antro = JSON.parse(raw);
+    }catch(err){ /* dato corrupto: se ignora */ }
+
+    if(!antro || typeof imcGaugeAngulo !== 'function' || typeof imcCategoria !== 'function'){
+      el.innerHTML = header+
+        '<p class="method-gauges-text">Registrá tu peso y talla para ver acá tu IMC y a qué rango corresponde.</p>'+
+        '<button type="button" class="btn btn-ghost" id="btnGaugeAntro">Registrar datos antropométricos</button>';
+      return;
+    }
+
+    const deg = 90 - imcGaugeAngulo(antro.imc);
+    const info = imcCategoria(antro.imc);
+    const catLabel = info.cat.charAt(0).toUpperCase()+info.cat.slice(1);
+
+    el.innerHTML = header+
+      '<div class="imc-gauge" aria-hidden="true">'+
+        '<svg viewBox="0 0 220 140" width="100%">'+
+          '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
+          '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
+          '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
+          '<path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+          '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
+          '<circle class="imc-pivote" cx="110" cy="115" r="6"/>'+
+        '</svg>'+
+      '</div>'+
+      '<div class="num">'+antro.imc.toFixed(1)+'</div>'+
+      '<div class="lab">IMC estimado (última medición registrada)</div>'+
+      '<div class="imc-cat imc-cat-'+info.zona+'">'+catLabel+'</div>'+
+      '<ul class="imc-legend">'+
+        '<li><span class="imc-dot imc-dot-bajo"></span>Bajo peso</li>'+
+        '<li><span class="imc-dot imc-dot-saludable"></span>Saludable</li>'+
+        '<li><span class="imc-dot imc-dot-sobrepeso"></span>Sobrepeso</li>'+
+        '<li><span class="imc-dot imc-dot-vigilar"></span>A vigilar</li>'+
+      '</ul>';
+  }
+
+  function setGaugesView(view){
+    const progresoEl = document.getElementById('methodGaugesProgreso');
+    const imcEl = document.getElementById('methodGaugesImc');
+    const btnProgreso = document.getElementById('btnVerProgreso');
+    const btnImc = document.getElementById('btnVerImc');
+    if(!progresoEl || !imcEl || !btnProgreso || !btnImc) return;
+
+    const showImc = view === 'imc';
+    progresoEl.classList.toggle('hidden', showImc);
+    imcEl.classList.toggle('hidden', !showImc);
+    btnProgreso.classList.toggle('is-active', !showImc);
+    btnImc.classList.toggle('is-active', showImc);
+    btnProgreso.setAttribute('aria-selected', String(!showImc));
+    btnImc.setAttribute('aria-selected', String(showImc));
+  }
+
+  const btnVerProgreso = document.getElementById('btnVerProgreso');
+  const btnVerImc = document.getElementById('btnVerImc');
+  if(btnVerProgreso) btnVerProgreso.addEventListener('click', function(){ setGaugesView('progreso'); });
+  if(btnVerImc) btnVerImc.addEventListener('click', function(){ setGaugesView('imc'); });
+
+  // El botón "Registrar datos antropométricos" del estado vacío de "Mi IMC"
+  // vive dentro de contenido generado por innerHTML (igual que
+  // #btnGaugeDiagnostico/#btnReevaluar más abajo), así que se delega el
+  // click sobre el contenedor fijo en vez de buscar el botón recién creado.
+  const methodGaugesImcEl = document.getElementById('methodGaugesImc');
+  if(methodGaugesImcEl){
+    methodGaugesImcEl.addEventListener('click', function(e){
+      if(e.target.closest('#btnGaugeAntro')) openModal('modalAntropometria');
+    });
+  }
+
   function resetReevalForm(){
     const form = document.getElementById('formReevaluacion');
     if(form) form.reset();
@@ -400,6 +488,8 @@
   }
 
   renderMethodGauges();
+  renderMethodImc();
+  setGaugesView('progreso'); // arranca siempre en "Mi progreso", nunca en "Mi IMC"
 
   // Reveal on scroll
   const revealEls = document.querySelectorAll('.reveal:not(.in)');

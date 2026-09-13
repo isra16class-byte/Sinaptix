@@ -309,6 +309,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .method-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:58px;padding-top:44px;border-top:1px solid var(--panel-line)}
 
 .method-gauges{background:var(--paper);border-radius:var(--radius);padding:28px 26px;box-shadow:var(--shadow)}
+
+/* Interruptor "Mi progreso" / "Mi IMC" dentro de .method-gauges (sección
+   03, Método). Por defecto siempre queda activo "Mi progreso" — ver
+   setGaugesView('progreso') en js/script.js — el usuario puede tocar "Mi
+   IMC" para ver el medidor en su lugar; solo un panel visible a la vez. */
+.gauges-switch{display:flex;gap:6px;background:var(--panel);border-radius:var(--radius-pill);padding:4px;margin-bottom:18px;width:fit-content;max-width:100%}
+.gauges-switch-btn{font-family:var(--font-m);font-size:12.5px;font-weight:700;letter-spacing:.01em;color:var(--ink-soft);background:transparent;border:none;border-radius:var(--radius-pill);padding:9px 16px;cursor:pointer;transition:background .18s ease,color .18s ease}
+.gauges-switch-btn:hover{color:var(--ink)}
+.gauges-switch-btn.is-active{background:var(--paper);color:var(--purple);box-shadow:var(--shadow)}
 .method-gauges-title{font-family:var(--font-d);font-size:19px;font-weight:800;color:var(--ink);margin:10px 0 12px;max-width:none}
 .method-gauges-text{color:var(--ink-soft);font-size:14px;margin-bottom:18px}
 .gauge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:4px 0 16px}

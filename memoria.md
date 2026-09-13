@@ -738,6 +738,65 @@ comentario histórico explicando el origen del dato.
   que el anillo único + la línea de delta se ven bien, sobre todo con
   nombres de área más largos o valores negativos de delta.
 
+## Interruptor "Mi progreso" / "Mi IMC" (`#methodGauges`, sección 03)
+
+Desde esta sesión, `#methodGauges` (la tarjeta descrita arriba) **ya no
+pinta directo su contenido en el propio `#methodGauges`** — ahora es un
+contenedor fijo con un interruptor tipo pestañas + dos paneles que se
+alternan, porque el usuario pidió poder elegir entre ver los anillos de
+progreso o el medidor de IMC en esa misma sección (antes solo existían
+los anillos ahí; el medidor de IMC solo vivía en "Mi plan").
+
+- **Estructura en `index.html`**, dentro de `<aside id="methodGauges">`:
+  - `.gauges-switch` (`#gaugesSwitch`): dos botones, `#btnVerProgreso` y
+    `#btnVerImc` (`role="tab"`, `aria-selected`). Estilo pill/segmented
+    control (`.gauges-switch-btn`, activo = `.is-active`).
+  - `#methodGaugesProgreso`: el panel de los anillos — es el mismo
+    contenido que antes se pintaba en `#methodGauges` a secas;
+    `renderMethodGauges()` (`js/script.js`) solo cambió su `el` de target,
+    ninguna otra lógica de esa función se tocó.
+  - `#methodGaugesImc`: panel nuevo, pintado por `renderMethodImc()`
+    (`js/script.js`). Reusa el mismo medidor semicircular SVG que
+    `mi-plan.html` (arcos `.imc-zone-*` fijos + `.imc-aguja` rotada) y las
+    funciones compartidas `imcCategoria`/`imcGaugeAngulo` de
+    `js/nutricion-planes.js` — no hay una tercera copia de los umbrales
+    de IMC. Si no hay `sinaptix_antropometria` en `localStorage`, muestra
+    un estado vacío con botón `#btnGaugeAntro` que abre
+    `#modalAntropometria` (el click se delega sobre `#methodGaugesImc`
+    porque el botón se crea dentro de HTML inyectado por `innerHTML`,
+    mismo patrón que `#btnGaugeDiagnostico`/`#btnReevaluar`).
+- **`setGaugesView(view)`** (`'progreso'` o `'imc'`): togglea `.hidden` en
+  ambos paneles y `.is-active`/`aria-selected` en ambos botones — solo un
+  panel visible a la vez. **Se llama una única vez, `setGaugesView
+  ('progreso')`, al final del arranque de `js/script.js`** — el
+  interruptor siempre abre en "Mi progreso" por decisión explícita del
+  usuario, sin importar si ya hay un IMC guardado. No hay persistencia de
+  la pestaña elegida entre recargas (a propósito: si se agrega en el
+  futuro, usar una clave nueva de `localStorage`, no reemplazar el
+  default).
+- **`renderMethodImc()` se repinta**, además de al cargar la página, en:
+  el submit de `#formAntro` (justo después de guardar
+  `sinaptix_antropometria`) y en ambas ramas (con/sin sesión) del submit
+  del wizard de nutrición en `js/script.js` — por si
+  `nutriGuardarAntropometriaSiFalta` guardó antropometría por primera vez
+  ahí. Así el panel de IMC no queda desactualizado sin recargar, aunque
+  esté oculto en ese momento (repintar un panel oculto es barato, es solo
+  `innerHTML` de un `<div>` chico).
+- Si en el futuro se agrega una tercera gráfica a esta tarjeta, seguir el
+  mismo patrón: un botón más en `.gauges-switch`, un panel más como
+  hermano de `#methodGaugesProgreso`/`#methodGaugesImc`, y sumar esa rama
+  a `setGaugesView` (hoy es un booleano `showImc`, pasaría a comparar
+  contra el string `view` en cada rama en vez de invertir un solo flag).
+- Verificado simulando el DOM de `index.html` con **jsdom** (no
+  Playwright — ver limitación de red ya anotada en la sección de anillos
+  de progreso, sigue vigente en esta sesión): estado inicial con
+  "Progreso" activo y "IMC" oculto; click en "Mi IMC" alterna paneles y
+  estado de botones; con un IMC de prueba guardado en `localStorage`,
+  `renderMethodImc()` pinta número/categoría/color correctos; volver a
+  "Mi progreso" alterna de nuevo. **Pendiente**: verificación visual real
+  en navegador (layout del `.gauges-switch` sobre el fondo de
+  `.method-gauges`, responsive ≤900px) en cuanto haya acceso a Playwright.
+
 ## Títulos manuscritos tipo "marcador" en Método y Pilares (`lam-03`, `lam-04`)
 
 A partir de una referencia visual que dio el usuario (título en fuente
