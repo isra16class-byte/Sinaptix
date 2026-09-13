@@ -103,20 +103,45 @@ function nutriConstruirAjustes(d){
   return ajustes;
 }
 
+// Cada aviso lleva un `nivel` ('moderado' | 'alto') además del texto, para
+// que nutriBuildResumenHTML pueda pintarlos con distinta intensidad visual
+// (ver .nutri-note / .nutri-note--alto en css/styles.css) — ver
+// plan-mejoras-mi-plan-y-encuesta.md, sección 4.2 ("Ajustes más graduales,
+// no binarios") para el criterio de esta sesión.
 function nutriConstruirAvisos(d){
   const avisos = [];
+  const estresAlto = (parseInt(d.estres, 10) || 0) >= 4;
+  const fatigaAlta = (parseInt(d.fatiga, 10) || 0) >= 4;
+  const suenoMalo = d.sueno === 'Menos de 5' || d.sueno === '5 a 6' || (d.calidadSueno && d.calidadSueno <= 2);
+
   if(d.condiciones.length || d.medicacion === 'Sí'){
-    avisos.push('Antes de aplicar este plan, valídalo con tu médico o nutricionista: indicaste una condición de salud y/o medicación regular.');
+    avisos.push({nivel:'alto', texto:'Antes de aplicar este plan, valídalo con tu médico o nutricionista: indicaste una condición de salud y/o medicación regular.'});
   }
-  if(d.sueno === 'Menos de 5' || d.sueno === '5 a 6' || (d.calidadSueno && d.calidadSueno <= 2)){
-    avisos.push('Ningún plan alimentario sustituye dormir lo suficiente — tu sueño también está afectando tu rendimiento cognitivo.');
+
+  // Antes este aviso era independiente del estrés; ahora solo se muestra si
+  // además hay estrés alto (4-5), combo que pedía el documento original.
+  if(suenoMalo && estresAlto){
+    avisos.push({nivel:'alto', texto:'Dormir poco combinado con estrés alto desgasta tu rendimiento cognitivo más rápido que cualquiera de los dos por separado — ningún plan alimentario sustituye dormir lo suficiente.'});
   }
+
+  // Eje combinado nuevo (estrés + fatiga altos a la vez): no lo cubre
+  // ningún aviso individual, ver sección 4.2 del documento de mejoras.
+  if(estresAlto && fatigaAlta){
+    avisos.push({nivel:'alto', texto:'Estrés y fatiga elevados al mismo tiempo agotan más rápido nutrientes como magnesio y complejo B — este plan ya los prioriza, pero conviene atender el descanso y el manejo del estrés en paralelo.'});
+  }
+
   if(d.cafeina === '4 o más al día'){
-    avisos.push('Te recomendamos reducir la cafeína de forma gradual, no de golpe, para evitar más fatiga los primeros días.');
+    avisos.push({nivel:'alto', texto:'Te recomendamos reducir la cafeína de forma gradual, no de golpe, para evitar más fatiga los primeros días.'});
+  } else if(d.cafeina === '2 a 3 al día'){
+    avisos.push({nivel:'moderado', texto:'Tu consumo de cafeína es moderado — prestá atención a cómo te sentís si lo seguís aumentando.'});
   }
+
   if(d.ultraprocesados === 'A diario'){
-    avisos.push('Se sugiere una transición gradual para bajar los ultraprocesados en vez de un cambio radical, para que el plan sea sostenible.');
+    avisos.push({nivel:'alto', texto:'Se sugiere una transición gradual para bajar los ultraprocesados en vez de un cambio radical, para que el plan sea sostenible.'});
+  } else if(d.ultraprocesados === 'Algunas veces por semana'){
+    avisos.push({nivel:'moderado', texto:'Tu consumo de ultraprocesados es moderado — ir reduciéndolo de a poco ayuda a que el cambio se sostenga.'});
   }
+
   return avisos;
 }
 
@@ -152,7 +177,10 @@ function nutriBuildResumenHTML(d){
   if(ajustes.length){
     html += '<div><div class="nutri-block-title">Ajustado a tu caso</div><ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul></div>';
   }
-  avisos.forEach(a=>{ html += '<p class="nutri-note">'+a+'</p>'; });
+  avisos.forEach(a=>{
+    const cls = a.nivel === 'alto' ? 'nutri-note nutri-note--alto' : 'nutri-note';
+    html += '<p class="'+cls+'">'+a.texto+'</p>';
+  });
   return html;
 }
 

@@ -533,8 +533,8 @@ más de uno, cada uno con su propio "día tipo").
   grilla).
 
 **Tabla de conexiones** (`nutriConstruirAjustes` / `nutriConstruirAvisos`
-en `js/script.js`) — así es como las respuestas modifican el plan antes
-de mostrarlo:
+en `js/nutricion-planes.js`) — así es como las respuestas modifican el
+plan antes de mostrarlo:
 - Alergias marcadas u "otra alergia" → nota de exclusión + sustitución
   dentro del mismo grupo nutricional.
 - Restricción Vegetariano/Vegano → nota de sustitución de fuentes
@@ -547,12 +547,38 @@ de mostrarlo:
 - Hora de mayor exigencia mental → nota de en qué momento del día se
   ubica el snack de refuerzo.
 - Condición de salud marcada y/o medicación regular = Sí → **aviso**
-  (`.nutri-note`, fondo dorado) de validar el plan con un profesional
-  antes de aplicarlo — no bloquea el envío, solo lo marca.
-- Sueño <6h o calidad de sueño ≤2 → aviso de que el plan no sustituye
-  dormir lo suficiente.
-- Cafeína "4 o más al día" → aviso de reducir gradualmente.
-- Ultraprocesados "a diario" → aviso de transición gradual.
+  nivel `'alto'` de validar el plan con un profesional antes de
+  aplicarlo — no bloquea el envío, solo lo marca.
+
+**Avisos graduados** (desde la sesión del punto 5 de
+`plan-mejoras-mi-plan-y-encuesta.md`, sección 4.2): `nutriConstruirAvisos`
+ya **no** devuelve strings, devuelve objetos `{nivel, texto}` con
+`nivel` `'moderado'` o `'alto'`. `nutriBuildResumenHTML` usa `nivel` para
+elegir la clase CSS: `'moderado'` → `.nutri-note` (fondo dorado, el
+estilo que ya existía), `'alto'` → `.nutri-note.nutri-note--alto` (fondo
+rojo, clase nueva en `css/styles.css`). Si se agrega un aviso nuevo en el
+futuro, tiene que devolver este mismo shape `{nivel, texto}` o
+`nutriBuildResumenHTML` rompe (asume `a.nivel`/`a.texto`, ya no `a` como
+string).
+
+- **Sueño**: antes disparaba solo (`d.sueno` <6h o `d.calidadSueno` ≤2).
+  **Decisión tomada con el usuario en esta sesión**: ahora exige
+  *además* estrés alto (`d.estres >= 4`) — alguien con mal sueño pero
+  estrés bajo/medio ya no ve ningún aviso de sueño. Es intencional, no
+  un bug; si se quiere volver a que sea independiente, es cuestión de
+  sacar el `&& estresAlto` de esa condición.
+- **Eje combinado nuevo**: `d.estres >= 4` **y** `d.fatiga >= 4` a la vez
+  → aviso propio de magnesio/complejo B (antes no existía; lo mencionaba
+  el documento original como "Plan 4" pero no estaba implementado).
+- **Cafeína**: `'4 o más al día'` → nivel `'alto'` (mismo texto de
+  siempre); `'2 a 3 al día'` → nivel `'moderado'` **nuevo** (antes ese
+  escalón no generaba ningún aviso).
+- **Ultraprocesados**: `'A diario'` → nivel `'alto'` (mismo texto de
+  siempre); `'Algunas veces por semana'` → nivel `'moderado'` **nuevo**
+  (antes tampoco generaba aviso).
+- `.nutri-summary` ya tenía `gap:12px` en su `display:flex`, así que con
+  varios avisos a la vez (ahora es un caso común, antes casi no pasaba)
+  no hizo falta tocar el espaciado del contenedor.
 
 **Envío (ya no es por correo — reemplazado por login + "Mi plan")**: al
 enviar el paso 8, se guarda todo en `localStorage` bajo `sinaptix_objetivo`

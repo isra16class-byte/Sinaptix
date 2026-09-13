@@ -495,3 +495,8 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
   font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--gold);
   background:var(--gold-soft);border-radius:var(--radius-sm);padding:10px 12px;
 }
+/* Avisos graduados: nivel "alto" (médico/medicación, combos estrés+sueño y
+   estrés+fatiga, cafeína/ultraprocesados en su tope) se pinta en rojo en vez
+   de dorado, para diferenciarlo de "moderado" — ver
+   plan-mejoras-mi-plan-y-encuesta.md, sección 4.2. */
+.nutri-note--alto{color:var(--red);background:rgba(179,38,30,.14)}

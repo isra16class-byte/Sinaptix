@@ -5,6 +5,43 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Avisos graduados y ejes combinados (estrés+sueño, estrés+fatiga)
+
+- Punto 5 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2, "Ajustes
+  más graduales, no binarios"). `nutriConstruirAvisos` (`js/nutricion-planes.js`)
+  ahora devuelve objetos `{nivel, texto}` en vez de strings — `nivel` es
+  `'moderado'` o `'alto'`, usado por `nutriBuildResumenHTML` para pintar
+  cada aviso con `.nutri-note` (moderado, dorado, sin cambios) o
+  `.nutri-note.nutri-note--alto` (alto, rojo, clase nueva en
+  `css/styles.css`).
+- **Decisiones tomadas con el usuario para esta sesión** (el documento
+  original dejaba esto abierto a decidir):
+  - El aviso de sueño **ya no es independiente**: antes disparaba solo con
+    `d.sueno`/`d.calidadSueno` malos; ahora exige además estrés alto
+    (`d.estres >= 4`). Alguien con mal sueño pero estrés bajo/medio ya no
+    ve ningún aviso de sueño — es un cambio de comportamiento intencional,
+    no un bug, si en el futuro se quiere revertir a que sea independiente
+    otra vez.
+  - Nuevo aviso de **eje combinado**: `d.estres >= 4` y `d.fatiga >= 4` a
+    la vez dispara un aviso propio (magnesio/complejo B), que antes no
+    existía — el documento original lo mencionaba como "Plan 4" pero no
+    estaba implementado.
+  - Cafeína y ultraprocesados pasan de binario a **2 niveles**: el nivel
+    superior (`'4 o más al día'` / `'A diario'`) mantiene el texto y
+    nivel `'alto'` de antes; se agregó un nivel `'moderado'` nuevo para
+    el escalón intermedio (`'2 a 3 al día'` / `'Algunas veces por
+    semana'`), que antes no generaba ningún aviso.
+  - El aviso médico/medicación se marcó como `'alto'` (ya existía, no
+    cambió el texto ni la condición para mostrarlo).
+- `.nutri-summary` ya tenía `gap:12px` en su `display:flex`, así que
+  varios avisos seguidos (ahora es común, ver caso de prueba con 4 avisos
+  a la vez) quedan espaciados sin tocar ese contenedor.
+- Verificado con un script de Node que ejecuta `nutriConstruirAvisos` /
+  `nutriBuildResumenHTML` contra casos sintéticos (sueño malo con y sin
+  estrés alto, eje combinado, cada nivel de cafeína/ultraprocesados) antes
+  de generar el patch — no hay test runner en el repo, así que quedó como
+  verificación manual de esta sesión, no como archivo de test agregado.
+
 ## 2026-09-13 — "Un día tipo" en el resultado de cada plan de nutrición
 
 - Punto 4 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.3): cada uno
