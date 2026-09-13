@@ -216,7 +216,7 @@
   },{threshold:.15});
   revealEls.forEach(el=>io.observe(el));
 
-  // Progreso de scroll (barra superior, estilo Odoo)
+  // Progreso de scroll (barra superior)
   const progressBar = document.getElementById('scrollProgress');
   function onScroll(){
     if(!progressBar) return;
