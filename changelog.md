@@ -5,6 +5,28 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Rayón izquierdo de Método/Pilares ahora sangra hasta el borde real
+
+- El usuario mandó una captura de referencia (título "Optimizado para
+  mejorar la productividad") donde los rayones nacen del borde real de
+  la pantalla, y una captura propia de `lam-04` (Pilares) donde dijo que
+  "faltaba" el rayón izquierdo.
+- El rayón ya existía en el markup (uno de los 7 de `.lam-title-frame`
+  en `lam-03` y `lam-04`), pero estaba posicionado con `left:6px` —
+  relativo a `.lam-title-frame`, que hereda el ancho centrado de `.wrap`
+  (`max-width:1180px`), así que nacía a ~200-250px del borde real en vez
+  de desde ahí. Por eso se veía "ausente" comparado con la referencia.
+- Se cambió ese rayón a `left:calc(50% - 50vw)` en `index.html` (mismo
+  cambio en `lam-03` y `lam-04`) — truco de CSS que aprovecha que
+  `.lam-title-frame` está centrado igual que el viewport, así el borde
+  izquierdo del rayón cae siempre en `x=0` real sin depender de un valor
+  fijo en px que se rompería en otras resoluciones. Se subió el `width`
+  de 140px a 170px para que se note más.
+- No se tocó ningún otro rayón del frame (el cluster superior derecho ni
+  los inferiores derechos) — el pedido era puntual sobre el izquierdo.
+- Verificado con Playwright en 1600px y 1280px de ancho: el rayón nace
+  del borde real del viewport en ambos casos.
+
 ## 2026-09-13 — Párrafo de Pilares movido debajo de la ola
 
 - El usuario probó el patch anterior en local (Live Server) y mandó una

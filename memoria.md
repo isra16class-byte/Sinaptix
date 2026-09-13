@@ -504,6 +504,28 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   sí está permitido) solo para la captura de verificación. En un deploy
   real (Netlify) la fuente carga normal desde Google Fonts, no hace
   falta ningún cambio adicional para eso.
+- **Rayón inferior izquierdo con sangrado real al borde del viewport**
+  (sesión posterior, feedback contra una captura de referencia): el
+  usuario mostró una referencia donde el rayón inferior izquierdo del
+  `.lam-title-frame` nace justo en el borde de la pantalla, no cerca del
+  título. El rayón ya existía (uno de los 7 de `.lam-title-frame`,
+  `left:6px;bottom:-6px`), pero al estar posicionado relativo a
+  `.lam-title-frame` (que hereda el ancho del contenido de `.wrap`,
+  centrado con `max-width:1180px`), quedaba a ~200-250px del borde real
+  en vez de nacer de él — por eso se percibía como "falta un rayón".
+  Se cambió su `left` a `calc(50% - 50vw)` en vez de un valor fijo en
+  `index.html` (`lam-03` y `lam-04`, ambos con el mismo markup): como
+  `.lam-title-frame` es un bloque centrado cuyo centro horizontal
+  coincide con el centro del viewport (hereda el ancho de `.wrap`, que
+  tiene `margin:0 auto`), este truco de CSS hace que el borde izquierdo
+  del rayón caiga exactamente en `x=0` del viewport sin importar el
+  ancho de pantalla (no depende de un `px` fijo que se rompería en otras
+  resoluciones). Se subió el `width` de ese rayón de 140px a 170px para
+  que se note más al nacer del borde. Verificado con Playwright en 1600px
+  y 1280px de ancho: en ambos casos el rayón sigue naciendo del borde
+  real. El resto de los 6 rayones de `.lam-title-frame` (los del cluster
+  superior derecho y los inferiores derechos) no se tocaron — el pedido
+  fue puntual sobre el rayón izquierdo.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
