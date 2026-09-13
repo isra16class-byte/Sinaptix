@@ -5,53 +5,28 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
-## 2026-09-12 — Corrección de los trazos tipo marcador (finos, en pareja, anclados)
+## 2026-09-12 — Revertidos los trazos tipo marcador (rompían el layout y no convencieron)
 
-- El usuario prueba el patch anterior en el navegador y reporta que "no
-  quedó bien": en el Hero un trazo quedaba flotando solo, sin nada cerca
-  (el Hero es `100vh` con el contenido centrado por flex, así que un
-  `%` de posición no cae junto a ningún elemento real como sí pasa en las
-  demás secciones), y en general los trazos se veían gruesos/redondeados
-  tipo "mancha" en vez de finos como en odoo.com.
-- Se rehace `svg/deco-mark.svg` más fino (`stroke-width` de 9 a 5, menos
-  amplitud de onda) y se crea `svg/deco-mark-sm.svg`, una versión corta
-  para usar en pareja (un trazo largo + uno corto, como hace odoo.com).
-- Se reposicionan **todos** los trazos de las 6 secciones en parejas,
-  pegados a un punto de contenido real (eyebrow, título, botones, pie del
-  hero) — se elimina el trazo huérfano del Hero y se reemplaza por un
-  trazo corto anclado a la leyenda del pie del hero.
-- Se adelgaza también `svg/deco-underline.svg` (`stroke-width` de 14 a
-  11) para que combine mejor con los trazos más finos.
-- Archivos tocados: `index.html`, `svg/deco-mark.svg`,
-  `svg/deco-underline.svg`, `svg/deco-mark-sm.svg` (nuevo), `memoria.md`,
-  `changelog.md`.
-
-## 2026-09-12 — Trazos tipo marcador inspirados en odoo.com (verde de marca)
-
-- El usuario muestra una captura de odoo.com con trazos hechos a mano
-  (rayas sueltas + subrayado ondulado bajo una palabra del título) y pide
-  replicar ese recurso. Se define con el usuario: color **verde**
-  (`#2E7D5B`) y aplicación **en todo el sitio, densidad similar a Odoo**.
-- Se crean 2 SVG nuevos, ambos en `#2E7D5B`:
-  - `svg/deco-mark.svg`: trazo suelto ondulado (acento de fondo).
-  - `svg/deco-underline.svg`: subrayado ondulado más grueso, pensado para
-    ir debajo de una palabra.
-- Se agrega clase `.deco-mark` en `css/styles.css` (mismo patrón que
-  `.deco-fruit`: oculta en móvil bajo `max-width:720px`, pero sin
-  animación de flotación) y se colocan 1–2 `<img class="deco deco-mark">`
-  por sección (Hero, Visión, Método, Pilares, Beneficios, Contacto).
-- Se agrega clase `.title-mark` (`position:relative` + `::after` con
-  `background:url('../svg/deco-underline.svg')`) y se envuelve una
-  palabra clave por título de sección: "claridad" (Hero), "alimenta"
-  (Visión), "cuatro fases" (Método), "trabajo" (Pilares), "carga alta"
-  (Beneficios), "asesoría" (Contacto).
-- **Fix de paso**: se corrige `.hero h1 em`, que tenía `font-style:normal`
-  heredado de antes del cambio a Fraunces — por eso "claridad" nunca se
-  veía en itálica pese a que la memoria ya lo daba por hecho. Ahora es
-  `font-style:italic` de verdad.
+- Se habían probado trazos tipo "marcador" estilo odoo.com en dos
+  iteraciones (trazos sueltos + subrayado bajo palabra clave en cada
+  título; luego una corrección con trazos más finos en pareja). El
+  usuario prueba ambas versiones en el navegador y decide revertir todo:
+  además de no convencer visualmente ("está horrible"), envolver la
+  palabra "alimenta" en un `<span>` dentro del `h2` de Visión (que usa
+  `display:flex`) rompía el layout — el texto se apilaba una palabra por
+  línea, gigante, en vez de fluir normal.
+- Se revierten con `git revert` los dos commits de esa sesión
+  (`9f01a59` y `bfaade2`), sin conflictos.
+- Se conserva el único fix de esa sesión que sí era correcto y no tenía
+  relación con el problema: `.hero h1 em` se mantiene en
+  `font-style:italic` (no se revierte a `normal`), para que "claridad"
+  se siga viendo en Fraunces itálica.
+- Se eliminan `svg/deco-mark.svg`, `svg/deco-mark-sm.svg` y
+  `svg/deco-underline.svg`.
+- Estado resultante: equivalente al commit "Cambiar tipografia de
+  titulos a Fraunces", sin ninguna decoración tipo marcador.
 - Archivos tocados: `index.html`, `css/styles.css`, `memoria.md`,
-  `changelog.md`, `svg/deco-mark.svg` (nuevo), `svg/deco-underline.svg`
-  (nuevo).
+  `changelog.md` (además de borrar los 3 SVG mencionados).
 
 ## 2026-09-12 — Tipografía de títulos: Fraunces (editorial y cálida)
 

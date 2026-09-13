@@ -63,22 +63,6 @@ a{color:inherit;text-decoration:none}
 @media(prefers-reduced-motion:reduce){.deco-fruit{animation:none}}
 @media(max-width:720px){.deco-fruit{display:none}}
 
-.deco-mark{opacity:.85}
-@media(max-width:720px){.deco-mark{display:none}}
-
-.title-mark{position:relative;display:inline-block}
-.title-mark::after{
-  content:'';
-  position:absolute;
-  left:-3%;right:-3%;
-  bottom:-.14em;
-  height:.34em;
-  min-height:9px;
-  background:url('../svg/deco-underline.svg') no-repeat center/100% 100%;
-  z-index:-1;
-  pointer-events:none;
-}
-
 .eyebrow{
   font-family:var(--font-m);
   font-size:14px;
