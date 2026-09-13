@@ -5,33 +5,53 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
-## 2026-09-13 — Trazos naranjas reemplazados por espiga de trigo lineal (excepto Método/Pilares)
+## 2026-09-13 — Trazos naranjas reemplazados por espiga de trigo real vectorizada (excepto Método/Pilares)
 
 - El usuario mostró una captura del hero con los trazos tipo "marcador"
-  naranjas (`.deco-scribble`) y una búsqueda de imágenes de granos
-  (trigo, avena, cebada, centeno) preguntando si convenía cambiar esos
-  trazos por algo con esa temática, **menos en las secciones 3 y 4**
-  (Método y Pilares, `lam-03`/`lam-04`), que ya estaban validadas.
-- Se preguntó estilo (lineal/outline simple, en el mismo espíritu que el
-  trazo actual) y color (dorado más "trigo", más amarillo que el naranja
-  original `#EDA23A`) antes de tocar código.
-- Se creó `svg/deco-espiga.svg`: una espiga de trigo en línea (un trazo
-  curvo central + una serie de "aristas"/bristles alternados a los
-  costados, todo en `stroke`, sin relleno), en `#D9A441` (dorado trigo).
-  Mismo espíritu decorativo que `deco-scribble.svg` (viewBox ancho y
-  bajo, pensado para usarse rotado y escalado como fondo), pero
-  reconocible como grano en vez de un garabato abstracto.
+  naranjas (`.deco-scribble`) y una búsqueda de imágenes de granos,
+  preguntando si convenía cambiar esos trazos por algo con esa temática,
+  **menos en las secciones 3 y 4** (Método y Pilares, `lam-03`/`lam-04`),
+  que ya estaban validadas. Se acordó estilo lineal/outline y color
+  dorado más "trigo" (`#D9A441`, más amarillo que el `#EDA23A` original)
+  antes de tocar código.
+- **Iteración 1** (descartada): SVG hecho a mano, un trazo curvo +
+  "aristas" cortas tipo espina de pescado. El usuario lo rechazó: "se ve
+  horrible jaja".
+- **Iteración 2** (descartada): espiga vertical generada por script
+  (granos tipo almendra en herringbone sobre un tallo). El usuario
+  prefirió pedirle la imagen a un generador externo (Gemini) en vez de
+  seguir iterando a mano.
+- Se le dio al usuario un prompt (en español e inglés) para pedir una
+  espiga de trigo en line art, dorada, aislada en fondo blanco, sin
+  sombras/degradados, pensada para recortar y adaptar fácil.
+- El usuario subió la imagen generada por Gemini (espiga muy detallada y
+  limpia). Se instaló `potrace` (`apt-get install -y potrace`) y se
+  vectorizó: recorte al bounding box del dibujo con PIL, umbral a
+  blanco/negro, `potrace -s`, y recoloreado del `fill` resultante a
+  `#D9A441`. Resultado: `svg/deco-espiga.svg` (viewBox `0 0 163 669`),
+  fiel al dibujo de Gemini pero como SVG vectorial liviano.
 - En `index.html` se reemplazó `src="svg/deco-scribble.svg"` por
-  `src="svg/deco-espiga.svg"` únicamente en las instancias `.deco
-  .deco-scribble` de `lam-01` (Hero), `lam-02` (Visión), `lam-05` (Para
-  quién es) y `lam-06` (Contacto). **No se tocó** `lam-03` ni `lam-04`
-  (siguen con `deco-scribble.svg`, incluidos sus `.title-scribble`), tal
-  como pidió el usuario.
+  `src="svg/deco-espiga.svg"` en las 12 instancias `.deco .deco-scribble`
+  de `lam-01` (Hero, 6), `lam-02` (Visión, 2), `lam-05` (Para quién es, 2)
+  y `lam-06` (Contacto, 2). **No se tocó** `lam-03` ni `lam-04` (siguen
+  con `deco-scribble.svg`, incluidos sus `.title-scribble`).
+- **Ajuste de posición/ángulo** (feedback del usuario tras ver el primer
+  montaje: "la ubicación las veo mal... deberían estar inclinadas...
+  revueltas o saliendo de la pantalla como cortadas"): se re-hicieron los
+  `style` inline de las 12 instancias con rotaciones bien variadas
+  (18°–42°, alternando signo, en vez de la leve inclinación pareja de
+  antes) y varias con offset negativo grande (`right:-25px` a `-35px`,
+  `left:-15px` a `-35px`) para que queden cortadas por el borde real de
+  la pantalla, aprovechando que `.hero` tiene `overflow:hidden` y
+  `body`/`html` tiene `overflow-x:hidden` (no hizo falta el truco
+  `var(--vw100, 100vw)` de `lam-03`/`lam-04` porque estas instancias son
+  hijas directas de la `<section>`, ya a ancho completo de viewport).
 - `svg/deco-scribble.svg` no se borró: sigue existiendo y en uso en
   `lam-03`/`lam-04` y en `.title-mark`/`.title-scribble`.
-- Verificado con Playwright (servidor local + capturas) en el hero
-  (`lam-01`), `lam-02`, `lam-05`, `lam-06` con la espiga nueva, y en
-  `lam-03`/`lam-04` confirmando que siguen con el trazo original.
+- Verificado con Playwright (servidor local + capturas) en 4 versiones
+  sucesivas (dos descartadas + espiga de Gemini con posición inicial +
+  posición final "revuelta") en Hero, Visión, Para quién es, Contacto, y
+  confirmando en cada iteración que Método/Pilares seguían sin cambios.
 
 ## 2026-09-13 — Imagen del Hero reemplazada por ilustración de cerebro con chispas de neuronas
 

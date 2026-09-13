@@ -118,49 +118,81 @@ Ahora:
 - El contenido/copy en español **no cambió**, solo el sistema visual.
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
-- **Trazos de fondo: espiga de trigo (Hero/Visión/Para quién es/Contacto) +
-  marcador original (Método/Pilares)**: hay dos SVG de rayón de fondo que
-  conviven, mismo patrón `.deco` (position:absolute, z-index:0, detrás del
-  `.wrap`, clase `.deco-scribble` en `css/styles.css`, opacidad base
-  `.85`, oculto en móvil `max-width:720px`) que ya usan los blobs de
-  fruta, pero **con dos SVG distintos según la sección**:
+- **Trazos de fondo: espiga de trigo real vectorizada (Hero/Visión/Para quién
+  es/Contacto) + marcador original (Método/Pilares)**: hay dos SVG de rayón
+  de fondo que conviven, mismo patrón `.deco` (position:absolute,
+  z-index:0, detrás del `.wrap`, clase `.deco-scribble` en
+  `css/styles.css`, opacidad base `.85`, oculto en móvil
+  `max-width:720px`) que ya usan los blobs de fruta, pero **con dos SVG
+  distintos según la sección**:
   - `svg/deco-scribble.svg` (trazo tipo marcador liso, `stroke:#EDA23A`,
-    `stroke-width:11`, un único path `M8,17 Q200,9 392,13`, sin
-    ondulaciones — el usuario rechazó explícitamente una versión con
-    varias curvas por verse "tembleque"): sigue en uso, pero **solo**
-    en `lam-03` (Método) y `lam-04` (Pilares) — tanto en los `.deco
+    un único path sin ondulaciones): sigue en uso, pero **solo** en
+    `lam-03` (Método) y `lam-04` (Pilares) — tanto en los `.deco
     .deco-scribble` propios de esas dos secciones como en el mecanismo
     `.title-mark`/`.title-scribble` (ver más abajo, "Rayón pegado al
-    título"). No tocar el path de este archivo si se retoma esa idea en
-    otro lado; es la forma ya validada para el look "marcador" clásico.
-  - `svg/deco-espiga.svg` (nuevo): una espiga de trigo en línea —un
-    trazo curvo central (`M10,50 Q200,36 390,44`) más una serie de
-    "aristas"/bristles cortas alternadas a los costados (`<line>`),
-    todo en `stroke`, sin relleno, color `#D9A441` (dorado trigo, más
-    amarillo que el naranja `#EDA23A` original) — usado en `lam-01`
-    (Hero), `lam-02` (Visión), `lam-05` (Para quién es) y `lam-06`
-    (Contacto), en los mismos `<img class="deco deco-scribble">` que
-    antes apuntaban a `deco-scribble.svg` (mismo viewBox ancho/bajo,
-    pensado para usarse rotado y escalado igual que antes — solo cambió
-    el `src`). El usuario pidió este cambio mostrando una referencia de
-    imágenes de granos (trigo/avena/cebada/centeno) para que el rayón se
-    sintiera más ligado a la temática de neuroalimentación, mantuvo el
-    estilo lineal/outline del trazo original y solo cambió a un dorado
-    más amarillo. **Si se agregan nuevas instancias de este trazo en el
-    futuro, usar `deco-espiga.svg` por defecto — `deco-scribble.svg`
-    queda reservado para Método/Pilares y para el subrayado de título.**
-  - Distribución (sin cambios de cantidad/posición respecto a antes, solo
-    cambió el archivo referenciado donde corresponde): 6 en el Hero
-    (clúster arriba-derecha + acentos sueltos) y 2 por cada una de las
-    otras 5 secciones (`lam-02` a `lam-06`).
+    título"). No tocar este archivo si se retoma esa idea en otro lado.
+  - `svg/deco-espiga.svg` (nuevo, **reemplaza dos intentos previos
+    descartados**): usado en `lam-01` (Hero), `lam-02` (Visión), `lam-05`
+    (Para quién es) y `lam-06` (Contacto).
+    - **Historia del proceso** (por si se repite algo similar): el
+      primer intento fue un SVG hecho a mano con un trazo + "aristas"
+      tipo espina de pescado — el usuario lo rechazó ("se ve horrible").
+      El segundo intento fue una espiga vertical generada por script
+      (kernels tipo almendra) — tampoco convenció al usuario, que pidió
+      en cambio pedirle la imagen a un generador externo (Gemini) y que
+      Claude hiciera "la magia" de adaptarla. Se le dio al usuario un
+      prompt en español e inglés para pedir una espiga de trigo en line
+      art, dorada, aislada en fondo blanco. El usuario subió la imagen
+      generada (un trazo de espiga muy limpio y detallado). Esa imagen
+      **se vectorizó con potrace** (recorte al bounding box con PIL,
+      umbral a blanco/negro, `potrace -s`), y el resultado (paths
+      cerrados rellenos, no strokes) se recoloreó a `fill="#D9A441"` —
+      así quedó como SVG liviano y fiel al dibujo original, ya no como
+      un trazo hecho a mano.
+    - **Si se necesita volver a vectorizar una imagen de referencia en
+      este entorno**: `potrace` está disponible (se instaló con
+      `apt-get install -y potrace`); flujo: recortar al contenido con
+      PIL (bounding box de píxeles no blancos), umbralizar a blanco/negro
+      duro, `potrace input.pbm -s -o out.svg`, y luego recolorear el
+      `fill` del `<g>` resultante al color deseado.
+    - **Forma final**: viewBox `0 0 163 669` (una sola espiga, vertical,
+      con aristas/awns saliendo del grano y tallo con dos hojas en la
+      base), color `#D9A441` (dorado trigo, más amarillo que el naranja
+      `#EDA23A` original).
+    - **Posición/ángulo (ajuste pedido por el usuario tras ver el primer
+      montaje)**: el usuario pidió que no fueran solo trazos con
+      leve inclinación, sino que se vieran "revueltos" (ángulos de
+      rotación bien variados, no solo unos pocos grados) y que algunas
+      espigas salieran cortadas por el borde real de la pantalla, como
+      mecidas por el viento. Se lograron los cortes de borde real
+      simplemente con offsets negativos grandes (`right:-25px`,
+      `left:-35px`, etc.) combinados con rotaciones amplias y variadas
+      (entre 18° y 42°, alternando signo) — **no** hizo falta el truco
+      `var(--vw100, 100vw)` de `lam-03`/`lam-04` en este caso porque las
+      instancias de `.deco-scribble` en `lam-01/02/05/06` son hijas
+      directas de la `<section>` (que ya ocupa el ancho completo del
+      viewport), a diferencia de las de `lam-03`/`lam-04` que están
+      anidadas dentro de un contenedor con `max-width` propio. El corte
+      real del borde funciona porque `.hero` tiene `overflow:hidden` y el
+      `body`/`html` tiene `overflow-x:hidden` (línea existente en
+      `css/styles.css`), así que cualquier elemento posicionado con
+      offset negativo grande queda recortado limpio en el borde real.
+    - **Si se agregan nuevas instancias de este trazo en el futuro,
+      usar `deco-espiga.svg` por defecto** — `deco-scribble.svg` queda
+      reservado para Método/Pilares y para el subrayado de título.
+  - Distribución (sin cambios de cantidad respecto a antes, solo cambió
+    el archivo, tamaño/rotación/posición donde corresponde): 6 en el
+    Hero y 2 por cada una de las otras 3 secciones que usan la espiga
+    (`lam-02`, `lam-05`, `lam-06`).
   - **Verificación visual**: en este entorno hay Chromium + Playwright
-    instalados; antes de entregar un patch de este tipo (decoración visual
-    de fondo/tamaños/posiciones/forma/color de un trazo) conviene levantar
-    un servidor local (`python3 -m http.server` sobre el repo) y tomar
-    capturas con Playwright para confirmar cómo se ve realmente, en vez de
-    asumir por el código — incluyendo confirmar que las secciones que
-    NO debían cambiar (p.ej. Método/Pilares en este caso) efectivamente
-    siguen igual.
+    instalados; antes de entregar un patch de este tipo (decoración
+    visual de fondo/tamaños/posiciones/forma/color de un trazo) conviene
+    levantar un servidor local (`python3 -m http.server` sobre el repo) y
+    tomar capturas con Playwright para confirmar cómo se ve realmente —
+    incluyendo confirmar que las secciones que NO debían cambiar (Método/
+    Pilares en este caso) efectivamente siguen igual. Se iteró varias
+    veces (3 versiones de la espiga) mostrando capturas al usuario antes
+    de aplicar el cambio final al repo real.
 - **Capa de "vida" ilustrada (sesión posterior al rediseño visual)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima
