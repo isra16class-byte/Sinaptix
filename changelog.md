@@ -5,6 +5,22 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Trazos de marcador: rectos en vez de ondulados (corrección de forma)
+
+- El usuario manda su captura de referencia otra vez junto con la del
+  sitio, señalando que el trazo tiene que quedar "tal cual" la referencia
+  y pide explícitamente que no sea "tembleсoso" (con varias ondas/curvas)
+  como venía saliendo.
+- Se cambia el `path` de `svg/deco-scribble.svg` de una curva con tres
+  segmentos en "C" (varias jorobas, efecto garabato) a una sola curva
+  Bézier cuadrática `M8,17 Q200,9 392,13`: prácticamente una línea recta
+  con una leve inclinación, igual a como se ven los trazos en la
+  referencia de odoo.com.
+- No se tocan tamaños, posiciones, color ni opacidad (eso ya había
+  quedado bien en el ajuste anterior); solo la forma del trazo.
+- Verificado con capturas Playwright headless antes de generar el patch.
+- Archivos tocados: `svg/deco-scribble.svg`, `memoria.md`, `changelog.md`.
+
 ## 2026-09-12 — Centrar títulos de Método y Pilares (lam-03, lam-04)
 
 - El usuario pide que los títulos de las secciones 03 (Método) y 04

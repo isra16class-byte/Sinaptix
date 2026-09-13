@@ -119,35 +119,34 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
 - **Trazos tipo "marcador" de fondo (recuperados, versión distinta a la
-  revertida — ajustados tras feedback de "no se parece a la referencia")**:
-  hay un `svg/deco-scribble.svg` — un único trazo ondulado tipo marcador
-  (`stroke:#EDA23A`, `stroke-width:11` en un viewBox de 400×36, hand-drawn,
-  sin relleno) que se reutiliza como `<img>` varias veces por sección con
-  distinto tamaño (150–340px), rotación y posición (clase `.deco-scribble`,
-  opacidad base `.85` en `css/styles.css`), siguiendo el mismo patrón
-  `.deco` (position:absolute, z-index:0, detrás del `.wrap`) que ya usan
-  los blobs de fruta. Primer intento de esta sesión salió demasiado fino y
-  tenue (viewBox chico, stroke-width 6, opacidades bajas de .35–.4,
-  tamaños de 90–220px) y el usuario mandó captura señalando que no se
-  parecía a la referencia; se corrigió aumentando el grosor de trazo, el
-  tamaño de las instancias y subiendo la opacidad base, y verificando con
-  capturas de pantalla (Playwright headless, ver nota abajo) antes de
-  entregar el patch. A diferencia del intento anterior que sí se revirtió
-  (ver `changelog.md`, "Revertidos los trazos tipo marcador"), **no**
-  envuelve palabras dentro de títulos ni toca ningún `h2`/`span` — son
-  solo rayones de fondo sueltos, sin relación con el texto. Se ocultan en
-  móvil (`max-width:720px`) igual que `.deco-fruit`. Distribución: 6 en el
-  Hero (clúster arriba-derecha + acentos sueltos) y 2 por cada una de las
-  otras 5 secciones (`lam-02` a `lam-06`), reposicionados para no quedar
-  detrás de tarjetas opacas (pillars, quote-cards, stat-boxes) ni cruzar
-  el texto del footer del Hero.
+  revertida — ajustados dos veces tras feedback)**: hay un
+  `svg/deco-scribble.svg` — un único trazo tipo marcador (`stroke:#EDA23A`,
+  `stroke-width:11`) que se reutiliza como `<img>` varias veces por
+  sección con distinto tamaño (150–340px), rotación y posición (clase
+  `.deco-scribble`, opacidad base `.85` en `css/styles.css`), siguiendo el
+  mismo patrón `.deco` (position:absolute, z-index:0, detrás del `.wrap`)
+  que ya usan los blobs de fruta. **Forma del trazo (2do ajuste)**: la
+  referencia del usuario (captura de odoo.com) usa líneas prácticamente
+  rectas con una sola curva suave, no un garabato ondulado con varias
+  jorobas — el primer path (`C ... C ... C ...`, tres curvas) se veía
+  "tembleque" y el usuario lo rechazó explícitamente ("no se los hagas
+  temblecosos"). El path actual es una sola curva Bézier cuadrática
+  (`M8,17 Q200,9 392,13`), casi recta con una leve inclinación, que es la
+  que hay que seguir usando como base para este elemento — no volver a un
+  path con múltiples curvas/ondas. A diferencia del intento anterior que sí
+  se revirtió (ver `changelog.md`, "Revertidos los trazos tipo marcador"),
+  **no** envuelve palabras dentro de títulos ni toca ningún `h2`/`span` —
+  son solo rayones de fondo sueltos, sin relación con el texto. Se ocultan
+  en móvil (`max-width:720px`) igual que `.deco-fruit`. Distribución: 6 en
+  el Hero (clúster arriba-derecha + acentos sueltos) y 2 por cada una de
+  las otras 5 secciones (`lam-02` a `lam-06`), reposicionados para no
+  quedar detrás de tarjetas opacas ni cruzar texto.
   - **Verificación visual**: en este entorno hay Chromium + Playwright
     instalados; antes de entregar un patch de este tipo (decoración visual
-    de fondo/tamaños/posiciones) conviene levantar un servidor local
-    (`python3 -m http.server` sobre el repo) y tomar capturas con
-    Playwright para confirmar cómo se ve realmente, en vez de asumir por
-    el código. Así se detectó el problema de que los trazos eran
-    demasiado finos/tenues y que uno cruzaba el texto del footer.
+    de fondo/tamaños/posiciones/forma de un trazo) conviene levantar un
+    servidor local (`python3 -m http.server` sobre el repo) y tomar
+    capturas con Playwright para confirmar cómo se ve realmente, en vez de
+    asumir por el código.
 - **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima
