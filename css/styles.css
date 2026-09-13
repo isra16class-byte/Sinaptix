@@ -327,6 +327,34 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #miPlan .bar-chart-card{background:var(--paper)}
 #miPlan .nutri-summary{background:var(--paper);border:1px solid var(--line)}
 
+/* ---------- "Mi plan": layout tipo dashboard (Datos clave / Detalle) ----------
+   Reordena los mismos componentes que ya existían (medidor de IMC, tarjeta de
+   objetivo, gráfico de barras, resumen del plan, botones) en una grilla más
+   densa de 2 columnas en vez de una columna larga, a pedido del usuario
+   (referencia visual con "Datos clave" arriba y "Detalle del plan de
+   nutrición" abajo). No se crearon componentes nuevos de datos: son los
+   mismos stat-box/bar-chart-card/nutri-summary de siempre, solo reacomodados. */
+.miplan-subhead{
+  font-family:var(--font-b);font-size:19px;font-weight:800;color:var(--ink);
+  letter-spacing:-.01em;margin:0 0 16px;
+}
+.miplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.miplan-col{display:flex;flex-direction:column;gap:16px}
+.miplan-objetivo{display:flex;flex-direction:column;align-items:flex-start}
+.miplan-detalle-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
+.miplan-detalle-grid .nutri-summary{margin:0}
+.miplan-cierre{
+  background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px 22px;display:flex;flex-direction:column;gap:14px;align-self:stretch;
+}
+.miplan-cierre-title{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--purple-dark)}
+.miplan-cierre p.lam-text{font-size:14px;max-width:none;margin:0}
+.miplan-cierre-btns{flex-direction:column;align-items:stretch;margin-top:auto}
+.miplan-cierre-btns .btn{width:100%;text-align:center}
+@media(max-width:900px){
+  .miplan-grid,.miplan-detalle-grid{grid-template-columns:1fr}
+}
+
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
 @media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}

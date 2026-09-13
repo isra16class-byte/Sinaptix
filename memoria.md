@@ -1022,6 +1022,64 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
     ancho de viewport, comparando contra la imagen de referencia que dio
     el usuario.
 
+## Layout tipo dashboard de "Mi plan" (`.miplan-*`, `mi-plan.html`)
+
+A partir de una imagen de referencia que trajo el usuario (mockup de "Mi
+plan" reorganizado, con encabezados "Datos Clave" y "Detalle del Plan de
+Nutrición" y las mismas frutas decorativas que ya usa el sitio), se
+reacomodó `#miPlanConSesion` en una grilla de 2 columnas más densa en vez
+de una sola columna larga apilada. **No se crearon componentes de datos
+nuevos ni se tocó ningún `id`** — son los mismos de siempre (medidor de
+IMC, tarjeta de objetivo, gráfico de barras, resumen del plan armado por
+`nutriBuildResumenHTML`, botones de acción), solo reordenados en el
+markup; `js/mi-plan.js` no necesitó ningún cambio.
+
+- **Encabezado centrado**: eyebrow + `h2.lam-title` + email quedan
+  envueltos en `.sec-head-center` (clase ya existente, la misma que usan
+  los títulos centrados de Método/Pilares en `index.html`) — antes estaban
+  alineados a la izquierda.
+- **`.miplan-subhead`**: subtítulo de sección nuevo (texto normal, no
+  `.eyebrow` ni `.lam-title`) — hay dos en la página: "Datos clave" y
+  "Detalle del plan de nutrición".
+- **`.miplan-grid`** (2 columnas, `@media(max-width:900px)` colapsa a 1):
+  a la izquierda el `stat-box` del medidor de IMC (`#miPlanImc` y todo lo
+  que ya existía, sin cambios); a la derecha `.miplan-col` (flex-column)
+  con dos tarjetas apiladas:
+  - `.stat-box.miplan-objetivo`: la tarjeta de objetivo cognitivo, ahora
+    con un ícono (`img/Iconos/icon-neuronas.webp`, reusado del set de
+    Pilares — ver sección "Iconos ilustrados..." de este archivo) arriba
+    de una etiqueta itálica ("Objetivo cognitivo principal") y el valor
+    (`#miPlanObjetivo`) debajo — antes el valor iba primero y la etiqueta
+    después, como en el resto de `.stat-box`.
+  - `#miPlanBarras` (`.bar-chart-card`, el gráfico de barras de
+    Foco/Memoria/Energía/Calma): sin cambios internos, solo cambió de
+    posición (antes vivía debajo del `stat-grid` a ancho completo).
+- **`.miplan-detalle-grid`** (2 columnas, mismo breakpoint de colapso):
+  a la izquierda `#miPlanDetalle` (`.nutri-summary`, el detalle del plan
+  armado por `nutriBuildResumenHTML` — sin cambios); a la derecha una
+  tarjeta nueva, `.miplan-cierre` ("Cierre"), que agrupa el texto de
+  `#miPlanCta` (el mensaje que invita a generar el plan, oculto vía JS
+  cuando ya hay uno guardado, igual que antes) y los botones "Generar mi
+  plan" (`#btnAbrirNutricionMiPlan`) / "Cerrar sesión" (`#btnLogout`) —
+  antes esos dos botones quedaban sueltos al final de la columna única,
+  sin agrupar visualmente con ningún texto.
+- Si se agrega contenido nuevo a "Mi plan" en el futuro que necesite su
+  propia fila del dashboard, seguir el mismo patrón: un `.miplan-subhead`
+  + una grilla `.miplan-grid`/`.miplan-detalle-grid` (o una nueva si la
+  proporción de columnas no calza con ninguna de las dos) en vez de volver
+  a apilar todo en una sola columna.
+- **Pendiente de verificación visual real**: mismo problema de red que
+  otras sesiones anotadas en este archivo — Playwright no pudo instalar
+  Chromium en este entorno (descarga bloqueada por la whitelist de
+  dominios). Se verificó con jsdom (estructura del DOM, anidado de las
+  grillas, unicidad de `id`) y con la librería `css` de npm (que
+  `css/styles.css` sigue parseando sin errores con los selectores nuevos
+  presentes), pero no hay captura de pantalla real. Revisar en cuanto haya
+  acceso a Playwright: que `.miplan-cierre` no quede desproporcionada en
+  alto/bajo respecto a `.nutri-summary` cuando el plan tiene mucho
+  contenido (varios avisos + "día tipo"), y el responsive ≤900px (ambas
+  grillas colapsan a 1 columna, pero no se vio en pantalla real).
+
 ## Medidor de IMC tipo velocímetro (`.imc-gauge`, "Mi plan")
 
 Antes el IMC en "Mi plan" era solo un número pelado (`#miPlanImc`), sin

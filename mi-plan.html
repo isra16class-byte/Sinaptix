@@ -53,11 +53,14 @@
 
     <!-- Estado: con sesión iniciada -->
     <div id="miPlanConSesion" class="hidden">
-      <span class="eyebrow reveal in">Mi plan</span>
-      <h2 class="lam-title reveal in d1" style="max-width:16ch">Tu progreso con SINAPTIX</h2>
-      <p class="lam-text reveal in d1" id="miPlanEmail" style="color:var(--panel-text)"></p>
+      <div class="sec-head-center">
+        <span class="eyebrow reveal in">Mi plan</span>
+        <h2 class="lam-title reveal in d1" style="max-width:16ch">Tu progreso con SINAPTIX</h2>
+        <p class="lam-text reveal in d1" id="miPlanEmail" style="color:var(--panel-text)"></p>
+      </div>
 
-      <div class="stat-grid reveal in d2" style="margin-top:30px">
+      <h3 class="miplan-subhead reveal in d2">Datos clave</h3>
+      <div class="miplan-grid reveal in d2">
         <div class="stat-box">
           <div class="imc-gauge hidden" id="miPlanImcGauge" aria-hidden="true">
             <svg viewBox="0 0 220 140" width="100%">
@@ -79,21 +82,27 @@
             <li><span class="imc-dot imc-dot-vigilar"></span>A vigilar</li>
           </ul>
         </div>
-        <div class="stat-box">
-          <div class="num" style="font-size:20px" id="miPlanObjetivo">—</div>
-          <div class="lab">Objetivo cognitivo principal</div>
+        <div class="miplan-col">
+          <div class="stat-box miplan-objetivo">
+            <img class="stat-icon" src="img/Iconos/icon-neuronas.webp" alt="">
+            <div class="lab" style="margin-top:0;font-style:italic">Objetivo cognitivo principal</div>
+            <div class="num" style="font-size:22px" id="miPlanObjetivo">—</div>
+          </div>
+          <div class="bar-chart-card hidden" id="miPlanBarras"></div>
         </div>
       </div>
 
-      <div class="bar-chart-card hidden reveal in d2" id="miPlanBarras" style="margin-top:26px"></div>
-
-      <div class="nutri-summary hidden reveal in d3" id="miPlanDetalle" style="margin-top:26px"></div>
-
-      <p class="lam-text reveal in d3" id="miPlanCta" style="margin-top:26px">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
-
-      <div class="btn-row reveal in d3" style="margin-top:10px">
-        <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
-        <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+      <h3 class="miplan-subhead reveal in d3" style="margin-top:40px">Detalle del plan de nutrición</h3>
+      <div class="miplan-detalle-grid reveal in d3">
+        <div class="nutri-summary hidden" id="miPlanDetalle"></div>
+        <div class="miplan-cierre">
+          <div class="miplan-cierre-title">Cierre</div>
+          <p class="lam-text" id="miPlanCta" style="color:var(--panel-text)">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
+          <div class="btn-row miplan-cierre-btns">
+            <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
+            <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </div>
 

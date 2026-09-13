@@ -5,6 +5,49 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Mi plan": layout tipo dashboard (Datos clave / Detalle del plan)
+
+- A partir de una imagen de referencia (mockup con "Mi plan" reorganizado en
+  un dashboard más denso, con encabezados "Datos Clave" y "Detalle del Plan
+  de Nutrición"), se reacomodó `#miPlanConSesion` en `mi-plan.html` sin crear
+  componentes de datos nuevos — son los mismos de siempre (medidor de IMC,
+  tarjeta de objetivo, gráfico de barras, resumen del plan, botones),
+  reordenados en una grilla de 2 columnas en vez de una sola columna larga.
+- Encabezado (eyebrow + título + email) ahora centrado, envuelto en
+  `.sec-head-center` (clase ya existente, reusada de Método/Pilares).
+- Nuevo subtítulo de sección `.miplan-subhead` ("Datos clave"), seguido de
+  `.miplan-grid` (2 columnas): a la izquierda el `stat-box` del medidor de
+  IMC (sin cambios internos), a la derecha `.miplan-col` con la tarjeta de
+  objetivo (ahora con ícono `img/Iconos/icon-neuronas.webp`, reusado de
+  Pilares) apilada arriba del `bar-chart-card` (gráfico de barras).
+- Segundo subtítulo `.miplan-subhead` ("Detalle del plan de nutrición")
+  seguido de `.miplan-detalle-grid` (2 columnas): a la izquierda el
+  `nutri-summary` de siempre (`#miPlanDetalle`, mismo HTML que arma
+  `nutriBuildResumenHTML`), a la derecha una tarjeta nueva `.miplan-cierre`
+  ("Cierre") que agrupa el texto de `#miPlanCta` y los botones "Generar mi
+  plan"/"Cerrar sesión" — antes esos dos botones quedaban sueltos al final
+  de la columna única.
+- Ningún `id` se tocó (`miPlanImc`, `miPlanObjetivo`, `miPlanBarras`,
+  `miPlanDetalle`, `miPlanCta`, `btnAbrirNutricionMiPlan`, `btnLogout`,
+  etc.), así que `js/mi-plan.js` no necesitó ningún cambio — solo se movió
+  el markup de lugar.
+- CSS nuevo en `css/styles.css`: `.miplan-subhead`, `.miplan-grid`,
+  `.miplan-col`, `.miplan-objetivo`, `.miplan-detalle-grid`,
+  `.miplan-cierre` + `.miplan-cierre-title`/`.miplan-cierre-btns`, con
+  `@media(max-width:900px)` que apila ambas grillas a 1 columna (mismo
+  breakpoint que ya usa `.split` en Manifiesto).
+- **Verificación**: en este entorno Playwright no pudo instalar Chromium
+  (la descarga sale de un dominio fuera de la whitelist de red de esta
+  sesión, mismo problema ya documentado en otras entradas de este archivo).
+  Se verificó en cambio con jsdom + la librería `css` de npm: los `id`
+  siguen únicos, el anidado de `.miplan-grid`/`.miplan-detalle-grid` es el
+  esperado, y `css/styles.css` sigue parseando sin errores con todos los
+  selectores nuevos presentes. **Pendiente**: confirmar con capturas reales
+  (desktop y ≤900px) en cuanto haya acceso a Playwright — sobre todo que la
+  tarjeta `.miplan-cierre` no quede más alta/baja que `.nutri-summary` de
+  forma rara cuando el detalle tiene mucho contenido (varios avisos, "día
+  tipo", etc.).
+
 ## 2026-09-13 — Hero: frutas fotográficas flotando alrededor del cerebro
 
 - A partir de una imagen de referencia que trajo el usuario (cerebro con
