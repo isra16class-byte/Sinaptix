@@ -5,6 +5,30 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Rayón pegado al título en Método y Pilares (subrayado + línea debajo)
+
+- El usuario aclara (con nueva captura) que no quería solo rayones sueltos
+  de fondo cerca del título: quería el mismo tratamiento que la
+  referencia de odoo.com, con un rayón subrayando la palabra final del
+  título y una línea completa justo debajo de todo el título.
+- Se agregan dos clases en `css/styles.css`: `.title-mark` (subrayado vía
+  `background-image` sobre un `<span>`, se adapta al ancho real de la
+  palabra) y `.title-scribble` (imagen de `deco-scribble.svg` en flujo
+  normal del documento, `display:block;margin:auto`, debajo del `h2`, para
+  que no dependa de coordenadas fijas ni de en cuántas líneas se parta el
+  título).
+- Se envuelve la última palabra del título en `lam-03` ("genérica") y
+  `lam-04` ("trabajo") en `<span class="title-mark">`, y se agrega el
+  `<img class="title-scribble">` como hermano del `h2` en ambas
+  secciones.
+- A diferencia del intento que se revirtió, estos `h2` no son
+  `display:flex`, así que envolver la palabra en un `span` no rompe el
+  wrapping del título — verificado con capturas Playwright (scrolleando
+  la página completa para disparar las animaciones `reveal` antes de la
+  captura, y confirmando visualmente el resultado final).
+- Archivos tocados: `index.html`, `css/styles.css`, `memoria.md`,
+  `changelog.md`.
+
 ## 2026-09-12 — Trazos de marcador: rectos en vez de ondulados (corrección de forma)
 
 - El usuario manda su captura de referencia otra vez junto con la del

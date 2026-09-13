@@ -193,6 +193,33 @@ automático para centrarse). El timeline de Método y el `pillar-grid` /
 layout de grilla normal, sin cambios. El resto de secciones (02, 05, 06)
 no se tocó y sigue con sus títulos alineados a la izquierda.
 
+**Rayón pegado al título en Método y Pilares**: además del centrado, el
+usuario pidió (mostrando de nuevo la referencia de odoo.com) que el
+título tuviera un rayón subrayando la última palabra clave + una línea
+completa debajo de todo el título, no solo rayones sueltos de fondo. Se
+resolvió con dos piezas nuevas en `css/styles.css`, pensadas para ser
+robustas ante cambios de texto (no usan coordenadas absolutas):
+- `.title-mark`: se aplica a un `<span>` que envuelve la última palabra
+  del `h2` (p.ej. `<span class="title-mark">genérica</span>`), con
+  `background-image:url(../svg/deco-scribble.svg)` en
+  `background-position:left bottom` y `background-size:100% 32%` — el
+  subrayado se estira automáticamente al ancho real de la palabra, sea
+  cual sea, sin depender de un pixel fijo.
+- `.title-scribble`: un `<img>` de `svg/deco-scribble.svg` colocado como
+  **hermano normal del `h2`** (no absoluto), con `display:block;
+  margin:6px auto 0`, así que queda centrado y fluye justo debajo del
+  título sin importar en cuántas líneas se parta el texto (evita el
+  problema de coordenadas fijas que rompió el intento revertido de
+  "trazos tipo marcador" original).
+- Se aplicó envolviendo la última palabra en `lam-03` ("genérica") y en
+  `lam-04` ("trabajo"). **Nota importante**: esto sí envuelve una palabra
+  en un `<span>` dentro de un `h2`, pero a diferencia del intento que se
+  revirtió, estos `h2` **no** son `display:flex` (son bloques de texto
+  normales), así que el span no rompe el wrapping — se verificó con
+  capturas Playwright que el texto sigue fluyendo bien. Si se repite este
+  patrón en otro título, confirmar primero que ese `h2` no use
+  `display:flex`.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos
