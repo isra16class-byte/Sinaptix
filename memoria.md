@@ -434,24 +434,44 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   negativo de Fraunces) y `font-size:clamp(40px,6vw,68px)` — más grande
   que el resto de `h2` porque una cursiva se ve visualmente más chica al
   mismo tamaño en px. El contenido de los títulos no cambió.
+- **Salto de línea forzado en `lam-03`** (sesión posterior, ver
+  `changelog.md` "Rayones reagrupados junto al título"): el título de
+  Método envolvía en 3 líneas de forma poco prolija con el wrap
+  automático por `max-width` en `ch`. Se resolvió igual que el `<br>`
+  del H1 del Hero: `<br>` explícito después de "fases," en el `h2` de
+  `lam-03`, más `style="max-width:32ch"` en ese mismo `h2` (solo para
+  evitar que "Un método en cuatro fases," vuelva a wrapear sola antes
+  del `<br>` — el `.lam-title` base sigue en `max-width:12ch` para el
+  resto de secciones). Si el copy de ese título cambia, revisar dónde
+  cae el `<br>` a mano, no depende del ancho de pantalla.
 - **`.title-mark`** (el `<span>` que subraya la última palabra del
   título, ya existía desde antes): para estas dos secciones se ajustó
   `background-position`/`background-size` (`left bottom 6px` /
   `100% 26%`) para que el rayón quede pegado a la línea base del texto
   manuscrito, distinto del ajuste que le sirve a Fraunces en otras
   secciones si se reutilizara ahí.
-- **Rayones "marco" de la sección**: en vez de los 2 `deco-scribble`
-  sueltos que tenía cada sección, ahora hay 6, con el mismo patrón
-  `.deco`/`.deco-scribble` de siempre (hijos de la `<section>`, mismo
-  `svg/deco-scribble.svg`, solo cambia `style` inline de tamaño/rotación/
-  posición) — **idénticos en `lam-03` y `lam-04`**: un trazo largo +
-  dos cortos apilados arriba a la derecha, y abajo un corto a la
-  izquierda, un largo y dos cortos hacia la derecha. Sigue ocultándose
-  en móvil (`max-width:720px`) por la regla ya existente de
-  `.deco-scribble`. Si se quiere aplicar este mismo tratamiento a otra
-  sección en el futuro, reusar este mismo set de 6 posiciones (ver
-  `index.html`, secciones `lam-03`/`lam-04`) en vez de inventar uno
-  nuevo, para mantener el "marco" consistente.
+- **Rayones "marco" del título (`.lam-title-frame`, ajustado en sesión
+  posterior — ver `changelog.md` "Rayones reagrupados junto al
+  título")**: son 7 `deco-scribble` (mismo patrón `.deco`/
+  `.deco-scribble` de siempre, solo cambia `style` inline de tamaño/
+  rotación/posición) — **idénticos en `lam-03` y `lam-04`**: un trazo
+  largo + dos cortos apilados arriba a la derecha (el "abanico"), y
+  abajo un corto a la izquierda, un largo y dos cortos hacia la
+  derecha. **Ya no son hijos directos de la `<section>`** (que es muy
+  alta por el timeline/pilar-grid de cada sección) — son hijos de un
+  contenedor nuevo, `.lam-title-frame` (`position:relative`, en
+  `css/styles.css`), que envuelve únicamente el `.sec-head-center`
+  (eyebrow + h2 + `.title-scribble` + `.lam-text` si existe). Esto es
+  a propósito: así los valores `top`/`bottom` quedan relativos a la
+  altura del bloque de título, no a la de toda la sección, y los
+  rayones quedan pegados al título en vez de aparecer sueltos cerca
+  del CTA final (que es lo que pasaba antes de este ajuste, con los
+  mismos 7 rayones como hijos directos de `<section>`). Sigue
+  ocultándose en móvil (`max-width:720px`) por la regla ya existente
+  de `.deco-scribble`. Si se quiere aplicar este mismo tratamiento a
+  otra sección en el futuro, reusar `.lam-title-frame` + este mismo
+  set de 7 posiciones (ver `index.html`, secciones `lam-03`/`lam-04`)
+  en vez de inventar uno nuevo, para mantener el "marco" consistente.
 - **Nota de verificación**: `fonts.googleapis.com` no es accesible desde
   el entorno de trabajo (sandbox con lista blanca de dominios), así que
   la fuente no se veía en las capturas de Playwright tomadas ahí

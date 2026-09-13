@@ -5,6 +5,41 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Rayones reagrupados junto al título (Método y Pilares)
+
+- El usuario mandó una captura del resultado de la sesión anterior y
+  señaló dos problemas comparando contra la referencia visual original:
+  el título de Método (`lam-03`) se veía partido en 3 líneas en vez de
+  2, y "faltaban rayas" cerca del título (los rayones existentes
+  quedaban lejos, cerca del CTA final, porque estaban posicionados
+  respecto a toda la sección, que es muy alta).
+- **Título en 2 líneas**: se agregó un `<br>` explícito en el `h2` de
+  `lam-03` después de "fases," (mismo patrón que el `<br>` del H1 del
+  Hero), en vez de depender del wrap automático por `max-width` en
+  `ch`, que partía el texto en 3 líneas desparejas. Se ajustó también
+  el `max-width` inline de ese `h2` a `32ch` para que la primera mitad
+  del título no vuelva a wrapear sola antes del `<br>`.
+- **Rayones pegados al título**: se creó un contenedor nuevo,
+  `.lam-title-frame` (`position:relative`, en `css/styles.css`), que
+  envuelve solo el `.sec-head-center` de cada sección (eyebrow + h2 +
+  `.title-scribble` + `.lam-text` si existe). Los 7 `deco-scribble` de
+  cada sección — antes hijos directos de `<section>` — pasaron a ser
+  hijos de este contenedor, con sus `top`/`bottom` reajustados para
+  quedar pegados arriba y abajo del bloque de título en vez de
+  relativos a la altura total de la sección. Aplicado igual en
+  `lam-03` y `lam-04` para mantenerlas idénticas, como ya establecía
+  `memoria.md`. Ver `memoria.md` → "Títulos manuscritos tipo
+  'marcador'..." para el detalle vigente (la descripción vieja de
+  "Rayones 'marco' de la sección" quedó reemplazada por esta).
+- **Verificado con Playwright** en este entorno: como
+  `fonts.googleapis.com` no es accesible acá, se inyectó temporalmente
+  el archivo de `Caveat` (bajado desde el repo de Google Fonts en
+  GitHub) solo para las capturas de verificación, igual que en la
+  sesión anterior. Se confirmaron 2 líneas en el título y la posición
+  de los rayones en desktop (1600px, 1280px), tablet (900px) y un
+  ancho intermedio (480px) — en mobile real (`≤720px`) los
+  `deco-scribble` ya se ocultaban de antes y no aplica.
+
 ## 2026-09-13 — Títulos estilo "marcador manuscrito" en Método y Pilares
 
 - El usuario mostró una referencia visual (título en fuente manuscrita

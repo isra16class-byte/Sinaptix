@@ -233,6 +233,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background-size:100% 26%;
 }
 
+.lam-title-frame{position:relative}
+
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}
