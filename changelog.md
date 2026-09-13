@@ -5,6 +5,39 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Reemplazo del correo por login: el plan se guarda en "Mi plan"
+
+- El paso final del wizard de nutrición (`#modalNutricion`) ya no envía
+  el plan por correo (`mailto:`) — como el sistema ya genera y muestra el
+  plan al instante en el paso 8, pedirlo por correo era redundante. Botón
+  del paso 8 renombrado de "Solicitar plan" a **"Guardar mi plan"**, y el
+  texto de intro del modal se actualizó para reflejar que el plan se
+  genera al instante (ya no dice que "el equipo de SINAPTIX arma la
+  propuesta").
+- Al enviar el paso 8: se guarda igual en `localStorage`
+  (`sinaptix_objetivo`, sin cambios en el formato) y:
+  - con sesión de Netlify Identity ya iniciada, se pinta el plan de
+    inmediato en "Mi plan", se cierra el modal y se hace scroll hasta ahí;
+  - sin sesión, se avisa que quedó guardado en el navegador y se invita a
+    iniciar sesión (se abre el login de Netlify Identity automáticamente
+    a los ~900ms) para verlo completo y no perderlo.
+- La sección **"Mi plan"** (`#miPlan`) deja de mostrar el mensaje de
+  espera ("tu plan está siendo preparado por el equipo, te escribimos a
+  tu correo") y en su lugar muestra el plan completo (nutrientes clave,
+  priorizar, moderar, ajustes y avisos), reconstruido desde la encuesta
+  guardada en `localStorage`. Si todavía no hay ningún plan guardado,
+  muestra un botón "Generar mi plan" que abre el mismo wizard.
+- Se extrajo la lógica de armado del HTML del plan a una función
+  compartida (`nutriBuildResumenHTML` en `js/script.js`), usada tanto por
+  el paso 8 del wizard como por "Mi plan", para no duplicar la tabla de
+  conexiones.
+- Verificado con Playwright (servidor local): flujo sin sesión (guarda +
+  ofrece login), estado vacío de "Mi plan" con su CTA, y flujo completo
+  con sesión simulada (plan se pinta al instante, cierre de modal, scroll,
+  contenido visible) — usando un stub de `window.netlifyIdentity` ya que
+  el widget real no puede autenticar sin salir a la red en este entorno.
+  Sin errores de JS y confirmado también en viewport móvil (380px).
+
 ## 2026-09-13 — Encuesta de nutrición especializada (wizard de 8 pasos)
 
 - Se reemplaza el formulario de una sola pantalla de `#modalNutricion`

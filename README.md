@@ -21,21 +21,26 @@ Sitio 100% estático (HTML/CSS/JS puro, sin build step), desplegado en Netlify.
 
 - **Landing de una sola página** con secciones: Inicio, Visión, Método, Pilares,
   Beneficios y Contacto, navegables desde el riel lateral (visible en desktop).
-- **Formularios** (`js/script.js`), todos envían un correo real vía `mailto:` a
-  `hola@sinaptix.com`:
-  - `formContacto` — contacto general.
-  - `formNutricion` (modal "Nutrición especializada") — objetivo cognitivo
-    principal. También se guarda en `localStorage` (`sinaptix_objetivo`).
-  - `formAntro` (modal "Datos antropométricos") — peso, talla, edad y sexo;
-    calcula el IMC en el cliente y lo guarda en `localStorage`
-    (`sinaptix_antropometria`).
+- **Formularios** (`js/script.js`):
+  - `formContacto` (contacto general) y `formAntro` (modal "Datos
+    antropométricos") envían un correo real vía `mailto:` a
+    `hola@sinaptix.com`.
+  - `formNutricion` (modal "Nutrición especializada") es un wizard de 8
+    pasos que genera el plan de neuroalimentación al instante (ya no
+    manda correo): guarda la respuesta en `localStorage`
+    (`sinaptix_objetivo`, con el detalle completo de la encuesta) y, si
+    hay sesión iniciada, lo muestra de una en "Mi plan"; si no hay
+    sesión, invita a iniciar sesión para guardarlo y verlo completo.
 - **Login con Netlify Identity**:
   - Botón "Iniciar sesión" en el nav abre el modal de Identity (login/registro).
   - Con sesión iniciada, el botón cambia a mostrar el nombre del usuario (o
     "Mi cuenta"), y el botón "Acceder" se oculta.
   - Al iniciar sesión aparece la sección **"Mi plan"**, que muestra el correo
-    del usuario y, si existen, el último IMC y objetivo cognitivo guardados en
-    `localStorage` de ese navegador.
+    del usuario, el último IMC guardado (si existe) y, si ya se completó la
+    encuesta de nutrición, el plan de neuroalimentación completo (nutrientes
+    clave, alimentos a priorizar/moderar, ajustes y avisos) reconstruido
+    desde `localStorage`. Si todavía no se completó, muestra un botón para
+    generarlo ahí mismo.
 
 ### Limitación actual conocida
 

@@ -294,9 +294,12 @@
       </div>
     </div>
 
-    <p class="lam-text reveal in d3" style="margin-top:26px">Tu plan de neuroalimentación está siendo preparado por el equipo de SINAPTIX. Te escribiremos a tu correo en cuanto esté listo.</p>
+    <div class="nutri-summary hidden reveal in d3" id="miPlanDetalle" style="margin-top:26px"></div>
+
+    <p class="lam-text reveal in d3" id="miPlanCta" style="margin-top:26px">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
 
     <div class="btn-row reveal in d3" style="margin-top:10px">
+      <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
       <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
     </div>
   </div>
@@ -307,7 +310,7 @@
     <button type="button" class="modal-close" data-close>×</button>
     <span class="eyebrow" style="color:var(--green)">Nutrición especializada</span>
     <h3>Creamos tu plan de neuroalimentación</h3>
-    <p class="modal-text">Respondé esta breve encuesta para que el equipo de SINAPTIX arme una propuesta de nutrición especializada, ajustada a tu rutina, tu salud y tus datos personales.</p>
+    <p class="modal-text">Respondé esta breve encuesta y generamos tu propuesta de nutrición especializada al instante, ajustada a tu rutina, tu salud y tus datos personales. Al final, iniciá sesión para guardarla y verla completa en "Mi plan" cuando quieras.</p>
 
     <div class="nutri-progress" id="nutriProgress" aria-hidden="true">
       <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -627,9 +630,9 @@
       <div class="nutri-nav">
         <button type="button" class="btn btn-ghost" id="nutriBack">Atrás</button>
         <button type="button" class="btn btn-solid" id="nutriNext">Siguiente</button>
-        <button type="submit" class="btn btn-solid hidden" id="nutriSubmit">Solicitar plan</button>
+        <button type="submit" class="btn btn-solid hidden" id="nutriSubmit">Guardar mi plan</button>
       </div>
-      <p class="modal-result" id="nutriResultado">Solicitud recibida — te escribimos con tu propuesta de nutrición especializada. ✓</p>
+      <p class="modal-result" id="nutriResultado">Tu plan quedó guardado. ✓</p>
     </form>
   </div>
 </div>

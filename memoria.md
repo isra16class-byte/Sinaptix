@@ -278,18 +278,60 @@ de mostrarlo:
 - Cafeína "4 o más al día" → aviso de reducir gradualmente.
 - Ultraprocesados "a diario" → aviso de transición gradual.
 
-**Envío**: al enviar el paso 8, se guarda todo en `localStorage` bajo
-`sinaptix_objetivo` (mismo key que antes, ahora con un campo `encuesta`
-adicional con todas las respuestas) y se arma un `mailto:` a
-`hola@sinaptix.com` con el resumen completo (datos + plan resuelto +
-ajustes + avisos), igual que el resto de formularios del sitio (no hay
-backend real todavía, ver "Pendientes conocidos").
+**Envío (ya no es por correo — reemplazado por login + "Mi plan")**: al
+enviar el paso 8, se guarda todo en `localStorage` bajo `sinaptix_objetivo`
+(mismo key que antes, con el campo `encuesta` con todas las respuestas).
+**Ya no se arma un `mailto:`** — como el plan se genera y se muestra en
+pantalla al instante (paso 8), pedirlo por correo dejó de tener sentido.
+En su lugar:
+- Si hay sesión de Netlify Identity iniciada (`netlifyIdentity.currentUser()`):
+  se pinta el plan de inmediato en `#miPlan` (objetivo + detalle completo),
+  se cierra el modal y se hace scroll hasta esa sección
+  (`#nutriResultado` muestra "Tu plan quedó guardado en tu cuenta...").
+- Si no hay sesión: el plan queda guardado igual en este navegador
+  (`localStorage`), pero se invita a iniciar sesión para no perderlo y
+  verlo completo — el mensaje lo dice explícito y, a los ~900ms,
+  se abre el login de Netlify Identity (`netlifyIdentity.open('login')`)
+  automáticamente.
+- Botón del paso 8: ya no dice "Solicitar plan", dice **"Guardar mi plan"**
+  (`#nutriSubmit`). El texto de intro del modal también se actualizó para
+  reflejar que el plan se genera al instante, no que "el equipo arma la
+  propuesta".
+
+**Sección "Mi plan" (`#miPlan`) ahora muestra el plan real, no un mensaje
+de espera**: antes decía "tu plan está siendo preparado por el equipo,
+te escribimos a tu correo" — eso ya no aplica porque el plan se genera en
+el momento. Cambios:
+- Nuevo contenedor `#miPlanDetalle` (clase `.nutri-summary`, reutiliza el
+  mismo estilo del resumen del wizard) que muestra el plan completo
+  (nutrientes clave, priorizar, moderar, ajustes y avisos) reconstruido
+  desde `sinaptix_objetivo.encuesta` guardado en `localStorage` — se pinta
+  cada vez que se inicia sesión (`pintarMiPlan` en `js/script.js`) y
+  también apenas se guarda un plan nuevo estando ya logueado.
+- Nuevo párrafo/CTA `#miPlanCta` + botón `#btnAbrirNutricionMiPlan`
+  ("Generar mi plan"): se muestra en vez del detalle cuando todavía no hay
+  ningún `sinaptix_objetivo` guardado, y abre el wizard
+  (`resetNutriWizard()` + `openModal('modalNutricion')`, igual que
+  `#btnNutricion`).
+- Se extrajo la lógica de armado del HTML del plan a una función
+  compartida, `nutriBuildResumenHTML(d)` en `js/script.js` (antes vivía
+  solo dentro de `nutriRenderResumen`, usado por el paso 8) — ahora la
+  usan tanto el paso 8 del wizard como `pintarMiPlan` y el handler de
+  `submit`, para no repetir la tabla de conexiones dos veces.
 
 **Verificado con Playwright** en este entorno (servidor local +
 capturas): navegación entre pasos, validación por paso, resolución
 automática de "No estoy seguro", aplicación de ajustes/avisos, prellenado
 desde antropometría, y layout en viewport móvil (380px) — checkboxes en
-grilla de 2 columnas y escalas 1-5 en fila siguen siendo usables.
+grilla de 2 columnas y escalas 1-5 en fila siguen siendo usables. Para el
+flujo de login, como el widget real de Netlify Identity no puede
+autenticar sin salir a la red en este entorno, se probó con un stub de
+`window.netlifyIdentity` inyectado antes de que cargue `script.js`: sesión
+ya iniciada (Mi plan se pinta al instante, sin CTA), sin plan guardado
+(se ve la CTA "Generar mi plan"), y el flujo completo de guardar un plan
+nuevo estando logueado (mensaje, cierre de modal, scroll a Mi plan, plan
+visible) — todo sin errores de JS y confirmado también en viewport móvil
+(380px).
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 

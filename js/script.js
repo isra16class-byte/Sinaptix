@@ -37,12 +37,24 @@
         }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
       }
 
+      const miPlanDetalleEl = document.getElementById('miPlanDetalle');
+      const miPlanCtaEl = document.getElementById('miPlanCta');
       const objetivo = localStorage.getItem('sinaptix_objetivo');
       if(objetivo){
         try{
           const o = JSON.parse(objetivo);
           document.getElementById('miPlanObjetivo').textContent = o.objetivo;
+          // Reconstruye el plan completo (con ajustes y avisos) a partir de
+          // la encuesta guardada, sin tener que volver a pedir nada.
+          if(miPlanDetalleEl && o.encuesta && typeof nutriBuildResumenHTML === 'function'){
+            miPlanDetalleEl.innerHTML = nutriBuildResumenHTML(o.encuesta);
+            miPlanDetalleEl.classList.remove('hidden');
+          }
+          if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
         }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
+      } else {
+        if(miPlanDetalleEl) miPlanDetalleEl.classList.add('hidden');
+        if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');
       }
     }
 
@@ -102,6 +114,13 @@
     openModal('modalNutricion');
   });
   document.getElementById('btnAntropometria').addEventListener('click', ()=>openModal('modalAntropometria'));
+  const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
+  if(btnAbrirNutricionMiPlan){
+    btnAbrirNutricionMiPlan.addEventListener('click', ()=>{
+      resetNutriWizard();
+      openModal('modalNutricion');
+    });
+  }
   document.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', e=>closeModal(e.target.closest('.modal-overlay')));
   });
@@ -397,8 +416,11 @@
     return avisos;
   }
 
-  function nutriRenderResumen(){
-    const d = nutriCollectData();
+  // Arma el HTML del plan resuelto a partir de una encuesta ya respondida.
+  // Se usa tanto en el paso 8 del wizard (#nutriResumen) como en "Mi plan"
+  // (#miPlanDetalle), reconstruyendo el mismo resultado desde los datos
+  // guardados en localStorage sin tener que repetir la lógica.
+  function nutriBuildResumenHTML(d){
     const objetivos = nutriResolverObjetivo(d);
     const planes = objetivos.map(o=>NUTRI_PLANES[o]).filter(Boolean);
     const ajustes = nutriConstruirAjustes(d);
@@ -418,12 +440,19 @@
       html += '<div><div class="nutri-block-title">Ajustado a tu caso</div><ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul></div>';
     }
     avisos.forEach(a=>{ html += '<p class="nutri-note">'+a+'</p>'; });
-
-    document.getElementById('nutriResumen').innerHTML = html;
+    return html;
   }
 
-  // Formulario de nutrición especializada: valida el último paso, guarda localmente
-  // (igual que los datos antropométricos, usado en "Mi plan") y envía un correo real.
+  function nutriRenderResumen(){
+    const d = nutriCollectData();
+    document.getElementById('nutriResumen').innerHTML = nutriBuildResumenHTML(d);
+  }
+
+  // Formulario de nutrición especializada: el plan ya se genera y se muestra
+  // en pantalla en el paso 8 (nutriRenderResumen), así que el envío ya no pide
+  // el plan por correo. En vez de eso, guarda la respuesta en localStorage
+  // (igual que los datos antropométricos) y ofrece iniciar sesión para
+  // dejar el plan guardado y verlo completo, cada vez, en "Mi plan".
   if(nutriForm){
     nutriForm.addEventListener('submit', function(e){
       e.preventDefault();
@@ -431,8 +460,6 @@
 
       const d = nutriCollectData();
       const objetivos = nutriResolverObjetivo(d);
-      const ajustes = nutriConstruirAjustes(d);
-      const avisos = nutriConstruirAvisos(d);
 
       localStorage.setItem('sinaptix_objetivo', JSON.stringify({
         objetivo: objetivos.join(' + '),
@@ -441,30 +468,37 @@
         fecha: new Date().toISOString()
       }));
 
-      const asunto = encodeURIComponent('Solicitud de nutrición especializada — '+d.nombre);
-      const cuerpo = encodeURIComponent(
-        'Nombre: '+d.nombre+'\n'+
-        'Correo: '+d.email+'\n'+
-        'Objetivo cognitivo: '+objetivos.join(' + ')+'\n\n'+
-        'Edad: '+d.edad+' | Sexo: '+d.sexo+' | Peso: '+(d.peso||'—')+' kg | Talla: '+(d.talla||'—')+' cm\n'+
-        'Actividad física: '+d.actividadFisica+'\n'+
-        'Tipo de actividad principal: '+d.tipoActividad+' | Mayor exigencia mental: '+d.horaExigencia+'\n'+
-        'Sueño: '+d.sueno+' (calidad percibida '+d.calidadSueno+'/5) | Horas de pantalla: '+(d.pantallas||'—')+'\n'+
-        'Comidas al día: '+d.comidas+' | Agua: '+d.agua+' | Cafeína: '+d.cafeina+' | Alcohol: '+d.alcohol+'\n'+
-        'Ultraprocesados: '+d.ultraprocesados+' | Tiempo para cocinar: '+d.tiempoCocina+'\n'+
-        'Alergias: '+(d.alergias.concat(d.alergiaOtra?[d.alergiaOtra]:[]).join(', ')||'Ninguna')+'\n'+
-        'Restricción alimentaria: '+d.restriccion+'\n'+
-        'Condiciones de salud: '+(d.condiciones.join(', ')||'Ninguna informada')+' | Medicación regular: '+d.medicacion+'\n'+
-        'Estrés: '+d.estres+'/5 | Fatiga: '+d.fatiga+'/5 | Concentración (dificultad): '+d.concentracion+'/5 | Olvidos: '+d.olvidos+'/5\n'+
-        'No le gusta: '+(d.disgustos||'—')+' | Presupuesto: '+d.presupuesto+'\n\n'+
-        'Ajustes aplicados:\n- '+(ajustes.join('\n- ')||'Sin ajustes adicionales')+'\n\n'+
-        (avisos.length ? 'Avisos:\n- '+avisos.join('\n- ') : '')
-      );
-
-      window.location.href = 'mailto:hola@sinaptix.com?subject='+asunto+'&body='+cuerpo;
       const res = document.getElementById('nutriResultado');
       res.style.display='block';
-      res.textContent = 'Abriendo tu correo para enviar la solicitud… ✓';
+
+      const currentUser = window.netlifyIdentity && netlifyIdentity.currentUser();
+      const miPlanEl = document.getElementById('miPlan');
+      const miPlanObjetivoEl = document.getElementById('miPlanObjetivo');
+      const miPlanDetalleEl = document.getElementById('miPlanDetalle');
+      const miPlanCtaEl = document.getElementById('miPlanCta');
+
+      if(currentUser){
+        // Ya con sesión iniciada: refresca "Mi plan" al toque y lleva ahí.
+        if(miPlanObjetivoEl) miPlanObjetivoEl.textContent = objetivos.join(' + ');
+        if(miPlanDetalleEl){
+          miPlanDetalleEl.innerHTML = nutriBuildResumenHTML(d);
+          miPlanDetalleEl.classList.remove('hidden');
+        }
+        if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
+
+        res.textContent = 'Tu plan quedó guardado en tu cuenta. Te llevamos a "Mi plan". ✓';
+        setTimeout(function(){
+          closeModal(document.getElementById('modalNutricion'));
+          if(miPlanEl) miPlanEl.scrollIntoView({behavior:'smooth'});
+        }, 900);
+      } else {
+        // Sin sesión: queda guardado en este navegador, pero para verlo
+        // completo y no perderlo, invitamos a iniciar sesión (o crear cuenta).
+        res.textContent = 'Guardamos tu propuesta en este navegador. Iniciá sesión para verla completa, guardada y lista cada vez que entres. ✓';
+        if(window.netlifyIdentity){
+          setTimeout(function(){ netlifyIdentity.open('login'); }, 900);
+        }
+      }
     });
   }
 
