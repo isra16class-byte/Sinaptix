@@ -5,6 +5,62 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Mi plan" pasa a ser una pantalla propia (`mi-plan.html`)
+
+- El usuario pidió que la sección "Mi plan" (antes visible/oculta dentro de
+  `index.html` con sesión iniciada) apareciera "en otra pantalla" — se
+  confirmó con el usuario que se refería a una página HTML separada con su
+  propia URL, no a un modal ni a un overlay dentro de `index.html`.
+- **Nuevo archivo `mi-plan.html`**: página independiente con su propio nav
+  (marca + "Volver al sitio" + "Cerrar sesión"), que reemplaza a la antigua
+  `<section id="miPlan">` de `index.html`. Tiene dos estados propios:
+  - **Sin sesión** (`#miPlanSinSesion`): mensaje + botón "Iniciar sesión"
+    (abre el widget de Netlify Identity ahí mismo) — cubre tanto a quien
+    entra directo por la URL como a quien recién cerró sesión.
+  - **Con sesión** (`#miPlanConSesion`): mismo contenido que tenía la
+    sección vieja (IMC, objetivo, detalle del plan, CTA), sin cambios de
+    copy ni de lógica de negocio.
+- **Nuevo archivo `js/nutricion-planes.js`**: se extrajeron de `js/script.js`
+  las piezas que NO dependen del DOM del wizard — `NUTRI_PLANES`,
+  `nutriResolverObjetivo`, `nutriConstruirAjustes`, `nutriConstruirAvisos` y
+  `nutriBuildResumenHTML` — a un archivo compartido, porque ahora dos
+  páginas (`index.html` y `mi-plan.html`) necesitan reconstruir el mismo
+  plan a partir de lo guardado en `localStorage` sin repetir la encuesta.
+  Se carga antes que `js/script.js` / `js/mi-plan.js` en ambas páginas.
+- **Nuevo archivo `js/mi-plan.js`**: toda la lógica específica de la nueva
+  pantalla (`netlifyIdentity.init`, pintar el plan guardado, togglear los
+  dos estados, botones de logout). No se reutilizó `js/script.js` tal cual
+  porque tiene varios `getElementById(...).addEventListener(...)` sin
+  guarda de `null` pensados para elementos que solo existen en
+  `index.html` (el modal/wizard de nutrición, el formulario de contacto,
+  etc.) — meterlo en `mi-plan.html` tal cual habría roto la página.
+- **`index.html`**:
+  - Se eliminó la sección `#miPlan` (ahora vive en `mi-plan.html`).
+  - Nuevo link de nav `#btnMiPlanNav` ("Mi plan" → `mi-plan.html`), oculto
+    por defecto y visible solo con sesión iniciada (mismo mecanismo de
+    `classList.toggle('hidden', !user)` que ya usaba `#btnAcceder`, pero
+    invertido).
+  - `js/script.js` simplificado: ya no pinta/oculta "Mi plan" in-place
+    (`pintarMiPlan`/`mostrarMiPlan`/`ocultarMiPlan` se eliminaron); al
+    hacer login (`netlifyIdentity.on('login', ...)`) ahora redirige directo
+    a `mi-plan.html` con `window.location.href`. Al enviar la encuesta de
+    nutrición con sesión ya iniciada, en vez de pintar la vieja sección
+    local, redirige a `mi-plan.html` (que la lee sola desde
+    `localStorage`).
+  - Nuevo bloque al final del wizard: si la URL trae `?generarPlan=1`
+    (llega desde el botón "Generar mi plan" de `mi-plan.html`, que no tiene
+    el modal/wizard propio), se abre el modal de nutrición automáticamente
+    y se limpia el parámetro de la URL con `history.replaceState` para que
+    un refresh no lo reabra solo.
+- Probado con Playwright (servidor local): `index.html` sin sesión no
+  muestra "Mi plan" en el nav y no tira errores de consola;
+  `mi-plan.html` muestra el estado "sin sesión" por defecto y, simulando
+  sesión + plan guardado en `localStorage`, renderiza igual que antes en la
+  vieja sección; `index.html?generarPlan=1` abre el modal solo y limpia la
+  URL. Los únicos errores de consola observados son 403 de recursos
+  externos (Google Fonts, el widget de Netlify Identity) bloqueados por la
+  red del sandbox de pruebas, no del código del sitio.
+
 ## 2026-09-13 — Trazos naranjas reemplazados por espiga de trigo real vectorizada (excepto Método/Pilares)
 
 - El usuario mostró una captura del hero con los trazos tipo "marcador"

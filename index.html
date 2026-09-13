@@ -28,6 +28,7 @@
       <li><a href="#lam-06">Contacto</a></li>
     </ul>
     <div class="nav-cta">
+      <a href="mi-plan.html" class="nav-btn nav-btn-ghost hidden" id="btnMiPlanNav">Mi plan</a>
       <a href="#" class="nav-btn nav-btn-ghost" id="btnLogin">Iniciar sesión</a>
       <a href="#lam-06" class="nav-btn nav-btn-solid" id="btnAcceder">Acceder</a>
     </div>
@@ -302,35 +303,6 @@
       <div class="f-brand"><img src="img/sinaptix-icon.png" alt=""><span>© 2026 SINAPTIX — Neuroalimentación aplicada</span></div>
       <span>Contenido informativo; no reemplaza diagnóstico médico ni nutricional certificado.</span>
     </footer>
-  </div>
-</section>
-
-<!-- ============ MI PLAN — visible solo con sesión iniciada ============ -->
-<section class="dark hidden" id="miPlan">
-  <div class="wrap">
-    <span class="eyebrow reveal in">Mi plan</span>
-    <h2 class="lam-title reveal in d1" style="max-width:16ch">Tu progreso con SINAPTIX</h2>
-    <p class="lam-text reveal in d1" id="miPlanEmail" style="color:var(--panel-text)"></p>
-
-    <div class="stat-grid reveal in d2" style="margin-top:30px">
-      <div class="stat-box">
-        <div class="num" id="miPlanImc">—</div>
-        <div class="lab" id="miPlanImcLab">Aún no registras tus datos antropométricos</div>
-      </div>
-      <div class="stat-box">
-        <div class="num" style="font-size:20px" id="miPlanObjetivo">—</div>
-        <div class="lab">Objetivo cognitivo principal</div>
-      </div>
-    </div>
-
-    <div class="nutri-summary hidden reveal in d3" id="miPlanDetalle" style="margin-top:26px"></div>
-
-    <p class="lam-text reveal in d3" id="miPlanCta" style="margin-top:26px">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
-
-    <div class="btn-row reveal in d3" style="margin-top:10px">
-      <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
-      <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
-    </div>
   </div>
 </section>
 
@@ -748,6 +720,7 @@
   </div>
 </div>
 
+<script src="js/nutricion-planes.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

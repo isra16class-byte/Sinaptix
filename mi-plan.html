@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi plan — SINAPTIX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;1,800&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="img/sinaptix-icon.png">
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="mark">
+    <img src="img/sinaptix-icon.png" alt="SINAPTIX">
+    SINAPTIX
+  </div>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="index.html">Volver al sitio</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#" class="nav-btn nav-btn-ghost hidden" id="btnLogoutNav">Cerrar sesión</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ MI PLAN — pantalla propia, requiere sesión iniciada ============ -->
+<section class="dark" id="miPlan">
+  <div class="wrap">
+
+    <!-- Estado: sin sesión iniciada (visita directa a mi-plan.html, o recién cerró sesión) -->
+    <div id="miPlanSinSesion">
+      <span class="eyebrow reveal in">Mi plan</span>
+      <h2 class="lam-title reveal in d1" style="max-width:18ch">Iniciá sesión para ver tu plan</h2>
+      <p class="lam-text reveal in d1" style="color:var(--panel-text)">Tu plan de neuroalimentación se guarda en tu cuenta de SINAPTIX. Iniciá sesión (o creá una cuenta) para verlo acá.</p>
+      <div class="btn-row reveal in d2" style="margin-top:26px">
+        <a href="#" class="btn btn-solid" id="btnLoginMiPlan">Iniciar sesión</a>
+        <a href="index.html" class="btn btn-ghost">Volver al sitio</a>
+      </div>
+    </div>
+
+    <!-- Estado: con sesión iniciada -->
+    <div id="miPlanConSesion" class="hidden">
+      <span class="eyebrow reveal in">Mi plan</span>
+      <h2 class="lam-title reveal in d1" style="max-width:16ch">Tu progreso con SINAPTIX</h2>
+      <p class="lam-text reveal in d1" id="miPlanEmail" style="color:var(--panel-text)"></p>
+
+      <div class="stat-grid reveal in d2" style="margin-top:30px">
+        <div class="stat-box">
+          <div class="num" id="miPlanImc">—</div>
+          <div class="lab" id="miPlanImcLab">Aún no registras tus datos antropométricos</div>
+        </div>
+        <div class="stat-box">
+          <div class="num" style="font-size:20px" id="miPlanObjetivo">—</div>
+          <div class="lab">Objetivo cognitivo principal</div>
+        </div>
+      </div>
+
+      <div class="nutri-summary hidden reveal in d3" id="miPlanDetalle" style="margin-top:26px"></div>
+
+      <p class="lam-text reveal in d3" id="miPlanCta" style="margin-top:26px">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
+
+      <div class="btn-row reveal in d3" style="margin-top:10px">
+        <a href="index.html?generarPlan=1#lam-06" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</a>
+        <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="f-brand"><img src="img/sinaptix-icon.png" alt=""><span>© 2026 SINAPTIX — Neuroalimentación aplicada</span></div>
+      <span>Contenido informativo; no reemplaza diagnóstico médico ni nutricional certificado.</span>
+    </footer>
+  </div>
+</section>
+
+<script src="js/nutricion-planes.js"></script>
+<script src="js/mi-plan.js"></script>
+</body>
+</html>

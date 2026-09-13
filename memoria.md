@@ -89,6 +89,71 @@ asesoría en neuroalimentación (nutrición para rendimiento cognitivo). Sitio
 Identity, sección "Mi plan", limitación de `localStorage`, próximos pasos de
 backend).
 
+**"Mi plan" es una página propia, no una sección de `index.html`**: desde
+la sesión donde se agregó `mi-plan.html`, "Mi plan" **ya no** es la sección
+`<section id="miPlan">` oculta dentro de `index.html` — es una página HTML
+separada, `mi-plan.html`, con su propia URL. Si se retoma trabajo sobre
+"Mi plan", el punto de partida es este archivo, no `index.html`.
+
+- **Archivos involucrados**:
+  - `mi-plan.html`: la página en sí. Nav propio (marca + "Volver al sitio"
+    + "Cerrar sesión") y dos estados dentro de la misma `<section
+    id="miPlan">`: `#miPlanSinSesion` (mensaje + botón que abre el login de
+    Identity ahí mismo) y `#miPlanConSesion` (el contenido que antes vivía
+    en `index.html`: email, IMC, objetivo, detalle del plan, CTA — sin
+    cambios de copy).
+  - `js/nutricion-planes.js`: **compartido** entre `index.html` y
+    `mi-plan.html`. Contiene `NUTRI_PLANES` y las funciones puras de
+    cálculo del plan (`nutriResolverObjetivo`, `nutriConstruirAjustes`,
+    `nutriConstruirAvisos`, `nutriBuildResumenHTML`) — nada de esto toca el
+    DOM del wizard, solo recibe un objeto de datos y devuelve texto/HTML,
+    por eso se pudo sacar de `js/script.js` sin romper nada. **Debe
+    cargarse antes** que `js/script.js` (en `index.html`) o `js/mi-plan.js`
+    (en `mi-plan.html`) — ambos scripts asumen que `nutriBuildResumenHTML`
+    ya existe en el global scope.
+  - `js/mi-plan.js`: toda la lógica propia de `mi-plan.html` (init de
+    Netlify Identity, pintar el plan guardado en `localStorage`, togglear
+    los dos estados, logout). **No se reutilizó `js/script.js` tal cual**
+    en esta página — ese archivo tiene varios
+    `document.getElementById(...).addEventListener(...)` **sin** guarda de
+    `null` (ej. el submit del form de contacto, el form de antropometría,
+    el botón que abre el wizard de nutrición) pensados para elementos que
+    solo existen en `index.html`; incluirlo tal cual en `mi-plan.html`
+    tiraría un error de JS apenas cargue. Si en el futuro se necesita
+    compartir más lógica entre ambas páginas, extraerla a un archivo aparte
+    (como se hizo con `nutricion-planes.js`) en vez de intentar reusar
+    `script.js` completo.
+  - `index.html`: ya no tiene la sección "Mi plan". El nav tiene un nuevo
+    link `#btnMiPlanNav` ("Mi plan" → `mi-plan.html`), oculto por defecto y
+    visible solo con sesión iniciada (mismo mecanismo `classList.toggle
+    ('hidden', !user)` que ya usaba `#btnAcceder`, invertido). Carga
+    `js/nutricion-planes.js` antes que `js/script.js`.
+- **Flujo de login/logout** (en `js/script.js`, dentro del bloque de
+  Netlify Identity de `index.html`): al hacer login desde `index.html`
+  (`netlifyIdentity.on('login', ...)`), ya no se pinta nada localmente —
+  se redirige directo con `window.location.href = 'mi-plan.html'`. La
+  lógica de pintar/ocultar la sección in-place (`pintarMiPlan`,
+  `mostrarMiPlan`, `ocultarMiPlan`) se eliminó de `script.js` porque el
+  elemento `#miPlan` ya no existe en `index.html`.
+- **Flujo del wizard de nutrición completado con sesión ya iniciada**: en
+  vez de pintar la vieja sección local y hacer `scrollIntoView`, ahora
+  redirige a `mi-plan.html` (que lee el plan recién guardado solo de
+  `localStorage` al cargar).
+- **Botón "Generar mi plan" en `mi-plan.html`**: como esa página no tiene
+  el modal/wizard de nutrición (vive solo en `index.html`), el botón es un
+  link a `index.html?generarPlan=1#lam-06`. En `js/script.js`, al final del
+  bloque del wizard, hay un chequeo de `URLSearchParams` que si encuentra
+  `generarPlan=1` abre el modal automáticamente
+  (`resetNutriWizard()`+`openModal('modalNutricion')`) y limpia el
+  parámetro de la URL con `history.replaceState` para que un refresh no
+  reabra el modal solo.
+- **Pendiente/a decisión futura, no bloqueante**: `mi-plan.html` no lleva
+  decoración (rayones/blobs) ni sangrado a borde de pantalla como el resto
+  de `index.html` — es intencional para mantener el patch enfocado en la
+  funcionalidad; si se quiere alinear visualmente con el resto del sitio
+  (mismos `.deco-scribble`, mismo `--vw100`, etc.), es un ajuste de estilo
+  aparte, no un bug.
+
 **Estilo visual (vigente desde el rediseño visual del sitio)**: el sitio se
 rediseñó a partir de una referencia visual clara y editorial. Antes tenía un
 tema oscuro/navy con tipografía editorial (Space Grotesk + IBM Plex Mono).
