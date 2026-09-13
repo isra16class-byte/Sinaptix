@@ -137,10 +137,9 @@
 
     const talla = tallaCm/100;
     const imc = peso/(talla*talla);
-    let cat = 'peso saludable';
-    if(imc<18.5) cat='bajo peso';
-    else if(imc>=25 && imc<30) cat='sobrepeso';
-    else if(imc>=30) cat='rango a vigilar';
+    // imcCategoria vive en js/nutricion-planes.js (compartida con el medidor
+    // de "Mi plan") — antes esta misma tabla de umbrales estaba duplicada acá.
+    const cat = imcCategoria(imc).cat;
 
     // Guardado local (persiste entre visitas en este navegador)
     localStorage.setItem('sinaptix_antropometria', JSON.stringify({peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()}));

@@ -184,6 +184,29 @@ function nutriBuildResumenHTML(d){
   return html;
 }
 
+// ===================== IMC: categoría y medidor tipo velocímetro =====================
+// Compartido entre el formulario de antropometría (js/script.js, que calcula
+// el IMC) y el medidor de "Mi plan" (js/mi-plan.js, que lo pinta) — antes cada
+// uno tenía su propia copia de estos mismos umbrales. Ver
+// plan-mejoras-mi-plan-y-encuesta.md / continuar-grafico-imc.md: se mantiene
+// 'rango a vigilar' en vez de 'obesidad' (decisión de tono ya tomada).
+function imcCategoria(imc){
+  if(imc < 18.5) return {cat:'bajo peso', zona:'bajo'};
+  if(imc < 25) return {cat:'peso saludable', zona:'saludable'};
+  if(imc < 30) return {cat:'sobrepeso', zona:'sobrepeso'};
+  return {cat:'rango a vigilar', zona:'vigilar'};
+}
+
+// Rango que cubre el arco del medidor (15 a 40) — valores fuera de este
+// rango se recortan solo para la posición de la aguja, nunca para el
+// número exacto que se muestra al lado (ese siempre es el IMC real).
+const IMC_GAUGE_MIN = 15;
+const IMC_GAUGE_MAX = 40;
+function imcGaugeAngulo(imc){
+  const v = Math.max(IMC_GAUGE_MIN, Math.min(IMC_GAUGE_MAX, imc));
+  return 180 - (v - IMC_GAUGE_MIN) / (IMC_GAUGE_MAX - IMC_GAUGE_MIN) * 180;
+}
+
 // ===================== Áreas de bienestar (Foco / Memoria / Energía / Calma) =====================
 // Compartido entre los anillos de "Método" (index.html) y el gráfico de
 // barras de "Mi plan" (mi-plan.html): ambos parten de la misma encuesta

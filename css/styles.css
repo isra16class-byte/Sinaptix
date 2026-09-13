@@ -263,6 +263,32 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-box .num{font-family:var(--font-d);font-size:36px;font-weight:800;color:var(--purple);letter-spacing:-.02em}
 .stat-box .lab{font-family:var(--font-m);font-size:13px;color:var(--ink-soft);margin-top:8px;letter-spacing:0;font-weight:500}
 
+/* Medidor de IMC tipo velocímetro (semicírculo), en el stat-box de "Mi
+   plan" — ver plan-mejoras-mi-plan-y-encuesta.md y
+   continuar-grafico-imc.md. Los 4 arcos de color son fijos (siempre
+   representan los mismos umbrales de IMC); lo único que cambia por
+   usuario es la rotación de la aguja (js/mi-plan.js, vía
+   imcGaugeAngulo en js/nutricion-planes.js) y el texto/color de la
+   categoría debajo. Mismo criterio de color que los avisos graduados:
+   dorado = atención moderada, rojo = alto, verde = saludable. */
+.imc-gauge{max-width:220px;margin:0 auto -8px}
+.imc-zone{fill:none;stroke-width:18;stroke-linecap:butt}
+.imc-zone-bajo{stroke:var(--gold)}
+.imc-zone-saludable{stroke:var(--green)}
+.imc-zone-sobrepeso{stroke:var(--gold)}
+.imc-zone-vigilar{stroke:var(--red)}
+.imc-aguja{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.imc-pivote{fill:var(--ink)}
+.imc-cat{font-family:var(--font-m);font-size:13px;font-weight:700;margin-top:2px}
+.imc-cat-bajo,.imc-cat-sobrepeso{color:var(--gold)}
+.imc-cat-saludable{color:var(--green)}
+.imc-cat-vigilar{color:var(--red)}
+.imc-legend{display:flex;flex-wrap:wrap;gap:10px 14px;list-style:none;margin:10px 0 0;padding:0;font-family:var(--font-m);font-size:11.5px;color:var(--ink-soft)}
+.imc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.imc-dot-bajo,.imc-dot-sobrepeso{background:var(--gold)}
+.imc-dot-saludable{background:var(--green)}
+.imc-dot-vigilar{background:var(--red)}
+
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
 @media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}

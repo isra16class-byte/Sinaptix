@@ -30,6 +30,28 @@ if(window.netlifyIdentity){
         const imcLabEl = document.getElementById('miPlanImcLab');
         if(imcEl) imcEl.textContent = d.imc.toFixed(1);
         if(imcLabEl) imcLabEl.textContent = 'IMC estimado (última medición registrada)';
+
+        // Medidor tipo velocímetro: la aguja se recorta a [15, 40] solo para
+        // su posición (imcGaugeAngulo, en js/nutricion-planes.js), el número
+        // de arriba siempre muestra el IMC real sin recortar.
+        const gaugeEl = document.getElementById('miPlanImcGauge');
+        const agujaEl = document.getElementById('miPlanImcAguja');
+        const catEl = document.getElementById('miPlanImcCat');
+        const legendEl = document.getElementById('miPlanImcLegend');
+        if(typeof imcGaugeAngulo === 'function' && typeof imcCategoria === 'function'){
+          if(agujaEl){
+            const deg = 90 - imcGaugeAngulo(d.imc);
+            agujaEl.setAttribute('transform', 'rotate('+deg.toFixed(2)+' 110 115)');
+          }
+          const info = imcCategoria(d.imc);
+          if(catEl){
+            catEl.textContent = info.cat.charAt(0).toUpperCase()+info.cat.slice(1);
+            catEl.className = 'imc-cat imc-cat-'+info.zona;
+          }
+          if(gaugeEl) gaugeEl.classList.remove('hidden');
+          if(catEl) catEl.classList.remove('hidden');
+          if(legendEl) legendEl.classList.remove('hidden');
+        }
       }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
     }
 

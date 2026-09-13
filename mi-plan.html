@@ -51,8 +51,25 @@
 
       <div class="stat-grid reveal in d2" style="margin-top:30px">
         <div class="stat-box">
+          <div class="imc-gauge hidden" id="miPlanImcGauge" aria-hidden="true">
+            <svg viewBox="0 0 220 140" width="100%">
+              <path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>
+              <path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>
+              <path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>
+              <path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>
+              <line class="imc-aguja" id="miPlanImcAguja" x1="110" y1="115" x2="110" y2="45"/>
+              <circle class="imc-pivote" cx="110" cy="115" r="6"/>
+            </svg>
+          </div>
           <div class="num" id="miPlanImc">—</div>
           <div class="lab" id="miPlanImcLab">Aún no registras tus datos antropométricos</div>
+          <div class="imc-cat hidden" id="miPlanImcCat"></div>
+          <ul class="imc-legend hidden" id="miPlanImcLegend">
+            <li><span class="imc-dot imc-dot-bajo"></span>Bajo peso</li>
+            <li><span class="imc-dot imc-dot-saludable"></span>Saludable</li>
+            <li><span class="imc-dot imc-dot-sobrepeso"></span>Sobrepeso</li>
+            <li><span class="imc-dot imc-dot-vigilar"></span>A vigilar</li>
+          </ul>
         </div>
         <div class="stat-box">
           <div class="num" style="font-size:20px" id="miPlanObjetivo">—</div>

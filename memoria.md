@@ -945,6 +945,56 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
     ancho de viewport, comparando contra la imagen de referencia que dio
     el usuario.
 
+## Medidor de IMC tipo velocímetro (`.imc-gauge`, "Mi plan")
+
+Antes el IMC en "Mi plan" era solo un número pelado (`#miPlanImc`), sin
+ningún contexto de si era bajo, normal, alto, etc. Ahora tiene un medidor
+semicircular (SVG) con aguja + categoría en texto + leyenda de colores.
+
+- **Cálculo y categorías**: `imcCategoria(imc)` vive en
+  `js/nutricion-planes.js` (compartida, ya no duplicada) y devuelve
+  `{cat, zona}`. Umbrales (los mismos de siempre, no cambiaron):
+  `<18.5` bajo peso, `18.5–24.9` peso saludable, `25–29.9` sobrepeso,
+  `≥30` **"rango a vigilar"** — se mantiene ese término en vez de
+  "obesidad" (decisión de tono ya tomada por el usuario, coherente con
+  que el sitio ya evitaba la palabra clínica). `js/script.js` (el
+  formulario de antropometría de `index.html`) ahora llama a esta misma
+  función en vez de tener su propia copia de los umbrales — si se cambia
+  un umbral en el futuro, se cambia en un solo lugar.
+- **Geometría del arco**: también en `js/nutricion-planes.js`,
+  `imcGaugeAngulo(imc)` mapea el IMC a un ángulo (180°→0°) sobre un
+  rango fijo de display `IMC_GAUGE_MIN=15` / `IMC_GAUGE_MAX=40` — valores
+  fuera de ese rango se recortan **solo para la posición de la aguja**,
+  nunca para el número exacto que se muestra al lado (ese siempre es el
+  IMC real, sin recortar). Los 4 arcos de color (`.imc-zone-*` en
+  `mi-plan.html`) son `<path>` con coordenadas **fijas** (siempre
+  representan los mismos umbrales) — lo único dinámico es la rotación de
+  `#miPlanImcAguja` vía `transform="rotate(deg cx cy)"` seteado desde JS
+  (`js/mi-plan.js`, dentro de `pintarMiPlan`), calculado como
+  `90 - imcGaugeAngulo(imc)`. Si se necesita este mismo medidor en otro
+  lado, reusar `imcCategoria`/`imcGaugeAngulo` en vez de recalcular los
+  umbrales o el mapeo de ángulos a mano.
+- **Color**: mismo criterio que los avisos graduados (ver más abajo) —
+  dorado (`--gold`) para atención moderada (bajo peso y sobrepeso), rojo
+  (`--red`) para alto (rango a vigilar), verde (`--green`) para
+  saludable. Se aplica tanto a los arcos como al texto de la categoría
+  (`.imc-cat-*`) y a los puntos de la leyenda (`.imc-dot-*`).
+- **Estado sin datos**: el gauge, la categoría y la leyenda arrancan con
+  `class="hidden"` en el HTML y solo se muestran (`classList.remove
+  ('hidden')`) dentro de `pintarMiPlan` si existe
+  `sinaptix_antropometria` en localStorage — si no hay datos, se ve
+  igual que antes (placeholder "—" + "Aún no registras tus datos
+  antropométricos"), sin el medidor roto o vacío.
+- Verificado con Playwright (Chromium headless, con un stub de
+  `window.netlifyIdentity` inyectado vía `addInitScript` ya que el script
+  real de `identity.netlify.com` no carga en este sandbox — 403): 4
+  capturas forzando `sinaptix_antropometria` con un IMC de cada zona
+  (16.8, 22.1, 27.4, 33.9) confirmando que la aguja cae en el arco
+  correcto y el texto/color de categoría coincide, más una captura sin
+  datos guardados, más una prueba del formulario real de `index.html`
+  (`#formAntro`) para confirmar que `imcCategoria` compartida no le
+  rompió el resultado ni el guardado en `sinaptix_antropometria`.
+
 ## Imagen principal del Hero (`lam-01`, `.synapse-art`)
 
 El hero ya **no** usa el logotipo (`img/sinaptix-badge.png`) como pieza

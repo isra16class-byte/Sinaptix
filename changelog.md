@@ -5,6 +5,38 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Medidor de IMC tipo velocímetro en "Mi plan"
+
+- El IMC en "Mi plan" era solo un número (`#miPlanImc`) sin contexto. Se
+  agregó un medidor semicircular (SVG, 4 arcos de color fijos por
+  categoría + aguja que rota según el valor) más el nombre de la
+  categoría en texto y una leyenda de colores, para responder qué
+  significa cada tramo (pedido del usuario).
+- Nuevas funciones compartidas en `js/nutricion-planes.js`:
+  `imcCategoria(imc)` (umbrales: <18.5 bajo peso, 18.5-24.9 saludable,
+  25-29.9 sobrepeso, ≥30 "rango a vigilar" — se mantiene ese término, no
+  "obesidad", por decisión de tono ya tomada) e
+  `imcGaugeAngulo(imc)` (mapea el IMC a un ángulo del arco, recortado a
+  `[15, 40]` solo para la posición de la aguja, nunca para el número
+  mostrado).
+- `js/script.js` (formulario de antropometría de `index.html`) ya no
+  tiene su propia copia de los umbrales — ahora llama a `imcCategoria`,
+  la misma función que usa el medidor. Antes eran dos fuentes de verdad
+  con los mismos números escritos dos veces.
+- Color por zona: dorado (bajo peso/sobrepeso), verde (saludable), rojo
+  (rango a vigilar) — mismo criterio que los avisos graduados de la
+  entrada de abajo.
+- El medidor/categoría/leyenda arrancan ocultos en el HTML y solo se
+  muestran si hay `sinaptix_antropometria` guardado — sin datos, se ve
+  igual que antes (sin gauge roto ni vacío).
+- Verificado con Playwright (Chromium headless): 4 capturas (una por
+  zona) más el estado sin datos, más una prueba del formulario real de
+  antropometría para confirmar que compartir `imcCategoria` no le
+  rompió nada. Netlify Identity no carga en este sandbox (403 al pedir
+  `identity.netlify.com`), así que las pruebas usaron un stub de
+  `window.netlifyIdentity` inyectado por Playwright — no afecta el
+  comportamiento real en producción.
+
 ## 2026-09-13 — Avisos graduados y ejes combinados (estrés+sueño, estrés+fatiga)
 
 - Punto 5 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2, "Ajustes
