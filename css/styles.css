@@ -194,6 +194,23 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-14px)}
 }
+.brain-fruit{
+  position:absolute;z-index:4;display:block;height:auto;
+  pointer-events:none;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 14px 26px rgba(75,46,69,.26));
+  animation:brain-fruit-float 6.5s ease-in-out infinite;
+}
+.brain-fruit.bf2{animation-delay:.55s}
+.brain-fruit.bf3{animation-delay:1.5s}
+.brain-fruit.bf4{animation-delay:.9s}
+.brain-fruit.bf5{animation-delay:2.1s}
+@keyframes brain-fruit-float{
+  0%,100%{transform:translate(-50%,-50%) translateY(0)}
+  50%{transform:translate(-50%,-50%) translateY(-16px)}
+}
+@media(prefers-reduced-motion:reduce){.brain-fruit{animation:none}}
+@media(max-width:640px){.brain-fruit{display:none}}
 .pulse-dot{animation:travel 5.5s linear infinite}
 @keyframes travel{
   0%{offset-distance:0%}

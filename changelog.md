@@ -5,6 +5,36 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Hero: frutas fotográficas flotando alrededor del cerebro
+
+- A partir de una imagen de referencia que trajo el usuario (cerebro con
+  frutas reales flotando alrededor, conectadas con líneas punteadas), se
+  agregó ese mismo efecto a `#lam-01` usando las 5 fotos que el usuario ya
+  tenía en `img/imagenes-frutas/` (cereza, arándanos, uvas, nuez, fresa).
+- Las 5 fotos originales (JPG, fondo blanco liso de estudio) se procesaron
+  con un script Python (Pillow + numpy + scipy, no versionado — ver
+  `memoria.md` → "Frutas fotográficas flotando alrededor del cerebro" para
+  la lógica completa si hay que reproducirlo) para: quitarles el fondo
+  blanco (incluyendo huecos internos, no solo lo conectado al borde),
+  apagar con un desvanecido vertical la sombra ovalada de estudio que
+  traía cada foto, suavizar el borde recortado, y exportarlas a WebP con
+  transparencia real: `fruta-nuez.webp`, `fruta-cereza.webp`,
+  `fruta-arandanos.webp`, `fruta-uvas.webp`, `fruta-fresa.webp` (mismo
+  directorio, los JPG originales quedan de backup sin usarse en el sitio).
+- En `index.html`, las 5 imágenes se agregan como
+  `<img class="brain-fruit bf1..bf5">` dentro de `.synapse-art`, ubicadas
+  sobre los puntos de conexión que ya dibujaba el SVG de fondo (nuez y
+  cereza arriba, arándanos y uvas abajo con línea punteada hacia el
+  cerebro; la fresa se agregó "libre", sin línea, para dar más densidad).
+- En `css/styles.css`, clase nueva `.brain-fruit` + `@keyframes
+  brain-fruit-float` (animación propia, no se reusó `@keyframes float`
+  porque pisaría el `transform:translate(-50%,-50%)` fijo que centra cada
+  fruta sobre su punto). Respeta `prefers-reduced-motion` y se oculta en
+  `max-width:640px` para no saturar el hero en mobile.
+- Verificado con Playwright (capturas reales en 1600px/800px/400px):
+  sin halos blancos ni sombra residual, animación de flotación confirmada
+  comparando dos capturas, y ocultamiento limpio en mobile.
+
 ## 2026-09-13 — Hero: más decoraciones flotantes, glow lila y tipografía del título tipo "marcador"
 
 - **Más elementos decorativos en `#lam-01` (hero)**: se agregan 6 `<img

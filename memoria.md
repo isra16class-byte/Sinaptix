@@ -1193,6 +1193,120 @@ hand`, aplicada ahora también acá).
   (con internet normal) el `<link>` de Google Fonts que ya existía en
   `index.html` la carga sin problema.
 
+## Frutas fotográficas flotando alrededor del cerebro (`.brain-fruit`, Hero)
+
+El usuario pidió, mostrando una imagen de referencia (cerebro con frutas
+reales — cereza, arándanos, nuez, uvas — flotando alrededor, conectadas
+con líneas punteadas), replicar ese efecto en el hero usando fotos propias
+que ya tenía subidas en `img/imagenes-frutas/` (5 JPG genéricos
+`Gemini_Generated_Image_*.jpg`, con fondo blanco liso, no transparente).
+
+- **Por qué hizo falta procesarlas antes de usarlas**: a diferencia de los
+  iconos ilustrados de `img/Iconos/` (que tenían fondo tipo ajedrez
+  horneado en los píxeles, ver sección "Iconos ilustrados..." más abajo),
+  estas 5 fotos tenían fondo **blanco liso de foto de producto**, pero con
+  dos problemas propios que un flood-fill simple no resuelve:
+  1. Cada foto trae una sombra ovalada de estudio (gris, no blanco puro)
+     debajo de la fruta — si solo se quita "lo blanco puro" queda un
+     borrón gris/blanco pegado abajo de cada fruta, muy notorio al ponerlas
+     flotando sobre el fondo claro del hero.
+  2. Algunas fotos (las uvas) tienen huecos de fondo blanco **internos**,
+     no conectados al borde de la imagen (el hueco entre el tallo y los
+     granos) — un flood-fill que solo arranca desde el borde no los
+     detecta y quedan como parches blancos flotando en medio de la fruta.
+- **Script de procesamiento** (Python, Pillow + numpy + scipy, no quedó
+  guardado en el repo — se corrió una sola vez sobre los 5 JPG ya
+  existentes, igual que pasó con el script de los iconos de `img/Iconos/`;
+  si hace falta reprocesar o agregar una fruta nueva del mismo estilo,
+  recrear esta lógica):
+  1. Detectar todas las regiones "casi blancas" (los 3 canales RGB por
+     encima de un umbral, ~232) de la imagen completa, **sin exigir que
+     toquen el borde** — así se resuelven a la vez el fondo exterior y los
+     huecos internos tipo el de las uvas. Solo se descartan del recorte
+     final las regiones clarísimas demasiado chicas (brillos/reflejos
+     sobre la piel de la fruta, esos se dejan como parte de la textura).
+  2. Aplicar un **desvanecido vertical** (`alpha *= rampa lineal`) que
+     apaga gradualmente todo lo que quede en el ~20% inferior de la foto
+     — ahí es donde vive la sombra ovalada de estudio en las 5 fotos, y
+     como es gris (no blanco puro) el paso 1 no la eliminaba del todo.
+     Este desvanecido es la clave que evita el "borrón" bajo la fruta.
+  3. Erosionar el primer plano ~2px + `GaussianBlur(1.4)` sobre el canal
+     alpha para que el borde no quede dentado (mismo criterio que ya se
+     usaba para los iconos de `img/Iconos/`).
+  4. Recortar al bounding box real del contenido (`alpha > 12`) con 6px de
+     margen, para no cargar de más "aire" transparente alrededor.
+  5. Reescalar a máx. 600px de lado y exportar a WebP (`quality=90`).
+- **Archivos resultantes**, en el mismo `img/imagenes-frutas/` (los 5 JPG
+  originales se dejan igual, como backup/referencia, no se usan
+  directamente en el sitio — mismo criterio que los JPG de Gemini en
+  `img/Iconos/`): `fruta-nuez.webp`, `fruta-cereza.webp`,
+  `fruta-arandanos.webp`, `fruta-uvas.webp`, `fruta-fresa.webp`.
+- **HTML**: las 5 `<img class="brain-fruit bf1..bf5">` se agregan dentro
+  de `.synapse-art`, como hermanas del `<svg>` de líneas/puntos y del
+  `div.brain-art` (no adentro de `.brain-art`, que es solo para la
+  ilustración del cerebro y sus `.brain-spark`). Se ubicaron **encima de
+  los mismos puntos de conexión que ya dibujaba el SVG** (los `<circle>`
+  en `cx/cy` de un viewBox `0 0 500 500`), convirtiendo esas coordenadas a
+  porcentaje (`cx/500*100`, `cy/500*100`) para que cada fruta quede en la
+  punta de la línea punteada correspondiente, igual que en la imagen de
+  referencia:
+  - `bf1` nuez → `left:14%;top:23%` (esquina superior izquierda, punto
+    `70,120`).
+  - `bf2` cereza → `left:87%;top:16%` (esquina superior derecha, punto
+    `440,90`).
+  - `bf3` arándanos → `left:10%;top:78%` (esquina inferior izquierda,
+    punto `60,380`).
+  - `bf4` uvas → `left:88%;top:80%` (esquina inferior derecha, punto
+    `430,380`).
+  - `bf5` fresa → `left:3%;top:47%` (a la izquierda, a media altura) —
+    esta es la única **sin** punto/línea correspondiente en el SVG (no
+    había un quinto punto dibujado), se agregó "libre" para dar más
+    densidad, igual que en la imagen de referencia tiene una fruta extra
+    suelta además de las que sí están conectadas.
+- **CSS (`.brain-fruit`)**: cada imagen es un elemento absoluto centrado
+  sobre su punto con `transform:translate(-50%,-50%)` **fijo**, y la
+  animación de flotación (`@keyframes brain-fruit-float`, nueva, separada
+  de `@keyframes float` que ya usaba `.brain-art-img`) redeclara ese mismo
+  `translate(-50%,-50%)` en cada paso del keyframe junto con el
+  `translateY` — **si se hubiera reusado el `@keyframes float` genérico
+  (que solo anima `translateY`), la animación habría pisado el
+  `transform` estático de centrado** y las frutas se hubieran ido
+  corriendo de posición en vez de quedarse centradas sobre su punto y
+  solo flotar verticalmente. Si se agrega otro elemento flotante que
+  también necesite un `transform` fijo de posicionamiento (rotación,
+  centrado, etc.), tener el mismo cuidado: no combinarlo con una
+  animación de `transform` genérica ya existente, sino declarar un
+  `@keyframes` propio que incluya la parte fija en todos sus pasos.
+  - `filter:drop-shadow(...)` propio (más marcado que el de `.deco-fruit`,
+    `0 14px 26px`) porque estas fotos son mucho más realistas/detalladas
+    que los blobs SVG y necesitan más profundidad para leerse como que
+    "flotan" y no que están pegadas al cerebro.
+  - `animation-delay` distinto por clase (`bf2`..`bf5`) para que no
+    floten todas sincronizadas, mismo criterio que `.deco-fruit.d2/d3`.
+  - `z-index:4`, por encima de `.brain-art`
+    (`z-index:2`) y del SVG de fondo (sin `z-index`, queda por debajo de
+    ambos) — las frutas se ven "por encima" del cerebro cuando se
+    superponen en los bordes, igual que en la referencia.
+  - `@media(max-width:640px){.brain-fruit{display:none}}`: en mobile el
+    `.synapse-art` se achica mucho (el grid pasa a una columna) y 5 fotos
+    reales flotando alrededor de un cerebro ya chico se ve saturado y
+    compite con los `.brain-spark`; se ocultan solas, mismo patrón que
+    `.deco-fruit`/`.deco-scribble` en el resto del sitio (aunque el corte
+    ahí es en `720px`, acá se bajó a `640px` porque en el layout de una
+    columna el `.synapse-art` todavía se ve bien de tamaño hasta ese
+    ancho).
+- **Verificación visual real**: esta sesión sí tuvo Playwright/Chromium
+  disponible. Se confirmó con capturas en desktop (1600px), tablet (800px)
+  y mobile (400px) que: las 5 frutas quedan bien ubicadas alrededor del
+  cerebro sin halos blancos ni sombra residual, la animación de flotación
+  se nota (se comparó una captura contra otra tomada ~1.8s después), y en
+  ≤640px se ocultan limpio sin dejar huecos raros en el layout.
+- Si se pide sumar más densidad de frutas reales al hero en el futuro,
+  reusar el mismo criterio (procesarlas con el mismo script/pasos antes de
+  usarlas, no directamente los JPG con fondo blanco) y, si es posible,
+  ubicarlas sobre los puntos ya existentes del SVG en vez de inventar
+  coordenadas nuevas, para que la línea punteada siempre apunte a algo.
+
 ## Identidad visual de "Mi plan" alineada con el resto del sitio (`mi-plan.html`)
 
 Pedido del usuario: que "Mi plan" (`mi-plan.html`) tenga el mismo estilo
