@@ -118,6 +118,21 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 - El contenido/copy en español **no cambió**, solo el sistema visual.
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
+- **Trazos tipo "marcador" de fondo (recuperados, versión distinta a la
+  revertida)**: hay un nuevo `svg/deco-scribble.svg` — un único trazo
+  ondulado tipo marcador (`stroke:#E3A23B`, hand-drawn, sin relleno) que se
+  reutiliza como `<img>` varias veces por sección con distinto tamaño,
+  rotación y opacidad (clase `.deco-scribble`, ver `css/styles.css`),
+  siguiendo el mismo patrón `.deco` (position:absolute, z-index:0, detrás
+  del `.wrap`) que ya usan los blobs de fruta y demás decoraciones. A
+  diferencia del intento anterior (ver `changelog.md`, "Revertidos los
+  trazos tipo marcador"), **no** envuelve palabras dentro de títulos ni
+  toca ningún `h2`/`span` — son solo rayones de fondo sueltos, sin relación
+  con el texto, así que no repite el problema de layout que causó la
+  reversión. Se ocultan en móvil (`max-width:720px`) igual que
+  `.deco-fruit`. Distribución: 4 en el Hero (imitando el clúster superior
+  del ejemplo de referencia) y 2 por cada una de las otras 5 secciones
+  (`lam-02` a `lam-06`).
 - **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: hay 6
   ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
   (opacity baja) con una fruta/fruto seco flat-illustration encima

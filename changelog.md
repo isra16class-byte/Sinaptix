@@ -5,6 +5,30 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Trazos tipo marcador de fondo (nueva versión, sin tocar títulos)
+
+- El usuario pide recuperar el look de rayones de fondo tipo odoo.com,
+  mostrando una captura de referencia (clúster de trazos amarillo/naranja
+  dispersos, incluyendo uno de subrayado bajo texto).
+- Se crea `svg/deco-scribble.svg`: un trazo único ondulado tipo marcador
+  (path con curvas Bézier, `stroke-linecap:round`, color `#E3A23B`, sin
+  relleno) pensado para reutilizarse muchas veces con distinto tamaño,
+  rotación y opacidad vía `style` inline, igual que los blobs de fruta.
+- Se agrega la clase `.deco-scribble` en `css/styles.css` (opacidad base
+  `.55`, oculta en móvil `max-width:720px`).
+- Se colocan 4 instancias en el Hero (imitando el clúster superior de la
+  referencia) y 2 en cada una de las otras 5 secciones (`lam-02` a
+  `lam-06`), como hijos directos de cada `<section>` con
+  `position:absolute` y `z-index:0` (mismo patrón que los `.deco`
+  existentes), por lo que quedan detrás del `.wrap` y no interfieren con
+  ningún título ni texto.
+- A propósito, **no** se repite el patrón que causó la reversión anterior
+  (envolver una palabra en un `<span>` dentro de un `h2` con
+  `display:flex`): esta vez son solo decoraciones de fondo sueltas, sin
+  ninguna relación con el markup del texto.
+- Archivos tocados: `index.html`, `css/styles.css`, `svg/deco-scribble.svg`
+  (nuevo), `memoria.md`, `changelog.md`.
+
 ## 2026-09-12 — Revertidos los trazos tipo marcador (rompían el layout y no convencieron)
 
 - Se habían probado trazos tipo "marcador" estilo odoo.com en dos
