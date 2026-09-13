@@ -5,6 +5,20 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Confirmado en producción: el backend de "Mi plan" funciona de punta a punta
+
+- El usuario probó "Mi plan" en el sitio real desplegado (deploy
+  `master@94d6ba4`, el que migró la función a formato moderno) con sesión
+  real iniciada: el plan se guardó y se cargó correctamente. Confirma que
+  los dos fixes anteriores (`@netlify/neon` → `@netlify/database`, y
+  `plan.js` → `plan.mjs` con `getUser()` de `@netlify/identity`)
+  resolvieron el problema de verdad, no solo en teoría contra la
+  documentación.
+- `memoria.md`: se actualizó la sección "Backend real para Mi plan" y el
+  listado de "Pendientes conocidos" para reflejar que esto ya está
+  verificado en producción, no pendiente. No se cambió ningún código en
+  esta entrada — es puramente documentación.
+
 ## 2026-09-13 — Fix: la función seguía sin conectar (Lambda compatibility mode no inyecta la connection string)
 
 - **Segundo bug real, en el mismo deploy de prueba**: resuelto el paquete

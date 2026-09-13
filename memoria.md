@@ -1732,44 +1732,32 @@ eso, no un reemplazo.
   se agregan más tablas o relaciones, ahí sí conviene evaluar Drizzle (la
   guía de Netlify Database ya trae ese camino armado, con
   `drizzle-orm@beta`).
-- **Pendiente de verificación real** (no se pudo hacer desde esta sesión de
-  corrección, sin cuenta de Netlify ni deploy disponibles acá):
-  - Que con la función migrada a formato moderno (`plan.mjs`,
-    `export default`) `getDatabase()` reciba de verdad la connection
-    string y desaparezca el `MissingDatabaseConnectionError` — el
-    diagnóstico (Lambda compatibility mode no inyecta esa variable) viene
-    de la guía oficial de troubleshooting de Netlify Database, pero esta
-    sesión no tuvo forma de reproducir el error ni confirmar el fix contra
-    un sitio desplegado real. **Lo que sí quedó confirmado en esta
-    corrección** (ver los dos deploys reales que compartió el usuario):
-    que el paquete `@netlify/database` en sí conecta bien una vez que el
-    entorno tiene la connection string — el primer error
-    (`@netlify/neon`/`NETLIFY_DATABASE_URL`) y el segundo
-    (`MissingDatabaseConnectionError`) fueron dos causas distintas y
-    reales, no hipótesis; solo falta confirmar que la migración al
-    formato moderno resuelve esta segunda.
-  - Que `getUser()` de `@netlify/identity` devuelva de verdad el usuario a
-    partir del header `Authorization: Bearer <access_token>` que manda
-    `js/plan-sync.js`, igual que hacía `context.clientContext.user` en el
-    formato clásico — no se pudo probar contra Identity real desde acá.
-  - Que el `POST` con nombre de columna interpolado (`tipo`) vía `db.pool`
-    funcione tal cual contra Netlify Database — la sintaxis se armó
-    siguiendo el patrón de transacciones de la doc oficial, pero nunca se
-    ejecutó contra una base real desde acá.
-  - Que "Mi plan" persista de verdad entre dos navegadores/dispositivos
-    distintos logueados con la misma cuenta, una vez desplegado.
-  - Costo/consumo de créditos de Functions + Netlify Database en el plan
-    usado.
+- **Verificado en producción real** (deploy `master@94d6ba4`, confirmado
+  por el usuario): con la función ya en formato moderno (`plan.mjs`) y
+  `@netlify/database`, "Mi plan" guardó y cargó el plan correctamente con
+  sesión real iniciada — el ciclo completo (`getUser()` de
+  `@netlify/identity` resolviendo el usuario desde el header
+  `Authorization`, `getDatabase()` conectando sin
+  `MissingDatabaseConnectionError`, el `POST` con columna interpolada vía
+  `db.pool`, y el `GET` trayendo los datos de vuelta) funciona de punta a
+  punta. Los dos bugs de esta sesión de fix (paquete deprecado +
+  Lambda compatibility mode) están resueltos y confirmados, no solo
+  diagnosticados. Queda pendiente, no por dudas sobre si funciona sino
+  como validación adicional a futuro, confirmar la persistencia entre dos
+  navegadores/dispositivos distintos con la misma cuenta (no se probó
+  específicamente ese caso) y el costo/consumo de créditos de Functions +
+  Netlify Database en el plan usado.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - ~~Backend real para "Mi plan" (Netlify Database + Functions)~~ —
-  implementado, ver sección "Backend real para Mi plan (Netlify DB +
-  Netlify Functions)" más abajo. **Sigue pendiente la verificación en un
-  deploy real de Netlify** (provisionamiento automático de la base,
-  decodificación del JWT en la función, persistencia entre dos
-  dispositivos con la misma cuenta) — no se pudo probar desde esta sesión
-  por no tener acceso a una cuenta de Netlify ni a Postgres real acá.
+  implementado y **verificado en producción real** (deploy
+  `master@94d6ba4`), ver sección "Backend real para Mi plan (Netlify
+  Database + Netlify Functions)" más abajo. Los dos bugs encontrados en el
+  camino (paquete deprecado `@netlify/neon`, y luego la función en Lambda
+  compatibility mode sin poder recibir la connection string) quedaron
+  corregidos y confirmados con un guardado/carga de plan real, con sesión
+  real, en el sitio desplegado.
 - **Descartado**: trazos tipo "marcador" dispersos por el sitio (estilo
   ilustrado, en verde de marca). Se probó en una sesión, se revirtió por no
   convencer visualmente y por romper el layout del título de Visión al
