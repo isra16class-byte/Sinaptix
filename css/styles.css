@@ -277,6 +277,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 .lam-title-frame{position:relative}
 
+/* .title-hand: mismo tratamiento tipográfico manuscrito que ya tienen
+   #lam-03/#lam-04 (ver arriba), pero como clase reusable para aplicar a un
+   título puntual fuera de esas dos secciones (ej. el título de "Mi plan")
+   sin afectar otros h2.lam-title de la misma página. */
+.title-hand{
+  font-family:var(--font-hand);
+  font-weight:700;
+  font-style:normal;
+  letter-spacing:0;
+  line-height:1.15;
+  font-size:clamp(40px,6vw,68px);
+}
+
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}

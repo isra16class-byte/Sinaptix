@@ -5,6 +5,35 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Mi plan": título en una línea con tipografía manuscrita, sin el eyebrow "Mi plan"
+
+- El usuario vio el layout tipo dashboard recién aplicado y pidió dos
+  ajustes al título de `#miPlanConSesion`: que "Tu progreso con SINAPTIX"
+  entre en una sola línea (antes se partía en dos y "se comía" espacio
+  vertical sin dar impacto visual) y que use la misma tipografía
+  manuscrita del título de la sección 4 (Pilares, `#lam-04`), no Fraunces.
+- Se sacó el `<span class="eyebrow">Mi plan</span>` que iba arriba del
+  título (a pedido explícito del usuario, "quitemos eso de mi plan").
+- **Nueva clase reusable `.title-hand`** en `css/styles.css`: mismo
+  tratamiento que ya tenían `#lam-03 .lam-title`/`#lam-04 .lam-title`
+  (`font-family:var(--font-hand)` = Caveat, `font-weight:700`,
+  `letter-spacing:0`, `line-height:1.15`,
+  `font-size:clamp(40px,6vw,68px)`), pero como clase aplicable a un título
+  puntual fuera de esas dos secciones — se eligió una clase nueva en vez
+  de agregar `#miPlan .lam-title` al selector existente para no afectar de
+  paso el título de "Iniciá sesión para ver tu plan" ni el de la encuesta
+  inline ("Creamos tu plan de neuroalimentación"), que **no** se tocaron.
+- En `mi-plan.html`, el `h2` de `#miPlanConSesion` pasa a
+  `class="lam-title title-hand"` con `style="max-width:28ch"` (antes
+  `16ch`, que era lo que forzaba el corte en dos líneas) — mismo mecanismo
+  que ya usa `#lam-04` con `26ch` para su título de longitud similar (ver
+  `memoria.md`, sección de títulos manuscritos).
+- Verificado con jsdom: el `h2` mantiene el texto y el resto de `id`
+  intactos, no queda ningún `.eyebrow` dentro de ese bloque, y
+  `css/styles.css` sigue parseando con `.title-hand` definido — mismo
+  límite de red que la entrada anterior (no se pudo confirmar con
+  capturas reales de Playwright en este entorno).
+
 ## 2026-09-13 — "Mi plan": layout tipo dashboard (Datos clave / Detalle del plan)
 
 - A partir de una imagen de referencia (mockup con "Mi plan" reorganizado en

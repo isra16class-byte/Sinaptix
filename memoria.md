@@ -1022,6 +1022,25 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
     ancho de viewport, comparando contra la imagen de referencia que dio
     el usuario.
 
+**Título de "Mi plan" (`#miPlanConSesion`) sin eyebrow y en Caveat, una sola línea**
+(sesión posterior a la que armó el dashboard, feedback viendo el resultado
+real): el usuario pidió sacar el `eyebrow` ("Mi plan") de arriba del título
+porque no aportaba y pidió que "Tu progreso con SINAPTIX" usara la misma
+tipografía manuscrita del título de Pilares (`#lam-04`) en vez de Fraunces,
+y que entrara en una sola línea (antes se partía en dos, ocupando espacio
+vertical sin dar impacto). Se resolvió con una clase nueva reusable,
+`.title-hand` (en `css/styles.css`): mismo `font-family:var(--font-hand)`
+(Caveat) + `letter-spacing:0` + `font-size:clamp(40px,6vw,68px)` que ya
+tenían `#lam-03 .lam-title`/`#lam-04 .lam-title`, pero sin acoplarla a un
+`id` de sección — se aplicó `class="lam-title title-hand"` solo al `h2` de
+`#miPlanConSesion`, con `style="max-width:28ch"` (antes `16ch`) para que
+entre en una línea. **A propósito no se tocó** el resto de `.lam-title`
+de `mi-plan.html` (el de "Iniciá sesión para ver tu plan" en
+`#miPlanSinSesion`, ni el de la encuesta inline "Creamos tu plan de
+neuroalimentación") — siguen en Fraunces. Si se quiere aplicar Caveat a
+algún otro título puntual en el futuro, reusar `.title-hand` en vez de
+acoplar el cambio a un `id` de sección.
+
 ## Layout tipo dashboard de "Mi plan" (`.miplan-*`, `mi-plan.html`)
 
 A partir de una imagen de referencia que trajo el usuario (mockup de "Mi
