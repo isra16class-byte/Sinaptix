@@ -526,6 +526,20 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
   real. El resto de los 6 rayones de `.lam-title-frame` (los del cluster
   superior derecho y los inferiores derechos) no se tocaron — el pedido
   fue puntual sobre el rayón izquierdo.
+- **Título de Pilares en una sola línea en desktop** (misma sesión,
+  captura de `lam-04`): el usuario notó que el título "Cuatro frentes de
+  trabajo" se partía en dos líneas ("Cuatro frentes" / "de trabajo")
+  aunque a ese ancho de pantalla entraba de sobra en una sola. Causa: el
+  `h2.lam-title` de `lam-04` no tenía `style` propio y heredaba el
+  `max-width:12ch` base de `.lam-title` (pensado para títulos más
+  cortos), muy por debajo de los ~25 caracteres del texto. Se agregó
+  `style="max-width:26ch"` al `h2` de `lam-04` (mismo mecanismo que ya
+  usa `lam-03` con `32ch`, ver sección de títulos manuscritos arriba) —
+  ahora entra en una línea desde ~900px de ancho de viewport en adelante,
+  y sigue partiéndose de forma natural en mobile (`max-width:720px`,
+  donde `.deco-scribble` también se oculta). Verificado con Playwright en
+  1917px, 1600px, 1280px, 900px (una sola línea) y 380px (dos líneas,
+  sin cortes raros).
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 

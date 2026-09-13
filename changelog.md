@@ -5,6 +5,19 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Título de Pilares entra en una sola línea en desktop
+
+- El usuario mandó una captura de `lam-04` (Pilares) donde el título
+  "Cuatro frentes de trabajo" se partía en dos líneas aunque a ese ancho
+  de pantalla entraba de sobra en una.
+- Causa: el `h2.lam-title` de `lam-04` no tenía `style` propio y
+  heredaba el `max-width:12ch` base de `.lam-title`, pensado para
+  títulos más cortos. Se agregó `style="max-width:26ch"` en
+  `index.html`, igual que ya tiene `lam-03` con `32ch`.
+- Verificado con Playwright en 1917px, 1600px, 1280px y 900px (título en
+  una línea) y en 380px (sigue partiéndose en dos líneas de forma
+  natural, sin cortes raros, como corresponde en mobile).
+
 ## 2026-09-13 — Rayón izquierdo de Método/Pilares ahora sangra hasta el borde real
 
 - El usuario mandó una captura de referencia (título "Optimizado para
