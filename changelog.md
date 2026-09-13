@@ -5,6 +5,23 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Más frutas y decoraciones en "Mi plan"
+
+- El usuario vio el resultado de la entrada anterior ("Identidad visual de
+  'Mi plan' alineada con el resto del sitio") desplegado en Netlify y
+  pidió explícitamente "aumentale frutas y más cositas".
+- Se pasó de 4 a 8 elementos decorativos en `#miPlan`, repartidos en todo
+  el alto de la sección (antes solo estaban cerca de la cabecera): se
+  agregaron 3 frutas más (`deco-blob-orange.svg` a la izquierda a la
+  altura del título, `deco-blob-avocado.svg` a la derecha a la altura del
+  `stat-grid`/gráfico de barras, `deco-blob-almonds.svg` a la izquierda
+  cerca del CTA/footer) y una tercera `deco-espiga.svg` en la esquina
+  inferior derecha, que antes quedaba sin ningún acento. Todo reusa
+  `svg/*.svg` ya existente, sin crear assets nuevos.
+- Quedan sin usar en esta página `deco-blob-walnut.svg`,
+  `deco-blob-berries.svg` y `deco-leaf-beneficios.svg` por si se pide
+  aumentar la densidad todavía más en una sesión futura.
+
 ## 2026-09-13 — Identidad visual de "Mi plan" alineada con el resto del sitio
 
 - Pedido del usuario: que "Mi plan" (`mi-plan.html`) tenga el mismo estilo

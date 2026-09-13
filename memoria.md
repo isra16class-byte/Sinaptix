@@ -1130,14 +1130,30 @@ ninguno — se veía plana/genérica en comparación.
 - **Decoraciones agregadas** (como hijos directos de `<section
   id="miPlan">`, antes de `.wrap`, mismo patrón que cualquier sección de
   `index.html` — no se creó ningún asset nuevo, todo reutiliza
-  `svg/*.svg` ya existente):
+  `svg/*.svg` ya existente). Primera pasada: 4 elementos (circles-vision
+  arriba a la derecha + 1 fruta + 2 espigas). El usuario vio el resultado
+  desplegado y pidió explícitamente "aumentale frutas y más cositas", así
+  que se sumaron 4 más en la misma sesión — **son 8 en total**, repartidos
+  en todo el alto de la sección (arriba, a la mitad, y cerca del footer),
+  no solo en la cabecera:
   - `deco-circles-vision.svg` (los mismos círculos de fondo de la sección
     Manifiesto), muy sutil (`opacity:.12`), arriba a la derecha — encaja
     con el tono de "panel/dashboard" de esta pantalla mejor que una fruta.
-  - `deco-blob-kiwi.svg` abajo a la izquierda.
-  - Dos `deco-espiga.svg` (espigas de trigo) en esquinas opuestas,
-    ángulos distintos — mismo criterio de "2 espigas cruzadas" que usan
-    lam-02/04/05/06.
+  - 4 frutas (`deco-fruit`, con flotación): `deco-blob-kiwi.svg` abajo a
+    la izquierda, `deco-blob-orange.svg` a la izquierda a la altura del
+    título/párrafo, `deco-blob-avocado.svg` a la derecha a la altura del
+    `stat-grid`/gráfico de barras, `deco-blob-almonds.svg` a la izquierda
+    más abajo, cerca de los botones de CTA/footer.
+  - 3 `deco-espiga.svg` (espigas de trigo) en 3 esquinas distintas
+    (arriba-derecha, abajo-izquierda, abajo-derecha), ángulos distintos
+    — mismo criterio de "espigas cruzadas" que usan lam-02/04/05/06, acá
+    con una tercera para que la esquina inferior derecha (donde antes no
+    había nada) también tenga acento.
+  - Si se pide aumentar todavía más la densidad decorativa en el futuro,
+    seguir sacando de los mismos `svg/deco-*.svg` ya existentes (hay
+    `deco-blob-walnut.svg`, `deco-blob-berries.svg` y
+    `deco-leaf-beneficios.svg` sin usar todavía en esta página) en vez de
+    generar assets nuevos — es el patrón que sigue todo `index.html`.
   - Se **evitó a propósito** el tratamiento `.title-mark` (subrayado tipo
     marcador debajo de una palabra del título) que sí usan los `<h2>` de
     `index.html`: la sección "Pendientes conocidos" de este mismo archivo
