@@ -37,6 +37,7 @@
   --font-d:'Fraunces',serif;
   --font-b:'Inter',sans-serif;
   --font-m:'Inter',sans-serif;
+  --font-hand:'Caveat',cursive;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -215,6 +216,23 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   opacity:.85;
 }
 @media(max-width:720px){.title-scribble{display:none}}
+
+/* ---------- Titulos estilo "marcador" (lam-03 / lam-04) ---------- */
+#lam-03 .lam-title,
+#lam-04 .lam-title{
+  font-family:var(--font-hand);
+  font-weight:700;
+  font-style:normal;
+  letter-spacing:0;
+  line-height:1.15;
+  font-size:clamp(40px,6vw,68px);
+}
+#lam-03 .title-mark,
+#lam-04 .title-mark{
+  background-position:left bottom 6px;
+  background-size:100% 26%;
+}
+
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}

@@ -418,6 +418,49 @@ comentario histórico explicando el origen del dato.
   que el anillo único + la línea de delta se ven bien, sobre todo con
   nombres de área más largos o valores negativos de delta.
 
+## Títulos manuscritos tipo "marcador" en Método y Pilares (`lam-03`, `lam-04`)
+
+A partir de una referencia visual que dio el usuario (título en fuente
+manuscrita/cursiva estilo marcador, casi negro, con rayón subrayando la
+última palabra + un "marco" de rayones sueltos en las esquinas), se
+aplicó ese tratamiento **solo** a los `h2.lam-title` de `lam-03` (Método)
+y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
+
+- **Fuente**: `Caveat` (Google Fonts, pesos 600/700), agregada al mismo
+  `<link>` de Fraunces/Inter en `<head>` de `index.html`. Nueva variable
+  `--font-hand:'Caveat',cursive` en `css/styles.css` (bloque `:root`).
+  Regla con scope `#lam-03 .lam-title, #lam-04 .lam-title` que pone
+  `font-family:var(--font-hand)`, `letter-spacing:0` (sin el tracking
+  negativo de Fraunces) y `font-size:clamp(40px,6vw,68px)` — más grande
+  que el resto de `h2` porque una cursiva se ve visualmente más chica al
+  mismo tamaño en px. El contenido de los títulos no cambió.
+- **`.title-mark`** (el `<span>` que subraya la última palabra del
+  título, ya existía desde antes): para estas dos secciones se ajustó
+  `background-position`/`background-size` (`left bottom 6px` /
+  `100% 26%`) para que el rayón quede pegado a la línea base del texto
+  manuscrito, distinto del ajuste que le sirve a Fraunces en otras
+  secciones si se reutilizara ahí.
+- **Rayones "marco" de la sección**: en vez de los 2 `deco-scribble`
+  sueltos que tenía cada sección, ahora hay 6, con el mismo patrón
+  `.deco`/`.deco-scribble` de siempre (hijos de la `<section>`, mismo
+  `svg/deco-scribble.svg`, solo cambia `style` inline de tamaño/rotación/
+  posición) — **idénticos en `lam-03` y `lam-04`**: un trazo largo +
+  dos cortos apilados arriba a la derecha, y abajo un corto a la
+  izquierda, un largo y dos cortos hacia la derecha. Sigue ocultándose
+  en móvil (`max-width:720px`) por la regla ya existente de
+  `.deco-scribble`. Si se quiere aplicar este mismo tratamiento a otra
+  sección en el futuro, reusar este mismo set de 6 posiciones (ver
+  `index.html`, secciones `lam-03`/`lam-04`) en vez de inventar uno
+  nuevo, para mantener el "marco" consistente.
+- **Nota de verificación**: `fonts.googleapis.com` no es accesible desde
+  el entorno de trabajo (sandbox con lista blanca de dominios), así que
+  la fuente no se veía en las capturas de Playwright tomadas ahí
+  directamente — se confirmó el resultado inyectando temporalmente el
+  archivo de Caveat (bajado desde el repo de Google Fonts en GitHub, que
+  sí está permitido) solo para la captura de verificación. En un deploy
+  real (Netlify) la fuente carga normal desde Google Fonts, no hace
+  falta ningún cambio adicional para eso.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

@@ -5,6 +5,52 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Títulos estilo "marcador manuscrito" en Método y Pilares
+
+- El usuario mostró una referencia visual (título en fuente manuscrita
+  tipo marcador, color casi negro, con un subrayado de rayón bajo la
+  última palabra y un "marco" de 6 rayones sueltos repartidos en las
+  esquinas de la sección) y pidió replicarla en los títulos de Método
+  (`lam-03`) y Pilares (`lam-04`), respetando primero tipografía/saltos
+  de línea y agregando los rayones al final.
+- **Tipografía**: se agregó la fuente `Caveat` (pesos 600/700) al enlace
+  de Google Fonts en `index.html`, y una variable nueva
+  `--font-hand:'Caveat',cursive` en `css/styles.css`. Se creó una regla
+  con scope solo a esas dos secciones (`#lam-03 .lam-title, #lam-04
+  .lam-title`) que cambia `font-family` a la manuscrita, quita el
+  `letter-spacing` negativo que tienen el resto de títulos (Fraunces) y
+  sube el tamaño (`clamp(40px,6vw,68px)`) porque una fuente cursiva se ve
+  más chica que una serif al mismo tamaño de fuente. El resto de
+  secciones (Hero, Visión, Beneficios, Contacto) no se tocó y sigue en
+  Fraunces.
+- **Subrayado de la última palabra** (`.title-mark`, ya existía): se
+  ajustó solo para estas dos secciones (`background-position`/
+  `background-size`) para que el rayón quede pegado a la línea base del
+  texto manuscrito en vez de flotar más abajo como con Fraunces.
+- **Rayones "marco"**: se reemplazaron los 2 `deco-scribble` sueltos que
+  ya tenía cada sección por 6 rayones (reusando el mismo
+  `svg/deco-scribble.svg`, solo cambia tamaño/rotación/posición vía
+  `style` inline, mismo patrón `.deco` de siempre) distribuidos así en
+  ambas secciones (idéntico en `lam-03` y `lam-04`): un trazo largo +
+  dos trazos cortos apilados en la esquina superior derecha, y en la
+  parte inferior un trazo corto a la izquierda, uno largo y dos cortos
+  hacia la derecha — imitando la composición de la referencia. Sin
+  cambios en `svg/deco-scribble.svg` en sí (mismo color `#EDA23A` que ya
+  se usaba).
+- El contenido/copy de los títulos **no cambió** (`"Un método en cuatro
+  fases, no una dieta genérica"` y `"Cuatro frentes de trabajo"`), solo
+  el tratamiento visual.
+- Verificado con Playwright en este entorno: como `fonts.googleapis.com`
+  no es un dominio accesible desde este sandbox (ver
+  `network_configuration`), para la captura de verificación se inyectó
+  temporalmente el archivo de la fuente Caveat descargado desde el repo
+  público de Google Fonts en GitHub (dominio sí permitido) vía
+  `@font-face` con `data:` URI — solo para confirmar visualmente el
+  resultado en este entorno; el `index.html` entregado sigue apuntando
+  a Google Fonts normalmente, que sí cargará en un deploy real. Se
+  confirmó el resultado en desktop (1280px) y mobile (390px, donde los
+  rayones ya se ocultan como el resto de `.deco-scribble`).
+
 ## 2026-09-13 — Corregido: un solo anillo por área en vez de doble anillo pegado
 
 - El usuario mandó una captura real de la tarjeta de progreso: con dos
@@ -118,7 +164,6 @@ archivo.
   timeline). Sin errores de JS propios (los únicos errores de consola
   observados son 403 del widget de Netlify Identity al intentar salir a
   la red, no relacionados con este cambio).
-
 ## 2026-09-13 — Reemplazo del correo por login: el plan se guarda en "Mi plan"
 
 - El paso final del wizard de nutrición (`#modalNutricion`) ya no envía
