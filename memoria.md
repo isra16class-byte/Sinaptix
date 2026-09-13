@@ -1580,22 +1580,36 @@ eso, no un reemplazo.
 > paquete nativo `@netlify/database` y su propia variable `NETLIFY_DB_URL`.
 > Como el sitio nunca había llegado a provisionar una base con la extensión
 > vieja (era un sitio nuevo), no había forma de que la variable apareciera.
-> Todo lo que sigue en esta sección ya describe la versión corregida
-> (`@netlify/database`), no la original — si algo de otra parte del repo
-> todavía menciona `@netlify/neon` o `NETLIFY_DATABASE_URL`, está
-> desactualizado.
+> **Segunda corrección (misma sesión de fix)**: resuelto el paquete, el
+> siguiente deploy tiró un error distinto —
+> `MissingDatabaseConnectionError: The environment has not been configured
+> to use Netlify Database` — a pesar de que el log del deploy confirmaba
+> que el provisioning de la base se había completado bien. Causa raíz,
+> confirmada contra la guía oficial de troubleshooting de Netlify
+> Database: `netlify/functions/plan.js` estaba escrita con la firma
+> **clásica** (`exports.handler = async function(event, context)`), que
+> Netlify reconoce como **"Lambda compatibility mode"** — y esa
+> documentación dice explícitamente que en ese modo la connection string
+> de Netlify Database **no se inyecta automáticamente al runtime de la
+> función** (es el único primitivo de la plataforma donde hay que
+> pasarla a mano). El fix fue migrar la función al **formato moderno**
+> (`export default`, Web `Request`/`Response`), no seguir con la firma
+> clásica. Ver el detalle técnico completo más abajo en esta misma
+> sección — todo lo que sigue ya describe la versión con ambas
+> correcciones aplicadas.
 
-- **`netlify/functions/plan.js`**: una sola función, `GET` devuelve
-  `{antropometria, objetivo, reevaluacion}` (solo las claves que ese
-  usuario ya guardó — nunca `null` explícito, para que el cliente no pise
-  localStorage con vacío), `POST` recibe `{tipo, datos}` y hace upsert de
-  **una sola columna** (`tipo` es uno de `antropometria` / `objetivo` /
-  `reevaluacion`, validado contra una lista fija antes de interpolarlo en
-  el SQL — no es una columna arbitraria del body) sin tocar las otras dos
-  que ya tuviera guardadas ese usuario, porque cada formulario del sitio
-  llama a esto en un momento distinto.
+- **`netlify/functions/plan.mjs`** (nota: extensión `.mjs`, no `.js` — ver
+  por qué en el bullet de autenticación/formato más abajo): una sola
+  función, `GET` devuelve `{antropometria, objetivo, reevaluacion}` (solo
+  las claves que ese usuario ya guardó — nunca `null` explícito, para que
+  el cliente no pise localStorage con vacío), `POST` recibe `{tipo, datos}`
+  y hace upsert de **una sola columna** (`tipo` es uno de `antropometria` /
+  `objetivo` / `reevaluacion`, validado contra una lista fija antes de
+  interpolarlo en el SQL — no es una columna arbitraria del body) sin
+  tocar las otras dos que ya tuviera guardadas ese usuario, porque cada
+  formulario del sitio llama a esto en un momento distinto.
   - `GET` usa `db.sql` (tagged template de `@netlify/database`): los
-    valores interpolados (acá, `user.sub`) se bindean como parámetros
+    valores interpolados (acá, `user.id`) se bindean como parámetros
     reales de forma segura.
   - `POST` usa `db.pool` (un `pg.Pool` crudo que expone `@netlify/database`
     para casos que `db.sql` no cubre) porque necesita interpolar un
@@ -1611,24 +1625,43 @@ eso, no un reemplazo.
   código de la función. Este repo tiene una sola migración,
   `netlify/database/migrations/20260913231933_create_mi_plan.sql`, con el
   `CREATE TABLE mi_plan (...)` (mismas 6 columnas de siempre: `user_id`
-  primary key = `sub` del JWT de Identity, `email`, `antropometria`,
+  primary key = identificador único del usuario, `email`, `antropometria`,
   `objetivo`, `reevaluacion` como `jsonb`, `updated_at`). **Una vez
   aplicada esta migración en cualquier entorno (local, preview o
   producción), no se edita** — un cambio de esquema futuro (una columna
   nueva, un índice) va en un archivo de migración nuevo, no modificando
   este.
-- **Autenticación**: la función lee `context.clientContext.user` — Netlify
-  decodifica el JWT de Identity automáticamente cuando la request trae el
-  header `Authorization: Bearer <access_token>` (lo manda
-  `js/plan-sync.js`), así que la función nunca valida la firma a mano, eso
-  ya lo resolvió Netlify antes de invocarla. Sin ese header (o sin sesión
-  del lado del cliente), `context.clientContext.user` viene `undefined` y
-  la función devuelve 401. **Sigue sin verificarse end-to-end en un deploy
-  real** (ver "Pendiente de verificación real" más abajo) — lo que sí se
-  confirmó en esta sesión de corrección fue que la conexión a la base
-  funciona; el mecanismo de JWT de Identity en sí no falló en los logs que
-  compartió el usuario, pero tampoco hubo todavía un POST/GET exitoso de
-  punta a punta con sesión real para darlo por probado del todo.
+- **Autenticación y formato de la función (corregido en la segunda parte
+  de esta sesión de fix)**: la versión original tenía
+  `exports.handler = async function(event, context)` (formato clásico) y
+  leía `context.clientContext.user`. Netlify reconoce esa firma como
+  **"Lambda compatibility mode"**, y en ese modo **no inyecta la
+  connection string de Netlify Database al runtime** — de ahí el segundo
+  error (`MissingDatabaseConnectionError`) tras corregir el paquete. El
+  fix fue migrar el archivo al **formato moderno de Netlify Functions**:
+  - Archivo renombrado de `plan.js` a **`plan.mjs`** (extensión `.mjs` para
+    forzar ES modules explícitamente, sin depender de si el `package.json`
+    más cercano tiene `"type":"module"` — que este repo no tiene, y no
+    hacía falta agregarlo solo por esto).
+  - `export default async (req, context) => {...}` en vez de
+    `exports.handler`; `req` es un `Request` estándar de la Web
+    (`req.method`, `await req.json()`), la respuesta se arma con
+    `Response.json(...)` en vez de `{statusCode, body}`.
+  - Autenticación vía **`getUser()` de `@netlify/identity`** (paquete
+    nuevo, agregado a `package.json`) en vez de
+    `context.clientContext.user`: `getUser()` lee sola el header
+    `Authorization: Bearer <access_token>` de la request entrante (lo
+    sigue mandando `js/plan-sync.js`, sin cambios ahí) y devuelve el
+    usuario ya verificado o `null` — es el mecanismo que documenta Netlify
+    para Identity en el formato moderno de Functions. `user.id` reemplaza
+    a lo que antes era `user.sub` (mismo identificador único del usuario,
+    solo cambia el nombre de la propiedad en este paquete).
+  - **Sigue sin verificarse end-to-end en un deploy real** (ver "Pendiente
+    de verificación real" más abajo): el diagnóstico y el fix se armaron
+    contra la documentación oficial de troubleshooting de Netlify
+    Database y de `@netlify/identity`/Functions, pero esta sesión no tuvo
+    forma de reproducir el error ni de confirmar un `GET`/`POST` exitoso
+    de punta a punta contra un sitio desplegado real.
 - **Base de datos**: **Netlify Database** (Postgres, GA), acceso vía el
   paquete oficial `@netlify/database` — `getDatabase()` devuelve una
   conexión (`db.sql` para tagged-template queries, `db.pool` para SQL
@@ -1636,10 +1669,12 @@ eso, no un reemplazo.
   a mano; se autoconfigura con la variable de entorno `NETLIFY_DB_URL` que
   Netlify inyecta sola (**no** `NETLIFY_DATABASE_URL`, esa es la variable
   de la extensión vieja/deprecada — no confundir ambas si se vuelve a
-  tocar este archivo). **Provisionamiento automático**: al tener
-  `@netlify/database` listado en `package.json` (el sitio sigue sin build
-  step propio, ver `netlify.toml`), Netlify provisiona la base y aplica la
-  migración de `netlify/database/migrations/` en el próximo
+  tocar este archivo) **siempre que la función use el formato moderno**
+  (ver bullet anterior — en Lambda compatibility mode esta variable no se
+  inyecta). **Provisionamiento automático**: al tener `@netlify/database`
+  listado en `package.json` (el sitio sigue sin build step propio, ver
+  `netlify.toml`), Netlify provisiona la base y aplica la migración de
+  `netlify/database/migrations/` en el próximo
   `netlify dev`/`netlify build`/push — no hace falta ningún paso manual en
   el dashboard, a diferencia de "Enable Identity" que sí sigue siendo
   manual (ver sección de requisitos del README). Se agregó `.gitignore`
@@ -1699,19 +1734,24 @@ eso, no un reemplazo.
   `drizzle-orm@beta`).
 - **Pendiente de verificación real** (no se pudo hacer desde esta sesión de
   corrección, sin cuenta de Netlify ni deploy disponibles acá):
-  - Que la migración (`netlify/database/migrations/...create_mi_plan.sql`)
-    se aplique sola en el próximo deploy y que la tabla `mi_plan` quede
-    creada — el fix se armó siguiendo al pie de la letra la guía oficial
-    de Netlify Database, pero no se corrió `netlify deploy` real desde
-    acá para confirmarlo.
-  - Que con `@netlify/database` en vez de `@netlify/neon` el error
-    original (`Failed to instantiate Neon client`) quede resuelto de
-    verdad — el diagnóstico (paquete deprecado) viene de la documentación
-    oficial de Netlify, pero esta sesión no tuvo forma de reproducir el
-    error ni confirmar el fix contra un sitio desplegado real.
-  - Que `context.clientContext.user` llegue poblado de verdad en un
-    request real con el JWT de Identity vigente (todo lo de esta sección
-    viene de documentación de Netlify, no de una prueba propia).
+  - Que con la función migrada a formato moderno (`plan.mjs`,
+    `export default`) `getDatabase()` reciba de verdad la connection
+    string y desaparezca el `MissingDatabaseConnectionError` — el
+    diagnóstico (Lambda compatibility mode no inyecta esa variable) viene
+    de la guía oficial de troubleshooting de Netlify Database, pero esta
+    sesión no tuvo forma de reproducir el error ni confirmar el fix contra
+    un sitio desplegado real. **Lo que sí quedó confirmado en esta
+    corrección** (ver los dos deploys reales que compartió el usuario):
+    que el paquete `@netlify/database` en sí conecta bien una vez que el
+    entorno tiene la connection string — el primer error
+    (`@netlify/neon`/`NETLIFY_DATABASE_URL`) y el segundo
+    (`MissingDatabaseConnectionError`) fueron dos causas distintas y
+    reales, no hipótesis; solo falta confirmar que la migración al
+    formato moderno resuelve esta segunda.
+  - Que `getUser()` de `@netlify/identity` devuelva de verdad el usuario a
+    partir del header `Authorization: Bearer <access_token>` que manda
+    `js/plan-sync.js`, igual que hacía `context.clientContext.user` en el
+    formato clásico — no se pudo probar contra Identity real desde acá.
   - Que el `POST` con nombre de columna interpolado (`tipo`) vía `db.pool`
     funcione tal cual contra Netlify Database — la sintaxis se armó
     siguiendo el patrón de transacciones de la doc oficial, pero nunca se

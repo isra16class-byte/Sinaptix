@@ -4,12 +4,25 @@
 // "Backend real para Mi plan", para el porqué de este diseño y su
 // contraparte en el cliente (js/plan-sync.js).
 //
-// Autenticación: Netlify decodifica el JWT de Identity automáticamente
-// cuando el cliente manda el header "Authorization: Bearer <access_token>"
-// (lo hace js/plan-sync.js) y deja el usuario ya verificado en
-// `context.clientContext.user` — no hace falta validar la firma a mano acá,
-// eso ya lo hizo Netlify antes de invocar la función. Sin ese header (o sin
-// sesión iniciada), `user` viene undefined y devolvemos 401.
+// **Por qué este archivo es `.mjs` con `export default` (formato moderno de
+// Netlify Functions) y no `.js` con `exports.handler` (formato clásico /
+// "Lambda compatibility mode")**: con la firma clásica, Netlify Database
+// NUNCA inyecta la connection string al runtime de la función (lo
+// documenta Netlify explícitamente: "Functions in Lambda compatibility
+// mode... is the only platform primitive where you're responsible for
+// passing the connection string yourself") — eso causaba
+// `MissingDatabaseConnectionError` en cada invocación aunque la base ya
+// estuviera provisionada y el deploy log confirmara el provisioning. La
+// única forma soportada de que `getDatabase()` funcione sin pasarle una
+// connection string a mano es usar el formato moderno.
+//
+// Autenticación: `getUser()` de `@netlify/identity` lee el header
+// `Authorization: Bearer <access_token>` de la request entrante (lo manda
+// `js/plan-sync.js`) y devuelve el usuario ya verificado, o `null` si no
+// hay sesión — reemplaza a `context.clientContext.user` del formato
+// clásico, que ya no se usa en este archivo. `user.id` es el identificador
+// único del usuario (el mismo valor que el JWT clásico exponía como
+// `sub`).
 //
 // GET  -> devuelve {antropometria, objetivo, reevaluacion} del usuario
 //         (cualquier bloque que no se haya guardado todavía viene ausente,
@@ -22,30 +35,30 @@
 //
 // La tabla `mi_plan` NO se crea acá: vive en
 // netlify/database/migrations/20260913231933_create_mi_plan.sql, que
-// Netlify aplica solo durante el deploy (ver "CRITICAL: Never apply
-// migrations to a Netlify-hosted database" en la guía de Netlify Database
-// — el runtime de la función nunca corre DDL).
-const { getDatabase } = require('@netlify/database');
+// Netlify aplica solo durante el deploy (el runtime de la función nunca
+// corre DDL).
+import { getUser } from '@netlify/identity';
+import { getDatabase } from '@netlify/database';
 
 const TIPOS_VALIDOS = ['antropometria', 'objetivo', 'reevaluacion'];
 
-exports.handler = async function(event, context){
-  const user = context.clientContext && context.clientContext.user;
+export default async (req, context) => {
+  const user = await getUser();
   if(!user){
-    return {statusCode: 401, body: JSON.stringify({error: 'No hay sesión iniciada.'})};
+    return Response.json({error: 'No hay sesión iniciada.'}, {status: 401});
   }
 
   const db = getDatabase();
 
-  if(event.httpMethod === 'GET'){
-    // Tagged template de db.sql: los valores interpolados (acá, user.sub)
+  if(req.method === 'GET'){
+    // Tagged template de db.sql: los valores interpolados (acá, user.id)
     // se bindean como parámetros reales, no se concatenan en el texto de
     // la query — seguro para valores, no para nombres de columna (ver el
     // POST más abajo, donde `tipo` sí es un nombre de columna dinámico).
     const filas = await db.sql`
       SELECT antropometria, objetivo, reevaluacion
       FROM mi_plan
-      WHERE user_id = ${user.sub}
+      WHERE user_id = ${user.id}
     `;
     const fila = filas[0];
     // Solo se devuelven los bloques que existen de verdad (columna no
@@ -58,22 +71,18 @@ exports.handler = async function(event, context){
       if(fila.objetivo != null) resultado.objetivo = fila.objetivo;
       if(fila.reevaluacion != null) resultado.reevaluacion = fila.reevaluacion;
     }
-    return {
-      statusCode: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(resultado)
-    };
+    return Response.json(resultado);
   }
 
-  if(event.httpMethod === 'POST'){
+  if(req.method === 'POST'){
     let body;
-    try{ body = JSON.parse(event.body || '{}'); }
-    catch(err){ return {statusCode: 400, body: JSON.stringify({error: 'JSON inválido.'})}; }
+    try{ body = await req.json(); }
+    catch(err){ return Response.json({error: 'JSON inválido.'}, {status: 400}); }
 
     const tipo = body.tipo;
     const datos = body.datos;
     if(!TIPOS_VALIDOS.includes(tipo)){
-      return {statusCode: 400, body: JSON.stringify({error: 'tipo inválido. Debe ser uno de: '+TIPOS_VALIDOS.join(', ')})};
+      return Response.json({error: 'tipo inválido. Debe ser uno de: '+TIPOS_VALIDOS.join(', ')}, {status: 400});
     }
 
     // El nombre de columna (`tipo`) no se puede bindear como parámetro de
@@ -91,14 +100,14 @@ exports.handler = async function(event, context){
         'INSERT INTO mi_plan (user_id, email, '+tipo+', updated_at) '+
         'VALUES ($1, $2, $3, now()) '+
         'ON CONFLICT (user_id) DO UPDATE SET '+tipo+' = $3, email = $2, updated_at = now()',
-        [user.sub, user.email, JSON.stringify(datos)]
+        [user.id, user.email, JSON.stringify(datos)]
       );
     } finally {
       client.release();
     }
 
-    return {statusCode: 200, body: JSON.stringify({ok: true})};
+    return Response.json({ok: true});
   }
 
-  return {statusCode: 405, body: JSON.stringify({error: 'Método no soportado.'})};
+  return Response.json({error: 'Método no soportado.'}, {status: 405});
 };

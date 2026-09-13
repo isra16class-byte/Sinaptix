@@ -5,6 +5,40 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Fix: la función seguía sin conectar (Lambda compatibility mode no inyecta la connection string)
+
+- **Segundo bug real, en el mismo deploy de prueba**: resuelto el paquete
+  (`@netlify/database`) y confirmado que el provisioning de la base se
+  completó bien (según el log del deploy), la función seguía fallando con
+  `MissingDatabaseConnectionError: The environment has not been configured
+  to use Netlify Database`.
+- **Causa raíz**, confirmada contra la guía oficial de troubleshooting de
+  Netlify Database: `netlify/functions/plan.js` usaba la firma **clásica**
+  (`exports.handler = async function(event, context)`), que Netlify
+  reconoce como **"Lambda compatibility mode"**. En ese modo, la
+  connection string de Netlify Database **no se inyecta automáticamente**
+  al runtime — es el único primitivo de la plataforma donde eso pasa.
+- **Fix**: la función se migró al **formato moderno de Netlify Functions**:
+  - Renombrada `netlify/functions/plan.js` → **`netlify/functions/plan.mjs`**
+    (extensión `.mjs` para forzar ES modules sin tocar `"type"` en
+    `package.json`).
+  - `export default async (req, context) => {...}` (Web `Request`/
+    `Response`) en vez de `exports.handler` (`event`/`{statusCode, body}`).
+  - Autenticación migrada de `context.clientContext.user` a **`getUser()`
+    de `@netlify/identity`** (dependencia nueva en `package.json`), que
+    lee sola el header `Authorization` de la request entrante. `user.id`
+    reemplaza a `user.sub` como identificador único del usuario en las
+    queries (mismo valor, distinto nombre de propiedad).
+- **`README.md`** y **`memoria.md`** actualizados con el nombre de archivo
+  correcto (`plan.mjs`) y una segunda nota explicando este bug, para que
+  una sesión futura no vuelva a escribir una función de este repo con la
+  firma clásica.
+- **Sigue sin verificarse en un deploy real** si este segundo fix resuelve
+  el error de verdad (no hay cuenta de Netlify ni deploy disponibles desde
+  este entorno) — sí quedó confirmado, por los dos deploys reales que
+  compartió el usuario, que el paquete `@netlify/database` en sí conecta
+  bien una vez que el entorno tiene la connection string.
+
 ## 2026-09-13 — Fix: el backend de "Mi plan" usaba un paquete deprecado (`@netlify/neon` → `@netlify/database`)
 
 - **Bug real encontrado en un deploy**: la función `plan.js` fallaba en

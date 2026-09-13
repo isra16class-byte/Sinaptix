@@ -17,9 +17,9 @@ Sitio 100% estático (HTML/CSS/JS puro, sin build step), desplegado en Netlify.
 ├── js/nutricion-planes.js       # Funciones puras del plan de nutrición, compartidas entre páginas
 ├── js/nutricion-wizard.js       # Wizard de 8 pasos de la encuesta de nutrición
 ├── js/plan-sync.js              # Sincronización de "Mi plan" con el backend (ver abajo)
-├── netlify/functions/plan.js    # Netlify Function: lee/escribe "Mi plan" en Netlify Database
+├── netlify/functions/plan.mjs   # Netlify Function (formato moderno): lee/escribe "Mi plan" en Netlify Database
 ├── netlify/database/migrations/ # Migración SQL de la tabla mi_plan (la aplica el deploy, no la función)
-├── package.json                 # Solo declara la dependencia @netlify/database (sitio sin build step propio)
+├── package.json                 # Declara @netlify/database y @netlify/identity (sitio sin build step propio)
 ├── img/                         # Logos e íconos (PNG/WebP)
 ├── svg/                         # Ilustraciones decorativas de fondo
 └── netlify.toml                 # Configuración de build/despliegue/functions en Netlify
@@ -60,7 +60,7 @@ servidor** cuando hay sesión iniciada:
   pintar la pantalla (no cambió nada de esa lectura) — sirve también como
   caché si no hay red o si se entra sin sesión.
 - `js/plan-sync.js` (compartido entre `index.html` y `mi-plan.html`) manda
-  una copia de cada guardado a `netlify/functions/plan.js`, que la escribe
+  una copia de cada guardado a `netlify/functions/plan.mjs`, que la escribe
   en Netlify Database (Postgres, GA) asociada al usuario autenticado. Al
   entrar a "Mi plan" con sesión iniciada, primero trae lo que haya en el
   servidor y lo mezcla en `localStorage` (el servidor manda) — así el plan
@@ -133,9 +133,14 @@ configurada como rama de producción para no perder de vista cuál desplegar.
    `@netlify/neon` (extensión deprecada por Netlify) — corregido en una
    sesión posterior, ver `memoria.md`.
 2. ~~Crear **Netlify Functions** para leer y escribir esos datos de forma
-   segura~~ — resuelto: `netlify/functions/plan.js`, verifica la sesión vía
-   `context.clientContext.user` (Netlify decodifica el JWT de Identity
-   automáticamente a partir del header `Authorization`).
+   segura~~ — resuelto: `netlify/functions/plan.mjs` (formato moderno,
+   `export default`), verifica la sesión vía `getUser()` de
+   `@netlify/identity` (lee el header `Authorization` de la request
+   entrante). Nota: la primera implementación usaba el formato clásico
+   (`exports.handler`, `context.clientContext.user`), que Netlify corre en
+   "Lambda compatibility mode" — un modo que no inyecta la connection
+   string de Netlify Database — corregido en la misma sesión que el punto
+   1, ver `memoria.md`.
 3. ~~Conectar los formularios existentes a esas funciones cuando haya
    sesión iniciada~~ — resuelto: `js/plan-sync.js`, enganchado en los 3
    puntos de guardado (`formAntro`, `formNutricion` en ambas páginas,
