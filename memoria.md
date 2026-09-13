@@ -416,6 +416,21 @@ más un botón final `#nutriSubmit` en el paso 8.
   `sinaptix_antropometria`), el paso 2 se prellena automáticamente con
   esos datos (`resetNutriWizard`, que corre cada vez que se abre el
   modal) para no volver a pedirlos.
+- **Convención visual de obligatorio/opcional** (desde la sesión que sacó
+  la palabra "opcional"): todos los campos de `#formNutricion` tienen una
+  etiqueta visible (`.nutri-field-label` para inputs/selects sueltos, o el
+  `<span class="nutri-field-label">` que ya se usaba para grupos de
+  checkbox/radio) — ya **no** queda ningún campo con `<label class=
+  "sr-only">` + placeholder como única referencia. Los obligatorios llevan
+  `<span class="req" aria-hidden="true">*</span>` pegado al final del
+  texto de la etiqueta (asterisco rojo, clase nueva en `css/styles.css`,
+  usa `var(--red)`); los opcionales no llevan ningún símbolo ni la palabra
+  "opcional" en ningún lado (ni en la etiqueta ni en el placeholder). Hay
+  una frase aclaratoria una sola vez, debajo de la intro del formulario:
+  "Los campos marcados con \* son obligatorios." **Si se agrega un campo
+  nuevo a esta encuesta en el futuro, seguir este mismo patrón** (etiqueta
+  visible + `.req` si es obligatorio, nada si no lo es) en vez de volver
+  al patrón de `sr-only` + placeholder.
 
 **Los 4 planes en sí no cambiaron ni se descartaron** — siguen siendo los
 mismos 4 objetivos que ya existían en el select (`Mejorar concentración`,

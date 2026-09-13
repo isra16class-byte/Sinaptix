@@ -5,6 +5,53 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Asterisco rojo en campos obligatorios de la encuesta de nutrición (se saca la palabra "opcional")
+
+- El usuario pidió reemplazar la palabra "(opcional)" (que aparecía en el
+  placeholder de 4 campos: Peso, Talla, Otra alergia, Alimentos que no te
+  gustan) por un asterisco rojo en las preguntas obligatorias, dejando las
+  opcionales sin ninguna marca — según referencia visual que compartió
+  ("Teléfono \*").
+- Antes de tocar código se armó un documento de investigación
+  (`plan-mejoras-mi-plan-y-encuesta.md`, entregado al usuario, no vive en
+  el repo) sobre buenas prácticas de formularios (marcar obligatorios vs.
+  opcionales) y oportunidades de mejora para la encuesta y "Mi plan" en
+  general — este patch implementa solo el punto 1 de ese documento (el de
+  menor costo/mayor impacto), el resto queda pendiente de decidir.
+- Hallazgo técnico clave: un asterisco no se puede pintar de rojo dentro
+  de un `placeholder` (es un solo string, un solo color) — hacía falta
+  una etiqueta visible de verdad. La mayoría de los campos de
+  `#formNutricion` (Objetivo, Nombre, Email, Edad, Sexo, Peso, Talla,
+  Comidas, Agua, Cafeína, Alcohol, Ultraprocesados, Tiempo de cocina,
+  Otra alergia, Restricción, Medicación, las 4 escalas de percepción,
+  Disgustos, Presupuesto) usaban el patrón `<label class="sr-only">` +
+  texto solo en el `placeholder` — se convirtieron todas esas etiquetas a
+  visibles, reusando el estilo ya existente `.nutri-field-label` (no se
+  inventó un estilo nuevo). De paso corrige una práctica de accesibilidad
+  poco recomendable (depender del placeholder como única etiqueta).
+- Nueva clase `.req` en `css/styles.css` (asterisco rojo, `aria-hidden`
+  porque el atributo HTML `required` ya alcanza para lectores de
+  pantalla) y nueva variable `--red:#B3261E` en `:root` — es el mismo
+  rojo que ya usaba `.nutri-error`, que se actualizó para usar la
+  variable en vez del hex suelto (sin cambio visual).
+- Se agregó una frase aclaratoria una sola vez, debajo del párrafo de
+  introducción del formulario (en el modal de `index.html` y en la
+  encuesta inline de `mi-plan.html`): *"Los campos marcados con \* son
+  obligatorios."*
+- Los 4 campos opcionales (Peso, Talla, Otra alergia, Alimentos que no te
+  gustan) quedaron con etiqueta visible pero sin asterisco y sin ninguna
+  palabra — de paso corrige una inconsistencia que ya existía: "Horas de
+  pantalla" tampoco es obligatorio (no tiene `required`) pero nunca dijo
+  "opcional" en ningún lado; ahora, al no llevar asterisco, queda
+  consistente con el resto de los campos opcionales.
+- Cambio duplicado en `index.html` (modal) y `mi-plan.html` (encuesta
+  inline) porque comparten el mismo `#formNutricion` — se verificó que
+  ambos archivos terminan con la misma cantidad de asteriscos (24) y sin
+  ningún resto de `sr-only` u "opcional" dentro del formulario.
+- No se tocó `js/nutricion-wizard.js` ni `js/nutricion-planes.js`: el
+  cambio es puramente de HTML/CSS, no afecta la validación (los mismos
+  atributos `required` siguen intactos) ni la lógica de armado del plan.
+
 ## 2026-09-13 — Gráfico de barras (Foco/Memoria/Energía/Calma) en "Mi plan"
 
 - El usuario preguntó si valía la pena agregar un gráfico a "Mi plan"; se
