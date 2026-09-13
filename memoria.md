@@ -647,6 +647,51 @@ y `lam-04` (Pilares) — el resto de secciones sigue en Fraunces.
     ancho de viewport, comparando contra la imagen de referencia que dio
     el usuario.
 
+## Imagen principal del Hero (`lam-01`, `.synapse-art`)
+
+El hero ya **no** usa el logotipo (`img/sinaptix-badge.png`) como pieza
+central flotante — el usuario pidió reemplazarlo por una ilustración de
+un cerebro dividido a la mitad: un lado hecho de frutas/verduras, el otro
+lado iluminado como una red de neuronas (`img/hero-cerebro-nutricion.png`,
+PNG 1024×1024 con fondo transparente, ~1.2MB — pendiente optimizar/pasar
+a WebP si el peso se vuelve un problema real de rendimiento).
+
+- El SVG de fondo de `.synapse-art` (las líneas finas + los puntos que
+  viajan por ellas, `.pulse-dot`) **no se tocó**, sigue detrás de la
+  imagen igual que antes con el logo.
+- Nueva estructura dentro de `.synapse-art`: un `div.brain-art` que
+  contiene la `<img class="brain-art-img">` (la ilustración) más 8
+  `<span class="brain-spark">` posicionados en `%` sobre los puntos de
+  luz más brillantes del lado de neuronas de la imagen (coordenadas
+  sacadas analizando los píxeles más brillantes del PNG). Cada spark es
+  un punto con `radial-gradient` + `box-shadow` que parpadea
+  (`@keyframes spark-twinkle`, opacidad y escala) con duración y
+  `animation-delay` distintos por `span` (variables CSS `--dur`/`--d`
+  inline) para que no parpadeen todos sincronizados — simula que las
+  "neuronas" de la imagen se encienden y apagan, ya que el PNG en sí es
+  una imagen estática y no se le puede animar el brillo interno
+  directamente.
+- `.brain-art-img` conserva la misma animación de flotación
+  (`animation:float`) que antes tenía `.logo-badge` (la clase
+  `.logo-badge` y su CSS se dejaron intactos en `css/styles.css` por si
+  se necesita revertir, pero ya no se usan en el HTML).
+- `width:82%` en `.brain-art` (antes `.logo-badge` usaba `56%`) — la
+  ilustración ocupa más espacio del círculo de `.synapse-art` porque es
+  una imagen compuesta que se lee mejor grande, a diferencia del
+  logotipo que era un ícono simple.
+- `prefers-reduced-motion:reduce` también apaga `.brain-art-img`
+  (flotación) y dejar `.brain-spark` visible pero fijo en opacidad .6
+  (sin parpadeo) — mismo criterio que ya existía para `.logo-badge` y
+  `.pulse-dot`.
+- Si se vuelve a cambiar esta imagen en el futuro, para reposicionar los
+  `.brain-spark` sobre los nuevos puntos de luz: abrir la imagen con
+  cualquier herramienta de análisis de píxeles, filtrar los píxeles más
+  brillantes/blancos del lado que corresponda a "neuronas" (no confundir
+  con brillos del lado de comida, ej. el ajo o el limón también son
+  claros) y convertir sus coordenadas a porcentaje del ancho/alto total
+  de la imagen para que el posicionamiento siga funcionando aunque el
+  contenedor cambie de tamaño.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

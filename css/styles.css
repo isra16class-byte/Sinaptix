@@ -167,6 +167,24 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   filter:drop-shadow(0 18px 40px rgba(75,46,69,.22));
   animation:float 6s ease-in-out infinite;
 }
+.brain-art{position:relative;z-index:2;width:82%}
+.brain-art-img{
+  display:block;width:100%;height:auto;
+  filter:drop-shadow(0 18px 40px rgba(75,46,69,.28));
+  animation:float 6s ease-in-out infinite;
+}
+.brain-spark{
+  position:absolute;width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#f6d9a8 45%,rgba(246,217,168,0) 75%);
+  box-shadow:0 0 10px 3px rgba(255,225,170,.85);
+  opacity:0;pointer-events:none;
+  animation:spark-twinkle var(--dur,2.4s) ease-in-out infinite;
+  animation-delay:var(--d,0s);
+}
+@keyframes spark-twinkle{
+  0%,100%{opacity:0;transform:scale(.5)}
+  50%{opacity:1;transform:scale(1.2)}
+}
 @keyframes float{
   0%,100%{transform:translateY(0)}
   50%{transform:translateY(-14px)}
@@ -179,6 +197,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 @media(prefers-reduced-motion:reduce){
   .pulse-dot{animation:none}
   .logo-badge{animation:none}
+  .brain-art-img{animation:none}
+  .brain-spark{animation:none;opacity:.6}
   .reveal{transition:none;opacity:1;transform:none}
 }
 

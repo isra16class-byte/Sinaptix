@@ -5,6 +5,33 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Imagen del Hero reemplazada por ilustración de cerebro con chispas de neuronas
+
+- El usuario pidió reemplazar el logotipo flotante del Hero (`lam-01`,
+  `.synapse-art`) por una imagen que subió: un cerebro dividido a la
+  mitad entre frutas/verduras y una red de neuronas iluminada. También
+  pidió mantener algún efecto como el que tenía el logo, o que las luces
+  de las neuronas de la imagen parpadeen.
+- Se agregó `img/hero-cerebro-nutricion.png` (1024×1024, fondo
+  transparente) y se reemplazó `<img class="logo-badge">` por un
+  `div.brain-art` con la nueva imagen (`.brain-art-img`, conserva la
+  animación `float` que ya tenía el logo) + 8 `<span class="brain-spark">`
+  posicionados sobre los puntos de luz más brillantes de la imagen
+  (detectados analizando los píxeles del PNG), cada uno con una animación
+  de parpadeo (`@keyframes spark-twinkle`) con duración/retraso distintos
+  para que no parpadeen sincronizados.
+- El SVG de fondo de `.synapse-art` (líneas + puntos viajando) no se
+  tocó. La clase `.logo-badge` se deja sin usar en el HTML pero se
+  mantiene en `css/styles.css` por si se necesita revertir.
+- Se actualizó la regla de `prefers-reduced-motion` para incluir los
+  nuevos elementos (`.brain-art-img` sin flotar, `.brain-spark` sin
+  parpadeo, opacidad fija).
+- Verificado con Playwright en desktop (1600px) y mobile (390px), y
+  forzando el parpadeo a su punto máximo para confirmar que los sparks
+  quedan alineados sobre las luces de la imagen.
+- Ver `memoria.md` → "Imagen principal del Hero" para el detalle y cómo
+  reposicionar los sparks si se cambia la imagen a futuro.
+
 ## 2026-09-13 — Grosor y cruce corregido en los rayones de Pilares (lam-04)
 
 - El usuario mostró una captura de referencia externa (mock de otra
