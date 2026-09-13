@@ -123,3 +123,78 @@ function nutriBuildResumenHTML(d){
   avisos.forEach(a=>{ html += '<p class="nutri-note">'+a+'</p>'; });
   return html;
 }
+
+// ===================== Áreas de bienestar (Foco / Memoria / Energía / Calma) =====================
+// Compartido entre los anillos de "Método" (index.html) y el gráfico de
+// barras de "Mi plan" (mi-plan.html): ambos parten de la misma encuesta
+// (estrés/fatiga/concentración/olvidos, escala 1-5) y del mismo color
+// según el porcentaje. Puramente funciones de cálculo — no tocan el DOM,
+// por eso viven acá y no en script.js / mi-plan.js.
+
+// Invierte cada escala 1-5 (donde 5 = peor) a un puntaje de bienestar
+// 1-5 (donde 5 = mejor), sin importar cómo se formuló la pregunta.
+function gaugeComputeAreas(d){
+  return {
+    foco: 6 - (parseInt(d.concentracion, 10) || 3),
+    memoria: 6 - (parseInt(d.olvidos, 10) || 3),
+    energia: 6 - (parseInt(d.fatiga, 10) || 3),
+    calma: 6 - (parseInt(d.estres, 10) || 3)
+  };
+}
+
+function gaugeHexToRgb(hex){
+  const h = hex.replace('#','');
+  return {
+    r: parseInt(h.substring(0,2),16),
+    g: parseInt(h.substring(2,4),16),
+    b: parseInt(h.substring(4,6),16)
+  };
+}
+function gaugeLerp(a, b, t){ return a + (b-a)*t; }
+function gaugeRgbToHex(rgb){
+  const toHex = v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0');
+  return '#'+toHex(rgb.r)+toHex(rgb.g)+toHex(rgb.b);
+}
+
+// Color dinámico según el porcentaje: rojo (necesita atención) → dorado
+// (en progreso) → verde (sólido), interpolado en RGB para que el cambio
+// de color sea gradual y no un salto brusco entre 3 colores fijos.
+const GAUGE_LOW = '#B3261E';   // mismo rojo que ya se usa para validaciones
+const GAUGE_MID = '#C1703B';  // var(--gold)
+const GAUGE_HIGH = '#2E7D5B'; // var(--green)
+function gaugeColorForPercent(pct){
+  const p = Math.max(0, Math.min(100, pct));
+  const low = gaugeHexToRgb(GAUGE_LOW), mid = gaugeHexToRgb(GAUGE_MID), high = gaugeHexToRgb(GAUGE_HIGH);
+  if(p <= 50){
+    const t = p/50;
+    return gaugeRgbToHex({r:gaugeLerp(low.r,mid.r,t), g:gaugeLerp(low.g,mid.g,t), b:gaugeLerp(low.b,mid.b,t)});
+  }
+  const t = (p-50)/50;
+  return gaugeRgbToHex({r:gaugeLerp(mid.r,high.r,t), g:gaugeLerp(mid.g,high.g,t), b:gaugeLerp(mid.b,high.b,t)});
+}
+
+// Arma el gráfico de barras de "Mi plan" (foco/memoria/energía/calma) a
+// partir de la encuesta guardada — un solo punto en el tiempo (el estado
+// actual), sin comparación con una reevaluación posterior (eso solo existe
+// hoy en los anillos de "Método", en index.html).
+function nutriBuildBarChartHTML(encuesta){
+  const areas = gaugeComputeAreas(encuesta);
+  const items = [
+    {key:'foco', label:'Foco'},
+    {key:'memoria', label:'Memoria'},
+    {key:'energia', label:'Energía'},
+    {key:'calma', label:'Calma'}
+  ];
+  let html = '<h4 class="bar-chart-title">Tu estado actual</h4>'+
+    '<p class="bar-chart-text">Según lo que respondiste en la encuesta — foco, memoria, energía y calma, de 0 a 100.</p>';
+  items.forEach(function(item){
+    const pct = Math.round((areas[item.key]/5)*100);
+    const color = gaugeColorForPercent(pct);
+    html += '<div class="bar-row">'+
+      '<span class="bar-label">'+item.label+'</span>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+      '<span class="bar-pct">'+pct+'%</span>'+
+      '</div>';
+  });
+  return html;
+}

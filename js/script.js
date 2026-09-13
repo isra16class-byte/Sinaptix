@@ -249,47 +249,9 @@
     }catch(err){ return ''; }
   }
 
-  // Invierte cada escala 1-5 (donde 5 = peor) a un puntaje de bienestar
-  // 1-5 (donde 5 = mejor), sin importar cómo se formuló la pregunta.
-  function gaugeComputeAreas(d){
-    return {
-      foco: 6 - (parseInt(d.concentracion, 10) || 3),
-      memoria: 6 - (parseInt(d.olvidos, 10) || 3),
-      energia: 6 - (parseInt(d.fatiga, 10) || 3),
-      calma: 6 - (parseInt(d.estres, 10) || 3)
-    };
-  }
-
-  function gaugeHexToRgb(hex){
-    const h = hex.replace('#','');
-    return {
-      r: parseInt(h.substring(0,2),16),
-      g: parseInt(h.substring(2,4),16),
-      b: parseInt(h.substring(4,6),16)
-    };
-  }
-  function gaugeLerp(a, b, t){ return a + (b-a)*t; }
-  function gaugeRgbToHex(rgb){
-    const toHex = v => Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0');
-    return '#'+toHex(rgb.r)+toHex(rgb.g)+toHex(rgb.b);
-  }
-
-  // Color dinámico según el porcentaje: rojo (necesita atención) → dorado
-  // (en progreso) → verde (sólido), interpolado en RGB para que el cambio
-  // de color sea gradual y no un salto brusco entre 3 colores fijos.
-  const GAUGE_LOW = '#B3261E';   // mismo rojo que ya se usa para validaciones
-  const GAUGE_MID = '#C1703B';  // var(--gold)
-  const GAUGE_HIGH = '#2E7D5B'; // var(--green)
-  function gaugeColorForPercent(pct){
-    const p = Math.max(0, Math.min(100, pct));
-    const low = gaugeHexToRgb(GAUGE_LOW), mid = gaugeHexToRgb(GAUGE_MID), high = gaugeHexToRgb(GAUGE_HIGH);
-    if(p <= 50){
-      const t = p/50;
-      return gaugeRgbToHex({r:gaugeLerp(low.r,mid.r,t), g:gaugeLerp(low.g,mid.g,t), b:gaugeLerp(low.b,mid.b,t)});
-    }
-    const t = (p-50)/50;
-    return gaugeRgbToHex({r:gaugeLerp(mid.r,high.r,t), g:gaugeLerp(mid.g,high.g,t), b:gaugeLerp(mid.b,high.b,t)});
-  }
+  // gaugeComputeAreas, gaugeColorForPercent y sus helpers de color viven
+  // ahora en js/nutricion-planes.js (compartidos con el gráfico de barras
+  // de mi-plan.html) — ese script se carga antes que este.
 
   function gaugeArc(cx, cy, r, strokeWidth, pct, color){
     const circumference = 2*Math.PI*r;

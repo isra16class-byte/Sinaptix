@@ -35,12 +35,17 @@ if(window.netlifyIdentity){
 
     const miPlanDetalleEl = document.getElementById('miPlanDetalle');
     const miPlanCtaEl = document.getElementById('miPlanCta');
+    const miPlanBarrasEl = document.getElementById('miPlanBarras');
     const objetivo = localStorage.getItem('sinaptix_objetivo');
     if(objetivo){
       try{
         const o = JSON.parse(objetivo);
         const objetivoEl = document.getElementById('miPlanObjetivo');
         if(objetivoEl) objetivoEl.textContent = o.objetivo;
+        if(o.encuesta && miPlanBarrasEl && typeof nutriBuildBarChartHTML === 'function'){
+          miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o.encuesta);
+          miPlanBarrasEl.classList.remove('hidden');
+        }
         if(miPlanDetalleEl && o.encuesta && typeof nutriBuildResumenHTML === 'function'){
           miPlanDetalleEl.innerHTML = nutriBuildResumenHTML(o.encuesta);
           miPlanDetalleEl.classList.remove('hidden');
@@ -48,6 +53,7 @@ if(window.netlifyIdentity){
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
       }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
     } else {
+      if(miPlanBarrasEl) miPlanBarrasEl.classList.add('hidden');
       if(miPlanDetalleEl) miPlanDetalleEl.classList.add('hidden');
       if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');
     }

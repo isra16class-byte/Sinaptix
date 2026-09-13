@@ -5,6 +5,33 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Gráfico de barras (Foco/Memoria/Energía/Calma) en "Mi plan"
+
+- El usuario preguntó si valía la pena agregar un gráfico a "Mi plan"; se
+  le ofrecieron 3 opciones (barras reemplazando los anillos de Método,
+  barras nuevas en Mi Plan con datos ya existentes, o no agregar nada) y
+  eligió: 1 gráfico de barras con su estado actual (Foco/Memoria/Energía/
+  Calma), sin comparación antes/después.
+- Se movieron `gaugeComputeAreas`, `gaugeColorForPercent` y sus helpers de
+  color de `js/script.js` a `js/nutricion-planes.js` (compartido) — son
+  funciones puras de cálculo (sin DOM), las mismas que ya usaban los
+  anillos de "Método" en `index.html`, así que el gráfico de barras y los
+  anillos parten del mismo cálculo y la misma escala de color.
+- Nueva función `nutriBuildBarChartHTML(encuesta)` en
+  `js/nutricion-planes.js`, llamada desde `pintarMiPlan(user)` en
+  `js/mi-plan.js`.
+- Nuevo contenedor `#miPlanBarras` en `mi-plan.html`, entre el `stat-grid`
+  (IMC/objetivo) y el detalle del plan. Nuevos estilos en
+  `css/styles.css` (`.bar-chart-card`, `.bar-row`, `.bar-track`,
+  `.bar-fill`, etc.) — barras simples con `<div>`+CSS, sin librería de
+  gráficos externa.
+- Probado con Playwright: con una encuesta guardada de ejemplo
+  (estrés=4, fatiga=3, concentración=2, olvidos=3), el gráfico de barras
+  en `mi-plan.html` muestra Foco 80%, Memoria 60%, Energía 60%, Calma 40%
+  — y los anillos de "Método" en `index.html`, con la misma encuesta,
+  muestran exactamente los mismos porcentajes. Cero errores de consola en
+  ambas páginas.
+
 ## 2026-09-13 — "Generar mi plan" ahora es inline en mi-plan.html (no redirige a index.html)
 
 - Feedback del usuario sobre el patch anterior: al tocar "Generar mi plan"

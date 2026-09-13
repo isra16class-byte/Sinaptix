@@ -175,7 +175,34 @@ separada, `mi-plan.html`, con su propia URL. Si se retoma trabajo sobre
   `nutriBuildResumenHTML`) y antes de `js/script.js` / `js/mi-plan.js`, y
   después del HTML del formulario (asume que `#formNutricion` ya existe en
   el DOM al cargar, igual que el resto de los scripts de este sitio).
-- **Duplicación deliberada**: el HTML de las 8 fieldsets del formulario
+- **Gráfico de barras en "Mi plan"** (`#miPlanBarras`, en `mi-plan.html`):
+  a pedido del usuario, se agregó un gráfico de barras horizontales con el
+  "estado actual" (Foco, Memoria, Energía, Calma), calculado a partir de la
+  encuesta guardada. **No** es una comparación antes/después (eso solo
+  existe en los anillos de "Método", en `index.html`) — es un solo punto
+  en el tiempo. Reutiliza exactamente el mismo cálculo y la misma escala
+  de color que ya usaban los anillos de "Método", para que ambos
+  coincidan si se miran los dos.
+  - `gaugeComputeAreas`, `gaugeColorForPercent` y sus helpers de color
+    (`gaugeHexToRgb`, `gaugeLerp`, `gaugeRgbToHex`, `GAUGE_LOW/MID/HIGH`)
+    se movieron de `js/script.js` a `js/nutricion-planes.js` (compartido)
+    — son funciones puras de cálculo, sin DOM, así que no hubo que
+    duplicar nada. `js/script.js` conserva solo lo que sí es específico de
+    los anillos SVG de índice (`gaugeArc`, `gaugeBuildItem`,
+    `gaugeDeltaHtml`, `gaugeFechaCorta`, `renderMethodGauges`).
+  - Nueva función `nutriBuildBarChartHTML(encuesta)` en
+    `js/nutricion-planes.js`: arma el HTML de las 4 barras a partir de
+    `gaugeComputeAreas`. Se llama desde `pintarMiPlan(user)` en
+    `js/mi-plan.js`, igual que `nutriBuildResumenHTML`.
+  - Estilos nuevos en `css/styles.css`: `.bar-chart-card`,
+    `.bar-chart-title`, `.bar-chart-text`, `.bar-row`, `.bar-label`,
+    `.bar-track`, `.bar-fill`, `.bar-pct` — reutilizan las variables de
+    color/tipografía existentes (`--paper-2`, `--line`, `--panel-line`,
+    `--font-d`, `--font-m`), no hay ninguna librería de gráficos nueva
+    (Chart.js, etc.): son `<div>` con `width` en porcentaje, simple CSS.
+  - Se muestra/oculta igual que el resto de "Mi plan": si todavía no hay
+    `sinaptix_objetivo` guardado, `#miPlanBarras` queda oculto (no hay
+    datos que graficar todavía).
   (`#formNutricion`) está duplicado entre `index.html` (dentro del modal) y
   `mi-plan.html` (inline) — es contenido estático, no hay motor de
   templates en este sitio (sin build step), así que si se agrega/cambia un
