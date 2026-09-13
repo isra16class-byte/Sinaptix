@@ -90,13 +90,6 @@
     openModal('modalNutricion');
   });
   document.getElementById('btnAntropometria').addEventListener('click', ()=>openModal('modalAntropometria'));
-  const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
-  if(btnAbrirNutricionMiPlan){
-    btnAbrirNutricionMiPlan.addEventListener('click', ()=>{
-      resetNutriWizard();
-      openModal('modalNutricion');
-    });
-  }
   document.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', e=>closeModal(e.target.closest('.modal-overlay')));
   });
@@ -187,129 +180,13 @@
   });
 
   // ===================== Encuesta de nutrición especializada (wizard) =====================
-  // NUTRI_PLANES y las funciones de cálculo del plan (nutriResolverObjetivo,
-  // nutriConstruirAjustes, nutriConstruirAvisos, nutriBuildResumenHTML) viven
-  // ahora en js/nutricion-planes.js (compartido con mi-plan.html) — ese script
-  // se carga antes que este en el <head>/<body>.
-  const NUTRI_TOTAL_STEPS = 8;
-  let nutriCurrentStep = 1;
-
-  const nutriForm = document.getElementById('formNutricion');
-  const nutriSteps = nutriForm ? Array.from(nutriForm.querySelectorAll('.nutri-step')) : [];
-  const nutriDots = document.querySelectorAll('#nutriProgress .dot');
-  const nutriBackBtn = document.getElementById('nutriBack');
-  const nutriNextBtn = document.getElementById('nutriNext');
-  const nutriSubmitBtn = document.getElementById('nutriSubmit');
-  const nutriErrorEl = document.getElementById('nutriError');
-
-  function nutriShowStep(n){
-    nutriCurrentStep = n;
-    nutriSteps.forEach(s=>s.classList.toggle('active', parseInt(s.dataset.step,10)===n));
-    nutriDots.forEach((d,i)=>{
-      d.classList.toggle('done', i < n-1);
-      d.classList.toggle('active', i === n-1);
-    });
-    nutriBackBtn.classList.toggle('hidden', n===1);
-    nutriNextBtn.classList.toggle('hidden', n===NUTRI_TOTAL_STEPS);
-    nutriSubmitBtn.classList.toggle('hidden', n!==NUTRI_TOTAL_STEPS);
-    nutriErrorEl.classList.remove('show');
-    if(n===NUTRI_TOTAL_STEPS) nutriRenderResumen();
-  }
-
-  function resetNutriWizard(){
-    if(!nutriForm) return;
-    nutriForm.reset();
-    document.getElementById('nutriResultado').style.display='none';
-    // Prellenar edad/sexo/peso/talla si ya existen en "Mis datos" (antropometría)
-    const antro = localStorage.getItem('sinaptix_antropometria');
-    const hint = document.getElementById('nutriAntroHint');
-    if(antro){
-      try{
-        const d = JSON.parse(antro);
-        document.getElementById('nutriEdad').value = d.edad || '';
-        document.getElementById('nutriSexo').value = d.sexo === 'Femenino' || d.sexo === 'Masculino' ? d.sexo : '';
-        document.getElementById('nutriPeso').value = d.peso || '';
-        document.getElementById('nutriTalla').value = d.tallaCm || '';
-        if(hint) hint.textContent = 'Prellenado con los datos que ya registraste en "Registrar datos antropométricos".';
-      }catch(err){ if(hint) hint.textContent=''; }
-    } else if(hint){ hint.textContent=''; }
-    nutriShowStep(1);
-  }
-
-  function nutriValidateStep(n){
-    const stepEl = nutriSteps.find(s=>parseInt(s.dataset.step,10)===n);
-    if(!stepEl) return true;
-    const invalid = stepEl.querySelector(':invalid');
-    if(invalid){
-      nutriErrorEl.textContent = 'Completa los campos obligatorios de este paso antes de continuar.';
-      nutriErrorEl.classList.add('show');
-      if(invalid.reportValidity) invalid.reportValidity();
-      return false;
-    }
-    nutriErrorEl.classList.remove('show');
-    return true;
-  }
-
-  if(nutriNextBtn){
-    nutriNextBtn.addEventListener('click', ()=>{
-      if(!nutriValidateStep(nutriCurrentStep)) return;
-      if(nutriCurrentStep < NUTRI_TOTAL_STEPS) nutriShowStep(nutriCurrentStep+1);
-    });
-  }
-  if(nutriBackBtn){
-    nutriBackBtn.addEventListener('click', ()=>{
-      if(nutriCurrentStep > 1) nutriShowStep(nutriCurrentStep-1);
-    });
-  }
-
-  function nutriGetChecked(name){
-    return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(i=>i.value);
-  }
-  function nutriGetRadio(name){
-    const el = document.querySelector('input[name="'+name+'"]:checked');
-    return el ? el.value : '';
-  }
-
-  function nutriCollectData(){
-    return {
-      objetivo: document.getElementById('nutriObjetivo').value,
-      nombre: document.getElementById('nutriNombre').value.trim(),
-      email: document.getElementById('nutriEmail').value.trim(),
-      edad: document.getElementById('nutriEdad').value,
-      sexo: document.getElementById('nutriSexo').value,
-      peso: document.getElementById('nutriPeso').value,
-      talla: document.getElementById('nutriTalla').value,
-      actividadFisica: document.getElementById('nutriActividadFisica').value,
-      tipoActividad: document.getElementById('nutriTipoActividad').value,
-      horaExigencia: document.getElementById('nutriHoraExigencia').value,
-      sueno: document.getElementById('nutriSueno').value,
-      pantallas: document.getElementById('nutriPantallas').value,
-      calidadSueno: parseInt(nutriGetRadio('nutriCalidadSueno')||'0', 10),
-      comidas: document.getElementById('nutriComidas').value,
-      agua: document.getElementById('nutriAgua').value,
-      cafeina: document.getElementById('nutriCafeina').value,
-      alcohol: document.getElementById('nutriAlcohol').value,
-      ultraprocesados: document.getElementById('nutriUltraprocesados').value,
-      tiempoCocina: document.getElementById('nutriTiempoCocina').value,
-      alergias: nutriGetChecked('nutriAlergia'),
-      alergiaOtra: document.getElementById('nutriAlergiaOtra').value.trim(),
-      restriccion: document.getElementById('nutriRestriccion').value,
-      condiciones: nutriGetChecked('nutriCondicion'),
-      medicacion: nutriGetRadio('nutriMedicacion'),
-      estres: parseInt(nutriGetRadio('nutriEstres')||'0', 10),
-      fatiga: parseInt(nutriGetRadio('nutriFatiga')||'0', 10),
-      concentracion: parseInt(nutriGetRadio('nutriConcentracion')||'0', 10),
-      olvidos: parseInt(nutriGetRadio('nutriOlvidos')||'0', 10),
-      disgustos: document.getElementById('nutriDisgustos').value.trim(),
-      presupuesto: document.getElementById('nutriPresupuesto').value,
-      consentimiento: document.getElementById('nutriConsentimiento').checked
-    };
-  }
-
-  function nutriRenderResumen(){
-    const d = nutriCollectData();
-    document.getElementById('nutriResumen').innerHTML = nutriBuildResumenHTML(d);
-  }
+  // El motor del wizard (navegación entre pasos, validación, recolección de
+  // datos, NUTRI_TOTAL_STEPS, resetNutriWizard, nutriValidateStep,
+  // nutriCollectData, etc.) vive ahora en js/nutricion-wizard.js —
+  // compartido con la sección inline de mi-plan.html — que se carga antes
+  // que este archivo. Acá solo queda lo específico de index.html: cómo se
+  // abre (dentro del modal, ver btnNutricion más arriba) y qué pasa al
+  // guardar el plan.
 
   // Formulario de nutrición especializada: el plan ya se genera y se muestra
   // en pantalla en el paso 8 (nutriRenderResumen), así que el envío ya no pide
@@ -356,16 +233,6 @@
         }
       }
     });
-  }
-
-  // "Mi plan" (mi-plan.html) no tiene el modal/wizard de nutrición propio
-  // (vive solo en index.html), así que su botón "Generar mi plan" enlaza acá
-  // con ?generarPlan=1 y este bloque abre el modal automáticamente al llegar.
-  if(new URLSearchParams(window.location.search).get('generarPlan') === '1'){
-    resetNutriWizard();
-    openModal('modalNutricion');
-    // Limpia el parámetro para que un refresh de la página no reabra el modal solo.
-    history.replaceState(null, '', window.location.pathname + window.location.hash);
   }
 
   // ===================== Anillos de progreso (Método) =====================

@@ -1,0 +1,135 @@
+// ===================== Motor del wizard de nutrición (compartido) =====================
+// Extraído de js/script.js para poder mostrar la misma encuesta tanto en el
+// modal de index.html como en la sección inline de mi-plan.html, sin
+// duplicar la lógica de navegación entre pasos. Solo opera sobre
+// #formNutricion y sus hijos — no sabe (ni le importa) si ese formulario
+// está dentro de un modal o de una sección normal de la página.
+//
+// Requiere que #formNutricion ya exista en el DOM al momento de cargar este
+// script (colocarlo después del formulario en el HTML, como el resto de los
+// scripts de este sitio) y que js/nutricion-planes.js se haya cargado antes
+// (usa nutriBuildResumenHTML). El manejo del evento "submit" (qué pasa
+// cuando se guarda el plan) NO vive acá — es distinto en cada página
+// (index.html redirige a "Mi plan"; mi-plan.html se queda en la misma
+// pantalla) y se define en js/script.js / js/mi-plan.js respectivamente.
+
+const NUTRI_TOTAL_STEPS = 8;
+let nutriCurrentStep = 1;
+
+const nutriForm = document.getElementById('formNutricion');
+const nutriSteps = nutriForm ? Array.from(nutriForm.querySelectorAll('.nutri-step')) : [];
+const nutriDots = document.querySelectorAll('#nutriProgress .dot');
+const nutriBackBtn = document.getElementById('nutriBack');
+const nutriNextBtn = document.getElementById('nutriNext');
+const nutriSubmitBtn = document.getElementById('nutriSubmit');
+const nutriErrorEl = document.getElementById('nutriError');
+
+function nutriShowStep(n){
+  nutriCurrentStep = n;
+  nutriSteps.forEach(s=>s.classList.toggle('active', parseInt(s.dataset.step,10)===n));
+  nutriDots.forEach((d,i)=>{
+    d.classList.toggle('done', i < n-1);
+    d.classList.toggle('active', i === n-1);
+  });
+  nutriBackBtn.classList.toggle('hidden', n===1);
+  nutriNextBtn.classList.toggle('hidden', n===NUTRI_TOTAL_STEPS);
+  nutriSubmitBtn.classList.toggle('hidden', n!==NUTRI_TOTAL_STEPS);
+  nutriErrorEl.classList.remove('show');
+  if(n===NUTRI_TOTAL_STEPS) nutriRenderResumen();
+}
+
+function resetNutriWizard(){
+  if(!nutriForm) return;
+  nutriForm.reset();
+  const resultadoEl = document.getElementById('nutriResultado');
+  if(resultadoEl) resultadoEl.style.display='none';
+  // Prellenar edad/sexo/peso/talla si ya existen en "Mis datos" (antropometría)
+  const antro = localStorage.getItem('sinaptix_antropometria');
+  const hint = document.getElementById('nutriAntroHint');
+  if(antro){
+    try{
+      const d = JSON.parse(antro);
+      document.getElementById('nutriEdad').value = d.edad || '';
+      document.getElementById('nutriSexo').value = d.sexo === 'Femenino' || d.sexo === 'Masculino' ? d.sexo : '';
+      document.getElementById('nutriPeso').value = d.peso || '';
+      document.getElementById('nutriTalla').value = d.tallaCm || '';
+      if(hint) hint.textContent = 'Prellenado con los datos que ya registraste en "Registrar datos antropométricos".';
+    }catch(err){ if(hint) hint.textContent=''; }
+  } else if(hint){ hint.textContent=''; }
+  nutriShowStep(1);
+}
+
+function nutriValidateStep(n){
+  const stepEl = nutriSteps.find(s=>parseInt(s.dataset.step,10)===n);
+  if(!stepEl) return true;
+  const invalid = stepEl.querySelector(':invalid');
+  if(invalid){
+    nutriErrorEl.textContent = 'Completa los campos obligatorios de este paso antes de continuar.';
+    nutriErrorEl.classList.add('show');
+    if(invalid.reportValidity) invalid.reportValidity();
+    return false;
+  }
+  nutriErrorEl.classList.remove('show');
+  return true;
+}
+
+if(nutriNextBtn){
+  nutriNextBtn.addEventListener('click', ()=>{
+    if(!nutriValidateStep(nutriCurrentStep)) return;
+    if(nutriCurrentStep < NUTRI_TOTAL_STEPS) nutriShowStep(nutriCurrentStep+1);
+  });
+}
+if(nutriBackBtn){
+  nutriBackBtn.addEventListener('click', ()=>{
+    if(nutriCurrentStep > 1) nutriShowStep(nutriCurrentStep-1);
+  });
+}
+
+function nutriGetChecked(name){
+  return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked')).map(i=>i.value);
+}
+function nutriGetRadio(name){
+  const el = document.querySelector('input[name="'+name+'"]:checked');
+  return el ? el.value : '';
+}
+
+function nutriCollectData(){
+  return {
+    objetivo: document.getElementById('nutriObjetivo').value,
+    nombre: document.getElementById('nutriNombre').value.trim(),
+    email: document.getElementById('nutriEmail').value.trim(),
+    edad: document.getElementById('nutriEdad').value,
+    sexo: document.getElementById('nutriSexo').value,
+    peso: document.getElementById('nutriPeso').value,
+    talla: document.getElementById('nutriTalla').value,
+    actividadFisica: document.getElementById('nutriActividadFisica').value,
+    tipoActividad: document.getElementById('nutriTipoActividad').value,
+    horaExigencia: document.getElementById('nutriHoraExigencia').value,
+    sueno: document.getElementById('nutriSueno').value,
+    pantallas: document.getElementById('nutriPantallas').value,
+    calidadSueno: parseInt(nutriGetRadio('nutriCalidadSueno')||'0', 10),
+    comidas: document.getElementById('nutriComidas').value,
+    agua: document.getElementById('nutriAgua').value,
+    cafeina: document.getElementById('nutriCafeina').value,
+    alcohol: document.getElementById('nutriAlcohol').value,
+    ultraprocesados: document.getElementById('nutriUltraprocesados').value,
+    tiempoCocina: document.getElementById('nutriTiempoCocina').value,
+    alergias: nutriGetChecked('nutriAlergia'),
+    alergiaOtra: document.getElementById('nutriAlergiaOtra').value.trim(),
+    restriccion: document.getElementById('nutriRestriccion').value,
+    condiciones: nutriGetChecked('nutriCondicion'),
+    medicacion: nutriGetRadio('nutriMedicacion'),
+    estres: parseInt(nutriGetRadio('nutriEstres')||'0', 10),
+    fatiga: parseInt(nutriGetRadio('nutriFatiga')||'0', 10),
+    concentracion: parseInt(nutriGetRadio('nutriConcentracion')||'0', 10),
+    olvidos: parseInt(nutriGetRadio('nutriOlvidos')||'0', 10),
+    disgustos: document.getElementById('nutriDisgustos').value.trim(),
+    presupuesto: document.getElementById('nutriPresupuesto').value,
+    consentimiento: document.getElementById('nutriConsentimiento').checked
+  };
+}
+
+function nutriRenderResumen(){
+  const d = nutriCollectData();
+  document.getElementById('nutriResumen').innerHTML = nutriBuildResumenHTML(d);
+}

@@ -11,6 +11,9 @@ if(window.netlifyIdentity){
   const btnLoginMiPlan = document.getElementById('btnLoginMiPlan');
   const btnLogout = document.getElementById('btnLogout');
   const btnLogoutNav = document.getElementById('btnLogoutNav');
+  const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
+  const nutriInlineVolver = document.getElementById('nutriInlineVolver');
+  const nutriInlineEl = document.getElementById('nutriInline');
 
   // Reconstruye el plan completo (con ajustes y avisos) a partir de la
   // encuesta guardada en localStorage — usa nutriBuildResumenHTML de
@@ -76,6 +79,58 @@ if(window.netlifyIdentity){
   }
   if(btnLogout) btnLogout.addEventListener('click', doLogout);
   if(btnLogoutNav) btnLogoutNav.addEventListener('click', doLogout);
+
+  // La encuesta se muestra inline en esta misma pantalla (no un modal chico)
+  // para tener más espacio y visión mientras se completa. Como solo se llega
+  // acá con sesión ya iniciada (el botón vive dentro de #miPlanConSesion),
+  // no hace falta contemplar el caso "sin sesión" en este flujo.
+  if(btnAbrirNutricionMiPlan){
+    btnAbrirNutricionMiPlan.addEventListener('click', function(){
+      resetNutriWizard();
+      if(conSesionEl) conSesionEl.classList.add('hidden');
+      if(nutriInlineEl){
+        nutriInlineEl.classList.remove('hidden');
+        nutriInlineEl.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    });
+  }
+  if(nutriInlineVolver){
+    nutriInlineVolver.addEventListener('click', function(){
+      if(nutriInlineEl) nutriInlineEl.classList.add('hidden');
+      if(conSesionEl) conSesionEl.classList.remove('hidden');
+    });
+  }
+  if(nutriForm){
+    nutriForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      if(!nutriValidateStep(NUTRI_TOTAL_STEPS)) return;
+
+      const d = nutriCollectData();
+      const objetivos = nutriResolverObjetivo(d);
+
+      localStorage.setItem('sinaptix_objetivo', JSON.stringify({
+        objetivo: objetivos.join(' + '),
+        email: d.email,
+        encuesta: d,
+        fecha: new Date().toISOString()
+      }));
+
+      const res = document.getElementById('nutriResultado');
+      if(res){
+        res.style.display='block';
+        res.textContent = 'Tu plan quedó guardado. Volviendo a "Mi plan"… ✓';
+      }
+
+      // Ya estamos en "Mi plan": alcanza con volver a pintarlo (sin recargar
+      // la página) y ocultar la encuesta, en vez de redirigir a otro lado.
+      setTimeout(function(){
+        if(nutriInlineEl) nutriInlineEl.classList.add('hidden');
+        if(conSesionEl) conSesionEl.classList.remove('hidden');
+        const user = netlifyIdentity.currentUser();
+        if(user) pintarMiPlan(user);
+      }, 900);
+    });
+  }
 
   netlifyIdentity.on('init', function(user){
     if(user) mostrarEstadoConSesion(user); else mostrarEstadoSinSesion();

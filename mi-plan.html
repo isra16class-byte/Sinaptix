@@ -65,9 +65,344 @@
       <p class="lam-text reveal in d3" id="miPlanCta" style="margin-top:26px">Todavía no generaste tu plan de neuroalimentación. Completá la encuesta y quedará guardado acá, listo para consultar cuando quieras.</p>
 
       <div class="btn-row reveal in d3" style="margin-top:10px">
-        <a href="index.html?generarPlan=1#lam-06" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</a>
+        <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
         <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
       </div>
+    </div>
+
+    <!-- Encuesta de nutrición — inline en esta misma pantalla (no modal chico),
+         para tener más espacio y visión mientras se completa. Mismo formulario
+         que index.html; el motor de navegación entre pasos vive en
+         js/nutricion-wizard.js (compartido). -->
+    <div id="nutriInline" class="hidden" style="margin-top:70px">
+      <button type="button" class="btn btn-ghost" id="nutriInlineVolver" style="margin-bottom:30px">← Volver a Mi plan</button>
+
+      <span class="eyebrow reveal in" style="color:var(--green)">Nutrición especializada</span>
+      <h2 class="lam-title reveal in d1" style="max-width:20ch">Creamos tu plan de neuroalimentación</h2>
+      <p class="lam-text reveal in d1" style="color:var(--panel-text);max-width:640px">Respondé esta breve encuesta y generamos tu propuesta de nutrición especializada al instante, ajustada a tu rutina, tu salud y tus datos personales.</p>
+
+      <div class="nutri-progress reveal in d2" id="nutriProgress" aria-hidden="true" style="max-width:640px;margin-top:26px">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+
+      <form class="modal-form reveal in d2" id="formNutricion" novalidate style="max-width:640px;margin-top:8px">
+
+        <!-- PASO 1 — Objetivo y contacto -->
+        <fieldset class="nutri-step" data-step="1">
+          <legend class="nutri-legend">1. Tu objetivo</legend>
+          <div class="nutri-group">
+            <label class="sr-only" for="nutriObjetivo">Objetivo cognitivo principal</label>
+            <select class="modal-input" id="nutriObjetivo" required>
+              <option value="" disabled selected>Objetivo cognitivo principal</option>
+              <option>Mejorar concentración</option>
+              <option>Reducir fatiga mental</option>
+              <option>Sostener memoria de trabajo</option>
+              <option>Manejo de estrés mental</option>
+              <option value="No estoy seguro">No estoy seguro / varios objetivos</option>
+            </select>
+          </div>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriNombre">Nombre</label>
+              <input class="modal-input" type="text" id="nutriNombre" placeholder="Nombre" required>
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriEmail">Correo electrónico</label>
+              <input class="modal-input" type="email" id="nutriEmail" placeholder="Correo electrónico" required>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- PASO 2 — Datos personales y antropométricos -->
+        <fieldset class="nutri-step" data-step="2">
+          <legend class="nutri-legend">2. Sobre ti</legend>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriEdad">Edad</label>
+              <input class="modal-input" type="number" id="nutriEdad" placeholder="Edad" required>
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriSexo">Sexo biológico</label>
+              <select class="modal-input" id="nutriSexo" required>
+                <option value="" disabled selected>Sexo biológico</option>
+                <option>Femenino</option>
+                <option>Masculino</option>
+                <option>Prefiero no decir</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriPeso">Peso en kilogramos (opcional)</label>
+              <input class="modal-input" type="number" id="nutriPeso" placeholder="Peso (kg) — opcional">
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriTalla">Talla en centímetros (opcional)</label>
+              <input class="modal-input" type="number" id="nutriTalla" placeholder="Talla (cm) — opcional">
+            </div>
+          </div>
+          <p class="nutri-hint" id="nutriAntroHint"></p>
+          <div class="nutri-group">
+            <label class="nutri-field-label" for="nutriActividadFisica">Nivel de actividad física</label>
+            <select class="modal-input" id="nutriActividadFisica" required>
+              <option value="" disabled selected>Nivel de actividad física</option>
+              <option>Sedentario</option>
+              <option>Ligero</option>
+              <option>Moderado</option>
+              <option>Intenso</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <!-- PASO 3 — Rutina y exigencia mental -->
+        <fieldset class="nutri-step" data-step="3">
+          <legend class="nutri-legend">3. Tu rutina mental</legend>
+          <div class="nutri-group">
+            <label class="nutri-field-label" for="nutriTipoActividad">Tipo de actividad principal</label>
+            <select class="modal-input" id="nutriTipoActividad" required>
+              <option value="" disabled selected>Tipo de actividad principal</option>
+              <option>Estudio</option>
+              <option>Trabajo de oficina</option>
+              <option>Trabajo físico</option>
+              <option>Mixto</option>
+            </select>
+          </div>
+          <div class="nutri-group">
+            <label class="nutri-field-label" for="nutriHoraExigencia">Horas de mayor exigencia mental</label>
+            <select class="modal-input" id="nutriHoraExigencia" required>
+              <option value="" disabled selected>Horas de mayor exigencia mental</option>
+              <option>Mañana</option>
+              <option>Tarde</option>
+              <option>Noche</option>
+              <option>Variable</option>
+            </select>
+          </div>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="nutri-field-label" for="nutriSueno">Horas de sueño promedio</label>
+              <select class="modal-input" id="nutriSueno" required>
+                <option value="" disabled selected>Horas de sueño</option>
+                <option>Menos de 5</option>
+                <option>5 a 6</option>
+                <option>7 a 8</option>
+                <option>Más de 8</option>
+              </select>
+            </div>
+            <div class="nutri-group">
+              <label class="nutri-field-label" for="nutriPantallas">Horas de pantalla / estudio seguido</label>
+              <input class="modal-input" type="number" id="nutriPantallas" placeholder="Horas aprox.">
+            </div>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Calidad de sueño percibida</span>
+            <div class="scale-row" data-scale="nutriCalidadSueno">
+              <label class="scale-opt"><input type="radio" name="nutriCalidadSueno" value="1" required><span>1</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriCalidadSueno" value="2"><span>2</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriCalidadSueno" value="3"><span>3</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriCalidadSueno" value="4"><span>4</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriCalidadSueno" value="5"><span>5</span></label>
+            </div>
+            <div class="scale-labels"><span>Muy mala</span><span>Muy buena</span></div>
+          </div>
+        </fieldset>
+
+        <!-- PASO 4 — Hábitos alimentarios actuales -->
+        <fieldset class="nutri-step" data-step="4">
+          <legend class="nutri-legend">4. Tus hábitos actuales</legend>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriComidas">Comidas al día</label>
+              <select class="modal-input" id="nutriComidas" required>
+                <option value="" disabled selected>Comidas al día</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5 o más</option>
+              </select>
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriAgua">Agua al día</label>
+              <select class="modal-input" id="nutriAgua" required>
+                <option value="" disabled selected>Agua al día</option>
+                <option>Menos de 4 vasos</option>
+                <option>4 a 6 vasos</option>
+                <option>7 a 8 vasos</option>
+                <option>Más de 8 vasos</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriCafeina">Consumo de cafeína</label>
+              <select class="modal-input" id="nutriCafeina" required>
+                <option value="" disabled selected>Cafeína al día</option>
+                <option>Ninguna</option>
+                <option>1 al día</option>
+                <option>2 a 3 al día</option>
+                <option>4 o más al día</option>
+              </select>
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriAlcohol">Consumo de alcohol</label>
+              <select class="modal-input" id="nutriAlcohol" required>
+                <option value="" disabled selected>Alcohol</option>
+                <option>Nunca</option>
+                <option>Ocasional</option>
+                <option>Frecuente</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-row">
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriUltraprocesados">Ultraprocesados o azúcar añadida</label>
+              <select class="modal-input" id="nutriUltraprocesados" required>
+                <option value="" disabled selected>Ultraprocesados / azúcar</option>
+                <option>Rara vez</option>
+                <option>Algunas veces por semana</option>
+                <option>A diario</option>
+              </select>
+            </div>
+            <div class="nutri-group">
+              <label class="sr-only" for="nutriTiempoCocina">Tiempo para cocinar</label>
+              <select class="modal-input" id="nutriTiempoCocina" required>
+                <option value="" disabled selected>Tiempo para cocinar</option>
+                <option>Cocino yo con tiempo</option>
+                <option>Cocino yo con poco tiempo</option>
+                <option>Alguien cocina por mí</option>
+                <option>Como afuera la mayoría de días</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- PASO 5 — Salud, alergias y restricciones -->
+        <fieldset class="nutri-step" data-step="5">
+          <legend class="nutri-legend">5. Salud y restricciones</legend>
+          <p class="nutri-hint">Esta información se usa solo para adaptar las recomendaciones alimentarias y no reemplaza una consulta médica o nutricional profesional.</p>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Alergias o intolerancias alimentarias</span>
+            <div class="check-grid">
+              <label class="check-row"><input type="checkbox" name="nutriAlergia" value="Frutos secos"><span>Frutos secos</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriAlergia" value="Mariscos"><span>Mariscos</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriAlergia" value="Lactosa"><span>Lactosa</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriAlergia" value="Gluten"><span>Gluten</span></label>
+            </div>
+            <label class="sr-only" for="nutriAlergiaOtra">Otra alergia</label>
+            <input class="modal-input" type="text" id="nutriAlergiaOtra" placeholder="Otra alergia o intolerancia (opcional)">
+          </div>
+          <div class="nutri-group">
+            <label class="nutri-field-label" for="nutriRestriccion">Restricción o estilo alimentario</label>
+            <select class="modal-input" id="nutriRestriccion" required>
+              <option value="" disabled selected>Restricción alimentaria</option>
+              <option>Ninguna</option>
+              <option>Vegetariano</option>
+              <option>Vegano</option>
+              <option>Sin gluten</option>
+              <option>Otra</option>
+            </select>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Condiciones de salud relevantes para la dieta</span>
+            <div class="check-grid">
+              <label class="check-row"><input type="checkbox" name="nutriCondicion" value="Diabetes"><span>Diabetes</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriCondicion" value="Hipertensión"><span>Hipertensión</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriCondicion" value="Problema tiroideo"><span>Problema tiroideo</span></label>
+              <label class="check-row"><input type="checkbox" name="nutriCondicion" value="Prefiero no decir"><span>Prefiero no decir</span></label>
+            </div>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">¿Tomás alguna medicación de forma regular?</span>
+            <div class="scale-row" style="justify-content:flex-start;gap:20px">
+              <label class="scale-opt scale-opt-wide"><input type="radio" name="nutriMedicacion" value="Sí" required><span>Sí</span></label>
+              <label class="scale-opt scale-opt-wide"><input type="radio" name="nutriMedicacion" value="No"><span>No</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- PASO 6 — Percepción actual -->
+        <fieldset class="nutri-step" data-step="6">
+          <legend class="nutri-legend">6. Cómo te sentís día a día</legend>
+          <p class="nutri-hint">Del 1 (nunca / muy baja) al 5 (siempre / muy alta).</p>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Nivel de estrés percibido</span>
+            <div class="scale-row" data-scale="nutriEstres">
+              <label class="scale-opt"><input type="radio" name="nutriEstres" value="1" required><span>1</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriEstres" value="2"><span>2</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriEstres" value="3"><span>3</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriEstres" value="4"><span>4</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriEstres" value="5"><span>5</span></label>
+            </div>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Fatiga mental durante el día</span>
+            <div class="scale-row" data-scale="nutriFatiga">
+              <label class="scale-opt"><input type="radio" name="nutriFatiga" value="1" required><span>1</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriFatiga" value="2"><span>2</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriFatiga" value="3"><span>3</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriFatiga" value="4"><span>4</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriFatiga" value="5"><span>5</span></label>
+            </div>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Dificultad para concentrarte</span>
+            <div class="scale-row" data-scale="nutriConcentracion">
+              <label class="scale-opt"><input type="radio" name="nutriConcentracion" value="1" required><span>1</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriConcentracion" value="2"><span>2</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriConcentracion" value="3"><span>3</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriConcentracion" value="4"><span>4</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriConcentracion" value="5"><span>5</span></label>
+            </div>
+          </div>
+          <div class="nutri-group">
+            <span class="nutri-field-label">Olvidos o dificultad para retener información</span>
+            <div class="scale-row" data-scale="nutriOlvidos">
+              <label class="scale-opt"><input type="radio" name="nutriOlvidos" value="1" required><span>1</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriOlvidos" value="2"><span>2</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriOlvidos" value="3"><span>3</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriOlvidos" value="4"><span>4</span></label>
+              <label class="scale-opt"><input type="radio" name="nutriOlvidos" value="5"><span>5</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- PASO 7 — Preferencias y cierre -->
+        <fieldset class="nutri-step" data-step="7">
+          <legend class="nutri-legend">7. Preferencias</legend>
+          <div class="nutri-group">
+            <label class="sr-only" for="nutriDisgustos">Alimentos que no te gustan</label>
+            <textarea class="modal-input" id="nutriDisgustos" rows="3" placeholder="Alimentos que no te gustan o no vas a comer (opcional)"></textarea>
+          </div>
+          <div class="nutri-group">
+            <label class="nutri-field-label" for="nutriPresupuesto">Presupuesto aproximado para alimentación especializada</label>
+            <select class="modal-input" id="nutriPresupuesto" required>
+              <option value="" disabled selected>Presupuesto</option>
+              <option>Ajustado</option>
+              <option>Medio</option>
+              <option>Sin restricción</option>
+            </select>
+          </div>
+          <label class="check-row" style="margin-top:6px">
+            <input type="checkbox" id="nutriConsentimiento" required>
+            <span>Acepto que SINAPTIX use esta información para generar mi propuesta de nutrición especializada.</span>
+          </label>
+        </fieldset>
+
+        <!-- PASO 8 — Resultado -->
+        <fieldset class="nutri-step" data-step="8">
+          <legend class="nutri-legend">8. Tu propuesta</legend>
+          <div class="nutri-summary" id="nutriResumen"></div>
+        </fieldset>
+
+        <p class="nutri-error" id="nutriError"></p>
+
+        <div class="nutri-nav">
+          <button type="button" class="btn btn-ghost" id="nutriBack">Atrás</button>
+          <button type="button" class="btn btn-solid" id="nutriNext">Siguiente</button>
+          <button type="submit" class="btn btn-solid hidden" id="nutriSubmit">Guardar mi plan</button>
+        </div>
+        <p class="modal-result" id="nutriResultado">Tu plan quedó guardado. ✓</p>
+      </form>
     </div>
 
     <footer>
@@ -78,6 +413,7 @@
 </section>
 
 <script src="js/nutricion-planes.js"></script>
+<script src="js/nutricion-wizard.js"></script>
 <script src="js/mi-plan.js"></script>
 </body>
 </html>

@@ -5,6 +5,42 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Generar mi plan" ahora es inline en mi-plan.html (no redirige a index.html)
+
+- Feedback del usuario sobre el patch anterior: al tocar "Generar mi plan"
+  no quería que lo mandara a `index.html`, sino que la encuesta apareciera
+  ahí mismo, "como una sección que ocupe la pantalla normal para que haya
+  más visión" (en vez del modal chico de antes).
+- **Nuevo `js/nutricion-wizard.js`** (compartido): se extrajo de
+  `js/script.js` el motor de navegación del wizard (pasos, validación,
+  recolección de datos, render del resumen) — sin el manejo de `submit` ni
+  de apertura/cierre, que sigue siendo distinto por página. Se carga
+  después de `js/nutricion-planes.js` y antes de `js/script.js` /
+  `js/mi-plan.js`, en ambas páginas.
+- **`mi-plan.html`**: se agregó `#nutriInline`, un duplicado del formulario
+  de 8 pasos del modal de `index.html` (mismos `id`), pero SIN el
+  contenedor `.modal-card` — vive suelto dentro de la página (`.wrap`,
+  `max-width:640px` en el form) para que se vea como una sección normal del
+  sitio y no como un popup chico. "Generar mi plan" ahora es un `<button>`
+  que oculta `#miPlanConSesion` y muestra `#nutriInline` (antes era un link
+  a `index.html?generarPlan=1`). Se agregó "← Volver a Mi plan"
+  (`#nutriInlineVolver`) para cancelar sin guardar.
+- **`js/mi-plan.js`**: nuevo submit handler para el `#formNutricion` de esta
+  página — como solo se llega a este botón con sesión ya iniciada, siempre
+  guarda en `localStorage` y vuelve a pintar "Mi plan" en el momento
+  (`pintarMiPlan(user)` de nuevo) sin recargar ni redirigir.
+- **`index.html` / `js/script.js`**: se quitó el bloque que abría el modal
+  automáticamente vía `?generarPlan=1` (ya no hace falta, `mi-plan.html` no
+  redirige más para esto). El modal de nutrición de `index.html` sigue
+  funcionando exactamente igual que antes (mismo botón "Generar nutrición
+  especializada", mismo modal).
+- Probado con Playwright: en `mi-plan.html`, con sesión simulada, se
+  completó la encuesta de punta a punta (los 8 pasos) sin salir nunca de
+  `mi-plan.html` ni recargar la página, y al guardar se vuelve a "Mi plan"
+  con el objetivo y el detalle del plan ya actualizados. También se
+  verificó que `index.html` sigue abriendo su modal de nutrición sin
+  cambios. Cero errores de consola en ambos flujos.
+
 ## 2026-09-13 — "Mi plan" pasa a ser una pantalla propia (`mi-plan.html`)
 
 - El usuario pidió que la sección "Mi plan" (antes visible/oculta dentro de

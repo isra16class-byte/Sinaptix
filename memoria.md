@@ -147,12 +147,42 @@ separada, `mi-plan.html`, con su propia URL. Si se retoma trabajo sobre
   (`resetNutriWizard()`+`openModal('modalNutricion')`) y limpia el
   parámetro de la URL con `history.replaceState` para que un refresh no
   reabra el modal solo.
-- **Pendiente/a decisión futura, no bloqueante**: `mi-plan.html` no lleva
-  decoración (rayones/blobs) ni sangrado a borde de pantalla como el resto
-  de `index.html` — es intencional para mantener el patch enfocado en la
-  funcionalidad; si se quiere alinear visualmente con el resto del sitio
-  (mismos `.deco-scribble`, mismo `--vw100`, etc.), es un ajuste de estilo
-  aparte, no un bug.
+- **Botón "Generar mi plan" en `mi-plan.html`**: la encuesta se muestra
+  **inline, en la misma pantalla** (no un modal chico ni una redirección a
+  `index.html`) — el usuario pidió expresamente que no lo mandara a la
+  página de inicio, sino que la encuesta apareciera ahí mismo, "como una
+  sección que ocupe la pantalla normal para que haya más visión". El botón
+  oculta `#miPlanConSesion` y muestra `#nutriInline` (mismo formulario que
+  el modal de `index.html`, mismos `id`, sin el contenedor `.modal-card` —
+  vive suelto dentro de `.wrap`, con `max-width:640px` en el form para
+  legibilidad pero sin el límite de alto/ancho de un modal). Un botón
+  "← Volver a Mi plan" (`#nutriInlineVolver`) permite cancelar sin guardar.
+  Al enviar, como esta pantalla solo es alcanzable con sesión ya iniciada,
+  siempre se guarda en `localStorage` y se vuelve a pintar "Mi plan" en el
+  momento (llamando de nuevo a `pintarMiPlan(user)`) sin recargar ni
+  redirigir a ningún lado.
+- **`js/nutricion-wizard.js`** (nuevo, compartido): se extrajo de
+  `js/script.js` el "motor" del wizard — navegación entre pasos
+  (`nutriShowStep`, `resetNutriWizard`), validación (`nutriValidateStep`),
+  recolección de datos (`nutriCollectData`, `nutriGetChecked`,
+  `nutriGetRadio`) y render del resumen (`nutriRenderResumen`) — porque
+  ahora dos lugares distintos (el modal de `index.html` y la sección
+  inline de `mi-plan.html`) necesitan la misma navegación de pasos sobre
+  `#formNutricion`. Este archivo **no** decide qué pasa al enviar el
+  formulario (`submit`) ni cómo se abre — eso es distinto en cada página y
+  se define en `js/script.js` (index.html) / `js/mi-plan.js` (mi-plan.html)
+  respectivamente. Debe cargarse después de `js/nutricion-planes.js` (usa
+  `nutriBuildResumenHTML`) y antes de `js/script.js` / `js/mi-plan.js`, y
+  después del HTML del formulario (asume que `#formNutricion` ya existe en
+  el DOM al cargar, igual que el resto de los scripts de este sitio).
+- **Duplicación deliberada**: el HTML de las 8 fieldsets del formulario
+  (`#formNutricion`) está duplicado entre `index.html` (dentro del modal) y
+  `mi-plan.html` (inline) — es contenido estático, no hay motor de
+  templates en este sitio (sin build step), así que si se agrega/cambia un
+  campo de la encuesta hay que replicarlo a mano en las dos páginas. Los
+  `id` de los campos son los mismos en ambas (no hay colisión porque viven
+  en documentos HTML distintos); `nutriCollectData()` (en
+  `nutricion-wizard.js`) los lee por `id` sin importar en qué página está.
 
 **Estilo visual (vigente desde el rediseño visual del sitio)**: el sitio se
 rediseñó a partir de una referencia visual clara y editorial. Antes tenía un
