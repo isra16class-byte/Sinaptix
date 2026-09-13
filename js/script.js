@@ -142,7 +142,13 @@
     const cat = imcCategoria(imc).cat;
 
     // Guardado local (persiste entre visitas en este navegador)
-    localStorage.setItem('sinaptix_antropometria', JSON.stringify({peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()}));
+    const datosAntro = {peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()};
+    localStorage.setItem('sinaptix_antropometria', JSON.stringify(datosAntro));
+    // Si hay sesión iniciada, además queda guardado en el servidor (ver
+    // js/plan-sync.js) para que viaje entre dispositivos — si no hay
+    // sesión, planSyncGuardar no hace nada y el dato queda solo local,
+    // como pasaba antes de que existiera este archivo.
+    if(typeof planSyncGuardar === 'function') planSyncGuardar('antropometria', datosAntro);
     if(typeof renderMethodImc === 'function') renderMethodImc();
 
     res.style.display='block';
@@ -207,12 +213,16 @@
       // nutriGuardarAntropometriaSiFalta en js/nutricion-planes.js.
       nutriGuardarAntropometriaSiFalta(d);
 
-      localStorage.setItem('sinaptix_objetivo', JSON.stringify({
+      const datosObjetivo = {
         objetivo: objetivos.join(' + '),
         email: d.email,
         encuesta: d,
         fecha: new Date().toISOString()
-      }));
+      };
+      localStorage.setItem('sinaptix_objetivo', JSON.stringify(datosObjetivo));
+      // Sincroniza con el servidor si hay sesión (ver js/plan-sync.js);
+      // sin sesión no hace nada, igual que antes de este archivo.
+      if(typeof planSyncGuardar === 'function') planSyncGuardar('objetivo', datosObjetivo);
 
       const res = document.getElementById('nutriResultado');
       res.style.display='block';
@@ -470,9 +480,11 @@
         return;
       }
 
-      localStorage.setItem('sinaptix_reevaluacion', JSON.stringify({
-        estres, fatiga, concentracion, olvidos, fecha: new Date().toISOString()
-      }));
+      const datosReeval = {estres, fatiga, concentracion, olvidos, fecha: new Date().toISOString()};
+      localStorage.setItem('sinaptix_reevaluacion', JSON.stringify(datosReeval));
+      // Sincroniza con el servidor si hay sesión (ver js/plan-sync.js);
+      // sin sesión no hace nada, igual que antes de este archivo.
+      if(typeof planSyncGuardar === 'function') planSyncGuardar('reevaluacion', datosReeval);
 
       res.style.display='block';
       res.style.color='';

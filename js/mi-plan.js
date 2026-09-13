@@ -94,7 +94,18 @@ if(window.netlifyIdentity){
     if(sinSesionEl) sinSesionEl.classList.add('hidden');
     if(conSesionEl) conSesionEl.classList.remove('hidden');
     if(btnLogoutNav) btnLogoutNav.classList.remove('hidden');
-    pintarMiPlan(user);
+    // Antes de pintar, trae del servidor lo que haya guardado ese usuario
+    // (ver js/plan-sync.js) y lo mezcla en localStorage — así "Mi plan" se
+    // ve igual entrando desde otro dispositivo, no solo desde este
+    // navegador. planSyncCargar nunca rechaza la promesa (atrapa sus
+    // propios errores), así que no hace falta un .catch acá; si falla o
+    // no hay nada en el servidor todavía, se pinta con lo que ya hubiera
+    // localmente, como pasaba antes de que existiera este sync.
+    if(typeof planSyncCargar === 'function'){
+      planSyncCargar().then(function(){ pintarMiPlan(user); });
+    } else {
+      pintarMiPlan(user);
+    }
   }
 
   function mostrarEstadoSinSesion(){
@@ -153,12 +164,17 @@ if(window.netlifyIdentity){
       // Ver nutriGuardarAntropometriaSiFalta en js/nutricion-planes.js.
       nutriGuardarAntropometriaSiFalta(d);
 
-      localStorage.setItem('sinaptix_objetivo', JSON.stringify({
+      const datosObjetivo = {
         objetivo: objetivos.join(' + '),
         email: d.email,
         encuesta: d,
         fecha: new Date().toISOString()
-      }));
+      };
+      localStorage.setItem('sinaptix_objetivo', JSON.stringify(datosObjetivo));
+      // Sincroniza con el servidor (ver js/plan-sync.js) — a esta pantalla
+      // solo se llega con sesión ya iniciada, así que siempre hay a dónde
+      // sincronizar.
+      if(typeof planSyncGuardar === 'function') planSyncGuardar('objetivo', datosObjetivo);
 
       const res = document.getElementById('nutriResultado');
       if(res){

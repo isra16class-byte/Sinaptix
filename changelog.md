@@ -5,6 +5,52 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Backend real para "Mi plan": Netlify DB + Netlify Functions
+
+- Implementa el pendiente conocido "backend real para Mi plan" (ver
+  `memoria.md`): los 3 bloques de datos (antropometría, objetivo/plan,
+  reevaluación) ahora se sincronizan con el servidor cuando hay sesión
+  iniciada, además de seguir guardándose en `localStorage` como hasta
+  ahora — `localStorage` sigue siendo lo único que lee el resto del sitio,
+  esto es un espejo agregado encima, no un reemplazo.
+- **Nuevo `package.json`** (no existía) declarando `@netlify/neon` como
+  única dependencia — el sitio sigue sin build step propio. Se agregó
+  `.gitignore` con `node_modules/` por lo mismo. Al tener esa dependencia,
+  Netlify auto-provisiona Netlify DB (Postgres/Neon) y su variable de
+  entorno en el próximo build/deploy, sin pasos manuales en el dashboard.
+- **Nueva `netlify/functions/plan.js`**: `GET` devuelve los datos guardados
+  del usuario autenticado, `POST` hace upsert de un solo bloque por vez
+  (`antropometria` / `objetivo` / `reevaluacion`, validado contra una lista
+  fija). Autenticación vía `context.clientContext.user` (Netlify decodifica
+  el JWT de Identity solo con que el cliente mande el header
+  `Authorization`). Tabla `mi_plan` (una fila por usuario) creada con
+  `CREATE TABLE IF NOT EXISTS` en cada invocación, sin migraciones aparte.
+- **`netlify.toml`**: se agregó `[functions]` con
+  `directory = "netlify/functions"` y `node_bundler = "esbuild"`.
+- **Nuevo `js/plan-sync.js`** (compartido entre `index.html` y
+  `mi-plan.html`): `planSyncGuardar(tipo, datos)` (fire-and-forget, nunca
+  bloquea el formulario que la llama) y `planSyncCargar()` (trae y mezcla
+  en `localStorage` lo que haya en el servidor, el servidor manda).
+- **Enganchado en los 3 puntos existentes de guardado** (`js/script.js`:
+  `#formAntro`, `#formNutricion`, `#formReevaluacion`; `js/mi-plan.js`: el
+  wizard inline de `mi-plan.html`; `js/nutricion-planes.js`:
+  `nutriGuardarAntropometriaSiFalta`) sin cambiar la lógica que ya existía
+  en ninguno, solo sumando la llamada de sincronización justo después de
+  cada `localStorage.setItem` que ya estaba.
+- **`planSyncCargar()` enganchado en `js/mi-plan.js`**, dentro de
+  `mostrarEstadoConSesion` (se llama tanto en `init` como en `login` de
+  Identity): ahora espera a traer los datos del servidor antes de llamar a
+  `pintarMiPlan`. No se tocó `index.html`/`script.js` para esto porque esa
+  página ya redirige a `mi-plan.html` al hacer login, que es donde vive
+  toda la lectura de "Mi plan".
+- **Pendiente de verificación real, no se pudo hacer desde esta sesión**
+  (sin cuenta de Netlify ni deploy real disponibles acá): que la base se
+  autoprovisione como documenta Netlify, que `context.clientContext.user`
+  llegue poblado con un JWT real, que el upsert con columna interpolada
+  funcione contra Neon, y que "Mi plan" persista de verdad entre dos
+  dispositivos con la misma cuenta. Ver el detalle completo en
+  `memoria.md`, sección "Backend real para Mi plan".
+
 ## 2026-09-13 — "Mi plan": dos bugs reales que impedían que se pareciera a la referencia
 
 - El usuario pidió explícitamente diagnosticar por qué el resultado no se

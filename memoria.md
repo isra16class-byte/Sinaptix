@@ -1556,10 +1556,131 @@ usan la paleta de marca (`--navy-bright`, `--green`, `--gold`, `--purple`).
   del texto, y que el icono de "neuronas" (con efecto vidrio) se vea bien
   sobre el fondo claro de `.stat-box`.
 
+## Backend real para Mi plan (Netlify DB + Netlify Functions)
+
+Implementa el punto 1 de "Próximos pasos" (README.md): los 3 bloques de
+datos de "Mi plan" (`sinaptix_antropometria`, `sinaptix_objetivo`,
+`sinaptix_reevaluacion`) ahora también se guardan en el servidor cuando hay
+sesión iniciada, no solo en `localStorage`. Diseño elegido: **`localStorage`
+sigue siendo la única fuente que lee el resto del sitio** (`pintarMiPlan`,
+`renderMethodGauges`, el medidor de IMC, etc.) — no se tocó ninguna de esas
+lecturas. Lo que se agregó es un "espejo" hacia el servidor por encima de
+eso, no un reemplazo.
+
+- **`netlify/functions/plan.js`**: una sola función, `GET` devuelve
+  `{antropometria, objetivo, reevaluacion}` (solo las claves que ese
+  usuario ya guardó — nunca `null` explícito, para que el cliente no pise
+  localStorage con vacío), `POST` recibe `{tipo, datos}` y hace upsert de
+  **una sola columna** (`tipo` es uno de `antropometria` / `objetivo` /
+  `reevaluacion`, validado contra una lista fija antes de interpolarlo en
+  el SQL — no es una columna arbitraria del body) sin tocar las otras dos
+  que ya tuviera guardadas ese usuario, porque cada formulario del sitio
+  llama a esto en un momento distinto. La tabla (`mi_plan`, una fila por
+  usuario, `user_id` = `sub` del JWT de Identity como primary key) se crea
+  con `CREATE TABLE IF NOT EXISTS` en cada invocación en vez de una
+  migración aparte — no hay build step ni herramienta de migraciones en
+  este repo (sitio 100% estático) y el costo de ese chequeo es
+  despreciable para una tabla de un registro por usuario. Si el esquema
+  crece, conviene pasar a una migración real con `drizzle-kit` (ver docs
+  de Netlify DB) en vez de seguir agregando `IF NOT EXISTS` sueltos.
+- **Autenticación**: la función lee `context.clientContext.user` — Netlify
+  decodifica el JWT de Identity automáticamente cuando la request trae el
+  header `Authorization: Bearer <access_token>` (lo manda
+  `js/plan-sync.js`), así que la función nunca valida la firma a mano, eso
+  ya lo resolvió Netlify antes de invocarla. Sin ese header (o sin sesión
+  del lado del cliente), `context.clientContext.user` viene `undefined` y
+  la función devuelve 401. **No verificado en un deploy real** — todo lo
+  que se sabe de este mecanismo viene de la documentación de Netlify y de
+  hilos de su foro de soporte, no de una prueba end-to-end acá (no hay
+  cuenta de Netlify ni sitio desplegado disponibles desde este entorno).
+- **Base de datos**: Netlify DB (Postgres, por debajo es Neon), acceso vía
+  el paquete oficial `@netlify/neon` (`const sql = neon()` — no hace falta
+  pasar ninguna connection string a mano, se autoconfigura con una
+  variable de entorno que Netlify inyecta sola). **Provisionamiento
+  automático**: al tener `@netlify/neon` listado en `package.json` (que no
+  existía en el repo hasta esta sesión — se creó solo con esa dependencia,
+  el sitio sigue sin build step propio, ver `netlify.toml`), Netlify crea
+  la base y la variable de entorno la primera vez que corre `netlify dev`,
+  `netlify build`, o un build disparado por push — no hace falta ningún
+  paso manual en el dashboard, a diferencia de "Enable Identity" que sí
+  sigue siendo manual (ver sección de requisitos del README). Se agregó
+  `.gitignore` (no existía) con `node_modules/` porque ahora hay
+  `package.json`/`package-lock.json` versionados.
+- **`netlify.toml`**: se agregó el bloque `[functions]` con
+  `directory = "netlify/functions"` y `node_bundler = "esbuild"` — Netlify
+  auto-detecta esa carpeta igual sin el bloque, pero se dejó explícito.
+- **`js/plan-sync.js`** (nuevo, compartido entre `index.html` y
+  `mi-plan.html`, se carga después de `nutricion-wizard.js` y antes de
+  `script.js`/`mi-plan.js` — mismo orden que ya usa `nutricion-planes.js`):
+  - `planSyncGuardar(tipo, datos)`: llamada "fire and forget" — si hay
+    sesión, manda `{tipo, datos}` por `POST` a la función; si falla
+    (sin red, función caída), solo un `console.warn`, nunca bloquea el
+    formulario que la llamó. Sin sesión, no hace nada (el dato ya quedó en
+    `localStorage` por el código que ya existía antes de esta sesión).
+  - `planSyncCargar()`: `GET` a la función, mezcla la respuesta en
+    `localStorage` (el servidor manda: si trae un bloque, pisa el que
+    hubiera en este navegador — puede venir de otro dispositivo; un bloque
+    ausente en la respuesta no borra nada local). Nunca rechaza la
+    promesa, atrapa sus propios errores y devuelve `null` si algo falla,
+    para que quien la llame no necesite un `.catch` aparte.
+- **Puntos donde se enganchó `planSyncGuardar`** (los 3 mismos lugares que
+  ya escribían en `localStorage`, sin cambiar nada de su lógica existente,
+  solo agregando la llamada justo después del `setItem`):
+  - `js/script.js`, submit de `#formAntro` (antropometría, `index.html`).
+  - `js/script.js`, submit de `#formNutricion` (objetivo/plan, `index.html`).
+  - `js/script.js`, submit de `#formReevaluacion` (reevaluación).
+  - `js/mi-plan.js`, submit del wizard inline de nutrición en
+    `mi-plan.html` (objetivo/plan).
+  - `js/nutricion-planes.js`, `nutriGuardarAntropometriaSiFalta` (el
+    autoguardado de antropometría desde el paso 2 de la encuesta cuando
+    todavía no había un registro previo) — esta función ya tenía un efecto
+    secundario de `localStorage` antes de esta sesión (ver su comentario
+    original más arriba en este archivo), así que sumarle el de red acá es
+    consistente con eso, no una excepción nueva a "son funciones puras".
+- **Punto donde se enganchó `planSyncCargar`**: `js/mi-plan.js`,
+  `mostrarEstadoConSesion` (se llama tanto desde el evento `init` como
+  `login` de Identity) — ahora es quien decide cuándo pintar: espera a
+  `planSyncCargar()` (que nunca falla hacia afuera) y recién después llama
+  a `pintarMiPlan(user)`, para que la pantalla se pinte con los datos ya
+  mezclados del servidor. No se agregó en `index.html`/`script.js` porque
+  esa página ya no muestra el contenido de "Mi plan" in-place — al hacer
+  login ahí se redirige directo a `mi-plan.html` (ver más arriba en este
+  mismo archivo), que es donde vive toda la lectura.
+- **Por qué no se creó un archivo de migraciones ni un ORM (Drizzle)**:
+  para una sola tabla de 6 columnas y 3 tipos de upsert, `CREATE TABLE IF
+  NOT EXISTS` + SQL crudo via `@netlify/neon` alcanza y evita sumar una
+  herramienta más a un repo que hasta esta sesión no tenía build step ni
+  `package.json` en absoluto. Si en el futuro se agregan más tablas,
+  relaciones, o necesita rollback de esquema, ahí sí conviene migrar a
+  Drizzle (la guía de Netlify DB ya trae ese camino armado).
+- **Pendiente de verificación real** (no se pudo hacer desde esta sesión,
+  sin cuenta de Netlify ni deploy disponibles acá):
+  - Que `netlify dev`/`netlify build`/el primer push realmente
+    autoprovisionen la base y la variable de entorno como documenta
+    Netlify, sin ningún paso manual adicional.
+  - Que `context.clientContext.user` llegue poblado de verdad en un
+    request real con el JWT de Identity vigente (todo lo de esta sección
+    viene de documentación y foros, no de una prueba propia).
+  - Que el upsert con nombre de columna interpolado (`tipo`) funcione tal
+    cual contra Neon — la sintaxis se armó a mano siguiendo el patrón de
+    `@netlify/neon` de los docs, pero nunca se ejecutó contra una base
+    real desde acá.
+  - Que "Mi plan" persista de verdad entre dos navegadores/dispositivos
+    distintos logueados con la misma cuenta, una vez desplegado.
+  - Costo/consumo de créditos de Functions + Netlify DB en el plan usado,
+    sobre todo porque `ensureTabla` corre un `CREATE TABLE IF NOT EXISTS`
+    en cada invocación (barato, pero es una query de más por request que
+    vale la pena confirmar que no pesa en la práctica).
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
-- Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos
-  antropométricos y el objetivo cognitivo solo viven en `localStorage`.
+- ~~Backend real para "Mi plan" (Netlify Database + Functions)~~ —
+  implementado, ver sección "Backend real para Mi plan (Netlify DB +
+  Netlify Functions)" más abajo. **Sigue pendiente la verificación en un
+  deploy real de Netlify** (provisionamiento automático de la base,
+  decodificación del JWT en la función, persistencia entre dos
+  dispositivos con la misma cuenta) — no se pudo probar desde esta sesión
+  por no tener acceso a una cuenta de Netlify ni a Postgres real acá.
 - **Descartado**: trazos tipo "marcador" dispersos por el sitio (estilo
   ilustrado, en verde de marca). Se probó en una sesión, se revirtió por no
   convencer visualmente y por romper el layout del título de Visión al

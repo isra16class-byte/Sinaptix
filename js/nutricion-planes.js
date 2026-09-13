@@ -240,9 +240,13 @@ function nutriGuardarAntropometriaSiFalta(d){
   const talla = tallaCm/100;
   const imc = peso/(talla*talla);
 
-  localStorage.setItem('sinaptix_antropometria', JSON.stringify({
-    peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()
-  }));
+  const datosAntro = {peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()};
+  localStorage.setItem('sinaptix_antropometria', JSON.stringify(datosAntro));
+  // Mismo espejo hacia el servidor que #formAntro (ver js/plan-sync.js y
+  // js/script.js) — sin sesión no hace nada, y esta función ya tenía este
+  // único efecto secundario de localStorage antes de que existiera
+  // plan-sync.js, así que agregar el de red acá es consistente con eso.
+  if(typeof planSyncGuardar === 'function') planSyncGuardar('antropometria', datosAntro);
   return true;
 }
 
