@@ -1202,6 +1202,54 @@ ninguno — se veía plana/genérica en comparación.
   `.deco-scribble` ya se ocultan solas en `max-width:720px`, pero no se
   vio en pantalla real).
 
+## Iconos ilustrados en secciones 02 y 04 (`img/Iconos/`)
+
+Los iconos de línea SVG originales de la sección "Nuestra visión" (que no
+tenía iconos, solo números) y "Pilares nutricionales" (4 `<svg
+class="pillar-icon">` inline) se reemplazaron por un set de 8 iconos
+ilustrados estilo "glossy 3D gradient bubble" (parecido a los iconos de
+producto de Firefox/Mozilla), generados con Gemini a partir de prompts que
+usan la paleta de marca (`--navy-bright`, `--green`, `--gold`, `--purple`).
+
+- **Archivos fuente en `img/Iconos/`**: los 8 JPG originales que bajó el
+  usuario de Gemini (`Gemini_Generated_Image_*.jpg`, nombres genéricos sin
+  relación con el contenido) se conservan como referencia/backup por si
+  hay que regenerar algo, pero **no se usan directamente en el sitio**.
+- **Archivos usados en el sitio** (mismo directorio, formato WebP,
+  256×256, con transparencia real): `icon-energia-cerebral.webp`,
+  `icon-neuronas.webp`, `icon-semanas.webp`, `icon-acompanamiento.webp`
+  (sección 02) e `icon-omega3.webp`, `icon-antioxidantes.webp`,
+  `icon-complejo-b.webp`, `icon-hidratacion.webp` (sección 04).
+- **Por qué hubo que procesarlos**: los JPG de Gemini no traen canal alfa
+  — lo que se ve como "fondo transparente" en la vista previa de Gemini es
+  en realidad un patrón de ajedrez gris/blanco **horneado en los píxeles
+  de la imagen**. Se limpiaron con un script Python (Pillow + numpy +
+  scipy) que detecta los 2 tonos de ajedrez por imagen (no son
+  exactamente iguales entre archivos — uno de los iconos tiene además un
+  efecto de esfera de vidrio semitransparente que deja ver el ajedrez a
+  través, eso sí es parte del diseño original y se dejó tal cual), hace
+  flood-fill desde los bordes, cierra huecos de ruido de compresión JPEG y
+  erosiona 2px el borde para quitar el flequillo punteado remanente. El
+  script no quedó guardado en el repo (se corrió una sola vez sobre los
+  JPG ya commiteados); si hace falta reprocesar algún icono nuevo del
+  mismo estilo, recrear la lógica: detectar color de ajedrez por imagen
+  (no asumir un valor fijo), usar `scipy.ndimage.binary_closing(...,
+  border_value=1)` — **ojo con el `border_value` por defecto (0), rompe el
+  flood-fill en el borde real de la imagen** —, y erosionar ~2px el
+  primer plano antes de exportar a WebP.
+- **CSS**: `.stat-icon` (40×40, `margin-bottom:14px`, dentro de
+  `.stat-box`) y `.pillar-icon-img` (56×56, `object-fit:contain`, dentro
+  de `.pillar`, que ya es flex-column con `gap:16px` así que no hace
+  falta margin manual). La clase vieja `.pillar-icon` (para los SVG de
+  línea) se eliminó de `css/styles.css`.
+- **Pendiente de verificación visual real**: esta sesión no llegó a
+  confirmar en navegador (ni con `wkhtmltoimage` ni Playwright) que los 8
+  iconos se vean bien alineados y con buen contraste dentro de
+  `.stat-box`/`.pillar`. Revisar sobre todo que el `object-fit:contain` de
+  `.pillar-icon-img` no deje los iconos redondos con bordes raros al lado
+  del texto, y que el icono de "neuronas" (con efecto vidrio) se vea bien
+  sobre el fondo claro de `.stat-box`.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

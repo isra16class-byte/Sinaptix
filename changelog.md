@@ -5,6 +5,51 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Iconos ilustrados en secciones 02 y 04
+
+- Se reemplazan los iconos de dos secciones de `index.html` por un set de
+  8 iconos ilustrados (estilo "glossy 3D gradient bubble", generados con
+  Gemini a partir de un prompt con la paleta de marca) en vez de los SVG
+  de línea que había antes.
+- **Sección 02 (Nuestra visión)**: se agrega un `<img class="stat-icon">`
+  dentro de cada una de las 4 `.stat-box` (antes no tenían icono, solo el
+  número): `icon-energia-cerebral.webp` (20%), `icon-neuronas.webp` (86B),
+  `icon-semanas.webp` (4–6), `icon-acompanamiento.webp` (1:1).
+- **Sección 04 (Pilares nutricionales)**: se reemplazan los 4
+  `<svg class="pillar-icon">` inline por `<img class="pillar-icon-img">`:
+  `icon-omega3.webp`, `icon-antioxidantes.webp`, `icon-complejo-b.webp`,
+  `icon-hidratacion.webp`.
+- Los 8 archivos originales que bajó el usuario de Gemini
+  (`img/Iconos/Gemini_Generated_Image_*.jpg`) eran JPG de 1024×1024 sin
+  canal alfa real: el "fondo transparente" que mostraba la vista previa de
+  Gemini estaba **horneado como píxeles grises/blancos de ajedrez dentro
+  de la propia imagen**. Se procesaron con un script Python
+  (numpy+scipy+Pillow) que: detecta los 2 tonos de ajedrez por imagen
+  (varían entre archivos), hace flood-fill desde los bordes para marcarlos
+  como fondo, cierra huecos de ruido de compresión JPEG con
+  `binary_closing(..., border_value=1)` (ver nota abajo), erosiona 2px el
+  borde del primer plano para comer el flequillo punteado remanente,
+  suaviza el alfa con `GaussianBlur(1.5)`, recorta al bounding box y
+  reescala a 256×256. Resultado: WebP con transparencia real, ~13–18KB
+  cada uno (vs. 500–630KB del JPG original).
+- **Bug encontrado y corregido durante el procesamiento**: `scipy.ndimage.
+  binary_closing` con su `border_value` por defecto (0) erosiona
+  incorrectamente el borde real de la imagen (trata todo lo que está fuera
+  del array como fondo/falso), lo que rompía la conexión del flood-fill al
+  borde y dejaba sin quitar el ajedrez completo en algunas imágenes (pasó
+  con el icono de "neuronas"). Se resuelve pasando `border_value=1`.
+- Nuevas clases CSS en `css/styles.css`: `.stat-icon` (40×40,
+  `margin-bottom:14px`) y `.pillar-icon-img` (56×56,
+  `object-fit:contain`). Se elimina `.pillar-icon` (ya no se usa, era para
+  los SVG de línea viejos).
+- Falta 1 concepto del set original de 8 (Antioxidantes y polifenoles) en
+  la primera tanda de imágenes que subió el usuario; se generó y subió por
+  separado en un segundo push antes de este patch.
+- **Pendiente**: no se hizo verificación visual real en navegador de esta
+  sesión (se priorizó cerrar el patch antes del límite de sesión). Revisar
+  en Netlify preview que los 8 iconos se vean bien alineados dentro de
+  `.stat-box` y `.pillar` antes de mergear a `master`.
+
 ## 2026-09-13 — Más frutas y decoraciones en "Mi plan"
 
 - El usuario vio el resultado de la entrada anterior ("Identidad visual de

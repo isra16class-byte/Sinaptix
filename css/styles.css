@@ -259,6 +259,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}
+.stat-icon{width:40px;height:40px;display:block;margin-bottom:14px;object-fit:contain}
 .stat-box:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
 .stat-box .num{font-family:var(--font-d);font-size:36px;font-weight:800;color:var(--purple);letter-spacing:-.02em}
 .stat-box .lab{font-family:var(--font-m);font-size:13px;color:var(--ink-soft);margin-top:8px;letter-spacing:0;font-weight:500}
@@ -358,7 +359,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease;
 }
 .pillar:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent}
-.pillar-icon{width:46px;height:46px;padding:8px;border-radius:12px;background:var(--purple-soft)}
+.pillar-icon-img{width:56px;height:56px;object-fit:contain}
 .pillar h3{font-size:18px;font-weight:700}
 .pillar p{font-size:14.5px;color:var(--ink-soft)}
 
