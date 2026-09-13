@@ -220,6 +220,77 @@ robustas ante cambios de texto (no usan coordenadas absolutas):
   patrón en otro título, confirmar primero que ese `h2` no use
   `display:flex`.
 
+## Encuesta y planes de nutrición especializada (`#modalNutricion`)
+
+El botón "Generar nutrición especializada" (`#btnNutricion`, en Método/
+lam-03) ya no abre un formulario de una sola pantalla (objetivo + email).
+Ahora abre un **wizard de 8 pasos** dentro del mismo `#modalNutricion`,
+con barra de progreso (`.nutri-progress`, puntos que se van marcando
+`done`/`active`) y botones Atrás/Siguiente (`#nutriBack`/`#nutriNext`),
+más un botón final `#nutriSubmit` en el paso 8.
+
+- **Pasos 1 a 7**: recolectan objetivo cognitivo, contacto, datos
+  personales/antropométricos, rutina y exigencia mental, hábitos
+  alimentarios actuales, salud/alergias/restricciones, percepción actual
+  (4 escalas 1-5: estrés, fatiga, dificultad de concentración, olvidos) y
+  preferencias/presupuesto + consentimiento. Cada paso valida sus campos
+  obligatorios con `:invalid` antes de dejar avanzar (`nutriValidateStep`
+  en `js/script.js`); los campos opcionales no llevan `required`.
+- **Paso 8**: muestra el plan resuelto (`nutriRenderResumen`), ya
+  ajustado a las respuestas — no es solo un mensaje de "solicitud
+  recibida", se arma en pantalla antes de enviar.
+- Si el usuario ya registró peso/talla/edad/sexo en "Registrar datos
+  antropométricos" (`#modalAntropometria`, guardado en
+  `sinaptix_antropometria`), el paso 2 se prellena automáticamente con
+  esos datos (`resetNutriWizard`, que corre cada vez que se abre el
+  modal) para no volver a pedirlos.
+
+**Los 4 planes en sí no cambiaron ni se descartaron** — siguen siendo los
+mismos 4 objetivos que ya existían en el select (`Mejorar concentración`,
+`Reducir fatiga mental`, `Sostener memoria de trabajo`, `Manejo de estrés
+mental`), ahora con contenido real por plan (`NUTRI_PLANES` en
+`js/script.js`): enfoque, nutrientes clave, alimentos a priorizar y a
+moderar. Se agregó una quinta opción al select, `"No estoy seguro / varios
+objetivos"`, que **no es un plan nuevo**: dispara
+`nutriResolverObjetivo`, que compara las 4 escalas del paso 6 y devuelve
+el/los plan(es) existentes con puntaje más alto (si hay empate, muestra
+más de uno).
+
+**Tabla de conexiones** (`nutriConstruirAjustes` / `nutriConstruirAvisos`
+en `js/script.js`) — así es como las respuestas modifican el plan antes
+de mostrarlo:
+- Alergias marcadas u "otra alergia" → nota de exclusión + sustitución
+  dentro del mismo grupo nutricional.
+- Restricción Vegetariano/Vegano → nota de sustitución de fuentes
+  animales por vegetales.
+- Restricción Sin gluten → nota de sustitución de cereales con gluten.
+- Presupuesto "Ajustado" → nota de reemplazo por alternativas económicas.
+- Tiempo para cocinar bajo / "como afuera" → nota de recetas
+  simplificadas.
+- Alimentos que no le gustan (texto libre) → se listan como excluidos.
+- Hora de mayor exigencia mental → nota de en qué momento del día se
+  ubica el snack de refuerzo.
+- Condición de salud marcada y/o medicación regular = Sí → **aviso**
+  (`.nutri-note`, fondo dorado) de validar el plan con un profesional
+  antes de aplicarlo — no bloquea el envío, solo lo marca.
+- Sueño <6h o calidad de sueño ≤2 → aviso de que el plan no sustituye
+  dormir lo suficiente.
+- Cafeína "4 o más al día" → aviso de reducir gradualmente.
+- Ultraprocesados "a diario" → aviso de transición gradual.
+
+**Envío**: al enviar el paso 8, se guarda todo en `localStorage` bajo
+`sinaptix_objetivo` (mismo key que antes, ahora con un campo `encuesta`
+adicional con todas las respuestas) y se arma un `mailto:` a
+`hola@sinaptix.com` con el resumen completo (datos + plan resuelto +
+ajustes + avisos), igual que el resto de formularios del sitio (no hay
+backend real todavía, ver "Pendientes conocidos").
+
+**Verificado con Playwright** en este entorno (servidor local +
+capturas): navegación entre pasos, validación por paso, resolución
+automática de "No estoy seguro", aplicación de ajustes/avisos, prellenado
+desde antropometría, y layout en viewport móvil (380px) — checkboxes en
+grilla de 2 columnas y escalas 1-5 en fila siguen siendo usables.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - Backend real para "Mi plan" (Netlify Database + Functions) — hoy los datos

@@ -347,3 +347,64 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
   font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--green);
   display:none;padding-top:4px;
 }
+
+/* ---------- ENCUESTA DE NUTRICIÓN ESPECIALIZADA (wizard) ---------- */
+.modal-card-wide{max-width:560px}
+
+.nutri-progress{display:flex;gap:6px;margin-bottom:22px}
+.nutri-progress .dot{flex:1;height:4px;border-radius:var(--radius-pill);background:var(--line)}
+.nutri-progress .dot.done{background:var(--purple)}
+.nutri-progress .dot.active{background:var(--gold)}
+
+.nutri-step{border:none;padding:0;margin:0;display:none;flex-direction:column;gap:14px}
+.nutri-step.active{display:flex}
+.nutri-legend{font-family:var(--font-m);font-size:12.5px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.03em;padding:0;margin-bottom:2px}
+
+.nutri-group{display:flex;flex-direction:column;gap:6px}
+.nutri-field-label{font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.nutri-hint{font-family:var(--font-m);font-size:12px;color:var(--ink-faint);margin:-4px 0 2px}
+
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.check-row{display:flex;align-items:center;gap:9px;font-family:var(--font-b);font-size:14px;color:var(--ink);cursor:pointer}
+.check-row input{width:16px;height:16px;accent-color:var(--purple);flex:none}
+
+.scale-row{display:flex;gap:8px;justify-content:space-between}
+.scale-opt{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:9px 6px;cursor:pointer;font-family:var(--font-m);font-size:14px;color:var(--ink-soft);
+  transition:border-color .2s,color .2s,background .2s;
+}
+.scale-opt input{position:absolute;opacity:0;width:1px;height:1px}
+.scale-opt:has(input:checked){border-color:var(--purple);background:var(--purple-soft);color:var(--purple);font-weight:700}
+.scale-opt-wide{flex:none;padding:9px 20px}
+.scale-labels{display:flex;justify-content:space-between;font-family:var(--font-m);font-size:11.5px;color:var(--ink-faint)}
+
+.nutri-error{
+  font-family:var(--font-m);font-size:12.5px;font-weight:600;color:#B3261E;
+  display:none;padding-top:2px;
+}
+.nutri-error.show{display:block}
+
+.nutri-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+.nutri-nav .btn{flex:none}
+#nutriBack.hidden{visibility:hidden}
+
+.nutri-summary{
+  background:var(--panel);border-radius:var(--radius-sm);
+  padding:18px 20px;font-family:var(--font-b);font-size:14px;line-height:1.55;color:var(--ink);
+  display:flex;flex-direction:column;gap:12px;
+}
+.nutri-summary h4{
+  font-family:var(--font-d);font-size:17px;font-weight:800;color:var(--purple-dark);margin:0;
+}
+.nutri-summary .nutri-block-title{
+  font-family:var(--font-m);font-size:11.5px;font-weight:700;color:var(--ink-soft);
+  text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;
+}
+.nutri-summary ul{margin:0;padding-left:18px}
+.nutri-summary li{margin-bottom:3px}
+.nutri-note{
+  font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--gold);
+  background:var(--gold-soft);border-radius:var(--radius-sm);padding:10px 12px;
+}

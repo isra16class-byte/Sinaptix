@@ -5,6 +5,45 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Encuesta de nutrición especializada (wizard de 8 pasos)
+
+- Se reemplaza el formulario de una sola pantalla de `#modalNutricion`
+  (objetivo + email) por un wizard de 8 pasos con barra de progreso,
+  que recolecta objetivo, datos personales/antropométricos, rutina y
+  exigencia mental, hábitos alimentarios, salud/alergias/restricciones,
+  percepción actual (4 escalas 1-5) y preferencias/presupuesto, antes de
+  mostrar el plan resuelto.
+- Los 4 planes de nutrición especializada que ya existían en el select
+  (concentración, fatiga mental, memoria de trabajo, estrés) se
+  mantienen sin cambios de fondo; se les agrega contenido real (enfoque,
+  nutrientes clave, alimentos a priorizar/moderar) en un objeto
+  `NUTRI_PLANES` en `js/script.js`. Se agrega una quinta opción al
+  select, "No estoy seguro / varios objetivos", que resuelve
+  automáticamente cuál de los 4 planes existentes mostrar según las 4
+  escalas del paso 6 (`nutriResolverObjetivo`), sin crear un plan nuevo.
+- Se agrega una tabla de conexiones (`nutriConstruirAjustes` /
+  `nutriConstruirAvisos`) que ajusta el texto del plan según alergias,
+  restricción alimentaria, presupuesto, tiempo para cocinar, alimentos
+  que no le gustan al usuario y hora de mayor exigencia mental, y agrega
+  avisos de derivación (condición de salud/medicación, sueño
+  insuficiente, cafeína alta, ultraprocesados a diario) sin bloquear el
+  envío.
+- El paso 2 se prellena automáticamente con los datos ya guardados en
+  `sinaptix_antropometria` si el usuario los registró antes, para no
+  pedirlos dos veces.
+- El envío final guarda todo en `localStorage` (`sinaptix_objetivo`, con
+  un campo `encuesta` nuevo con todas las respuestas) y arma un
+  `mailto:` a `hola@sinaptix.com` con el resumen completo, igual que el
+  resto de formularios del sitio — sigue sin haber backend real.
+- Se agregan los estilos nuevos del wizard en `css/styles.css`: barra de
+  progreso por puntos, checkboxes en grilla, escalas 1-5 tipo píldora,
+  tarjeta de resumen (`.nutri-summary`) y avisos (`.nutri-note`).
+- Verificado con Playwright headless + servidor local: navegación y
+  validación por paso, resolución automática de "No estoy seguro",
+  aplicación de ajustes/avisos según distintas combinaciones de
+  respuestas, prellenado desde antropometría, y layout en viewport móvil
+  (380px).
+
 ## 2026-09-12 — Rayón pegado al título en Método y Pilares (subrayado + línea debajo)
 
 - El usuario aclara (con nueva captura) que no quería solo rayones sueltos
