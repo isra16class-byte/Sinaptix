@@ -441,11 +441,48 @@ más un botón final `#nutriSubmit` en el paso 8.
 - **Paso 8**: muestra el plan resuelto (`nutriRenderResumen`), ya
   ajustado a las respuestas — no es solo un mensaje de "solicitud
   recibida", se arma en pantalla antes de enviar.
-- Si el usuario ya registró peso/talla/edad/sexo en "Registrar datos
-  antropométricos" (`#modalAntropometria`, guardado en
-  `sinaptix_antropometria`), el paso 2 se prellena automáticamente con
-  esos datos (`resetNutriWizard`, que corre cada vez que se abre el
-  modal) para no volver a pedirlos.
+- **Peso y talla en el paso 2: resumen + "Actualizar" en vez de inputs
+  vacíos para volver a completar** (sesión que implementó el punto 3 de
+  `plan-mejoras-mi-plan-y-encuesta.md`, sección 4.2 — "lógica condicional
+  para no repetir datos ya conocidos"): si el usuario ya registró peso y
+  talla en "Registrar datos antropométricos" (`#modalAntropometria`,
+  guardado en `sinaptix_antropometria`), el paso 2 ya **no** muestra los
+  dos inputs de Peso/Talla para volver a completarlos — muestra una frase
+  resumen ("Ya tenemos tu peso y talla registrados (fecha) — 70 kg, 175
+  cm.") con un botón "Actualizar peso y talla" que revela los inputs si
+  el usuario quiere cambiarlos. Edad y sexo biológico **sí** se siguen
+  mostrando como inputs/select normales (solo se prellenan), porque son
+  más rápidos de confirmar con un vistazo que peso/talla y no tienen el
+  mismo problema de "dos campos numéricos vacíos para volver a llenar".
+  - Markup nuevo en `index.html` y `mi-plan.html` (paso 2, idéntico en
+    ambos): el `.modal-row` de Peso/Talla ahora tiene `id="nutriAntroInputs"`,
+    y justo debajo se agregó `<div class="nutri-antro-resumen hidden"
+    id="nutriAntroResumen">` con un `<p id="nutriAntroResumenTexto">` y el
+    botón `#btnNutriAntroEditar` (`.btn.btn-ghost`, mismo lenguaje visual
+    que los CTA de "Método"). Reemplaza al viejo `<p id="nutriAntroHint">`
+    (ya no existe).
+  - Lógica en `resetNutriWizard()` (`js/nutricion-wizard.js`): si
+    `sinaptix_antropometria` tiene `peso` **y** `tallaCm`, arma el texto
+    del resumen (reutiliza `gaugeFechaCorta`, de `js/nutricion-planes.js`,
+    para la fecha corta) y oculta `#nutriAntroInputs` / muestra
+    `#nutriAntroResumen`; si no, es al revés (inputs visibles, resumen
+    oculto) — mismo comportamiento que antes para quien no tiene datos
+    guardados. **Los inputs de peso/talla se prellenan igual aunque estén
+    ocultos** (no se vacían), así que si el usuario ve el resumen y no
+    hace click en "Actualizar", `nutriCollectData()` sigue leyendo el
+    mismo peso/talla que ya tenía guardado — no hace falta ninguna rama
+    especial en el submit del formulario.
+  - El click en `#btnNutriAntroEditar` solo alterna las clases `hidden`
+    (mismo patrón `classList.toggle`/`add`/`remove` que el resto del
+    sitio) para volver a mostrar los inputs; no hay forma de "volver" al
+    resumen sin cerrar y reabrir el wizard (`resetNutriWizard` se encarga
+    de eso la próxima vez).
+  - Probado con un script de Node + `jsdom` (no hay browser de Playwright
+    instalado en este entorno, ver nota más abajo) que carga el
+    `#formNutricion` real de `index.html` y corre `resetNutriWizard()` con
+    tres escenarios: sin antropometría guardada, con peso+talla guardados,
+    y con antropometría que no incluye peso/talla (solo edad/sexo) — los
+    tres se comportan como se espera.
 - **Convención visual de obligatorio/opcional** (desde la sesión que sacó
   la palabra "opcional"): todos los campos de `#formNutricion` tienen una
   etiqueta visible (`.nutri-field-label` para inputs/selects sueltos, o el

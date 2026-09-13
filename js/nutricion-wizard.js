@@ -43,20 +43,55 @@ function resetNutriWizard(){
   nutriForm.reset();
   const resultadoEl = document.getElementById('nutriResultado');
   if(resultadoEl) resultadoEl.style.display='none';
-  // Prellenar edad/sexo/peso/talla si ya existen en "Mis datos" (antropometría)
+
+  // Prellenar edad/sexo/peso/talla si ya existen en "Mis datos"
+  // (antropometría). Peso y talla, en particular, ya no se muestran como
+  // dos inputs vacíos para volver a completar cuando ya hay un dato
+  // guardado: se resumen en una frase ("Ya tenemos tu peso y talla
+  // registrados...") + botón "Actualizar peso y talla" que revela los
+  // inputs si el usuario quiere cambiarlos. Los inputs igual quedan
+  // prellenados por debajo aunque estén ocultos, así que si el usuario no
+  // toca nada se sigue mandando el mismo peso/talla que ya tenía. Ver
+  // plan-mejoras-mi-plan-y-encuesta.md, sección 4.2 ("Lógica condicional
+  // para no repetir datos ya conocidos").
   const antro = localStorage.getItem('sinaptix_antropometria');
-  const hint = document.getElementById('nutriAntroHint');
+  const antroInputsEl = document.getElementById('nutriAntroInputs');
+  const antroResumenEl = document.getElementById('nutriAntroResumen');
+  const antroResumenTextoEl = document.getElementById('nutriAntroResumenTexto');
+  let d = null;
   if(antro){
-    try{
-      const d = JSON.parse(antro);
-      document.getElementById('nutriEdad').value = d.edad || '';
-      document.getElementById('nutriSexo').value = d.sexo === 'Femenino' || d.sexo === 'Masculino' ? d.sexo : '';
-      document.getElementById('nutriPeso').value = d.peso || '';
-      document.getElementById('nutriTalla').value = d.tallaCm || '';
-      if(hint) hint.textContent = 'Prellenado con los datos que ya registraste en "Registrar datos antropométricos".';
-    }catch(err){ if(hint) hint.textContent=''; }
-  } else if(hint){ hint.textContent=''; }
+    try{ d = JSON.parse(antro); }catch(err){ d = null; }
+  }
+  if(d){
+    document.getElementById('nutriEdad').value = d.edad || '';
+    document.getElementById('nutriSexo').value = d.sexo === 'Femenino' || d.sexo === 'Masculino' ? d.sexo : '';
+    document.getElementById('nutriPeso').value = d.peso || '';
+    document.getElementById('nutriTalla').value = d.tallaCm || '';
+  }
+  if(d && d.peso && d.tallaCm){
+    if(antroResumenTextoEl){
+      // gaugeFechaCorta vive en js/nutricion-planes.js (cargado antes que
+      // este script) — es un formateador de fecha genérico, no específico
+      // de los anillos/gráfico, así que se reutiliza acá también.
+      antroResumenTextoEl.textContent = 'Ya tenemos tu peso y talla registrados ('+gaugeFechaCorta(d.fecha)+') — '+d.peso+' kg, '+d.tallaCm+' cm.';
+    }
+    if(antroInputsEl) antroInputsEl.classList.add('hidden');
+    if(antroResumenEl) antroResumenEl.classList.remove('hidden');
+  } else {
+    if(antroInputsEl) antroInputsEl.classList.remove('hidden');
+    if(antroResumenEl) antroResumenEl.classList.add('hidden');
+  }
   nutriShowStep(1);
+}
+
+const btnNutriAntroEditar = document.getElementById('btnNutriAntroEditar');
+if(btnNutriAntroEditar){
+  btnNutriAntroEditar.addEventListener('click', function(){
+    const antroInputsEl = document.getElementById('nutriAntroInputs');
+    const antroResumenEl = document.getElementById('nutriAntroResumen');
+    if(antroInputsEl) antroInputsEl.classList.remove('hidden');
+    if(antroResumenEl) antroResumenEl.classList.add('hidden');
+  });
 }
 
 function nutriValidateStep(n){

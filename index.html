@@ -365,7 +365,7 @@
             </select>
           </div>
         </div>
-        <div class="modal-row">
+        <div class="modal-row" id="nutriAntroInputs">
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriPeso">Peso (kg)</label>
             <input class="modal-input" type="number" id="nutriPeso" placeholder="Peso (kg)">
@@ -375,7 +375,10 @@
             <input class="modal-input" type="number" id="nutriTalla" placeholder="Talla (cm)">
           </div>
         </div>
-        <p class="nutri-hint" id="nutriAntroHint"></p>
+        <div class="nutri-antro-resumen hidden" id="nutriAntroResumen">
+          <p class="nutri-antro-texto" id="nutriAntroResumenTexto"></p>
+          <button type="button" class="btn btn-ghost" id="btnNutriAntroEditar">Actualizar peso y talla</button>
+        </div>
         <div class="nutri-group">
           <label class="nutri-field-label" for="nutriActividadFisica">Nivel de actividad física <span class="req" aria-hidden="true">*</span></label>
           <select class="modal-input" id="nutriActividadFisica" required>

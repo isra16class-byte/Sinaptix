@@ -5,6 +5,39 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Paso 2 del wizard: resumen + "Actualizar" en vez de reingresar peso/talla ya guardados
+
+- Punto 3 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2): si ya hay
+  peso y talla guardados en `sinaptix_antropometria` ("Registrar datos
+  antropométricos"), el paso 2 de la encuesta de nutrición ya no muestra
+  los dos inputs vacíos-para-reeditar — muestra una frase ("Ya tenemos tu
+  peso y talla registrados (fecha) — 70 kg, 175 cm.") y un botón
+  "Actualizar peso y talla" que revela los inputs si se quieren cambiar.
+  Sin datos guardados (o con antropometría que no incluye peso/talla), se
+  ve exactamente igual que antes. Edad y sexo biológico no cambiaron: se
+  siguen prellenando pero mostrando como campos normales.
+- `index.html` y `mi-plan.html` (paso 2, idéntico en ambos): nuevo
+  `id="nutriAntroInputs"` en el `.modal-row` de Peso/Talla y nuevo bloque
+  `#nutriAntroResumen` (texto + botón `#btnNutriAntroEditar`), en
+  reemplazo del viejo `<p id="nutriAntroHint">`.
+- `js/nutricion-wizard.js` (`resetNutriWizard`): arma el texto del resumen
+  reutilizando `gaugeFechaCorta` (de `js/nutricion-planes.js`) y alterna
+  `.hidden` entre inputs y resumen según si hay peso+talla guardados. Los
+  inputs se siguen prellenando aunque queden ocultos, así que si el
+  usuario no toca nada se manda el mismo dato que ya tenía — no hubo que
+  tocar `nutriCollectData` ni el submit del formulario.
+- CSS: `.nutri-antro-resumen`, `.nutri-antro-texto` y un ajuste de tamaño
+  para `#btnNutriAntroEditar` (mismo `.btn.btn-ghost` que el resto del
+  sitio, un poco más chico para no dominar el paso).
+- Probado con Node + `jsdom` (instalado en un directorio temporal fuera
+  del repo, no se agregó como dependencia): se cargó el `#formNutricion`
+  real de `index.html` junto con `nutricion-planes.js` y
+  `nutricion-wizard.js`, y se corrió `resetNutriWizard()` en 3 escenarios
+  (sin antropometría, con peso+talla, con antropometría incompleta) — los
+  tres muestran/ocultan lo esperado y el botón "Actualizar" funciona.
+  Sigue pendiente una revisión visual en navegador real (Playwright no se
+  pudo instalar en este entorno, ver entrada anterior del changelog).
+
 ## 2026-09-13 — Gráfico de barras de "Mi plan" ahora compara antes/después con la reevaluación de "Método"
 
 - Punto 2 de `plan-mejoras-mi-plan-y-encuesta.md` (sección 4.2): el gráfico
