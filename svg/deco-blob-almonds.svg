@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+  <path d="M46,9 C80,-9 133,1 162,32 C191,63 187,116 157,147 C128,177 71,185 38,162 C6,140 -7,94 7,59 C15,38 25,21 46,9 Z" fill="#B5789F" opacity=".16"/>
+  <g transform="translate(52,50)">
+    <path d="M25 0C34 0 40 14 40 32C40 50 34 68 25 78C16 68 10 50 10 32C10 14 16 0 25 0Z" fill="#D8B487"/>
+    <path d="M25 2C33 2 38 15 38 32C38 49 33 66 25 76C17 66 12 49 12 32C12 15 17 2 25 2Z" fill="#C6996A"/>
+    <path d="M25 8c1 3 1 6 0 9" stroke="#8A6A42" stroke-width="1.6" opacity=".6" stroke-linecap="round"/>
+    <g transform="translate(46,14) rotate(18)">
+      <path d="M13 0C19 0 23 11 23 25C23 39 19 53 13 60C7 53 3 39 3 25C3 11 7 0 13 0Z" fill="#D8B487"/>
+      <path d="M13 2C18 2 21 12 21 25C21 38 18 51 13 58C8 51 5 38 5 25C5 12 8 2 13 2Z" fill="#C6996A"/>
+    </g>
+    <g transform="translate(-2,20) rotate(-16)">
+      <path d="M11 0C16 0 20 9 20 21C20 33 16 45 11 51C6 45 2 33 2 21C2 9 6 0 11 0Z" fill="#D8B487"/>
+      <path d="M11 2C15 2 18 10 18 21C18 32 15 43 11 48C7 43 4 32 4 21C4 10 7 2 11 2Z" fill="#C6996A"/>
+    </g>
+  </g>
+</svg>

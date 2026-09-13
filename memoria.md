@@ -113,18 +113,27 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
 - El contenido/copy en español **no cambió**, solo el sistema visual.
 - Los SVG decorativos (`svg/*.svg`) y el ícono del hero se recolorearon para
   funcionar sobre fondo claro (antes estaban pensados para fondo oscuro).
-- **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: se
-  agregaron 4 ilustraciones nuevas en `svg/deco-blob-*.svg` — un blob suave
-  en color de marca (opacity baja) con una fruta/fruto seco flat-illustration
-  encima (arándanos, aguacate, naranja, nuez) — colocadas detrás de los
-  títulos de Hero, Visión (02), Pilares (04) y Beneficios (05) como acento
-  visual relacionado con neuroalimentación. Clase CSS `.deco-fruit` (en
-  `css/styles.css`) les da flotación suave (`animation:float`, reusa el
-  keyframe del hero) con distintos `animation-delay` (`.d2`, `.d3`) para que
-  no floten sincronizadas, y se ocultan en móvil (`max-width:720px`) para no
-  saturar el layout angosto. Siguen el mismo patrón que los `.deco`
-  existentes: hijos directos de la `<section>`, `position:absolute`,
-  `z-index:0`, por lo que quedan detrás del `.wrap` (que tiene `z-index:1`).
+- **Capa de "vida" tipo odoo.com (sesión posterior al rediseño Odoo)**: hay 6
+  ilustraciones en `svg/deco-blob-*.svg` — un blob suave en color de marca
+  (opacity baja) con una fruta/fruto seco flat-illustration encima
+  (arándanos, aguacate, naranja, nuez, almendras, kiwi). Clase CSS
+  `.deco-fruit` (en `css/styles.css`) les da flotación suave
+  (`animation:float`, reusa el keyframe del hero) con distintos
+  `animation-delay` (`.d2`, `.d3`) para que no floten sincronizadas, y se
+  ocultan en móvil (`max-width:720px`) para no saturar el layout angosto.
+  Siguen el mismo patrón que los `.deco` existentes: hijos directos de la
+  `<section>`, `position:absolute`, `z-index:0`, por lo que quedan detrás
+  del `.wrap` (que tiene `z-index:1`).
+  - **Posicionamiento** (ajustado siguiendo patrón de lectura en Z de
+    landing pages — ver `changelog.md` sesión "posiciones estratégicas"):
+    nuez cerca del botón "Solicitar asesoría" del Hero, arándanos chico
+    arriba-derecha del Hero (framing), arándanos grande junto al título de
+    Visión + arándanos mini junto al stat-grid, almendras junto a los
+    botones CTA de Método, aguacate junto al título de Pilares, naranja
+    junto a las tarjetas de testimonios en Beneficios, kiwi junto al
+    formulario de contacto (CTA final). La idea es que cada fruta viva
+    cerca de un punto de atención real (título, CTA, dato clave), no solo
+    decorativa al azar.
 
 **Estructura de archivos** (sin cambios respecto al README): `index.html`
 (todo el markup, secciones `lam-01` a `lam-06`), `css/styles.css`,
