@@ -17,8 +17,9 @@ Sitio 100% estático (HTML/CSS/JS puro, sin build step), desplegado en Netlify.
 ├── js/nutricion-planes.js       # Funciones puras del plan de nutrición, compartidas entre páginas
 ├── js/nutricion-wizard.js       # Wizard de 8 pasos de la encuesta de nutrición
 ├── js/plan-sync.js              # Sincronización de "Mi plan" con el backend (ver abajo)
-├── netlify/functions/plan.js    # Netlify Function: lee/escribe "Mi plan" en Netlify DB
-├── package.json                 # Solo declara la dependencia @netlify/neon (sitio sin build step propio)
+├── netlify/functions/plan.js    # Netlify Function: lee/escribe "Mi plan" en Netlify Database
+├── netlify/database/migrations/ # Migración SQL de la tabla mi_plan (la aplica el deploy, no la función)
+├── package.json                 # Solo declara la dependencia @netlify/database (sitio sin build step propio)
 ├── img/                         # Logos e íconos (PNG/WebP)
 ├── svg/                         # Ilustraciones decorativas de fondo
 └── netlify.toml                 # Configuración de build/despliegue/functions en Netlify
@@ -60,23 +61,25 @@ servidor** cuando hay sesión iniciada:
   caché si no hay red o si se entra sin sesión.
 - `js/plan-sync.js` (compartido entre `index.html` y `mi-plan.html`) manda
   una copia de cada guardado a `netlify/functions/plan.js`, que la escribe
-  en Netlify DB (Postgres/Neon) asociada al usuario autenticado. Al entrar
-  a "Mi plan" con sesión iniciada, primero trae lo que haya en el servidor
-  y lo mezcla en `localStorage` (el servidor manda) — así el plan generado
-  en un dispositivo aparece también en otro, con la misma cuenta.
+  en Netlify Database (Postgres, GA) asociada al usuario autenticado. Al
+  entrar a "Mi plan" con sesión iniciada, primero trae lo que haya en el
+  servidor y lo mezcla en `localStorage` (el servidor manda) — así el plan
+  generado en un dispositivo aparece también en otro, con la misma cuenta.
 - Si la sincronización falla (sin red, función caída, etc.) nunca bloquea
   ni rompe el formulario que la disparó: solo queda un `console.warn` y el
   dato sigue guardado en este navegador, como pasaba antes de este backend.
 
 Ver `memoria.md`, sección "Backend real para Mi plan", para el detalle
-completo de la implementación y lo que falta verificar.
+completo de la implementación y lo que falta verificar (incluye la
+corrección de una sesión posterior: el paquete original, `@netlify/neon`,
+quedó deprecado por Netlify y se reemplazó por `@netlify/database`).
 
 **Provisionamiento de la base de datos**: no requiere nada manual en el
-dashboard de Netlify — al tener `@netlify/neon` en `package.json`, Netlify
-provisiona la base de datos (Neon) y configura la variable de entorno
-automáticamente en el próximo `netlify dev`, `netlify build`, o al hacer
-push (que dispara un build en Netlify). Ver
-[docs de Netlify DB](https://docs.netlify.com/storage/netlify-db).
+dashboard de Netlify — al tener `@netlify/database` en `package.json`,
+Netlify provisiona la base (Netlify Database) y aplica automáticamente la
+migración de `netlify/database/migrations/` en el próximo build/deploy, sin
+que haga falta configurar ninguna variable de entorno a mano. Ver
+[docs de Netlify Database](https://docs.netlify.com/build/data-and-storage/netlify-database/getting-started/).
 
 ## Requisitos en el dashboard de Netlify (no son código)
 
@@ -122,9 +125,13 @@ configurada como rama de producción para no perder de vista cuál desplegar.
 
 ## Próximos pasos (plan en curso)
 
-1. ~~Provisionar **Netlify Database** (Postgres/Neon)~~ — resuelto:
-   `package.json` declara `@netlify/neon`, que auto-provisiona la base en
-   el próximo build/deploy (ver sección "Backend de Mi plan" arriba).
+1. ~~Provisionar **Netlify Database** (Postgres)~~ — resuelto:
+   `package.json` declara `@netlify/database`, que auto-provisiona la base
+   en el próximo build/deploy y aplica la migración de
+   `netlify/database/migrations/` (ver sección "Backend de Mi plan"
+   arriba). Nota: la primera implementación usó el paquete equivocado,
+   `@netlify/neon` (extensión deprecada por Netlify) — corregido en una
+   sesión posterior, ver `memoria.md`.
 2. ~~Crear **Netlify Functions** para leer y escribir esos datos de forma
    segura~~ — resuelto: `netlify/functions/plan.js`, verifica la sesión vía
    `context.clientContext.user` (Netlify decodifica el JWT de Identity

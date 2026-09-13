@@ -5,6 +5,47 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Fix: el backend de "Mi plan" usaba un paquete deprecado (`@netlify/neon` → `@netlify/database`)
+
+- **Bug real encontrado en un deploy**: la función `plan.js` fallaba en
+  *todas* las invocaciones con `[@netlify/neon] Failed to instantiate Neon
+  client: connection string is not provided ... (NETLIFY_DATABASE_URL)`.
+  Diagnóstico: la extensión "Neon"/`@netlify/neon` de Netlify DB (beta)
+  quedó **deprecada** — Netlify bloqueó el aprovisionamiento de bases
+  nuevas por esa vía desde abril de 2026, y la reemplazó por **Netlify
+  Database** (GA), con el paquete nativo `@netlify/database` y su propia
+  variable `NETLIFY_DB_URL` (no `NETLIFY_DATABASE_URL`). Como el sitio
+  nunca provisionó nada con la extensión vieja, la variable jamás existió.
+- **`package.json`**: reemplazada la dependencia `@netlify/neon` por
+  `@netlify/database` (`^1.0.0`, resuelve a `1.1.0`). `package-lock.json`
+  regenerado.
+- **`netlify/functions/plan.js`** reescrita para usar `getDatabase()` de
+  `@netlify/database` en vez de `neon()`: el `GET` usa `db.sql` (tagged
+  template, bindea `user.sub` como parámetro seguro); el `POST` usa
+  `db.pool` (un `pg.Pool` crudo, mismo patrón que las transacciones de la
+  doc oficial) porque necesita interpolar un nombre de columna (`tipo`) en
+  el texto de la query, algo que un tagged template no permite hacer de
+  forma segura (esos placeholders son solo para valores).
+- **Nueva `netlify/database/migrations/20260913231933_create_mi_plan.sql`**:
+  el `CREATE TABLE mi_plan (...)` que antes vivía como
+  `CREATE TABLE IF NOT EXISTS` dentro de la función (`ensureTabla`, ya
+  eliminada) ahora es una migración de verdad — con Netlify Database, el
+  esquema **debe** manejarse por archivos de migración que Netlify aplica
+  solo durante el deploy; correr DDL desde el código de una función ya no
+  es el patrón soportado.
+- **`README.md`** y **`memoria.md`** actualizados: todas las menciones a
+  `@netlify/neon`/Netlify DB (beta)/`NETLIFY_DATABASE_URL` en la sección de
+  backend se corrigieron a `@netlify/database`/Netlify Database
+  (GA)/`NETLIFY_DB_URL`. `memoria.md` agrega además una nota explicando el
+  bug real y su diagnóstico, para que una sesión futura no repita el mismo
+  error si vuelve a tocar este backend.
+- **Sigue sin verificarse en un deploy real** (no hay cuenta de Netlify ni
+  sitio desplegado disponible desde este entorno): que la migración se
+  aplique sola, que el error original quede resuelto de verdad, y que el
+  `POST`/`GET` funcionen de punta a punta con una sesión real. Ver
+  `memoria.md`, sección "Backend real para Mi plan", "Pendiente de
+  verificación real".
+
 ## 2026-09-13 — Backend real para "Mi plan": Netlify DB + Netlify Functions
 
 - Implementa el pendiente conocido "backend real para Mi plan" (ver

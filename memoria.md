@@ -1556,7 +1556,7 @@ usan la paleta de marca (`--navy-bright`, `--green`, `--gold`, `--purple`).
   del texto, y que el icono de "neuronas" (con efecto vidrio) se vea bien
   sobre el fondo claro de `.stat-box`.
 
-## Backend real para Mi plan (Netlify DB + Netlify Functions)
+## Backend real para Mi plan (Netlify Database + Netlify Functions)
 
 Implementa el punto 1 de "Próximos pasos" (README.md): los 3 bloques de
 datos de "Mi plan" (`sinaptix_antropometria`, `sinaptix_objetivo`,
@@ -1567,6 +1567,24 @@ sigue siendo la única fuente que lee el resto del sitio** (`pintarMiPlan`,
 lecturas. Lo que se agregó es un "espejo" hacia el servidor por encima de
 eso, no un reemplazo.
 
+> **Corrección importante (sesión posterior a la implementación
+> original)**: la primera versión de este backend usaba el paquete
+> `@netlify/neon` (la extensión "Neon" de Netlify DB, en beta). Al probarlo
+> en un sitio real desplegado, la función fallaba en **todas** las
+> invocaciones con `[@netlify/neon] Failed to instantiate Neon client:
+> connection string is not provided ... (NETLIFY_DATABASE_URL)`. Investigando
+> con el usuario se confirmó la causa raíz: **esa extensión quedó
+> deprecada** — Netlify bloqueó la creación de bases nuevas vía
+> `@netlify/neon`/`NETLIFY_DATABASE_URL` desde abril de 2026, reemplazada
+> por **Netlify Database**, ahora GA (general availability), con el
+> paquete nativo `@netlify/database` y su propia variable `NETLIFY_DB_URL`.
+> Como el sitio nunca había llegado a provisionar una base con la extensión
+> vieja (era un sitio nuevo), no había forma de que la variable apareciera.
+> Todo lo que sigue en esta sección ya describe la versión corregida
+> (`@netlify/database`), no la original — si algo de otra parte del repo
+> todavía menciona `@netlify/neon` o `NETLIFY_DATABASE_URL`, está
+> desactualizado.
+
 - **`netlify/functions/plan.js`**: una sola función, `GET` devuelve
   `{antropometria, objetivo, reevaluacion}` (solo las claves que ese
   usuario ya guardó — nunca `null` explícito, para que el cliente no pise
@@ -1575,40 +1593,63 @@ eso, no un reemplazo.
   `reevaluacion`, validado contra una lista fija antes de interpolarlo en
   el SQL — no es una columna arbitraria del body) sin tocar las otras dos
   que ya tuviera guardadas ese usuario, porque cada formulario del sitio
-  llama a esto en un momento distinto. La tabla (`mi_plan`, una fila por
-  usuario, `user_id` = `sub` del JWT de Identity como primary key) se crea
-  con `CREATE TABLE IF NOT EXISTS` en cada invocación en vez de una
-  migración aparte — no hay build step ni herramienta de migraciones en
-  este repo (sitio 100% estático) y el costo de ese chequeo es
-  despreciable para una tabla de un registro por usuario. Si el esquema
-  crece, conviene pasar a una migración real con `drizzle-kit` (ver docs
-  de Netlify DB) en vez de seguir agregando `IF NOT EXISTS` sueltos.
+  llama a esto en un momento distinto.
+  - `GET` usa `db.sql` (tagged template de `@netlify/database`): los
+    valores interpolados (acá, `user.sub`) se bindean como parámetros
+    reales de forma segura.
+  - `POST` usa `db.pool` (un `pg.Pool` crudo que expone `@netlify/database`
+    para casos que `db.sql` no cubre) porque necesita interpolar un
+    **nombre de columna** (`tipo`) en el texto de la query — eso no se
+    puede hacer con los placeholders de un tagged template (esos son solo
+    para valores, no para identificadores). El resto de los valores sí van
+    con placeholders `$1/$2/$3` normales.
+- **La tabla `mi_plan` ya NO se crea en runtime** (a diferencia del diseño
+  original con `CREATE TABLE IF NOT EXISTS` en cada invocación de la
+  función): con Netlify Database, el esquema se maneja **solo** vía
+  archivos de migración en `netlify/database/migrations/`, que Netlify
+  aplica automáticamente durante el deploy — nunca a mano ni desde el
+  código de la función. Este repo tiene una sola migración,
+  `netlify/database/migrations/20260913231933_create_mi_plan.sql`, con el
+  `CREATE TABLE mi_plan (...)` (mismas 6 columnas de siempre: `user_id`
+  primary key = `sub` del JWT de Identity, `email`, `antropometria`,
+  `objetivo`, `reevaluacion` como `jsonb`, `updated_at`). **Una vez
+  aplicada esta migración en cualquier entorno (local, preview o
+  producción), no se edita** — un cambio de esquema futuro (una columna
+  nueva, un índice) va en un archivo de migración nuevo, no modificando
+  este.
 - **Autenticación**: la función lee `context.clientContext.user` — Netlify
   decodifica el JWT de Identity automáticamente cuando la request trae el
   header `Authorization: Bearer <access_token>` (lo manda
   `js/plan-sync.js`), así que la función nunca valida la firma a mano, eso
   ya lo resolvió Netlify antes de invocarla. Sin ese header (o sin sesión
   del lado del cliente), `context.clientContext.user` viene `undefined` y
-  la función devuelve 401. **No verificado en un deploy real** — todo lo
-  que se sabe de este mecanismo viene de la documentación de Netlify y de
-  hilos de su foro de soporte, no de una prueba end-to-end acá (no hay
-  cuenta de Netlify ni sitio desplegado disponibles desde este entorno).
-- **Base de datos**: Netlify DB (Postgres, por debajo es Neon), acceso vía
-  el paquete oficial `@netlify/neon` (`const sql = neon()` — no hace falta
-  pasar ninguna connection string a mano, se autoconfigura con una
-  variable de entorno que Netlify inyecta sola). **Provisionamiento
-  automático**: al tener `@netlify/neon` listado en `package.json` (que no
-  existía en el repo hasta esta sesión — se creó solo con esa dependencia,
-  el sitio sigue sin build step propio, ver `netlify.toml`), Netlify crea
-  la base y la variable de entorno la primera vez que corre `netlify dev`,
-  `netlify build`, o un build disparado por push — no hace falta ningún
-  paso manual en el dashboard, a diferencia de "Enable Identity" que sí
-  sigue siendo manual (ver sección de requisitos del README). Se agregó
-  `.gitignore` (no existía) con `node_modules/` porque ahora hay
+  la función devuelve 401. **Sigue sin verificarse end-to-end en un deploy
+  real** (ver "Pendiente de verificación real" más abajo) — lo que sí se
+  confirmó en esta sesión de corrección fue que la conexión a la base
+  funciona; el mecanismo de JWT de Identity en sí no falló en los logs que
+  compartió el usuario, pero tampoco hubo todavía un POST/GET exitoso de
+  punta a punta con sesión real para darlo por probado del todo.
+- **Base de datos**: **Netlify Database** (Postgres, GA), acceso vía el
+  paquete oficial `@netlify/database` — `getDatabase()` devuelve una
+  conexión (`db.sql` para tagged-template queries, `db.pool` para SQL
+  crudo/transacciones) sin que haga falta pasar ninguna connection string
+  a mano; se autoconfigura con la variable de entorno `NETLIFY_DB_URL` que
+  Netlify inyecta sola (**no** `NETLIFY_DATABASE_URL`, esa es la variable
+  de la extensión vieja/deprecada — no confundir ambas si se vuelve a
+  tocar este archivo). **Provisionamiento automático**: al tener
+  `@netlify/database` listado en `package.json` (el sitio sigue sin build
+  step propio, ver `netlify.toml`), Netlify provisiona la base y aplica la
+  migración de `netlify/database/migrations/` en el próximo
+  `netlify dev`/`netlify build`/push — no hace falta ningún paso manual en
+  el dashboard, a diferencia de "Enable Identity" que sí sigue siendo
+  manual (ver sección de requisitos del README). Se agregó `.gitignore`
+  (no existía) con `node_modules/` porque ahora hay
   `package.json`/`package-lock.json` versionados.
-- **`netlify.toml`**: se agregó el bloque `[functions]` con
+- **`netlify.toml`**: tiene el bloque `[functions]` con
   `directory = "netlify/functions"` y `node_bundler = "esbuild"` — Netlify
-  auto-detecta esa carpeta igual sin el bloque, pero se dejó explícito.
+  auto-detecta esa carpeta igual sin el bloque, pero se dejó explícito. No
+  hizo falta agregar nada nuevo a `netlify.toml` para Netlify Database (a
+  diferencia de Functions, no tiene un bloque de configuración propio acá).
 - **`js/plan-sync.js`** (nuevo, compartido entre `index.html` y
   `mi-plan.html`, se carga después de `nutricion-wizard.js` y antes de
   `script.js`/`mi-plan.js` — mismo orden que ya usa `nutricion-planes.js`):
@@ -1646,31 +1687,39 @@ eso, no un reemplazo.
   esa página ya no muestra el contenido de "Mi plan" in-place — al hacer
   login ahí se redirige directo a `mi-plan.html` (ver más arriba en este
   mismo archivo), que es donde vive toda la lectura.
-- **Por qué no se creó un archivo de migraciones ni un ORM (Drizzle)**:
-  para una sola tabla de 6 columnas y 3 tipos de upsert, `CREATE TABLE IF
-  NOT EXISTS` + SQL crudo via `@netlify/neon` alcanza y evita sumar una
-  herramienta más a un repo que hasta esta sesión no tenía build step ni
-  `package.json` en absoluto. Si en el futuro se agregan más tablas,
-  relaciones, o necesita rollback de esquema, ahí sí conviene migrar a
-  Drizzle (la guía de Netlify DB ya trae ese camino armado).
-- **Pendiente de verificación real** (no se pudo hacer desde esta sesión,
-  sin cuenta de Netlify ni deploy disponibles acá):
-  - Que `netlify dev`/`netlify build`/el primer push realmente
-    autoprovisionen la base y la variable de entorno como documenta
-    Netlify, sin ningún paso manual adicional.
+- **Por qué no se usó Drizzle**: para una sola tabla de 6 columnas y 3
+  tipos de upsert, SQL crudo via `@netlify/database` (`db.sql`/`db.pool`)
+  alcanza y evita sumar una herramienta más a un repo que no tenía build
+  step ni `package.json` hasta la sesión que agregó este backend. Lo que
+  **sí** es obligatorio con `@netlify/database` (a diferencia del diseño
+  original con `@netlify/neon`) es que el esquema viva en migraciones —
+  eso ya está resuelto (ver arriba), no es algo pendiente. Si en el futuro
+  se agregan más tablas o relaciones, ahí sí conviene evaluar Drizzle (la
+  guía de Netlify Database ya trae ese camino armado, con
+  `drizzle-orm@beta`).
+- **Pendiente de verificación real** (no se pudo hacer desde esta sesión de
+  corrección, sin cuenta de Netlify ni deploy disponibles acá):
+  - Que la migración (`netlify/database/migrations/...create_mi_plan.sql`)
+    se aplique sola en el próximo deploy y que la tabla `mi_plan` quede
+    creada — el fix se armó siguiendo al pie de la letra la guía oficial
+    de Netlify Database, pero no se corrió `netlify deploy` real desde
+    acá para confirmarlo.
+  - Que con `@netlify/database` en vez de `@netlify/neon` el error
+    original (`Failed to instantiate Neon client`) quede resuelto de
+    verdad — el diagnóstico (paquete deprecado) viene de la documentación
+    oficial de Netlify, pero esta sesión no tuvo forma de reproducir el
+    error ni confirmar el fix contra un sitio desplegado real.
   - Que `context.clientContext.user` llegue poblado de verdad en un
     request real con el JWT de Identity vigente (todo lo de esta sección
-    viene de documentación y foros, no de una prueba propia).
-  - Que el upsert con nombre de columna interpolado (`tipo`) funcione tal
-    cual contra Neon — la sintaxis se armó a mano siguiendo el patrón de
-    `@netlify/neon` de los docs, pero nunca se ejecutó contra una base
-    real desde acá.
+    viene de documentación de Netlify, no de una prueba propia).
+  - Que el `POST` con nombre de columna interpolado (`tipo`) vía `db.pool`
+    funcione tal cual contra Netlify Database — la sintaxis se armó
+    siguiendo el patrón de transacciones de la doc oficial, pero nunca se
+    ejecutó contra una base real desde acá.
   - Que "Mi plan" persista de verdad entre dos navegadores/dispositivos
     distintos logueados con la misma cuenta, una vez desplegado.
-  - Costo/consumo de créditos de Functions + Netlify DB en el plan usado,
-    sobre todo porque `ensureTabla` corre un `CREATE TABLE IF NOT EXISTS`
-    en cada invocación (barato, pero es una query de más por request que
-    vale la pena confirmar que no pesa en la práctica).
+  - Costo/consumo de créditos de Functions + Netlify Database en el plan
+    usado.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
