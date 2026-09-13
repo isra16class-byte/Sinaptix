@@ -101,9 +101,14 @@ editorial (Space Grotesk + IBM Plex Mono). Ahora:
   eyebrows, iconos), más acentos secundarios: verde `--green:#2E7D5B`,
   terracota `--gold:#C1703B`, azul `--navy-bright:#3B6EA5`. Texto en
   `--ink:#26161F` y variantes con opacidad.
-- **Tipografía**: una sola familia, `Inter` (Google Fonts), en vez de las
-  tres fuentes anteriores. Sin mayúsculas ni tracking tipo monoespaciado en
-  los eyebrows.
+- **Tipografía**: `Inter` (Google Fonts) en cuerpo de texto, navegación,
+  eyebrows y elementos de UI (`--font-b` / `--font-m`). Los títulos y
+  elementos de display (`h1`, `h2`, `h3`, marca del nav, números de
+  stat-box, valor de "Mi plan") usan `Fraunces` en peso 800, normal e
+  itálica (`--font-d`), elegida para dar un aire editorial/cálido que
+  conecte con lo nutricional sin perder seriedad — incluye el `<em>` de
+  "con *claridad*" en el H1 del Hero, que queda en Fraunces itálica. Sin
+  mayúsculas ni tracking tipo monoespaciado en los eyebrows.
 - **Componentes**: botones tipo píldora (`border-radius: 999px`), tarjetas
   redondeadas con sombra suave (`--radius`, `--shadow`, `--shadow-lg`) para
   stats, pilares nutricionales y testimonios, nav fijo blanco con blur y una

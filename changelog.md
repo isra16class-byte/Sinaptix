@@ -5,6 +5,24 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-12 — Tipografía de títulos: Fraunces (editorial y cálida)
+
+- Se evalúan 3 combinaciones de tipografía para títulos (manteniendo Inter
+  en el cuerpo): Fraunces (editorial/cálida), Sora (moderna/tech) y
+  Manrope (cercana/amigable). El usuario elige **Fraunces**.
+- Se agrega `Fraunces` (peso 800, normal e itálica) al `<link>` de Google
+  Fonts en `index.html`, junto a `Inter`.
+- Se cambia `--font-d` en `css/styles.css` de `'Inter',sans-serif` a
+  `'Fraunces',serif`. Este token ya se usaba en `h1`/`h2`/`h3`, la marca
+  del nav, los números de `.stat-box` y el valor de "Mi plan", así que el
+  cambio se propaga automáticamente sin tocar más selectores.
+- El `<em>` de "con *claridad*" en el H1 del Hero hereda `--font-d` y
+  queda en Fraunces itálica, efecto buscado deliberadamente.
+- Inter se mantiene sin cambios en cuerpo de texto, nav, botones,
+  eyebrows y demás UI (`--font-b`, `--font-m`).
+- Archivos tocados: `index.html`, `css/styles.css`, `memoria.md`,
+  `changelog.md`.
+
 ## 2026-09-12 — Pulido visual de los 6 íconos de fruta (degradados + sombra + nuez rediseñada)
 
 - El usuario reporta (con captura) que el ícono de nuez no se reconocía
