@@ -8,7 +8,22 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Visión: agrandar el fondo ilustrado y transparentar todas las tarjetas
+## 2026-09-14 — Visión: bajar el fondo ilustrado y las tarjetas
+
+Ajuste pedido por el usuario (con una captura marcando dónde quería que
+llegara el fondo): tanto el fondo como las tarjetas estaban pegados al
+borde superior de la sección, dejando un hueco vacío grande abajo (la
+columna de texto de Visión es más alta que el `stat-grid`).
+
+- `<div class="reveal d2">` que envuelve el `stat-grid` de Visión gana
+  `margin-top:90px` inline (cambio puntual solo en esta instancia, no
+  toca `.reveal.d2` en general, que se reusa en Método/Pilares/etc).
+- `vision-brain-bg`: `top` pasa de `20px` a `320px`, para que el arte se
+  reparta a lo largo de todo el alto de las tarjetas y siga bajando hacia
+  el hueco que quedaba vacío, en vez de quedar solo arriba.
+- Verificado con Playwright en 1024/1400px.
+
+
 
 Ajuste pedido por el usuario tras ver el resultado del patch anterior: la
 imagen de fondo se veía chica y solo la tarjeta "86B" dejaba notar el arte

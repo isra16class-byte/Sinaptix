@@ -188,13 +188,16 @@ próximos pasos).
   ilustrado (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro,
   red neuronal, rompecabezas) grande (`clamp(680px,64vw,1150px)`),
   posicionado con bleed casi hasta el borde derecho real de la pantalla,
-  igual que las neuronas de Método. Las 4 tarjetas
-  (`#lam-02 .stat-box`, incluida la destacada `.is-featured`) son
-  translúcidas (`rgba(255,255,255,.4)` / `rgba(75,46,69,.6)`) con blur
-  suave para dejar ver el arte detrás; se sacaron las decoraciones viejas
-  de esa esquina (círculos, huevo, aceite de oliva) que competían con el
-  arte nuevo. Ancho responsive con `clamp()`, oculto en mobile (`<900px`,
-  mismo criterio que el resto de `.deco-fruit`).
+  igual que las neuronas de Método. La columna de tarjetas (`.reveal.d2`
+  de esta sección) baja `margin-top:90px` y el fondo arranca en
+  `top:320px` (antes ambos pegados arriba) para repartir mejor el arte a
+  lo largo del hueco vertical que deja la columna de texto, más alta. Las
+  4 tarjetas (`#lam-02 .stat-box`, incluida la destacada `.is-featured`)
+  son translúcidas (`rgba(255,255,255,.4)` / `rgba(75,46,69,.6)`) con
+  blur suave para dejar ver el arte detrás; se sacaron las decoraciones
+  viejas de esa esquina (círculos, huevo, aceite de oliva) que competían
+  con el arte nuevo. Ancho responsive con `clamp()`, oculto en mobile
+  (`<900px`, mismo criterio que el resto de `.deco-fruit`).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
