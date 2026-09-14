@@ -5,6 +5,22 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Método (LAM-03): difuminar la costura con las secciones blancas vecinas
+
+- El usuario mandó una captura mostrando que el cambio de color anterior
+  (crema sólido) generaba una línea horizontal muy marcada contra el
+  blanco de las secciones de arriba/abajo (`lam-02`, `lam-04`), y pidió
+  diluir esa transición.
+- `css/styles.css`, mismo bloque `#lam-03{...}`: se agregó
+  `background:linear-gradient(180deg, var(--paper) 0, var(--panel) 220px,
+  var(--panel) calc(100% - 220px), var(--paper) 100%)` (funde a blanco en
+  los primeros/últimos ~220px de la sección en vez de cortar en seco), y
+  se aclaró un poco la paleta (`--panel` `#EBE5D7` → `#F1ECDE`, `--purple`
+  `#7C5C45` → `#82644E`) para que se sienta menos saturada.
+- Ver "Paleta cálida propia de LAM-03" en `memoria.md` para el detalle
+  completo y la nota de siempre: no se pudo verificar visualmente en un
+  navegador real desde este entorno.
+
 ## 2026-09-13 — Paleta cálida (crema + café) solo en Método (LAM-03)
 
 - El usuario mandó una imagen de referencia (mockup generado con IA) con

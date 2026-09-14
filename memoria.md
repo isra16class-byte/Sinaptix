@@ -1846,6 +1846,31 @@ imagen — no se tomó el texto ni la tipografía de esa imagen como pedido,
   `.btn-solid`/`.btn-ghost`) se recolorea solo, incluido el SVG de los
   anillos que arma `js/script.js` (usa `stroke="var(--panel-line)"`
   inline, también hereda).
+- **El fondo no es un color plano**: la primera versión de este cambio
+  dejaba `background:var(--panel)` sólido (heredado de
+  `section.dark{background:var(--panel)}`), y el usuario pidió después
+  "diluir" esa transición porque contra el blanco de `lam-02`/`lam-04`
+  (arriba y abajo) se notaba una línea horizontal muy marcada. El mismo
+  bloque `#lam-03` ahora también sobreescribe `background` (con más
+  especificidad que `section.dark` por ser un selector de ID) con:
+  ```css
+  background:linear-gradient(180deg,
+    var(--paper) 0,
+    var(--panel) 220px,
+    var(--panel) calc(100% - 220px),
+    var(--paper) 100%);
+  ```
+  Esto funde de blanco a crema en los primeros ~220px de la sección y de
+  crema a blanco otra vez en los últimos ~220px, así no corta en seco
+  contra las secciones blancas vecinas. También se aclaró un poco el tono
+  base (`--panel` pasó de `#EBE5D7` a `#F1ECDE`, más cerca del blanco) y
+  se atenuó el café de acento (`--purple` de `#7C5C45` a `#82644E`) para
+  que el conjunto se sienta menos saturado/"diluido", como pidió el
+  usuario. Si en pantallas muy chicas el contenido de la sección llega a
+  medir menos de ~450px de alto, los dos tramos de fundido (arriba/abajo)
+  se solaparían un poco — no rompe nada, solo se vería un poco más claro
+  al medio; no hace falta resolverlo salvo que alguien lo note como un
+  problema real.
 - **Qué NO se tocó a propósito**: los colores semánticos de los medidores
   (`gaugeColorForPercent` en `js/nutricion-planes.js`, y las zonas
   rojo/dorado/verde del medidor de IMC en `css/styles.css`) — esos indican
@@ -1853,20 +1878,19 @@ imagen — no se tomó el texto ni la tipografía de esa imagen como pedido,
   verse igual en todas las secciones y páginas donde aparezcan (incluida
   "Mi plan"). Tampoco se tocó la tipografía de `#lam-03 .lam-title`
   (sigue con la fuente manuscrita `Caveat` que ya tenía) ni ningún SVG
-  decorativo (`deco-blob-almonds.svg`, etc.) — la imagen de referencia
-  mostraba una fuente distinta, pero el pedido fue explícitamente "ese
-  color", no la tipografía.
-- **Si se quiere el mismo tratamiento en otra sección**, el patrón a
-  copiar es el bloque `#lam-0X{--panel:...; --panel-line:...; ...}` con
-  los mismos nombres de variable — no hace falta tocar nada más.
-- **No se pudo verificar visualmente en un navegador real desde este
-  entorno** (mismo problema de siempre: sin red a Google
+  decorativo (`deco-blob-almonds.svg`, etc.).
+- **Si se quiere el mismo tratamiento (paleta + fundido) en otra
+  sección**, el patrón a copiar es el bloque completo `#lam-0X{--panel:
+  ...; background:linear-gradient(...)}` con los mismos nombres de
+  variable — no hace falta tocar nada más.
+- **Seguimos sin poder verificar visualmente en un navegador real desde
+  este entorno** (mismo problema de siempre: sin red a Google
   Fonts/Netlify Identity, y el render headless disponible en el sandbox
-  fue inconsistente incluso para confirmar solo el color de fondo). La
-  lógica de cascada de custom properties está razonada y es la misma que
-  ya usa el resto del sitio (no es una técnica nueva), pero si el color
-  final no coincide con lo esperado al verlo en el navegador, avisar para
-  ajustar los valores hex.
+  viene siendo inconsistente incluso para confirmar solo el color de
+  fondo). La lógica de cascada de custom properties y el gradiente están
+  razonados contra el mismo mecanismo que ya usa el resto del sitio, pero
+  si el resultado no coincide con lo esperado al verlo en el navegador
+  (tono, o el ancho del fundido), avisar para ajustar los valores.
 
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 

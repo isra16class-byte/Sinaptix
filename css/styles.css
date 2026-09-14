@@ -432,15 +432,36 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    variables reescritas — solo lo hace lo que vive dentro de #lam-03.
    Los colores semánticos de los medidores (gauge rojo/dorado/verde según
    umbral, ej. IMC) NO se tocan a propósito: no son de marca, indican
-   estado de salud y deben verse igual en todas partes. */
+   estado de salud y deben verse igual en todas partes.
+
+   El fondo NO es un color plano: la sesión anterior lo dejó como
+   background:var(--panel) sólido (heredado de section.dark), lo que
+   generaba una línea horizontal muy marcada contra el blanco de lam-02
+   arriba y lam-04 abajo (ambas #FFFFFF). El usuario pidió diluir esa
+   costura. Acá se sobreescribe "background" (con más especificidad que
+   `section.dark{background:var(--panel)}` por ser selector de ID) con un
+   linear-gradient que arranca en --paper (blanco, igual que las
+   secciones vecinas), funde a --panel a los ~200px y vuelve a fundir a
+   --paper en los últimos ~200px — la sección "flota" en crema en su
+   interior pero no corta en seco contra el blanco de arriba/abajo. Si el
+   contenido real de la sección algún día mide menos de ~450px de alto en
+   pantallas muy chicas, los dos tramos de fundido se solaparían un poco
+   (no rompe nada, solo se vería un pelín más claro en el medio); no hace
+   falta resolverlo salvo que se note un problema real. */
 #lam-03{
-  --panel:#EBE5D7;
-  --panel-line:rgba(35,25,18,.18);
-  --panel-text:rgba(35,25,18,.64);
-  --purple:#7C5C45;
-  --purple-dark:#5B4432;
-  --purple-soft:rgba(124,92,69,.14);
+  --panel:#F1ECDE;
+  --panel-line:rgba(45,33,22,.16);
+  --panel-text:rgba(40,30,20,.62);
+  --purple:#82644E;
+  --purple-dark:#5F4A39;
+  --purple-soft:rgba(130,100,78,.12);
+  background:linear-gradient(180deg,
+    var(--paper) 0,
+    var(--panel) 220px,
+    var(--panel) calc(100% - 220px),
+    var(--paper) 100%);
 }
+
 
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
