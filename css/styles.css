@@ -305,6 +305,28 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-box.is-featured .num{color:#fff}
 .stat-box.is-featured .lab{color:rgba(255,255,255,.74)}
 
+/* Fondo ilustrado (cerebro + red neuronal) detrás del stat-grid de la
+   Visión (lam-02). Reemplaza las decoraciones sueltas que había antes en
+   esa esquina (círculos, huevo, aceite de oliva, espiga superior) para no
+   competir con este arte nuevo — ver memoria.md. Posición base (right/
+   top/width) inline en index.html junto al resto de los .deco de la
+   sección; acá solo opacidad y el ocultamiento en mobile (mismo criterio
+   que .deco-fruit).
+   Las .stat-box de esta sección pasan a fondo translúcido con blur para
+   dejar ver el trazo del arte por detrás sin perder legibilidad del
+   número/label. Es un ajuste **solo acá** (selector con #lam-02): en
+   "Mi plan" (#miPlan) y el resto del sitio .stat-box sigue con su fondo
+   sólido de siempre. */
+#lam-02 .vision-brain-bg{opacity:.95}
+@media(max-width:900px){#lam-02 .vision-brain-bg{display:none}}
+
+#lam-02 .stat-box{
+  background:rgba(255,255,255,.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+#lam-02 .stat-box.is-featured{background:rgba(75,46,69,.82)}
+
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}
 .vision-bullets li{display:flex;gap:16px;align-items:flex-start}

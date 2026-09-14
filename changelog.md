@@ -8,7 +8,34 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Archivar memoria.md y changelog.md, reiniciar condensados
+## 2026-09-14 — Fondo ilustrado (cerebro/red neuronal) detrás del stat-grid de Visión
+
+A pedido del usuario (venía de una imagen generada con Gemini, primero con
+texto horneado en el JPG —descartada por no ser accesible/editable— y
+después una versión limpia solo con el arte), se agregó como fondo
+decorativo del `stat-grid` de la sección Visión (`lam-02`):
+
+- Imagen nueva: `img/decoraciones-neurona/fondo-vision-red.webp` (convertida
+  desde el JPG subido, ~72 KB). Posicionada con el mismo patrón de bleed a
+  borde real de pantalla que ya usan las neuronas de Método
+  (`calc(50% - (var(--vw100, 100vw)/2))`), ancho `clamp(520px,50vw,860px)`
+  para que no invada la columna de texto en pantallas medianas (~1024px),
+  oculta en mobile (`<900px`).
+- `#lam-02 .stat-box` pasa a fondo `rgba(255,255,255,.55)` +
+  `backdrop-filter:blur(3px)` (la tarjeta destacada
+  `rgba(75,46,69,.82)`) para dejar ver el arte detrás sin perder
+  legibilidad. Cambio acotado a `#lam-02`: no afecta `.stat-box` en
+  `#miPlan` ni en otra parte.
+- Se sacaron las decoraciones viejas que quedaban en esa misma esquina
+  (`deco-circles-vision.svg`, `huevo.webp`, `aceite-oliva.webp`, la espiga
+  superior) porque competían visualmente con el arte nuevo. Se dejaron las
+  bayas y la espiga inferior, que están del lado del texto.
+- Verificado con Playwright (instalado en este entorno, a diferencia de
+  sesiones anteriores documentadas en el histórico) en 1024/1280/1400px:
+  sin invadir el texto, sin cortes feos del lado derecho, tarjetas
+  legibles.
+
+
 
 Se movieron los archivos `memoria.md` (2238 líneas) y `changelog.md`
 (1960 líneas) a `historico/memoria-2026-09-14.md` y

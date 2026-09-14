@@ -184,6 +184,15 @@ próximos pasos).
   (compartido entre modal de `index.html` y sección inline de
   `mi-plan.html`), 4 planes con "día tipo" cada uno + resolución
   automática si el usuario no está seguro de su objetivo.
+- **Visión (`lam-02`)**: el `stat-grid` de 4 tarjetas tiene ahora un fondo
+  ilustrado (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro,
+  red neuronal, rompecabezas) posicionado con bleed al borde derecho real
+  de la pantalla, igual que las neuronas de Método. Las tarjetas
+  (`#lam-02 .stat-box`) son semi-transparentes con blur para dejar ver el
+  arte detrás; se sacaron las decoraciones viejas de esa esquina (círculos,
+  huevo, aceite de oliva) que competían con el arte nuevo. Ancho responsive
+  con `clamp()`, oculto en mobile (`<900px`, mismo criterio que el resto
+  de `.deco-fruit`).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
