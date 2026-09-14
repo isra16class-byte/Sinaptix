@@ -5,6 +5,26 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — "Guardar datos" de antropometría ya no abre el correo: cierra el modal y muestra el IMC en Mi IMC
+
+- El usuario reportó que el botón "Guardar datos" del modal de datos
+  antropométricos lo mandaba a su cliente de correo, y pidió: quitar
+  eso, que el botón solo guarde los datos, que se cierre el modal, y
+  que el interruptor de la tarjeta de Método quede en "Mi IMC" para ver
+  ahí el resultado recién calculado.
+- `js/script.js`: en el submit de `#formAntro` se quitó el
+  `window.location.href = 'mailto:...'` (y el armado de `asunto`/
+  `cuerpo` que ya no se usa, junto con la variable `cat` que quedó sin
+  uso). El guardado en `localStorage`/`planSyncGuardar`/
+  `renderMethodImc()` sigue igual. Ahora, al guardar: se resetea el
+  formulario, se oculta el mensaje de resultado del modal (ya no hace
+  falta, se ve en la tarjeta), se cierra el modal
+  (`closeModal(#modalAntropometria)`), se cambia la pestaña de
+  `#methodGauges` a "Mi IMC" (`setGaugesView('imc')`) y se hace scroll
+  suave hasta esa tarjeta.
+- `#formReevaluacion` no se tocó, sigue con su comportamiento anterior.
+- Archivos tocados: `js/script.js`.
+
 ## 2026-09-13 — Quitar curcuma.webp de LAM-02 y bajar un poco más la neurona derecha de LAM-03
 
 - El usuario mandó una captura de la sección en el navegador (con la

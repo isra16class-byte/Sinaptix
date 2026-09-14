@@ -796,6 +796,36 @@ los anillos ahí; el medidor de IMC solo vivía en "Mi plan").
   "Mi progreso" alterna de nuevo. **Pendiente**: verificación visual real
   en navegador (layout del `.gauges-switch` sobre el fondo de
   `.method-gauges`, responsive ≤900px) en cuanto haya acceso a Playwright.
+- **El submit de `#formAntro` ahora salta directo a "Mi IMC" y cierra el
+  modal**: el usuario reportó que al apretar "Guardar datos" en el modal
+  de antropometría, el botón lo mandaba al cliente de correo (era un
+  `window.location.href = 'mailto:...'` heredado del mismo patrón que
+  usan los demás formularios del sitio — contacto y el resto), y pidió
+  quitar eso, que el botón "guarde los datos" (nada más), que se cierre
+  el modal, y que el interruptor de esta tarjeta quede en "Mi IMC" para
+  ver ahí mismo el resultado. En `js/script.js`, el handler de
+  `formAntro.addEventListener('submit', ...)` ya no arma `asunto`/`cuerpo`
+  ni redirige a `mailto:` — sigue guardando en `localStorage` +
+  `planSyncGuardar` + `renderMethodImc()` igual que antes, pero después:
+  resetea el form (`this.reset()`), oculta/limpia `#antroResultado` (el
+  mensaje de texto con el IMC ya no hace falta mostrarlo ahí porque se ve
+  en la tarjeta), llama `closeModal(document.getElementById
+  ('modalAntropometria'))`, y `setGaugesView('imc')` para dejar la
+  pestaña de esta tarjeta en "Mi IMC". También hace un
+  `scrollIntoView({behavior:'smooth', block:'center'})` sobre
+  `#methodGauges` por si el modal se abrió estando lejos de esa tarjeta
+  en la página (ej. desde el botón "Registrar datos antropométricos" del
+  estado vacío de "Mi IMC", que ya está ahí mismo, pero también existe
+  un `#btnAntropometria` en otra parte de la sección que abre el mismo
+  modal).
+  - `#formReevaluacion` (el otro form parecido, para la reevaluación
+    periódica) **no se tocó** — sigue mostrando su resultado inline en el
+    modal sin cerrarlo ni redirigir a nada; si en el futuro se pide el
+    mismo tratamiento ahí, replicar este mismo patrón.
+  - La variable `cat` (categoría de IMC calculada con `imcCategoria`)
+    se eliminó del handler de `formAntro` por quedar sin uso al borrar el
+    mensaje de resultado — `imcCategoria` se sigue usando igual dentro de
+    `renderMethodImc()`.
 
 ## Títulos manuscritos tipo "marcador" en Método y Pilares (`lam-03`, `lam-04`)
 

@@ -137,9 +137,6 @@
 
     const talla = tallaCm/100;
     const imc = peso/(talla*talla);
-    // imcCategoria vive en js/nutricion-planes.js (compartida con el medidor
-    // de "Mi plan") — antes esta misma tabla de umbrales estaba duplicada acá.
-    const cat = imcCategoria(imc).cat;
 
     // Guardado local (persiste entre visitas en este navegador)
     const datosAntro = {peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()};
@@ -151,20 +148,17 @@
     if(typeof planSyncGuardar === 'function') planSyncGuardar('antropometria', datosAntro);
     if(typeof renderMethodImc === 'function') renderMethodImc();
 
-    res.style.display='block';
-    res.style.color='';
-    res.textContent = sexo+', '+edad+' años — IMC estimado: '+imc.toFixed(1)+' ('+cat+'). Abriendo tu correo para enviar estos datos al equipo… ✓';
-
-    // Envía los datos al equipo de SINAPTIX por correo, igual que los demás formularios
-    const asunto = encodeURIComponent('Datos antropométricos — nuevo registro');
-    const cuerpo = encodeURIComponent(
-      'Peso: '+peso+' kg\n'+
-      'Talla: '+tallaCm+' cm\n'+
-      'Edad: '+edad+'\n'+
-      'Sexo: '+sexo+'\n'+
-      'IMC estimado: '+imc.toFixed(1)+' ('+cat+')'
-    );
-    window.location.href = 'mailto:hola@sinaptix.com?subject='+asunto+'&body='+cuerpo;
+    // Ya no se abre el cliente de correo ni se muestra el mensaje de
+    // resultado dentro del modal: al guardar, se cierra el modal y se
+    // lleva directo a la tarjeta "Mi IMC" en la sección Método, que ya
+    // queda actualizada con el resultado (ver renderMethodImc arriba).
+    res.style.display='none';
+    res.textContent='';
+    this.reset();
+    closeModal(document.getElementById('modalAntropometria'));
+    if(typeof setGaugesView === 'function') setGaugesView('imc');
+    const methodGaugesSection = document.getElementById('methodGauges');
+    if(methodGaugesSection) methodGaugesSection.scrollIntoView({behavior:'smooth', block:'center'});
   });
 
   // Formulario de contacto: envía un correo real a hola@sinaptix.com
