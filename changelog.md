@@ -5,6 +5,29 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Ajustar el color de la tarjeta de gráficas de Método a un blanco cálido propio
+
+- El usuario probó el fundido total con `--panel` del patch anterior y
+  avisó que quedaba feo (sin ningún límite visible), y pidió un color que
+  combinara mejor con el estilo del sitio.
+- `css/styles.css`: se creó `--gauge-card:#FBF7EE` (blanco cálido, más
+  claro que `--panel` pero dentro de la misma familia café/crema),
+  definido en el bloque `#lam-03{...}`. `.method-gauges` ahora usa
+  `background:var(--gauge-card, var(--paper))` con `box-shadow:var
+  (--shadow)` — y `--shadow` también se sobreescribió dentro de `#lam-03`
+  a un tono café (`rgba(95,74,57,.14)`) en vez del violeta genérico del
+  resto del sitio, sin afectar el uso de `--shadow` fuera de esta
+  sección.
+- `.gauges-switch` (track del interruptor "Mi progreso"/"Mi IMC") volvió
+  a `background:var(--panel)` (el diseño original), ya que con
+  `--gauge-card` la tarjeta y `--panel` vuelven a ser colores distintos.
+  `.gauges-switch-btn.is-active` pasó de `background:var(--paper)` a
+  `background:var(--gauge-card, var(--paper))` para combinar con el
+  nuevo tono de la tarjeta.
+- No verificado en navegador real (mismo problema de siempre en este
+  entorno); ver detalle completo en `memoria.md` → "Anillos de progreso
+  en Método".
+
 ## 2026-09-13 — Fundir la tarjeta de gráficas de Método con el fondo de la sección
 
 - El usuario mandó una captura de la sección Método (`#lam-03`) donde la

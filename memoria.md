@@ -737,31 +737,48 @@ comentario histórico explicando el origen del dato.
   a Playwright, conviene confirmar con capturas (desktop y móvil 380px)
   que el anillo único + la línea de delta se ven bien, sobre todo con
   nombres de área más largos o valores negativos de delta.
-- **La tarjeta `.method-gauges` ya no es un cuadro blanco sólido**: el
-  usuario mandó una captura (fondo crema de `#lam-03` con la tarjeta en
-  blanco puro, contraste marcado) y pidió "difuminar" ese cuadro para que
-  fuera del color del fondo. Se cambió `.method-gauges` de
-  `background:var(--paper)` + `box-shadow:var(--shadow)` a
-  `background:var(--panel)` + `border:1px solid var(--panel-line)` — como
-  `--panel` está sobreescrito dentro de `#lam-03` a la crema propia de esa
-  sección, la tarjeta ahora se funde con el fondo en vez de flotar como
-  cuadro blanco. Efecto colateral que hubo que corregir en el mismo
-  cambio: el track del switch "Mi progreso"/"Mi IMC" (`.gauges-switch`)
-  usaba `background:var(--panel)` para contrastar contra la tarjeta
-  blanca — al quedar la tarjeta también en `--panel` el track se volvía
-  invisible, así que se cambió a un tinte neutro semitransparente
-  (`rgba(0,0,0,.055)`), que se ve igual sobre la crema de `#lam-03` o
-  sobre cualquier otro `--panel`. El botón activo del switch
-  (`.gauges-switch-btn.is-active`) sigue en `--paper` blanco con sombra,
-  sin cambios, así que el tab seleccionado sigue destacando con
-  claridad. **No verificado en navegador real** (mismo problema de
-  siempre en este entorno, ver notas de renderizado más abajo en este
-  archivo) — razonado por CSS/cascada de custom properties, coincide con
-  el mismo mecanismo ya usado en la paleta cálida de `#lam-03`. Si esta
-  tarjeta se reutiliza en el futuro fuera de `#lam-03` (sobre un fondo
-  donde `--panel` no esté pensado para fundirse, p. ej. una sección
-  `.dark` normal), revisar si sigue queriéndose ese mismo tratamiento o
-  si conviene volver a un fondo con contraste propio.
+- **Color de la tarjeta `.method-gauges`: dos vueltas hasta llegar al
+  actual**. Punto de partida: cuadro blanco puro (`--paper`) + sombra
+  violeta genérica (`--shadow` del resto del sitio) — el usuario mandó
+  una captura y dijo que contra la crema de `#lam-03` se notaba
+  demasiado, pidió "difuminar" ese cuadro para que fuera del color del
+  fondo.
+  - **Primer intento (descartado)**: `background:var(--panel)` (el mismo
+    color exacto que el fondo de la sección) + `border:1px solid
+    var(--panel-line)` en vez de sombra. El usuario mandó otra captura:
+    quedó "feo" — sin ningún límite visible, la tarjeta se leía plana,
+    casi invisible como contenedor.
+  - **Versión actual**: se creó `--gauge-card:#FBF7EE` (un blanco cálido,
+    más claro que `--panel` pero dentro de la misma familia café/crema),
+    definido junto con el resto de overrides de paleta en el bloque
+    `#lam-03{...}` (justo antes de "03 PROCESO" en `css/styles.css`).
+    `.method-gauges` usa `background:var(--gauge-card, var(--paper))`
+    (con fallback a blanco puro si esta tarjeta se reutiliza algún día
+    fuera de `#lam-03`, donde `--gauge-card` no existiría) y volvió a
+    tener `box-shadow`, pero ya no la sombra violeta genérica: dentro de
+    `#lam-03` se sobreescribió también `--shadow` a un tono café
+    (`0 10px 30px rgba(95,74,57,.14)`) para que la sombra combine con
+    la paleta de esta sección en vez de desentonar. Esa sobreescritura de
+    `--shadow` es solo dentro de `#lam-03` — no afecta el resto del sitio
+    (se verificó que ningún otro elemento fuera de esta sección hereda de
+    `#lam-03`).
+  - **Efecto en cadena sobre el switch "Mi progreso"/"Mi IMC"**
+    (`.gauges-switch`): en el intento descartado su track había pasado de
+    `var(--panel)` a un tinte neutro `rgba(0,0,0,.055)` porque en ese
+    momento la tarjeta y `--panel` eran el mismo color. Con
+    `--gauge-card` ya distinto de `--panel`, se **revirtió** el track a
+    `background:var(--panel)` (el diseño original) — vuelve a contrastar
+    bien contra la tarjeta. El tab activo
+    (`.gauges-switch-btn.is-active`) también se actualizó de
+    `background:var(--paper)` a `background:var(--gauge-card, var
+    (--paper))`, para que combine con el nuevo tono de la tarjeta en vez
+    de quedar en blanco puro sobre un fondo que ya no lo es.
+  - **No verificado en navegador real** (mismo problema de siempre en
+    este entorno, ver notas de renderizado más abajo en este archivo) —
+    razonado por CSS/cascada de custom properties. Si al verlo el tono de
+    `--gauge-card` (#FBF7EE) no se distingue lo suficiente del fondo, o
+    la sombra café se ve demasiado tenue/marcada, avisar para ajustar
+    esos dos valores puntuales sin tocar el resto.
 
 ## Interruptor "Mi progreso" / "Mi IMC" (`#methodGauges`, sección 03)
 
