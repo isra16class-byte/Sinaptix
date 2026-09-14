@@ -186,18 +186,19 @@ próximos pasos).
   automática si el usuario no está seguro de su objetivo.
 - **Visión (`lam-02`)**: el `stat-grid` de 4 tarjetas tiene ahora un fondo
   ilustrado (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro,
-  red neuronal, rompecabezas) grande (`clamp(680px,64vw,1150px)`),
-  posicionado con bleed casi hasta el borde derecho real de la pantalla,
-  igual que las neuronas de Método. La columna de tarjetas (`.reveal.d2`
-  de esta sección) baja `margin-top:90px` y el fondo arranca en
-  `top:320px` (antes ambos pegados arriba) para repartir mejor el arte a
-  lo largo del hueco vertical que deja la columna de texto, más alta. Las
-  4 tarjetas (`#lam-02 .stat-box`, incluida la destacada `.is-featured`)
-  son translúcidas (`rgba(255,255,255,.4)` / `rgba(75,46,69,.6)`) con
-  blur suave para dejar ver el arte detrás; se sacaron las decoraciones
-  viejas de esa esquina (círculos, huevo, aceite de oliva) que competían
-  con el arte nuevo. Ancho responsive con `clamp()`, oculto en mobile
-  (`<900px`, mismo criterio que el resto de `.deco-fruit`).
+  red neuronal, rompecabezas) grande (`clamp(780px,74vw,1320px)`) y
+  pegado al borde derecho real de la pantalla (bleed `-40px`, se corta
+  a propósito contra el borde para que parezca que "sale" del costado),
+  igual criterio que las neuronas de Método. La columna de tarjetas
+  (`.reveal.d2` de esta sección) baja `margin-top:90px` y el fondo
+  arranca en `top:320px` para repartir el arte a lo largo de todo el
+  hueco vertical que deja la columna de texto, más alta. Las 4 tarjetas
+  (`#lam-02 .stat-box`, incluida la destacada `.is-featured`) son
+  translúcidas (`rgba(255,255,255,.4)` / `rgba(75,46,69,.6)`) con blur
+  suave para dejar ver el arte detrás; se sacaron las decoraciones viejas
+  de esa esquina (círculos, huevo, aceite de oliva) que competían con el
+  arte nuevo. Ancho responsive con `clamp()`, oculto en mobile (`<900px`,
+  mismo criterio que el resto de `.deco-fruit`).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.

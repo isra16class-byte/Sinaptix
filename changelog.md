@@ -8,7 +8,21 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Visión: bajar el fondo ilustrado y las tarjetas
+## 2026-09-14 — Visión: agrandar más el fondo y pegarlo al borde derecho
+
+Ajuste pedido por el usuario: quería el fondo más grande todavía y que
+pareciera que "sale" del costado derecho de la pantalla.
+
+- `vision-brain-bg`: ancho `clamp(680px,64vw,1150px)` ->
+  `clamp(780px,74vw,1320px)`.
+- Bleed hacia el borde derecho real: `+20px` -> `-40px` (ahora se corta
+  un poco contra el borde real de la pantalla a propósito, en vez de
+  quedar con margen).
+- Verificado con Playwright en 1024/1280/1400px: la red neuronal se corta
+  contra el borde derecho (efecto buscado) sin invadir la columna de
+  texto ni siquiera en 1024px.
+
+
 
 Ajuste pedido por el usuario (con una captura marcando dónde quería que
 llegara el fondo): tanto el fondo como las tarjetas estaban pegados al
