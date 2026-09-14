@@ -8,6 +8,16 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — Visión: fondo ilustrado más suave (blanquecino/difuminado)
+
+Pedido del usuario con captura: el fondo de cerebro/red neuronal se veía
+demasiado marcado/saturado detrás de las tarjetas ya en tono morado.
+
+- `#lam-02 .vision-brain-bg`: `opacity:.95` -> `.55`, y se agrega
+  `filter:blur(2px) brightness(1.35) saturate(.75)` (difumina bordes,
+  aclara y baja saturación para que quede más de fondo/lavado en vez de
+  competir visualmente con las tarjetas y el texto).
+
 ## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
 
 Pedido del usuario con captura: las 3 tarjetas claras del `stat-grid` de

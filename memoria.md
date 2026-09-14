@@ -189,7 +189,9 @@ próximos pasos).
   red neuronal, rompecabezas) grande (`clamp(880px,84vw,1480px)`) y
   pegado/recortado contra el borde derecho real de la pantalla (bleed
   `-40px`, para que parezca que "sale" del costado), igual criterio que
-  las neuronas de Método. La columna de tarjetas (`.reveal.d2` de esta
+  las neuronas de Método. El fondo se ve suave/lavado a propósito
+  (`opacity:.55` + `filter:blur(2px) brightness(1.35) saturate(.75)`)
+  para no competir con las tarjetas. La columna de tarjetas (`.reveal.d2` de esta
   sección) baja `margin-top:90px` y el fondo arranca en `top:230px` para
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
