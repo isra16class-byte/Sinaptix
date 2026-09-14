@@ -1748,6 +1748,84 @@ eso, no un reemplazo.
   específicamente ese caso) y el costo/consumo de créditos de Functions +
   Netlify Database en el plan usado.
 
+## Fotos de comida generadas (`img/generadas` / `img/generadas-cutout`)
+
+- El usuario sube fotos/ilustraciones de alimentos generadas (estilo
+  "cutout" con fondo blanco) a **`img/generadas/`** (jpg, sin
+  transparencia): `granada.jpg`, `chocolate.jpg`, `curucma.jpg` (nombre de
+  archivo con ese typo, ojo al referenciarlo), `espinaca.jpg`, `filete.jpg`
+  (en realidad es una posta/rodaja de salmón), `huevo.jpg`, `remolacha.jpg`,
+  `semilla chia.jpg` (con espacio en el nombre), `te.jpg`, `aceite de
+  oliva.jpg` (con espacios), más una imagen suelta sin usar
+  (`Gemini_Generated_Image_ot5quuot5quuot5q.jpg`).
+- Como esos jpg tienen fondo **blanco sólido, no transparente**, no se
+  pueden usar directamente como decoración flotante sobre secciones con
+  fondo de color (`section.dark`) sin que se note un recuadro blanco. Se
+  generó una segunda carpeta, **`img/generadas-cutout/`**, con versiones
+  `.webp` con el fondo removido (transparencia real) y recortadas a su
+  contenido (bounding box + padding), con nombres normalizados sin espacios
+  ni typos: `granada.webp`, `chocolate.webp`, `curcuma.webp`,
+  `espinaca.webp`, `filete.webp`, `huevo.webp`, `remolacha.webp`,
+  `semilla-chia.webp`, `te.webp`, `aceite-oliva.webp`.
+  - Removido con un script puntual (no versionado, no forma parte del
+    repo): por cada imagen, se calculó una máscara alfa según la distancia
+    de cada píxel al blanco puro (`(255,255,255)`), con una rampa suave
+    entre umbrales (~8 a ~45 de distancia euclídea) para no perder
+    anti-aliasing en los bordes; después se recortó al bounding box del
+    contenido con relleno de 8px. Si en el futuro se suben más imágenes
+    "cutout" con fondo blanco, se puede repetir el mismo enfoque en vez de
+    pedir el recorte manual en otra herramienta.
+  - **Si el usuario sube una imagen nueva a `img/generadas/` y pide
+    usarla como decoración**, primero hay que generarle su versión cutout
+    en `img/generadas-cutout/` (mismo proceso), no usar el jpg original
+    directamente en una sección con `class="deco deco-fruit"`.
+- **Dónde se usaron** (ver detalle en la sección de LAM-02/05/06 más abajo
+  en este archivo): son decoraciones flotantes, mismo tratamiento visual
+  que ya tenían las frutas del hero (`.deco-fruit`: animación de flotación
+  + `drop-shadow`, se ocultan automáticamente por CSS en mobile
+  `max-width:720px`), **no** son contenido informativo — son
+  `aria-hidden="true"` con `alt=""`, puramente decorativas.
+
+## Decoraciones nuevas en LAM-02 / LAM-05 / LAM-06 (fotos de comida)
+
+Antes de esta sesión, `lam-02` (Visión), `lam-05` (Beneficios) y `lam-06`
+(Contacto) solo tenían blobs SVG (`svg/deco-blob-*.svg`, `deco-espiga.svg`,
+etc.) como decoración — a diferencia del hero, que ya combinaba blobs SVG
+con fotos flotantes de fruta (`.brain-fruit`, `img/imagenes-frutas/`). El
+usuario pidió unificar el estilo agregando fotos de comida (de
+`img/generadas-cutout/`, ver sección de arriba) como decoración flotante en
+esas tres secciones, igual que el resto de la página. Los SVG existentes
+**no se tocaron**, solo se agregaron `<img>` nuevas con
+`class="deco deco-fruit"` (reutiliza la animación/drop-shadow ya definida
+en `css/styles.css`, no se agregó CSS nuevo) intercaladas entre los decos
+existentes de cada sección, con posiciones/rotaciones/opacidades a mano
+para no chocar con el contenido real (todas van detrás del contenido:
+`.deco` tiene `z-index:0`, `.wrap` tiene `z-index:1`).
+
+- **`lam-02`**: `huevo.webp`, `curcuma.webp`, `aceite-oliva.webp`.
+- **`lam-05`**: `granada.webp`, `remolacha.webp`, `chocolate.webp`,
+  `semilla-chia.webp`.
+- **`lam-06`**: `te.webp`, `filete.webp`, `espinaca.webp`.
+
+No se usó `Gemini_Generated_Image_ot5quuot5quuot5q.jpg` (la imagen suelta
+sin nombre descriptivo) — si el usuario quiere sumarla a alguna sección,
+falta decidir qué alimento es y generarle su cutout.
+
+**No se pudo verificar visualmente el resultado en esta sesión**: se
+intentó capturar un screenshot del `index.html` renderizado
+(`wkhtmltoimage`) para confirmar que las posiciones/tamaños quedan bien,
+pero el entorno de este sesión no tiene acceso de red a
+`fonts.googleapis.com`/`identity.netlify.com` (bloqueados por la
+configuración de red del sandbox) y además el sitio usa animaciones
+"reveal" por `IntersectionObserver` que no dispararon de forma confiable en
+el render headless usado para probar. El texto de las tres secciones no se
+vio en las capturas de prueba por eso (no es un bug real del sitio), pero
+sí se pudieron confirmar posición/tamaño/opacidad de las fotos nuevas
+porque los `.deco` son hermanos del `.reveal`, no dependen de él. **Si el
+usuario nota algo descuadrado (tamaño, posición, opacidad, choque con
+texto) al verlo en un navegador real, avisar en la próxima sesión — los
+valores se puede ajustar sin tocar el resto de la sección.**
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - ~~Backend real para "Mi plan" (Netlify Database + Functions)~~ —

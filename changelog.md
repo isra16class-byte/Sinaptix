@@ -5,6 +5,35 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Fotos de comida flotantes en Visión, Beneficios y Contacto
+
+- El usuario subió 10 fotos/ilustraciones de alimentos (estilo "cutout",
+  fondo blanco) a `img/generadas/` y pidió adaptar las secciones 2
+  (Visión), 5 (Beneficios) y 6 (Contacto) al mismo estilo visual que ya
+  usa el resto de la página (fotos de fruta flotantes, como en el hero).
+- Como los jpg originales tienen fondo blanco sólido (no transparente), no
+  se podían usar tal cual sobre secciones con fondo de color sin que se
+  viera un recuadro blanco. Se generaron versiones `.webp` con el fondo
+  removido y recortadas al contenido, guardadas en la carpeta nueva
+  `img/generadas-cutout/` (nombres normalizados sin espacios/typos:
+  `granada`, `chocolate`, `curcuma`, `espinaca`, `filete`, `huevo`,
+  `remolacha`, `semilla-chia`, `te`, `aceite-oliva`).
+- Se agregaron esas imágenes como decoración flotante (`class="deco
+  deco-fruit"`, reutilizando la animación/drop-shadow que ya existía en
+  `css/styles.css` — no se agregó CSS nuevo) en `lam-02` (huevo, cúrcuma,
+  aceite de oliva), `lam-05` (granada, remolacha, chocolate, semilla de
+  chía) y `lam-06` (té, filete, espinaca). Los blobs SVG que ya tenía cada
+  sección no se tocaron.
+- Ver "Fotos de comida generadas" y "Decoraciones nuevas en LAM-02 /
+  LAM-05 / LAM-06" en `memoria.md` para el detalle del proceso de recorte
+  y una nota importante: **no se pudo verificar visualmente el resultado
+  en un navegador real desde este entorno** (sin acceso de red a Google
+  Fonts/Netlify Identity para el render headless de prueba); si algo se ve
+  descuadrado, avisar en la próxima sesión para ajustar posiciones sin
+  tocar el resto.
+- No se usó `Gemini_Generated_Image_ot5quuot5quuot5q.jpg` (imagen suelta
+  sin nombre descriptivo, quedó sin usar en `img/generadas/`).
+
 ## 2026-09-13 — Confirmado en producción: el backend de "Mi plan" funciona de punta a punta
 
 - El usuario probó "Mi plan" en el sitio real desplegado (deploy
