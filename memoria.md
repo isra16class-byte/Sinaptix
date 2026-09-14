@@ -1805,13 +1805,16 @@ para no chocar con el contenido real (todas van detrás del contenido:
 En una sesión posterior se sumó el mismo tratamiento a **`lam-03`**
 (Método), que hasta entonces solo tenía el blob `deco-blob-almonds.svg`.
 Como las 10 fotos cutout que existen ya estaban todas repartidas entre
-`lam-02`/`lam-05`/`lam-06`, se reutilizaron tres de las que ya usa
-`lam-05` (`chocolate.webp`, `semilla-chia.webp`, `granada.webp`) también
-en `lam-03` — son puramente decorativas (`aria-hidden`, `alt=""`), así que
-repetir la misma foto en más de una sección no es un problema.
+`lam-02`/`lam-05`/`lam-06`, se reutilizaron dos de las que ya usa
+`lam-05` (`chocolate.webp`, `semilla-chia.webp`) también en `lam-03` — son
+puramente decorativas (`aria-hidden`, `alt=""`), así que repetir la misma
+foto en más de una sección no es un problema. Se probó también con
+`granada.webp` en `lam-03`, pero el usuario pidió sacarla (no
+especificó por qué — puede ser densidad visual o gusto), así que quedó
+descartada para esa sección; no se reemplazó por otra.
 
 - **`lam-02`**: `huevo.webp`, `curcuma.webp`, `aceite-oliva.webp`.
-- **`lam-03`**: `chocolate.webp`, `semilla-chia.webp`, `granada.webp`
+- **`lam-03`**: `chocolate.webp`, `semilla-chia.webp`
   (reutilizadas de `lam-05`).
 - **`lam-05`**: `granada.webp`, `remolacha.webp`, `chocolate.webp`,
   `semilla-chia.webp`.
@@ -1820,6 +1823,29 @@ repetir la misma foto en más de una sección no es un problema.
 No se usó `Gemini_Generated_Image_ot5quuot5quuot5q.jpg` (la imagen suelta
 sin nombre descriptivo) — si el usuario quiere sumarla a alguna sección,
 falta decidir qué alimento es y generarle su cutout.
+
+**Bug de recorte en la costura entre secciones (`curcuma.webp` y
+`aceite-oliva.webp` en `lam-02`) — corregido**: el usuario mandó una
+captura mostrando que estas dos fotos, al tener un `bottom` negativo
+(sobresalen por debajo del borde de `lam-02` a propósito, para que el
+efecto de flotar se vea natural), se veían "cortadas" justo en la línea
+donde empieza `lam-03`. La causa **no es la posición** (el usuario pidió
+explícitamente no moverlas): es orden de pintado en CSS. Como ninguna
+`section` tiene `z-index` propio, y estas imágenes tenían `z-index:0`
+(el valor por defecto de `.deco`), quedan en el mismo nivel de apilamiento
+que el fondo de la sección siguiente — y por orden de documento, `lam-03`
+(que viene después en el HTML) se pinta encima, tapando en línea recta la
+parte de la imagen que sobresalía. La corrección fue subirles el
+`z-index` a `1` **solo a esas dos imágenes**, inline en el `style`, sin
+tocar `left/right/bottom/width/opacity/transform`: con `z-index:1` quedan
+por encima del fondo/decoraciones (`z-index:0` o `auto`) de la sección
+siguiente, pero siguen por debajo de cualquier `.wrap` real (que también
+usa `z-index:1`, pero al aparecer más tarde en el HTML gana el empate en
+ese mismo nivel) — o sea, ya no tapan contenido de texto de ninguna
+sección, solo dejan de "cortarse" contra el fondo de la siguiente.
+**Si en el futuro se agrega otra foto `.deco-fruit` con `bottom`/`top`
+negativo que sobresalga de su sección**, aplicar el mismo `z-index:1` para
+evitar el mismo problema.
 
 **No se pudo verificar visualmente el resultado en esta sesión**: se
 intentó capturar un screenshot del `index.html` renderizado
@@ -1835,6 +1861,44 @@ porque los `.deco` son hermanos del `.reveal`, no dependen de él. **Si el
 usuario nota algo descuadrado (tamaño, posición, opacidad, choque con
 texto) al verlo en un navegador real, avisar en la próxima sesión — los
 valores se puede ajustar sin tocar el resto de la sección.**
+
+## Tipografía de títulos unificada: todos los `.lam-title` usan la fuente manuscrita de LAM-03
+
+Hasta esta sesión, la fuente manuscrita `Caveat` (`--font-hand`) en los
+títulos `h2.lam-title` era **especial de `lam-03`/`lam-04`** (regla
+`#lam-03 .lam-title, #lam-04 .lam-title{...}` en `css/styles.css`); el
+resto de los títulos (`lam-02`, `lam-05`, `lam-06`, y los títulos de
+`mi-plan.html` que no tenían la clase extra `.title-hand`) usaban la
+fuente serif por defecto de encabezados (`h1,h2,h3{font-family:var(--font-d)}`,
+Fraunces). El usuario pidió que el título de **todas** las secciones use
+la misma tipografía que ya tenía la sección 3.
+
+- **Cómo quedó implementado**: se movió el tratamiento completo
+  (`font-family:var(--font-hand)`, `font-weight:700`, `letter-spacing:0`,
+  `line-height:1.15`, `font-size:clamp(40px,6vw,68px)`) a la regla **base**
+  `.lam-title` (antes tenía `font-size:clamp(30px,4vw,42px)` y
+  `letter-spacing:-.02em`, heredando la fuente serif de `h1,h2,h3`). Esto
+  afecta automáticamente a **todos** los `h2.lam-title` del sitio: `lam-02`,
+  `lam-03`, `lam-04`, `lam-05`, `lam-06`, y los tres títulos de
+  `mi-plan.html` (con o sin la clase extra `.title-hand`, que ahora queda
+  redundante pero no rota — mismos valores, no hace daño dejarla).
+- La regla especial `#lam-03 .lam-title, #lam-04 .lam-title{...}` se
+  **eliminó** (quedaba duplicada con la base). Se dejó, sin tocar, el
+  ajuste de posición del subrayado `.title-mark` propio de esas dos
+  secciones (`#lam-03 .title-mark, #lam-04 .title-mark{background-position...}`),
+  que sigue aplicando solo donde existe el `<span class="title-mark">`
+  (hoy: `lam-03` y `lam-04`).
+- **Qué NO se tocó**: el `<h1>` del hero tiene su propia regla
+  (`.hero h1{font-family:var(--font-hand);...}`, con su propio `clamp`
+  mucho más grande) y ya usaba esta misma fuente desde antes — no
+  necesitó cambios.
+- **Si en el futuro se agrega un título nuevo con la clase `.lam-title`**,
+  ya sale con la fuente manuscrita por defecto, no hace falta agregar
+  nada aparte.
+- Mismo problema de siempre para verificar visualmente desde este entorno
+  (sin red a Google Fonts) — si `Caveat` no carga y hay fallback visible
+  en algún título, o algún título queda muy grande/chico para su
+  contenedor tras el cambio de `font-size`, avisar para ajustar.
 
 ## Paleta cálida propia de LAM-03 (Método)
 

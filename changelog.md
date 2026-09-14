@@ -5,6 +5,34 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Tipografía unificada, quitar granada de LAM-03 y arreglar corte de fotos en la costura LAM-02/LAM-03
+
+- El usuario mandó una captura y pidió tres cosas sobre el patch anterior:
+  1. Que el título de **todas** las secciones use la misma tipografía
+     manuscrita que ya tenía la sección 3 (Método).
+  2. Quitar la foto de granada que se había agregado a `lam-03`.
+  3. Arreglar que `curcuma.webp` y `aceite-oliva.webp` (en `lam-02`) se
+     ven "cortadas" justo donde empieza `lam-03`, **sin mover su
+     posición** (el usuario aclaró que la posición está bien).
+- `css/styles.css`: se movió el tratamiento tipográfico manuscrito
+  (`--font-hand`, `font-weight:700`, `font-size:clamp(40px,6vw,68px)`,
+  etc.) de la regla especial `#lam-03 .lam-title, #lam-04 .lam-title`
+  a la regla **base** `.lam-title` — ahora todos los títulos de sección
+  (`lam-02` a `lam-06`, más los de `mi-plan.html`) salen con la misma
+  fuente. Se eliminó la regla especial (quedaba duplicada) y se dejó
+  intacto el ajuste del subrayado `.title-mark` de `lam-03`/`lam-04`. Ver
+  "Tipografía de títulos unificada" en `memoria.md`.
+- `index.html`, sección `#lam-03`: se quitó el `<img>` de
+  `granada.webp` agregado en el patch anterior. Quedan solo
+  `chocolate.webp` y `semilla-chia.webp` en esa sección.
+- `index.html`, sección `#lam-02`: se agregó `z-index:1` (inline, en el
+  `style` existente) a `curcuma.webp` y `aceite-oliva.webp` — la causa
+  del corte era orden de pintado (la sección siguiente se pinta encima
+  por ir después en el HTML, no la posición), así que se corrigió el
+  `z-index` sin tocar `left/right/bottom/width/opacity/transform`. Ver
+  detalle del razonamiento en "Bug de recorte en la costura entre
+  secciones" en `memoria.md`.
+
 ## 2026-09-13 — Método (LAM-03): agregar fotos de comida decorativas
 
 - El usuario pidió agregarle a la sección 3 (`lam-03`, Método) las

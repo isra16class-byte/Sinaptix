@@ -235,7 +235,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 /* ---------- 02 MANIFIESTO ---------- */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
 @media(max-width:900px){.split{grid-template-columns:1fr;gap:44px}}
-.lam-title{font-size:clamp(30px,4vw,42px);margin:16px 0 22px;max-width:12ch;letter-spacing:-.02em}
+.lam-title{
+  font-family:var(--font-hand);
+  font-weight:700;
+  font-style:normal;
+  letter-spacing:0;
+  line-height:1.15;
+  font-size:clamp(40px,6vw,68px);
+  margin:16px 0 22px;
+  max-width:12ch;
+}
 .lam-text{color:var(--ink-soft);font-size:16.5px;max-width:52ch;text-align:left}
 .lam-text + .lam-text{margin-top:14px}
 .lead{text-align:left}
@@ -259,16 +268,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 @media(max-width:720px){.title-scribble{display:none}}
 
-/* ---------- Titulos estilo "marcador" (lam-03 / lam-04) ---------- */
-#lam-03 .lam-title,
-#lam-04 .lam-title{
-  font-family:var(--font-hand);
-  font-weight:700;
-  font-style:normal;
-  letter-spacing:0;
-  line-height:1.15;
-  font-size:clamp(40px,6vw,68px);
-}
+/* ---------- Ajuste del subrayado "marcador" (lam-03 / lam-04) ---------- */
 #lam-03 .title-mark,
 #lam-04 .title-mark{
   background-position:left bottom 6px;
@@ -277,10 +277,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 .lam-title-frame{position:relative}
 
-/* .title-hand: mismo tratamiento tipográfico manuscrito que ya tienen
-   #lam-03/#lam-04 (ver arriba), pero como clase reusable para aplicar a un
-   título puntual fuera de esas dos secciones (ej. el título de "Mi plan")
-   sin afectar otros h2.lam-title de la misma página. */
+/* .title-hand: desde que la tipografía manuscrita se unificó en la regla
+   base `.lam-title` (arriba), esta clase quedó redundante para cualquier
+   título que ya tenga `.lam-title` — se deja tal cual (no rompe nada,
+   mismos valores) por si algún título futuro la necesita sola, sin la
+   clase `.lam-title`. */
 .title-hand{
   font-family:var(--font-hand);
   font-weight:700;
