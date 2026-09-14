@@ -5,6 +5,22 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Quitar las 7 rayas naranjas y el chocolate detrás de la neurona izquierda en LAM-03
+
+- El usuario mandó una captura con 5 círculos rojos marcando rayas
+  decorativas naranjas alrededor del título de la sección Método, y
+  pidió sacarlas todas, además del `chocolate.webp` que aparecía
+  detrás de la neurona izquierda.
+- `index.html`: se eliminaron las 7 imágenes `deco-scribble.svg`
+  (rayas naranjas) que decoraban `.lam-title-frame` dentro de
+  `#lam-03`. El subrayado bajo "genérica" (`title-scribble`, clase
+  distinta, parte de la tipografía del título) no se tocó.
+- También se eliminó `img/generadas-cutout/chocolate.webp` de
+  `#lam-03` (estaba con `opacity:.3` detrás de la neurona izquierda).
+  `semilla-chia.webp`, la otra foto de comida de esa sección, no se
+  tocó.
+- Archivos tocados: `index.html`.
+
 ## 2026-09-13 — "Guardar datos" de antropometría ya no abre el correo: cierra el modal y muestra el IMC en Mi IMC
 
 - El usuario reportó que el botón "Guardar datos" del modal de datos

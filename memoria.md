@@ -1845,8 +1845,9 @@ descartada para esa sección; no se reemplazó por otra.
 
 - **`lam-02`**: `huevo.webp`, `aceite-oliva.webp` (`curcuma.webp` se
   quitó de esta sección después, ver nota más abajo).
-- **`lam-03`**: `chocolate.webp`, `semilla-chia.webp`
-  (reutilizadas de `lam-05`).
+- **`lam-03`**: `semilla-chia.webp` (reutilizada de `lam-05`);
+  `chocolate.webp` se agregó primero acá pero se quitó después, ver
+  nota más abajo.
 - **`lam-05`**: `granada.webp`, `remolacha.webp`, `chocolate.webp`,
   `semilla-chia.webp`.
 - **`lam-06`**: `te.webp`, `filete.webp`, `espinaca.webp`.
@@ -2122,6 +2123,27 @@ mismo tratamiento que las fotos de comida) como hijas de
   comida), bajar la neurona derecha un poco más. Se llevó `top` de
   `400px` a `460px`, sin tocar el offset horizontal (`-200px`) ni la
   neurona izquierda.
+- **Se quitaron las 7 rayas naranjas (`deco-scribble.svg`) del marco del
+  título de `lam-03`**: el usuario mandó una captura con círculos rojos
+  marcando las rayas decorativas que rodeaban el título "Un método en
+  cuatro fases..." (las 7 que vivían dentro de `.lam-title-frame`, cada
+  una un `<img class="deco deco-scribble" src="svg/deco-scribble.svg">`
+  distinto con su propia posición/rotación/ancho) y pidió sacarlas. Se
+  eliminaron las 7 por completo de `lam-03`; **no se tocó** el
+  `title-scribble` (el subrayado bajo la palabra "genérica" dentro de
+  `.sec-head-center`, es una clase distinta — `title-scribble`, no
+  `deco-scribble` — y forma parte de la tipografía del título, no es
+  una de las rayas sueltas). Si en el futuro se quiere volver a agregar
+  alguna raya decorativa a esta sección, no reutilizar ninguna posición
+  de las que había: se descartaron todas, no quedó ninguna de
+  referencia.
+- **Se quitó `chocolate.webp` de `lam-03`** (la que vivía detrás de la
+  neurona izquierda, con `opacity:.3`, apenas visible como mancha
+  translúcida): mismo pedido/captura que las rayas de arriba. Solo se
+  quitó esa — `semilla-chia.webp`, la otra foto de comida de esta
+  sección, **no se tocó**. Ver también la sección "Decoraciones de
+  fotos de comida" más arriba en este archivo, donde se actualizó la
+  lista de qué usa cada sección.
 - **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
   igual que el resto de `img/generadas-cutout/`, para mantener la
   convención del repo — redimensionadas a 560px de ancho antes de
