@@ -1813,7 +1813,8 @@ foto en más de una sección no es un problema. Se probó también con
 especificó por qué — puede ser densidad visual o gusto), así que quedó
 descartada para esa sección; no se reemplazó por otra.
 
-- **`lam-02`**: `huevo.webp`, `curcuma.webp`, `aceite-oliva.webp`.
+- **`lam-02`**: `huevo.webp`, `aceite-oliva.webp` (`curcuma.webp` se
+  quitó de esta sección después, ver nota más abajo).
 - **`lam-03`**: `chocolate.webp`, `semilla-chia.webp`
   (reutilizadas de `lam-05`).
 - **`lam-05`**: `granada.webp`, `remolacha.webp`, `chocolate.webp`,
@@ -1824,9 +1825,24 @@ No se usó `Gemini_Generated_Image_ot5quuot5quuot5q.jpg` (la imagen suelta
 sin nombre descriptivo) — si el usuario quiere sumarla a alguna sección,
 falta decidir qué alimento es y generarle su cutout.
 
+**`curcuma.webp` quitada de `lam-02` (chocaba visualmente con la
+neurona izquierda de `lam-03`)**: estaba anclada a `left:-25px;
+bottom:-35px` en `lam-02`, es decir sobresaliendo por el borde inferior
+izquierdo de esa sección — justo por eso, al hacer scroll hasta
+`lam-03`, aparecía pegada arriba de `neurona-izquierda.webp` (que
+arranca en `top:10px` de esa sección siguiente). El usuario mandó una
+captura señalándola como "eso que parece pan" (la textura/color de la
+cúrcuma se presta a esa lectura) y pidió sacarla. Se eliminó el
+`<img>` completo de `curcuma.webp` de `lam-02`; no se reemplazó por
+otra imagen ni se movió a otra sección. `huevo.webp` y
+`aceite-oliva.webp` (las otras dos fotos de esta sección) no se
+tocaron.
+
 **Bug de recorte en la costura entre secciones (`curcuma.webp` y
-`aceite-oliva.webp` en `lam-02`) — corregido**: el usuario mandó una
-captura mostrando que estas dos fotos, al tener un `bottom` negativo
+`aceite-oliva.webp` en `lam-02`) — corregido; `curcuma.webp` ya no
+existe en esta sección (ver nota arriba), la explicación queda para
+`aceite-oliva.webp` y como referencia si se repite el patrón**: el
+usuario mandó una captura mostrando que estas dos fotos, al tener un `bottom` negativo
 (sobresalen por debajo del borde de `lam-02` a propósito, para que el
 efecto de flotar se vea natural), se veían "cortadas" justo en la línea
 donde empieza `lam-03`. La causa **no es la posición** (el usuario pidió
@@ -2071,6 +2087,11 @@ mismo tratamiento que las fotos de comida) como hijas de
   se pide seguir afinando, seguir tocando estos mismos dos valores
   (offset del `right:calc(...)` y `top`) sin tocar la neurona
   izquierda.
+- **Tercera vuelta (solo bajarla más)**: el usuario pidió, en la misma
+  sesión que reportó lo de `curcuma.webp` (ver sección de fotos de
+  comida), bajar la neurona derecha un poco más. Se llevó `top` de
+  `400px` a `460px`, sin tocar el offset horizontal (`-200px`) ni la
+  neurona izquierda.
 - **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
   igual que el resto de `img/generadas-cutout/`, para mantener la
   convención del repo — redimensionadas a 560px de ancho antes de

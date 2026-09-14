@@ -5,6 +5,24 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Quitar curcuma.webp de LAM-02 y bajar un poco más la neurona derecha de LAM-03
+
+- El usuario mandó una captura de la sección en el navegador (con la
+  página scrolleada mostrando el final de LAM-02 y el inicio de
+  LAM-03) señalando "eso que parece pan" arriba de la neurona
+  izquierda, y pidió quitarlo.
+- `index.html`: se identificó como `img/generadas-cutout/curcuma.webp`
+  en `#lam-02` (anclada a `left:-25px;bottom:-35px`, por eso sobresalía
+  justo arriba de donde arranca `neurona-izquierda.webp` en la sección
+  siguiente). Se eliminó ese `<img>` por completo de `lam-02`; no se
+  reemplazó ni se movió a otra sección. `huevo.webp` y
+  `aceite-oliva.webp` (las otras dos fotos de esa sección) quedaron
+  igual.
+- De paso, en el mismo mensaje el usuario pidió bajar un poco más la
+  neurona derecha de LAM-03: `top` pasó de `400px` a `460px` (sin
+  tocar el offset horizontal de `-200px`).
+- Archivos tocados: `index.html`.
+
 ## 2026-09-13 — Ajuste fino de la neurona derecha de LAM-03 (más visible y más abajo)
 
 - El usuario confirmó con una captura que el ajuste anterior (bajar la
