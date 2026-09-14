@@ -5,6 +5,29 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Neuronas de LAM-03 ancladas al borde real de la pantalla y más grandes
+
+- El usuario mandó una captura marcando en rojo, sobre las dos neuronas
+  agregadas en el patch anterior, que el corte recto del soma quedaba
+  "feo" flotando a mitad de camino (no coincidía con ningún borde real)
+  y pidió agrandarlas bastante, del tamaño aproximado de los círculos
+  que dibujó a mano.
+- `index.html`: se movieron `neurona-izquierda.webp` y
+  `neurona-derecha.webp` de ser hijas de `.lam-title-frame` a ser hijas
+  directas de `<section id="lam-03">` (mismo nivel que
+  `chocolate.webp`/`semilla-chia.webp`), y se cambió su posicionamiento
+  horizontal de offsets fijos (`left:-60px`/`right:-60px`, relativos a
+  `.lam-title-frame`) al mismo truco que ya usan los `deco-scribble` de
+  esta sección para anclarse al **borde real del viewport**:
+  `left:calc(50% - (var(--vw100, 100vw) / 2))` (y su espejo
+  `right:calc(...)`). Al coincidir el corte recto del soma con el borde
+  de la pantalla, deja de leerse como un error y pasa a verse como que
+  la neurona "sale" del borde. De paso se agrandaron de `160px` a
+  `380px` de ancho.
+- Sin cambios en las imágenes en sí (mismos `.webp`), solo en cómo se
+  posicionan.
+- Archivos tocados: `index.html`.
+
 ## 2026-09-13 — Dos neuronas decorativas flanqueando el título de LAM-03 (Método)
 
 - Se agregaron dos ilustraciones de neurona (`.deco deco-fruit`, mismo

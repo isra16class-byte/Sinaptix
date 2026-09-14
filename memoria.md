@@ -2018,30 +2018,53 @@ mismo tratamiento que las fotos de comida) como hijas de
      cerebrito, usando `svg/deco-leaf-beneficios.svg` como referencia de
      estilo (mismo trazo delgado, mismo color `#C1703B`), renderizado con
      `cairosvg` y pegado a mano en esa posición.
-- **Integración en `index.html`**: ambas imágenes son hijas de
-  `.lam-title-frame` (no del `<section>` directamente), posicionadas a
-  mano con `left:-60px` / `right:-60px`, `top:-10px`, `width:160px`,
-  `opacity:.9`. Se le bajó la opacidad a `chocolate.webp` en esa misma
-  sección (`.5` → `.3`, es la única foto de comida cercana verticalmente
-  al título) para que las neuronas queden como protagonistas al
-  enmarcar el título; `semilla-chia.webp` no se tocó porque está en la
-  parte baja de la sección, lejos del título.
+- **Integración en `index.html`, v1 (descartada)**: en la primera pasada
+  las dos imágenes se pusieron como hijas de `.lam-title-frame`, chicas
+  (`width:160px`) y pegadas con offsets fijos (`left:-60px`/`right:-60px`)
+  relativos a ese frame (que está inset por el padding de `.wrap`, no
+  llega al borde real de la pantalla). El usuario mandó una captura: se
+  veía el corte recto del soma "flotando" a mitad de camino, un corte
+  feo porque no coincidía con ningún borde real.
+- **Integración final (la que quedó)**: ambas imágenes son hijas
+  directas de `<section id="lam-03">` (mismo nivel que `chocolate.webp`/
+  `semilla-chia.webp`/el blob de almendras), no de `.lam-title-frame`,
+  y usan el mismo truco de las `deco-scribble` de esta sección para
+  anclarse al **borde real del viewport** en vez de al borde de
+  `.wrap`:
+  ```html
+  style="left:calc(50% - (var(--vw100, 100vw) / 2));top:10px;width:380px;opacity:.95;transform:rotate(-2deg)"
+  ```
+  (y `right:calc(...)` espejado para la derecha). `--vw100` ya la
+  actualiza `js/script.js` (comentario ahí: "Fix: en vez de `50vw`,
+  usamos una variable CSS `--vw100`..."), así que no hizo falta tocar
+  JS. Al quedar el borde cortado del soma exactamente sobre el borde de
+  la pantalla, el corte recto ya no se nota como error — se lee como
+  que la neurona "sale" del borde de la pantalla, que es lo que pidió
+  el usuario. De paso se agrandaron bastante (`160px` → `380px` de
+  ancho) porque el usuario las quería mucho más grandes, del tamaño
+  aproximado de unos círculos que marcó a mano sobre una captura.
+- Se le bajó la opacidad a `chocolate.webp` en esa misma sección
+  (`.5` → `.3`, es la única foto de comida cercana verticalmente al
+  título) para que las neuronas queden como protagonistas al enmarcar
+  el título; `semilla-chia.webp` no se tocó porque está en la parte
+  baja de la sección, lejos del título.
 - **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
   igual que el resto de `img/generadas-cutout/`, para mantener la
   convención del repo — redimensionadas a 560px de ancho antes de
   exportar (el PNG reconstruido intermedio, más pesado, no se subió al
-  repo).
-- **No se pudo verificar visualmente en un navegador real desde este
-  entorno**: mismo problema de siempre (sin red a Google Fonts/Netlify
-  Identity) **más un hallazgo nuevo**: el render headless disponible en
-  este sandbox (`wkhtmltoimage`, motor QtWebKit) no decodifica `.webp`
-  — todas las imágenes `.webp` del sitio (no solo las nuevas) se ven
-  como ícono de "imagen rota" en ese render, así que tampoco sirvió para
-  confirmar posición/tamaño de estas dos piezas puntuales. Si en un
-  navegador real las neuronas quedan mal ubicadas, se superponen con el
-  texto del título, o chocan visualmente con `chocolate.webp`/
-  `semilla-chia.webp`, avisar en la próxima sesión — los valores se
-  ajustan sin tocar el resto de la sección.
+  repo). A 380px de ancho en pantalla siguen teniendo margen de
+  resolución de sobra.
+- **Esta vez sí se verificó con una captura real** que mandó el usuario
+  (el problema del corte recto de la v1), pero **el ajuste final
+  (borde real + 380px) todavía no se vio en un navegador real** — el
+  render headless de este entorno (`wkhtmltoimage`) no decodifica
+  `.webp` (todas las imágenes `.webp` del sitio se ven como ícono roto
+  ahí), así que se razonó por CSS/valores, no por captura. Si al verlo
+  el tamaño o la posición vertical (`top:10px`) no quedan como se
+  espera, o las neuronas de 380px chocan de más con el texto de la
+  timeline (columna izquierda, arranca alrededor de `x≈250px` dentro
+  de `.wrap`), avisar para ajustar — no hace falta tocar el resto de
+  la sección.
 - Si en el futuro se necesita repetir este tipo de reconstrucción
   (imagen "transparente" que resulta ser un JPG con cuadriculado
   horneado), el patrón a seguir es: 1) confirmar el problema muestreando
