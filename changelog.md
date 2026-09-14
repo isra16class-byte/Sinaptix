@@ -8,7 +8,22 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Visión: agrandar más el fondo y pegarlo al borde derecho
+## 2026-09-14 — Visión: agrandar más el fondo, subirlo, y glow en los números
+
+Ajuste pedido por el usuario: más grande todavía y un poco más arriba. Al
+agrandarlo/subirlo el cerebro del arte quedó justo encima del número
+"86B", comprometiendo la legibilidad — se resolvió con un glow en el
+texto en vez de volver atrás el tamaño/posición pedidos.
+
+- `vision-brain-bg`: ancho `clamp(780px,74vw,1320px)` ->
+  `clamp(880px,84vw,1480px)`; `top` `320px` -> `230px`.
+- Nuevo: `#lam-02 .stat-box .num` lleva `text-shadow` tipo glow (blanco
+  para las tarjetas normales, morado oscuro para `.is-featured`) para que
+  el número se siga leyendo bien aunque el arte de fondo (cerebro, en el
+  caso de la tarjeta 86B) caiga justo encima.
+- Verificado con Playwright en 1024/1400px.
+
+
 
 Ajuste pedido por el usuario: quería el fondo más grande todavía y que
 pareciera que "sale" del costado derecho de la pantalla.

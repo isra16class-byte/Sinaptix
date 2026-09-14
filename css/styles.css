@@ -325,7 +325,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(2px);
 }
+#lam-02 .stat-box .num{text-shadow:0 0 14px rgba(255,255,255,.95),0 0 4px rgba(255,255,255,.95)}
 #lam-02 .stat-box.is-featured{background:rgba(75,46,69,.6)}
+#lam-02 .stat-box.is-featured .num{text-shadow:0 0 14px rgba(75,46,69,.95),0 0 4px rgba(75,46,69,.95)}
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}
