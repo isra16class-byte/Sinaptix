@@ -5,6 +5,28 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Paleta cálida (crema + café) solo en Método (LAM-03)
+
+- El usuario mandó una imagen de referencia (mockup generado con IA) con
+  un fondo beige/crema y acentos café, y pidió aplicar ese color a la
+  sección 3 (Método).
+- `css/styles.css`: se agregó un bloque `#lam-03{--panel:#EBE5D7;
+  --panel-line:...; --panel-text:...; --purple:#7C5C45;
+  --purple-dark:#5B4432; --purple-soft:...}` que sobreescribe, solo
+  dentro de esa sección, las custom properties que ya usaban el fondo, el
+  eyebrow, la línea de tiempo, el switch "Mi progreso"/"Mi IMC" y los
+  botones — no se duplicó CSS, se aprovechó que las custom properties
+  heredan a los descendientes (incluido el SVG de los anillos que arma
+  `js/script.js`). Las demás secciones "dark" (Beneficios, Contacto) y
+  "Mi plan" no cambian.
+- No se tocaron los colores semánticos de los medidores (rojo/dorado/
+  verde según umbral, ej. zonas de IMC) ni la tipografía del título de
+  `#lam-03` (sigue en `Caveat`, manuscrita) — el pedido fue solo el color.
+- Ver "Paleta cálida propia de LAM-03" en `memoria.md`: **no se pudo
+  verificar visualmente en un navegador real desde este entorno** (mismas
+  limitaciones de red/render headless de siempre); avisar si el color no
+  coincide con lo esperado al verlo.
+
 ## 2026-09-13 — Fotos de comida flotantes en Visión, Beneficios y Contacto
 
 - El usuario subió 10 fotos/ilustraciones de alimentos (estilo "cutout",

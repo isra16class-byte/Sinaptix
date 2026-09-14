@@ -1826,6 +1826,48 @@ usuario nota algo descuadrado (tamaño, posición, opacidad, choque con
 texto) al verlo en un navegador real, avisar en la próxima sesión — los
 valores se puede ajustar sin tocar el resto de la sección.**
 
+## Paleta cálida propia de LAM-03 (Método)
+
+`#lam-03` (única sección) tiene su propia paleta de "crema + café" en vez
+del panel rosado/violeta que comparten las demás secciones `section.dark`
+(`lam-05`, `lam-06`). Se pidió a partir de una imagen de referencia (un
+mockup generado con IA, con errores de texto típicos de ese tipo de
+imagen — no se tomó el texto ni la tipografía de esa imagen como pedido,
+**solo el color**, tal cual lo pidió el usuario).
+
+- **Cómo está implementado** (`css/styles.css`, justo antes del bloque
+  `/* ---------- 03 PROCESO ---------- */`): un selector `#lam-03{...}`
+  que **sobreescribe las custom properties** `--panel`, `--panel-line`,
+  `--panel-text`, `--purple`, `--purple-dark`, `--purple-soft` solo para
+  ese elemento y sus descendientes (las custom properties heredan hacia
+  abajo en el DOM). No se duplicó ninguna regla existente — todo lo que ya
+  usaba esas variables (fondo de `section.dark`, `.eyebrow`, línea y
+  círculos numerados de `.timeline`, el switch "Mi progreso"/"Mi IMC" y
+  `.btn-solid`/`.btn-ghost`) se recolorea solo, incluido el SVG de los
+  anillos que arma `js/script.js` (usa `stroke="var(--panel-line)"`
+  inline, también hereda).
+- **Qué NO se tocó a propósito**: los colores semánticos de los medidores
+  (`gaugeColorForPercent` en `js/nutricion-planes.js`, y las zonas
+  rojo/dorado/verde del medidor de IMC en `css/styles.css`) — esos indican
+  estado de salud (bajo/saludable/alto), no son de marca, así que deben
+  verse igual en todas las secciones y páginas donde aparezcan (incluida
+  "Mi plan"). Tampoco se tocó la tipografía de `#lam-03 .lam-title`
+  (sigue con la fuente manuscrita `Caveat` que ya tenía) ni ningún SVG
+  decorativo (`deco-blob-almonds.svg`, etc.) — la imagen de referencia
+  mostraba una fuente distinta, pero el pedido fue explícitamente "ese
+  color", no la tipografía.
+- **Si se quiere el mismo tratamiento en otra sección**, el patrón a
+  copiar es el bloque `#lam-0X{--panel:...; --panel-line:...; ...}` con
+  los mismos nombres de variable — no hace falta tocar nada más.
+- **No se pudo verificar visualmente en un navegador real desde este
+  entorno** (mismo problema de siempre: sin red a Google
+  Fonts/Netlify Identity, y el render headless disponible en el sandbox
+  fue inconsistente incluso para confirmar solo el color de fondo). La
+  lógica de cascada de custom properties está razonada y es la misma que
+  ya usa el resto del sitio (no es una técnica nueva), pero si el color
+  final no coincide con lo esperado al verlo en el navegador, avisar para
+  ajustar los valores hex.
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - ~~Backend real para "Mi plan" (Netlify Database + Functions)~~ —

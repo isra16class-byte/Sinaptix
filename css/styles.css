@@ -415,6 +415,33 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 
 
+/* ---------- 03 MÉTODO — paleta cálida (crema + café) ----------
+   A pedido del usuario, a partir de una imagen de referencia (mockup
+   generado con IA) con fondo beige/crema y acentos café en vez del panel
+   rosado/violeta que usan las demás secciones "dark" (Beneficios,
+   Contacto). Se logra sobreescribiendo, solo dentro de #lam-03, las
+   custom properties que section.dark y sus componentes ya usaban
+   (--panel*, --purple*): como son custom properties, heredan hacia todos
+   los descendientes (incluido el SVG de los anillos que arma
+   js/script.js con stroke="var(--panel-line)"), así que no hace falta
+   duplicar reglas — remaquetando solo estas variables ya recolorea fondo,
+   texto, línea/números de la línea de tiempo, tarjeta de "Mi
+   progreso"/"Mi IMC" (el switch y el estado activo) y los botones
+   .btn-solid/.btn-ghost de esta sección. El resto del sitio (lam-05,
+   lam-06, "Mi plan", etc.) no se ve afectado porque nunca leen estas
+   variables reescritas — solo lo hace lo que vive dentro de #lam-03.
+   Los colores semánticos de los medidores (gauge rojo/dorado/verde según
+   umbral, ej. IMC) NO se tocan a propósito: no son de marca, indican
+   estado de salud y deben verse igual en todas partes. */
+#lam-03{
+  --panel:#EBE5D7;
+  --panel-line:rgba(35,25,18,.18);
+  --panel-text:rgba(35,25,18,.64);
+  --purple:#7C5C45;
+  --purple-dark:#5B4432;
+  --purple-soft:rgba(124,92,69,.14);
+}
+
 /* ---------- 03 PROCESO ---------- */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
 @media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}
