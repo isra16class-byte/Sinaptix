@@ -8,6 +8,26 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
+
+Pedido del usuario con captura: las 3 tarjetas claras del `stat-grid` de
+Visión (`lam-02`) contrastaban demasiado contra la destacada, que ya
+tenía fondo morado oscuro. Se unificó el tono de las 4.
+
+- `#lam-02 .stat-box`: fondo `rgba(255,255,255,.4)` ->
+  `rgba(75,46,69,.6)` (mismo morado que la destacada, translúcido con
+  blur para seguir dejando ver el arte de fondo).
+- `#lam-02 .stat-box .num`: color pasa a blanco, y el glow (`text-shadow`)
+  que antes era blanco (para legibilidad sobre fondo claro) ahora usa el
+  mismo morado oscuro que ya tenía la destacada, consistente con el fondo
+  nuevo.
+- `#lam-02 .stat-box .lab`: pasa a blanco (antes heredaba el color oscuro
+  por defecto de `.stat-box`).
+- `#lam-02 .stat-box.is-featured`: se sube levemente la opacidad a `.75`
+  (antes `.6`, igual que las demás ahora) para conservar una jerarquía
+  sutil con el dato principal, sin volver a contrastar en blanco vs.
+  morado.
+
 ## 2026-09-14 — Visión: agrandar más el fondo, subirlo, y glow en los números
 
 Ajuste pedido por el usuario: más grande todavía y un poco más arriba. Al

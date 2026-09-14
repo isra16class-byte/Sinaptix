@@ -193,15 +193,15 @@ próximos pasos).
   sección) baja `margin-top:90px` y el fondo arranca en `top:230px` para
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
-  incluida la destacada `.is-featured`) son translúcidas
-  (`rgba(255,255,255,.4)` / `rgba(75,46,69,.6)`) con blur suave para dejar
-  ver el arte detrás; los números (`.num`) llevan además un `text-shadow`
-  tipo glow (blanco / morado oscuro según la tarjeta) para seguir siendo
-  legibles cuando el cerebro del fondo cae justo encima (pasa en la
-  tarjeta 86B). Se sacaron las decoraciones viejas de esa esquina
-  (círculos, huevo, aceite de oliva) que competían con el arte nuevo.
-  Ancho responsive con `clamp()`, oculto en mobile (`<900px`, mismo
-  criterio que el resto de `.deco-fruit`).
+  incluida la destacada `.is-featured`) son translúcidas, **todas en el
+  mismo tono morado** (`rgba(75,46,69,.6)`, destacada `.75`) con blur
+  suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en blanco;
+  los números (`.num`) llevan además un `text-shadow` tipo glow (mismo
+  morado oscuro del fondo) para seguir siendo legibles cuando el cerebro
+  del fondo cae justo encima (pasa en la tarjeta 86B). Se sacaron las
+  decoraciones viejas de esa esquina (círculos, huevo, aceite de oliva)
+  que competían con el arte nuevo. Ancho responsive con `clamp()`, oculto
+  en mobile (`<900px`, mismo criterio que el resto de `.deco-fruit`).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
