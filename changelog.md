@@ -5,6 +5,53 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Dos neuronas decorativas flanqueando el título de LAM-03 (Método)
+
+- Se agregaron dos ilustraciones de neurona (`.deco deco-fruit`, mismo
+  tratamiento que las fotos de comida: flotación, oculta en mobile
+  <720px, detrás del contenido) a cada lado del `.lam-title-frame` en
+  `#lam-03`.
+- **Pieza izquierda** (`img/decoraciones-neurona/neurona-izquierda.webp`):
+  reconstruida a partir de `img/neuronas/neurona-izquierda-aprobada
+  (1).jpg` (ilustración ya aprobada por el usuario). Ese archivo fuente
+  era un JPG con el cuadriculado de "transparencia" de un visor
+  **horneado como píxeles reales** (sin canal alfa real) — se detectó y
+  se reconstruyó un PNG con transparencia real, y como el brillo dorado
+  difuminado de las puntas de sinapsis se perdía casi por completo al
+  quitar el cuadriculado (quedaban fragmentos duros), se regeneró ese
+  brillo de forma sintética (glow radial suave) sobre las puntas
+  detectadas de las dendritas, dejando intactos el soma, las ramas y el
+  ícono de cerebrito+nube tal cual estaban.
+- **Pieza derecha** (`img/decoraciones-neurona/neurona-derecha.webp`):
+  se decidió **no volver a pedirle a Gemini** que generara la pieza
+  derecha — varios intentos previos no lograban replicar la misma
+  composición espejada (forma de soma distinta, dos neuronas conectadas,
+  canopy completo en vez de media copa). En cambio: se tomó la imagen
+  izquierda ya reconstruida, se le quitó el ícono de cerebrito, se
+  espejó horizontalmente (flip simple), y se dibujó un ícono de hoja
+  (mismo estilo lineal delgado y color que `svg/deco-leaf-beneficios.svg`)
+  en la posición espejada donde estaba el cerebrito.
+- `index.html`: ambas imágenes se insertaron como hijas de
+  `.lam-title-frame` en `#lam-03`, una a cada lado del título
+  (`left:-60px` / `right:-60px`, `width:160px`, `opacity:.9`). Se bajó
+  la opacidad de `chocolate.webp` en esa misma sección (`.5` → `.3`,
+  única decoración de comida cercana verticalmente al título) para que
+  las neuronas sean el elemento protagonista al enmarcar el título;
+  `semilla-chia.webp` no se tocó (está en la parte baja de la sección,
+  lejos del título).
+- **No se pudo verificar visualmente en un navegador real desde este
+  entorno**: mismo problema de siempre (sin red a Google
+  Fonts/Netlify Identity) más un hallazgo nuevo — el render headless
+  disponible (`wkhtmltoimage`, motor QtWebKit) no decodifica `.webp`,
+  así que ni siquiera sirve para chequear posición/tamaño de estas
+  imágenes puntuales. Si al verlo en un navegador real las neuronas
+  quedan mal ubicadas, se superponen con el texto del título, o chocan
+  con `chocolate.webp`/`semilla-chia.webp`, avisar para ajustar los
+  valores (no hace falta tocar el resto de la sección).
+- Archivos tocados: `index.html`; nuevos
+  `img/decoraciones-neurona/neurona-izquierda.webp` y
+  `img/decoraciones-neurona/neurona-derecha.webp`.
+
 ## 2026-09-13 — Tipografía unificada, quitar granada de LAM-03 y arreglar corte de fotos en la costura LAM-02/LAM-03
 
 - El usuario mandó una captura y pidió tres cosas sobre el patch anterior:

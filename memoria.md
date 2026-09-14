@@ -1966,6 +1966,93 @@ imagen — no se tomó el texto ni la tipografía de esa imagen como pedido,
   si el resultado no coincide con lo esperado al verlo en el navegador
   (tono, o el ancho del fundido), avisar para ajustar los valores.
 
+## Dos neuronas decorativas flanqueando el título de LAM-03 (Método)
+
+`#lam-03` tiene dos ilustraciones de neurona (`class="deco deco-fruit"`,
+mismo tratamiento que las fotos de comida) como hijas de
+`.lam-title-frame`, una a cada lado del título, en
+`img/decoraciones-neurona/neurona-izquierda.webp` y
+`.../neurona-derecha.webp`.
+
+- **Origen de la pieza izquierda**: viene de
+  `img/neuronas/neurona-izquierda-aprobada (1).jpg`, una ilustración ya
+  aprobada por el usuario (soma plano en forma de estrella cortado en el
+  borde izquierdo, dendritas en abanico hacia la derecha, puntos dorados
+  de sinapsis en las puntas, ícono lineal dorado de cerebro+nube de
+  pensamiento integrado en una punta superior, pensada con fondo
+  transparente).
+- **Problema encontrado con ese archivo**: pese a lucir "transparente"
+  en un visor, es un **JPG sin canal alfa real** — el cuadriculado
+  gris/blanco que se ve de fondo está pintado como píxeles reales
+  (confirmado: celdas de ~21px alternando `rgb(249,249,247)` /
+  `rgb(209,209,209)`), típico de exportar desde un visor que muestra ese
+  patrón para "transparente" y aplanarlo a JPG sin preservar el alfa.
+  Al reconstruir el alfa detectando y descartando ese patrón, el soma,
+  las dendritas y el ícono se recuperan limpios, pero el brillo dorado
+  difuminado (bloom) de las puntas de sinapsis era tan sutil que en la
+  mayoría de los casos es casi indistinguible del cuadriculado, así que
+  se pierde casi por completo y quedan fragmentos duros/cuadrados en vez
+  del halo redondo original.
+- **Cómo se resolvió** (se le presentó el problema al usuario con una
+  imagen de diagnóstico compuesta sobre magenta, y eligió reconstruir en
+  vez de buscar el PNG original): se detectaron las puntas reales de las
+  dendritas por esqueletización de la línea oscura (`skimage.
+  skeletonize` + detección de endpoints, filtrando y fusionando puntos
+  cercanos), y en cada punta se dibujó un glow radial sintético
+  (gradiente dorado con desenfoque gaussiano) para aproximar el brillo
+  original. La capa base (soma + ramas + ícono) se reconstruyó aparte
+  filtrando solo líneas oscuras (`brillo<195`) más los píxeles cálidos
+  dentro del bounding box del ícono (para no perder sus trazos finos),
+  descartando cualquier otro resto cálido suelto del cuadriculado
+  (fragmentos de ruido JPEG) para que no queden manchas sueltas. El
+  glow sintético se compone **detrás** de esa capa base.
+- **Origen de la pieza derecha**: se descartó pedirle a Gemini que
+  generara una pieza derecha nueva — varios intentos no lograban
+  replicar la misma composición espejada (a veces forma de soma
+  distinta, otras dos neuronas conectadas, otras canopy completo en vez
+  de media copa). En cambio, se derivó **directamente** de la imagen
+  izquierda ya reconstruida:
+  1. se borró (a transparente) el área del ícono de cerebrito,
+  2. se espejó la imagen horizontalmente (flip simple, sin IA),
+  3. se dibujó un ícono de hoja en la posición espejada donde estaba el
+     cerebrito, usando `svg/deco-leaf-beneficios.svg` como referencia de
+     estilo (mismo trazo delgado, mismo color `#C1703B`), renderizado con
+     `cairosvg` y pegado a mano en esa posición.
+- **Integración en `index.html`**: ambas imágenes son hijas de
+  `.lam-title-frame` (no del `<section>` directamente), posicionadas a
+  mano con `left:-60px` / `right:-60px`, `top:-10px`, `width:160px`,
+  `opacity:.9`. Se le bajó la opacidad a `chocolate.webp` en esa misma
+  sección (`.5` → `.3`, es la única foto de comida cercana verticalmente
+  al título) para que las neuronas queden como protagonistas al
+  enmarcar el título; `semilla-chia.webp` no se tocó porque está en la
+  parte baja de la sección, lejos del título.
+- **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
+  igual que el resto de `img/generadas-cutout/`, para mantener la
+  convención del repo — redimensionadas a 560px de ancho antes de
+  exportar (el PNG reconstruido intermedio, más pesado, no se subió al
+  repo).
+- **No se pudo verificar visualmente en un navegador real desde este
+  entorno**: mismo problema de siempre (sin red a Google Fonts/Netlify
+  Identity) **más un hallazgo nuevo**: el render headless disponible en
+  este sandbox (`wkhtmltoimage`, motor QtWebKit) no decodifica `.webp`
+  — todas las imágenes `.webp` del sitio (no solo las nuevas) se ven
+  como ícono de "imagen rota" en ese render, así que tampoco sirvió para
+  confirmar posición/tamaño de estas dos piezas puntuales. Si en un
+  navegador real las neuronas quedan mal ubicadas, se superponen con el
+  texto del título, o chocan visualmente con `chocolate.webp`/
+  `semilla-chia.webp`, avisar en la próxima sesión — los valores se
+  ajustan sin tocar el resto de la sección.
+- Si en el futuro se necesita repetir este tipo de reconstrucción
+  (imagen "transparente" que resulta ser un JPG con cuadriculado
+  horneado), el patrón a seguir es: 1) confirmar el problema muestreando
+  píxeles de la zona "transparente" (¿son valores de gris neutro
+  alternando en celdas regulares?), 2) avisarle al usuario antes de
+  invertir tiempo reconstruyendo (puede que tenga el PNG original a
+  mano), 3) si no lo tiene, reconstruir la línea/forma sólida por
+  brillo, y cualquier brillo/glow sutil por separado y de forma
+  sintética en vez de intentar rescatar los píxeles originales (ya
+  perdidos).
+
 ## Pendientes conocidos (ver README.md → "Próximos pasos" para el detalle)
 
 - ~~Backend real para "Mi plan" (Netlify Database + Functions)~~ —
