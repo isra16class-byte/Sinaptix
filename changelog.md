@@ -5,6 +5,31 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Neurona derecha de LAM-03 bajada y empujada fuera de pantalla (solo ramitas visibles)
+
+- El usuario mandó una captura de cómo se veía la sección en producción:
+  ambas neuronas (izquierda y derecha) se veían completas y muy
+  prominentes, casi simétricas, ocupando gran parte del ancho. Pidió que
+  la neurona **derecha** se bajara y se moviera más hacia la derecha
+  para que **solo se vieran las puntas de las ramas** (no el soma ni el
+  cuerpo principal).
+- `index.html`: en `neurona-derecha.webp` (hija directa de
+  `#lam-03`), `top` pasó de `10px` a `340px` (baja de estar junto al
+  título a la altura del bloque de progreso/timeline), y el offset del
+  truco de anclaje al borde real (`right:calc(50% - (var(--vw100,
+  100vw) / 2))`) se le restaron `260px` adicionales
+  (`... - 260px`), empujando la imagen más allá del borde derecho real.
+  Como la imagen es el espejo de la izquierda, el soma queda en el
+  borde derecho de la imagen — al empujarla más afuera, el soma y el
+  cuerpo quedan fuera de pantalla y solo asoman las puntas de las
+  dendritas que se extendían hacia la izquierda de la imagen.
+- La neurona izquierda **no se tocó**.
+- **No verificado en navegador real** desde este entorno (el render
+  headless disponible no decodifica `.webp`); el ajuste se razonó por
+  valores CSS. Si al verlo se asoma más o menos de lo esperado, avisar
+  para afinar el offset de `-260px` o el `top:340px`.
+- Archivos tocados: `index.html`.
+
 ## 2026-09-13 — Neuronas de LAM-03 ancladas al borde real de la pantalla y más grandes
 
 - El usuario mandó una captura marcando en rojo, sobre las dos neuronas

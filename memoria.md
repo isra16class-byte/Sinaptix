@@ -2048,6 +2048,22 @@ mismo tratamiento que las fotos de comida) como hijas de
   título) para que las neuronas queden como protagonistas al enmarcar
   el título; `semilla-chia.webp` no se tocó porque está en la parte
   baja de la sección, lejos del título.
+- **Ajuste posterior (solo neurona derecha)**: el usuario mandó una
+  captura de la sección ya en producción y pidió que la neurona
+  **derecha** se bajara y se empujara más hacia afuera del borde, para
+  que **solo se vean las puntas de las ramas** (no el soma completo ni
+  el cuerpo principal) — la izquierda se queda igual (`top:10px`,
+  anclada justo al borde real). Se cambió `top:10px → 340px` (baja a
+  la altura del bloque de progreso/timeline) y se le restaron `260px`
+  extra al offset del anclaje al borde real: `right:calc(50% -
+  (var(--vw100, 100vw) / 2) - 260px)`. Como esta imagen es el espejo
+  horizontal de la izquierda, el soma queda en el borde **derecho** de
+  la imagen (no el izquierdo); al empujarla más hacia afuera, el soma
+  y el cuerpo principal quedan fuera de pantalla y solo asoman las
+  puntas de las dendritas, que en la imagen original se extendían
+  hacia el lado izquierdo. Si en el futuro se pide ajustar cuánto se
+  asoma, tocar ese mismo offset (`-260px`) y/o el `top:340px`, sin
+  tocar la neurona izquierda.
 - **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
   igual que el resto de `img/generadas-cutout/`, para mantener la
   convención del repo — redimensionadas a 560px de ancho antes de
