@@ -8,7 +8,24 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Fondo ilustrado (cerebro/red neuronal) detrás del stat-grid de Visión
+## 2026-09-14 — Visión: agrandar el fondo ilustrado y transparentar todas las tarjetas
+
+Ajuste pedido por el usuario tras ver el resultado del patch anterior: la
+imagen de fondo se veía chica y solo la tarjeta "86B" dejaba notar el arte
+detrás.
+
+- `img/decoraciones-neurona/fondo-vision-red.webp` pasa de
+  `clamp(520px,50vw,860px)` a `clamp(680px,64vw,1150px)`, y el bleed hacia
+  el borde derecho real de pantalla se acorta (`+20px` en vez de `+90px`)
+  para que ocupe casi toda la mitad derecha de la sección.
+- Las 4 `.stat-box` de `#lam-02` (incluida `.is-featured`, antes sólida)
+  pasan todas al mismo tratamiento translúcido: `rgba(255,255,255,.4)` /
+  `rgba(75,46,69,.6)` con `backdrop-filter:blur(2px)` (antes `.55`/`.82`
+  opacos y `blur(3px)`, mucho más tapado).
+- Verificado de nuevo con Playwright en 1024/1400px: texto de las 4
+  tarjetas sigue legible sobre el arte.
+
+
 
 A pedido del usuario (venía de una imagen generada con Gemini, primero con
 texto horneado en el JPG —descartada por no ser accesible/editable— y

@@ -321,11 +321,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 @media(max-width:900px){#lam-02 .vision-brain-bg{display:none}}
 
 #lam-02 .stat-box{
-  background:rgba(255,255,255,.55);
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
+  background:rgba(255,255,255,.4);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
 }
-#lam-02 .stat-box.is-featured{background:rgba(75,46,69,.82)}
+#lam-02 .stat-box.is-featured{background:rgba(75,46,69,.6)}
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}
