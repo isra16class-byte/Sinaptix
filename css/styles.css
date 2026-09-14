@@ -483,13 +483,27 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 .method-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:58px;padding-top:44px;border-top:1px solid var(--panel-line)}
 
-.method-gauges{background:var(--paper);border-radius:var(--radius);padding:28px 26px;box-shadow:var(--shadow)}
+/* Antes esta tarjeta era un cuadro blanco (--paper) con sombra, pensado
+   para contrastar sobre el fondo oscuro/rosado que usan el resto de las
+   secciones .dark. Dentro de #lam-03 el fondo de la sección es la crema
+   propia de esa sección (--panel, ver bloque "#lam-03{...}" más arriba),
+   así que ahora la tarjeta usa ese mismo --panel (se funde con el fondo
+   en vez de flotar como un cuadro blanco) y cambia la sombra por un
+   borde sutil (--panel-line) para conservar apenas la separación del
+   contenido de la izquierda. Si esta tarjeta se reutiliza algún día
+   fuera de #lam-03 sobre un fondo donde --panel no esté pensado para
+   fundirse, revisar este color. */
+.method-gauges{background:var(--panel);border-radius:var(--radius);padding:28px 26px;border:1px solid var(--panel-line)}
 
 /* Interruptor "Mi progreso" / "Mi IMC" dentro de .method-gauges (sección
    03, Método). Por defecto siempre queda activo "Mi progreso" — ver
    setGaugesView('progreso') en js/script.js — el usuario puede tocar "Mi
-   IMC" para ver el medidor en su lugar; solo un panel visible a la vez. */
-.gauges-switch{display:flex;gap:6px;background:var(--panel);border-radius:var(--radius-pill);padding:4px;margin-bottom:18px;width:fit-content;max-width:100%}
+   IMC" para ver el medidor en su lugar; solo un panel visible a la vez.
+   El track del switch ya no puede usar --panel de fondo (ahora es el
+   mismo color que la tarjeta, quedaría invisible) — se usa un tinte
+   neutro semitransparente en su lugar, que funciona igual sobre la
+   crema de #lam-03 o sobre --panel en cualquier otro contexto. */
+.gauges-switch{display:flex;gap:6px;background:rgba(0,0,0,.055);border-radius:var(--radius-pill);padding:4px;margin-bottom:18px;width:fit-content;max-width:100%}
 .gauges-switch-btn{font-family:var(--font-m);font-size:12.5px;font-weight:700;letter-spacing:.01em;color:var(--ink-soft);background:transparent;border:none;border-radius:var(--radius-pill);padding:9px 16px;cursor:pointer;transition:background .18s ease,color .18s ease}
 .gauges-switch-btn:hover{color:var(--ink)}
 .gauges-switch-btn.is-active{background:var(--paper);color:var(--purple);box-shadow:var(--shadow)}

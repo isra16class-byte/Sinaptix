@@ -737,6 +737,31 @@ comentario histórico explicando el origen del dato.
   a Playwright, conviene confirmar con capturas (desktop y móvil 380px)
   que el anillo único + la línea de delta se ven bien, sobre todo con
   nombres de área más largos o valores negativos de delta.
+- **La tarjeta `.method-gauges` ya no es un cuadro blanco sólido**: el
+  usuario mandó una captura (fondo crema de `#lam-03` con la tarjeta en
+  blanco puro, contraste marcado) y pidió "difuminar" ese cuadro para que
+  fuera del color del fondo. Se cambió `.method-gauges` de
+  `background:var(--paper)` + `box-shadow:var(--shadow)` a
+  `background:var(--panel)` + `border:1px solid var(--panel-line)` — como
+  `--panel` está sobreescrito dentro de `#lam-03` a la crema propia de esa
+  sección, la tarjeta ahora se funde con el fondo en vez de flotar como
+  cuadro blanco. Efecto colateral que hubo que corregir en el mismo
+  cambio: el track del switch "Mi progreso"/"Mi IMC" (`.gauges-switch`)
+  usaba `background:var(--panel)` para contrastar contra la tarjeta
+  blanca — al quedar la tarjeta también en `--panel` el track se volvía
+  invisible, así que se cambió a un tinte neutro semitransparente
+  (`rgba(0,0,0,.055)`), que se ve igual sobre la crema de `#lam-03` o
+  sobre cualquier otro `--panel`. El botón activo del switch
+  (`.gauges-switch-btn.is-active`) sigue en `--paper` blanco con sombra,
+  sin cambios, así que el tab seleccionado sigue destacando con
+  claridad. **No verificado en navegador real** (mismo problema de
+  siempre en este entorno, ver notas de renderizado más abajo en este
+  archivo) — razonado por CSS/cascada de custom properties, coincide con
+  el mismo mecanismo ya usado en la paleta cálida de `#lam-03`. Si esta
+  tarjeta se reutiliza en el futuro fuera de `#lam-03` (sobre un fondo
+  donde `--panel` no esté pensado para fundirse, p. ej. una sección
+  `.dark` normal), revisar si sigue queriéndose ese mismo tratamiento o
+  si conviene volver a un fondo con contraste propio.
 
 ## Interruptor "Mi progreso" / "Mi IMC" (`#methodGauges`, sección 03)
 

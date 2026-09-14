@@ -5,6 +5,28 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Fundir la tarjeta de gráficas de Método con el fondo de la sección
+
+- El usuario mandó una captura de la sección Método (`#lam-03`) donde la
+  tarjeta de las gráficas (`.method-gauges`) se veía como un cuadro
+  blanco marcado sobre el fondo crema de la sección, y pidió "difuminar"
+  ese cuadro para que fuera del color del fondo.
+- `css/styles.css`: `.method-gauges` pasó de `background:var(--paper)`
+  (blanco puro) + `box-shadow:var(--shadow)` a `background:var(--panel)`
+  + `border:1px solid var(--panel-line)` — al estar `--panel`
+  sobreescrito dentro de `#lam-03` a la crema propia de esa sección, la
+  tarjeta ahora se funde con el fondo.
+- Efecto colateral corregido en el mismo cambio: el track del switch
+  "Mi progreso"/"Mi IMC" (`.gauges-switch`) usaba `background:var
+  (--panel)` para contrastar contra la tarjeta blanca; al quedar la
+  tarjeta también en `--panel` el track se volvía invisible. Se cambió a
+  `rgba(0,0,0,.055)` (tinte neutro semitransparente). El botón activo del
+  switch no se tocó (sigue en `--paper` blanco con sombra, sigue
+  destacando).
+- No verificado en navegador real (mismo problema de siempre en este
+  entorno); razonado por cascada de custom properties, ver detalle en
+  `memoria.md` → "Anillos de progreso en Método".
+
 ## 2026-09-13 — Quitar las 7 rayas naranjas y el chocolate detrás de la neurona izquierda en LAM-03
 
 - El usuario mandó una captura con 5 círculos rojos marcando rayas
