@@ -5,6 +5,31 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Método (LAM-03): agregar fotos de comida decorativas
+
+- El usuario pidió agregarle a la sección 3 (`lam-03`, Método) las
+  decoraciones que ya se usaron en `lam-02`/`lam-05`/`lam-06`: fotos de
+  comida recortadas (`img/generadas-cutout/`) flotando con el mismo
+  tratamiento visual (`.deco.deco-fruit`) que ya tenían los blobs SVG de
+  esa sección.
+- `index.html`, sección `#lam-03`: se agregaron tres `<img>` nuevas
+  (hermanas del blob de almendras existente, `svg/deco-blob-almonds.svg`,
+  que no se tocó) usando fotos ya generadas en sesiones anteriores:
+  `chocolate.webp`, `semilla-chia.webp` y `granada.webp` (las mismas tres
+  que ya se usan en `lam-05` — no había fotos cutout sin usar en el
+  repo, así que se reutilizaron; son puramente decorativas y no
+  informativas, reutilizarlas entre secciones no es un problema).
+- No se agregó CSS nuevo: reutiliza la clase `.deco-fruit` ya definida
+  (animación de flotación + `drop-shadow`, oculta en mobile
+  `max-width:720px`). Posiciones elegidas a mano (esquinas de la sección,
+  detrás del contenido `z-index:0`) para no chocar con el timeline ni el
+  panel de medidores.
+- Mismo problema de siempre para verificar visualmente desde este
+  entorno (sin red a Google Fonts/Netlify Identity, render headless
+  inconsistente) — si al verlo en un navegador real alguna foto se ve
+  descuadrada o choca con el timeline/medidores, avisar para ajustar
+  posición/tamaño/opacidad sin tocar el resto de la sección.
+
 ## 2026-09-13 — Método (LAM-03): difuminar la costura con las secciones blancas vecinas
 
 - El usuario mandó una captura mostrando que el cambio de color anterior

@@ -1786,13 +1786,13 @@ eso, no un reemplazo.
   `max-width:720px`), **no** son contenido informativo — son
   `aria-hidden="true"` con `alt=""`, puramente decorativas.
 
-## Decoraciones nuevas en LAM-02 / LAM-05 / LAM-06 (fotos de comida)
+## Decoraciones de fotos de comida (LAM-02 / LAM-03 / LAM-05 / LAM-06)
 
-Antes de esta sesión, `lam-02` (Visión), `lam-05` (Beneficios) y `lam-06`
-(Contacto) solo tenían blobs SVG (`svg/deco-blob-*.svg`, `deco-espiga.svg`,
-etc.) como decoración — a diferencia del hero, que ya combinaba blobs SVG
-con fotos flotantes de fruta (`.brain-fruit`, `img/imagenes-frutas/`). El
-usuario pidió unificar el estilo agregando fotos de comida (de
+Antes de la sesión donde se agregó esto, `lam-02` (Visión), `lam-05`
+(Beneficios) y `lam-06` (Contacto) solo tenían blobs SVG (`svg/deco-blob-*.svg`,
+`deco-espiga.svg`, etc.) como decoración — a diferencia del hero, que ya
+combinaba blobs SVG con fotos flotantes de fruta (`.brain-fruit`,
+`img/imagenes-frutas/`). Se unificó el estilo agregando fotos de comida (de
 `img/generadas-cutout/`, ver sección de arriba) como decoración flotante en
 esas tres secciones, igual que el resto de la página. Los SVG existentes
 **no se tocaron**, solo se agregaron `<img>` nuevas con
@@ -1802,7 +1802,17 @@ existentes de cada sección, con posiciones/rotaciones/opacidades a mano
 para no chocar con el contenido real (todas van detrás del contenido:
 `.deco` tiene `z-index:0`, `.wrap` tiene `z-index:1`).
 
+En una sesión posterior se sumó el mismo tratamiento a **`lam-03`**
+(Método), que hasta entonces solo tenía el blob `deco-blob-almonds.svg`.
+Como las 10 fotos cutout que existen ya estaban todas repartidas entre
+`lam-02`/`lam-05`/`lam-06`, se reutilizaron tres de las que ya usa
+`lam-05` (`chocolate.webp`, `semilla-chia.webp`, `granada.webp`) también
+en `lam-03` — son puramente decorativas (`aria-hidden`, `alt=""`), así que
+repetir la misma foto en más de una sección no es un problema.
+
 - **`lam-02`**: `huevo.webp`, `curcuma.webp`, `aceite-oliva.webp`.
+- **`lam-03`**: `chocolate.webp`, `semilla-chia.webp`, `granada.webp`
+  (reutilizadas de `lam-05`).
 - **`lam-05`**: `granada.webp`, `remolacha.webp`, `chocolate.webp`,
   `semilla-chia.webp`.
 - **`lam-06`**: `te.webp`, `filete.webp`, `espinaca.webp`.
