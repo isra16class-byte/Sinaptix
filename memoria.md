@@ -2061,9 +2061,16 @@ mismo tratamiento que las fotos de comida) como hijas de
   la imagen (no el izquierdo); al empujarla más hacia afuera, el soma
   y el cuerpo principal quedan fuera de pantalla y solo asoman las
   puntas de las dendritas, que en la imagen original se extendían
-  hacia el lado izquierdo. Si en el futuro se pide ajustar cuánto se
-  asoma, tocar ese mismo offset (`-260px`) y/o el `top:340px`, sin
-  tocar la neurona izquierda.
+  hacia el lado izquierdo.
+- **Segunda vuelta de ajuste fino (aprobado por captura)**: el usuario
+  confirmó con otra captura que el resultado del ajuste anterior se
+  veía bien, y pidió dos afinamientos menores sobre el mismo elemento:
+  que se asomen un poco más las ramitas (acercarla un poco al viewport)
+  y bajarla un poco más. Se llevó el offset de `-260px` a `-200px`
+  (60px menos de empuje hacia afuera) y `top` de `340px` a `400px`. Si
+  se pide seguir afinando, seguir tocando estos mismos dos valores
+  (offset del `right:calc(...)` y `top`) sin tocar la neurona
+  izquierda.
 - **Formato de archivo**: se guardaron como `.webp` con alfa (no PNG),
   igual que el resto de `img/generadas-cutout/`, para mantener la
   convención del repo — redimensionadas a 560px de ancho antes de

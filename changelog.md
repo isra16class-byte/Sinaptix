@@ -5,6 +5,18 @@ inverso (lo más nuevo arriba). No se borran entradas viejas. Ver
 `memoria.md` para el estado actual del proyecto y las reglas de este
 archivo.
 
+## 2026-09-13 — Ajuste fino de la neurona derecha de LAM-03 (más visible y más abajo)
+
+- El usuario confirmó con una captura que el ajuste anterior (bajar la
+  neurona derecha y empujarla fuera de pantalla) se veía bien, y pidió
+  dos afinamientos menores: que se asomen un poco más las ramitas, y
+  bajarla un poco más.
+- `index.html`: en `neurona-derecha.webp`, el offset extra del anclaje
+  al borde real pasó de `-260px` a `-200px` (60px menos de empuje hacia
+  afuera, así se ve un poco más de las puntas de las dendritas), y
+  `top` pasó de `340px` a `400px`.
+- Archivos tocados: `index.html`.
+
 ## 2026-09-13 — Neurona derecha de LAM-03 bajada y empujada fuera de pantalla (solo ramitas visibles)
 
 - El usuario mandó una captura de cómo se veía la sección en producción:
