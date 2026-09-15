@@ -416,7 +416,7 @@ próximos pasos).
   se adaptó a una sola columna con el nav superior existente, sin tocar
   `<nav>`/`#miPlanSinSesion`.
   0. **Las 3 tarjetas del dashboard tienen fondo de color sólido +
-     ilustración propia** (sesión 2026-09-15, sexta tanda — reemplaza el
+     ilustración propia** (sesión 2026-09-15, sexta y séptima tanda — reemplaza el
      punto anterior de "misma cabecera", que sigue documentado abajo por
      el contexto de por qué existe `.miplan-card-head`/`.miplan-ring`).
      El usuario mostró una referencia nueva: 3 tarjetas con fondo sólido
@@ -475,6 +475,21 @@ próximos pasos).
      bleed de las ilustraciones no rompe el criterio de `overflow-x` de
      más abajo. Se confirmó que `index.html` sigue cargando normalmente
      (no se tocó nada fuera de `mi-plan.html`/`css/styles.css`).
+     **Séptima tanda (mismo día):** el usuario reportó (con captura del
+     sitio real desplegado) que Antropometría y Objetivo cognitivo
+     quedaban con alturas distintas en desktop — el motivo era
+     `.miplan-grid{align-items:start}`, que hace que cada columna del
+     grid tome solo la altura de su propio contenido en vez de la altura
+     de la fila. Fix: `align-items:stretch` en `.miplan-grid` +
+     `flex:1` en `.miplan-objetivo` (sin el `flex:1`, solo se estira el
+     wrapper invisible `.miplan-col`, no la tarjeta de color en sí, que
+     seguía corta — Antropometría no necesitó cambios porque es un ítem
+     directo del grid, sin wrapper de por medio). Verificado con
+     Playwright midiendo `getBoundingClientRect().height` de ambas
+     tarjetas en desktop (1440px): quedan exactamente iguales tanto sin
+     datos (266px) como con datos (403px). En mobile (<900px) el grid
+     pasa a 1 columna (regla ya existente) así que ahí no aplica — cada
+     tarjeta apilada mantiene su alto natural, que es lo esperable.
   0.1 **Las 3 tarjetas del dashboard (Antropometría / Objetivo cognitivo /
      Cierre) tienen la misma cabecera** (sesión 2026-09-15, quinta tanda —
      a pedido del usuario, con una captura de la referencia original al

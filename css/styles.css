@@ -424,9 +424,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   font-family:var(--font-b);font-size:19px;font-weight:800;color:var(--ink);
   letter-spacing:-.01em;margin:0 0 16px;
 }
-.miplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+/* align-items:stretch (antes "start"): sin esto, cada columna del grid
+   toma solo la altura de su propio contenido y las 2 tarjetas quedan
+   con alturas distintas cuando el texto/estado de una es más corto que
+   el de la otra (reportado por el usuario en el estado "sin datos": la
+   tarjeta de Antropometría queda más alta que la de Objetivo cognitivo
+   porque su placeholder de texto ocupa más líneas). Con "stretch" ambas
+   columnas del grid toman la altura de la fila (la más alta de las 2). */
+.miplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 .miplan-col{display:flex;flex-direction:column;gap:16px}
-.miplan-objetivo{display:flex;flex-direction:column;align-items:flex-start}
+/* flex:1 hace que la tarjeta en sí (no solo el wrapper .miplan-col, que
+   no tiene fondo propio) crezca para ocupar el alto que el grid le da a
+   esa columna — sin esto, .miplan-col se estira pero la tarjeta adentro
+   sigue con su alto natural, más corto, y el problema no se resuelve. */
+.miplan-objetivo{display:flex;flex-direction:column;align-items:flex-start;flex:1}
 .miplan-detalle-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
 .miplan-detalle-grid .nutri-summary{margin:0}
 .miplan-cierre{

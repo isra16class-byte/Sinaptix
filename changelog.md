@@ -8,6 +8,40 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (séptima tanda) — Antropometría y Objetivo cognitivo: mismo alto en desktop
+
+El usuario probó el cambio anterior en el deploy real y mandó una
+captura: las tarjetas "Antropometría" y "Objetivo cognitivo" se veían
+con distinta altura (la de Antropometría más alta), aunque comparten el
+mismo `.miplan-grid`.
+
+Causa: `.miplan-grid{align-items:start}` hace que cada columna del grid
+tome la altura de su propio contenido en vez de la altura de la fila
+completa — con `align-items:stretch` ambas columnas toman la altura de
+la fila (la más alta de las 2), pero eso solo estira el ítem del grid en
+sí. Antropometría es un ítem directo del grid (una `.stat-box`), así que
+estirarla ya alcanza. Objetivo cognitivo vive un nivel más adentro
+(`.miplan-col` → `.stat-box.miplan-objetivo`): estirar `.miplan-col`
+(el wrapper, sin fondo propio) no estira la tarjeta de color que está
+adentro, así que hacía falta además `flex:1` en `.miplan-objetivo` para
+que la tarjeta en sí crezca y llene ese alto.
+
+Cambios, `css/styles.css`:
+- `.miplan-grid`: `align-items:start` → `align-items:stretch`.
+- `.miplan-objetivo`: se agregó `flex:1` (mantiene el resto de sus
+  reglas: `display:flex;flex-direction:column;align-items:flex-start`).
+
+No se tocó `mi-plan.html` ni JS — cambio puramente de CSS.
+
+**Verificado con Playwright**: se midió `getBoundingClientRect().height`
+de ambas tarjetas en desktop (1440px) en 2 estados — sin datos (266.4px
+las 2) y con datos seedeados (403.2px las 2) — quedan exactamente
+iguales en ambos casos. Se revisó mobile (390px, donde el grid pasa a 1
+columna) para confirmar que el cambio no afecta el apilado — cada
+tarjeta mantiene su alto natural, que es lo esperable ahí. Se
+re-confirmó `window.scrollX===0` tras forzar scroll horizontal y que
+`index.html` sigue cargando normalmente.
+
 ## 2026-09-15 (sexta tanda) — Las 3 tarjetas del dashboard pasan a fondo de color + ilustración propia
 
 El usuario mostró una referencia nueva (mockup con 3 tarjetas de fondo de
