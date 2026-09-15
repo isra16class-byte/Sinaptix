@@ -8,6 +8,54 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (continuación) — Email de sesión movido a la tarjeta "Cierre" + plan a futuro de login/registro propios
+
+Sesión de seguimiento sobre el rediseño en 3 columnas del día anterior
+(commit `0a06514`). No se tocó ese rediseño; dos cosas nuevas:
+
+**1. `<p id="miPlanEmail">` ("Sesión iniciada como X") reubicado.**
+Vivía como línea suelta debajo del título "Tu progreso con SINAPTIX"
+(`#miPlanConSesion .sec-head-center`). A pedido del usuario, se sacó de
+ahí y ahora vive dentro de `.miplan-cierre`, justo arriba de los botones
+"Generar mi plan"/"Cerrar sesión" — así queda claro de qué cuenta es la
+sesión que se cierra, en vez de repetir el dato arriba de toda la
+pantalla. Cambio quirúrgico: mismo `id="miPlanEmail"`, así que
+`js/mi-plan.js` (`pintarMiPlan()`) no se tocó — solo cambió dónde vive
+el `<p>` en `mi-plan.html` y se agregó `.miplan-cierre-session` en
+`css/styles.css` (texto chico, `color:var(--ink-soft)`, mismo criterio
+que el resto de texto muted dentro de tarjetas blancas). Verificado con
+Playwright: desktop 1440px y mobile 390px, con y sin `full_name`
+cargado.
+
+Archivos tocados: `mi-plan.html`, `css/styles.css`.
+
+**2. Plan a futuro (NO implementado, documentado a pedido del usuario
+para otra sesión):** reemplazar el widget nativo de Netlify Identity
+por pantallas de login/registro propias en `mi-plan.html`, para (a)
+bajar de 3 a 2 los clicks reales para loguearse desde `index.html` (hoy:
+nav → botón "Iniciar sesión" de `mi-plan.html` → completar el widget
+nativo) y (b) poder pedir el nombre como campo obligatorio en el
+registro (evita el caso de fallback del avatar con el prefijo del
+email). Absorbe y reemplaza el pendiente suelto de "Opción B" charlado
+más temprano en esta misma sesión (formulario propio de signup contra
+la API de GoTrue) — ver detalle completo del alcance en "Pendientes
+conocidos" de `memoria.md`.
+
+**Verificación visual con Playwright de "Mi plan"** (dashboard con
+sesión, fallback de avatar, modal del wizard paso 8 en `index.html`):
+hecha en esta sesión, sin encontrar roturas — ver detalle en
+`memoria.md`.
+
+**Revisado README.md → "Próximos pasos":** el único punto accionable
+(verificación en un deploy real de Netlify) no se puede hacer desde este
+entorno por falta de credenciales/acceso de red a `netlify.com`.
+
+**Revisado y aclarado el punto "Descartado: trazos tipo marcador"** de
+`memoria.md`: se confirmó que no hay nada pendiente ahí (la
+funcionalidad descartada no existe en el sitio); se aclaró además que no
+debe confundirse con los trazos manuscritos naranjas de Método/Pilares,
+que son una función distinta y sí siguen vigentes.
+
 ## 2026-09-15 — "Detalle del plan de nutrición": rediseño en 3 columnas (Plan / Prioridades y Moderación / Cierre)
 
 Commit `0a06514` (autoreado correctamente), patch generado y entregado

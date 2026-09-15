@@ -367,14 +367,22 @@ próximos pasos).
   `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
   desde `user.user_metadata.full_name`, o el prefijo del email antes de
   la `@` como fallback si la persona no cargó nombre al registrarse en
-  Netlify Identity (decisión propia de esta sesión, no confirmada
-  puntualmente con el usuario — revisar si la quiere cambiar).
+  Netlify Identity. Este fallback queda **superado, no pendiente**: en
+  "Pendientes conocidos" hay un plan a futuro (login/registro propios,
+  sin el widget nativo) que va a pedir el nombre siempre como campo
+  obligatorio, así que este caso va a dejar de existir cuando se
+  implemente — mientras tanto sigue funcionando como está.
+  El texto "Sesión iniciada como {email}" (antes debajo del título
+  "Tu progreso con SINAPTIX", `<p id="miPlanEmail">`) se movió dentro de
+  esta misma tarjeta, pegado a los botones "Generar mi plan"/"Cerrar
+  sesión" (`.miplan-cierre-session`, a pedido del usuario, sesión
+  2026-09-15 continuación) — mismo `id` y misma lógica de
+  `pintarMiPlan()`, solo cambió dónde vive el `<p>` en el HTML.
   Verificado con Playwright (mock de `netlifyIdentity`, sin red real):
   desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
   `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
-- Para el detalle completo de esta sesión (íconos SVG exactos, criterio
-  de fallback del avatar, capturas de verificación) ver la entrada
-  2026-09-15 en `changelog.md`.
+- Para el detalle completo de esta sesión (íconos SVG exactos, capturas
+  de verificación) ver la entrada 2026-09-15 en `changelog.md`.
 - Para el detalle completo del resto de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
@@ -409,27 +417,86 @@ próximos pasos).
 
 ## Pendientes conocidos
 
-**Nota de la sesión 2026-09-15 (Detalle del plan en 3 columnas):** el
-commit y el `.patch` de este rediseño **ya se generaron** (commit
-`0a06514`, autoreado correctamente) y se le entregaron al usuario para
-aplicar con `git am` + `git push origin main`. Si estás leyendo esto y
-`git log` no muestra ese commit en `main`, es porque el usuario todavía
-no aplicó el patch — no hace falta rehacer el trabajo, solo esperar a
-que lo aplique o pedírselo. Si ya está aplicado, no queda nada
-pendiente de esta sesión salvo lo que se detalla abajo:
-- **Falta confirmar con el usuario** el criterio de fallback del avatar
-  de la tarjeta "Cierre" (usa el prefijo del email cuando la persona no
-  cargó `full_name` en Netlify Identity) — fue una decisión tomada sobre
-  la marcha, no se le preguntó puntualmente. Ver detalle en "Estado
-  actual del diseño" arriba y en la entrada 2026-09-15 de `changelog.md`.
+**Plan a futuro — reemplazar el widget nativo de Netlify Identity por
+pantallas de login/registro propias (NO implementado todavía, a pedido
+explícito del usuario: "no quiero que lo hagas tú ahora, mejor genera un
+plan").** Con el flujo actual, entrar a la web y loguearse de verdad
+toma 3 acciones: nav de `index.html` ("Iniciar sesión"/"Acceder", ambos
+son simples links a `mi-plan.html`) → botón "Iniciar sesión" de
+`#miPlanSinSesion` (recién ahí abre el widget nativo, `netlifyIdentity.open('login')`)
+→ completar el formulario **dentro del widget** y confirmar. El usuario
+quiere que el click de "Iniciar sesión" del nav lleve directo a la
+pantalla de login (`mi-plan.html`, como ya pasa hoy) pero que esa
+pantalla tenga sus **propios campos de email/contraseña** (y de nombre en
+el registro), sin abrir el recuadro nativo de Netlify. Esto además
+resuelve dos pendientes que quedan **obsoletos** con este plan (no hace
+falta seguir arrastrándolos como preguntas sueltas):
+- El pendiente de "confirmar el criterio de fallback del avatar" (prefijo
+  del email cuando falta `full_name`) — con un form propio, el nombre se
+  pide siempre como campo obligatorio, así que ese caso deja de existir.
+- El "Opción B" charlado en la sesión de hoy (formulario propio de
+  registro contra la API de GoTrue en vez de `netlifyIdentity.open('signup')`)
+  — queda absorbido por este plan más amplio, que cubre login Y registro.
 
-- Ver `README.md` → "Próximos pasos" para el detalle funcional.
-- Varias piezas visuales (dashboard de "Mi plan", iconos ilustrados,
-  decoraciones nuevas) quedaron documentadas como "sin verificación
-  visual real con Playwright" en `historico/memoria-2026-09-14.md` por
-  restricciones de red del entorno de esas sesiones — si en una sesión
-  nueva sí hay acceso a Playwright/Chromium, vale la pena revisar esas
-  pantallas contra lo documentado antes de asumir que están 100% pulidas.
+Alcance del plan (para cuando se implemente, en otra sesión):
+1. **Investigar la API de GoTrue de Netlify Identity directamente**
+   (`/.netlify/identity/signup`, `/.netlify/identity/token` con
+   `grant_type=password`, etc.) en vez de depender del widget — el widget
+   hoy se carga como script externo (`identity.netlify.com/v1/netlify-identity-widget.js`)
+   y es el que dibuja el recuadro nativo que el usuario quiere sacar.
+   Confirmar qué headers/formato exacto espera cada endpoint antes de
+   escribir el fetch.
+2. **`mi-plan.html` — `#miPlanSinSesion`**: reemplazar los botones que
+   hoy abren el widget (`btnLoginMiPlan`/`btnRegistrarseMiPlan`, ver
+   `js/mi-plan.js`) por dos formularios propios (login y registro, con
+   toggle entre ambos o un layout con los dos visibles — a definir con el
+   usuario antes de construir), estilizados con el resto del sitio.
+   Registro con nombre como campo **obligatorio** (`required`), a
+   diferencia de hoy.
+3. Manejar en el form propio los casos que el widget resolvía solo:
+   errores de credenciales inválidas, email ya registrado, confirmación
+   por correo (Netlify Identity por defecto pide confirmar el email antes
+   de poder loguearse — definir con el usuario si se mantiene ese paso o
+   se desactiva desde el panel de Netlify), y guardar el JWT/sesión de la
+   misma forma que hoy hace `netlifyIdentity.currentUser()` (o seguir
+   usando el objeto `netlifyIdentity` para lo que ya funciona —
+   `user.update()`, `.logout()` — y solo reemplazar la parte visual del
+   login/signup, evaluar cuál de las dos alternativas conviene antes de
+   escribir código).
+4. Una vez que exista el form propio, el nav de `index.html` no necesita
+   ningún cambio (ya lleva a `mi-plan.html`, que es donde va a vivir todo
+   el login) — la reducción de 3 acciones a 2 (nav → completar el form
+   propio ahí mismo) sale sola de este cambio, sin tocar `js/script.js`.
+5. Confirmar con el usuario el copy y diseño antes de escribir el HTML
+   final (mismo criterio que el resto del proyecto: no asumir layout de
+   formularios sin mostrar referencia).
+
+**Sesión 2026-09-15 (continuación) — email de sesión movido a la tarjeta
+"Cierre":** resuelto y commiteado en esta misma sesión (ver
+`changelog.md`). El `<p id="miPlanEmail">` que decía "Sesión iniciada
+como X" debajo del título de `#miPlanConSesion` se sacó de ahí y ahora
+vive dentro de `.miplan-cierre`, pegado a los botones "Generar mi
+plan"/"Cerrar sesión" — mismo `id` y misma lógica de `js/mi-plan.js`
+(`pintarMiPlan()`), no se tocó JS, solo el HTML/CSS.
+
+**Verificación visual de "Mi plan" con Playwright — hecha en la sesión
+2026-09-15 (continuación):** se pudo levantar Chromium en este entorno
+(a diferencia de sesiones anteriores). Se revisó con `netlifyIdentity`
+mockeado (el script real de `identity.netlify.com` no es alcanzable
+desde este entorno, se bloquea la request) + datos válidos seedeados en
+`localStorage`: dashboard con sesión (desktop 1440px y mobile 390px),
+fallback de avatar sin `full_name`, y el modal del wizard (paso 8) en
+`index.html`. **No se encontró ninguna rotura** — todo coincide con lo
+documentado en "Estado actual del diseño". No se llegó a revisar cada
+ícono/decoración suelta de otras secciones, solo el bloque que estaba
+marcado como pendiente de verificar.
+
+- Ver `README.md` → "Próximos pasos" para el detalle funcional. El único
+  punto realmente accionable ahí (punto 5, verificación en un deploy
+  real) **no se puede hacer desde este entorno**: no hay credenciales de
+  Netlify ni acceso de red a dominios `netlify.app`/`netlify.com`.
 - Descartado: trazos tipo "marcador" dispersos por el sitio (rompía el
   wrapping de títulos con `display:flex`). Si se retoma, ver el detalle
   en `historico/memoria-2026-09-14.md` antes de repetir el mismo error.
+  (No confundir con los trazos manuscritos naranjas de Método/Pilares,
+  que son una función distinta y sí siguen vigentes en el sitio.)

@@ -437,6 +437,12 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    contenedor (mismo mecanismo que .stat-box:has(...) más abajo). */
 #miPlanCierreUser:has(#miPlanUserName:empty){display:none}
 .miplan-cierre p.lam-text{font-size:14px;max-width:none;margin:0}
+/* "Sesión iniciada como X" — antes vivía como línea suelta debajo del
+   título de toda la pantalla; se movió acá, pegada a los botones
+   Generar/Cerrar sesión, para que quede claro de qué cuenta es la sesión
+   que se cierra (a pedido del usuario). Mismo id (#miPlanEmail) y misma
+   lógica en js/mi-plan.js — solo cambió dónde vive el <p> en el HTML. */
+.miplan-cierre-session{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin:0}
 .miplan-cierre-btns{flex-direction:row}
 .miplan-cierre-btns .btn{flex:1;text-align:center}
 @media(max-width:900px){
