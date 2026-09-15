@@ -8,6 +8,57 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (treceava tanda) — Visión (lam-02): título deformado corregido, sin raya naranja, tarjetas a blanco transparente
+
+El usuario mandó captura del deploy real mostrando el título de "Nuestra
+visión" roto (el texto envolvía letra por letra en vez de fluir normal,
+y "alimenta" quedaba suelto con su raya naranja lejos del resto) y pidió
+además que las 4 tarjetas de stats pasaran de fondo morado oscuro con
+letras blancas a fondo blanco transparente con letras del morado del
+sitio.
+
+**Título roto**: el `<h2 class="lam-title">` tenía
+`style="display:flex;align-items:center;gap:14px"` inline para alinear el
+ícono decorativo de puntitos al lado de "alimenta". Eso convertía el
+texto del título (nodo de texto + el `<span class="title-mark">` +
+el `<svg>`) en 3 flex-items en una sola fila sin wrap: el texto se
+achicaba mucho para hacerle lugar al resto, y como la tipografía
+manuscrita es grande, terminaba envolviendo cada palabra en su propia
+línea — exactamente lo que se ve en la captura. Fix: se saca el
+`display:flex` del `<h2>` (vuelve a ser texto normal, fluye y envuelve
+como cualquier título) y el `<svg>` de puntitos pasa a
+`display:inline-block;vertical-align:middle;margin-left:10px` (clase
+nueva `.lam-title-deco` en `css/styles.css`) para seguir viéndose pegado
+a "alimenta" sin flexbox.
+
+**Raya naranja**: `.title-mark` (compartida por lam-02/03/04/05/06) trae
+el subrayado tipo marcador vía `background-image:url(deco-scribble.svg)`.
+Se sacó **solo en lam-02** con `#lam-02 .title-mark{background-image:none;
+padding-bottom:0}` — el resto de los títulos con `.title-mark` (lam-03 a
+lam-06) no se tocaron, siguen con su trazo. El color morado de "alimenta"
+se mantiene (viene de `.title-mark{color:var(--purple)}`, no del
+background que se sacó).
+
+**Tarjetas de stats (`#lam-02 .stat-box`)**: pasaron de
+`background:rgba(75,46,69,.6)` (morado oscuro translúcido) con texto
+blanco (`#fff` + `text-shadow` para legibilidad sobre el arte de fondo) a
+`background:rgba(255,255,255,.55)` (blanco translúcido) con texto
+`var(--purple)` (sin `text-shadow`, ya no hace falta con fondo claro). Se
+unificó también `.stat-box.is-featured` (la tarjeta "20%", que antes
+quedaba más oscura que las otras 3) a la misma familia blanca
+(`rgba(255,255,255,.7)`), así las 4 tarjetas quedan iguales entre sí como
+pidió el usuario. El `.lab` usa el mismo morado con `opacity:.82` para
+mantener la jerarquía número/descripción sin volver a un gris distinto.
+No se tocó el resto del sitio: estos 3 selectores están todos scopeados
+con `#lam-02`, así que `.stat-box` fuera de esta sección (resto del
+sitio, "Mi plan") sigue con sus reglas propias de siempre.
+
+Verificado con Playwright (forzando `.reveal.in` para saltear la
+animación de scroll): desktop 1440px y mobile 390px — título fluye
+normal en varias líneas según el ancho disponible, sin raya naranja, y
+las 4 tarjetas quedan blancas/transparentes con texto morado, dejando ver
+el arte de fondo (cerebro + red neuronal) a través del blur.
+
 ## 2026-09-15 (doceava tanda) — Títulos de sección: mismo color combinado que el Hero
 
 El usuario pidió que los títulos de cada sección tuvieran "el color

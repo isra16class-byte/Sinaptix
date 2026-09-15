@@ -442,11 +442,22 @@ próximos pasos).
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
   incluida la destacada `.is-featured`) son translúcidas, **todas en el
-  mismo tono morado** (`rgba(75,46,69,.6)`, destacada `.75`) con blur
-  suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en blanco;
-  los números (`.num`) llevan además un `text-shadow` tipo glow (mismo
-  morado oscuro del fondo) para seguir siendo legibles cuando el cerebro
-  del fondo cae justo encima (pasa en la tarjeta 86B). Se sacaron las
+  mismo tono blanco** (`rgba(255,255,255,.55)`, destacada `.7`) con blur
+  suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en
+  `var(--purple)` (`.lab` con `opacity:.82` para diferenciarse del
+  `.num`); sin `text-shadow` (ya no hace falta, el fondo es claro). Antes
+  el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
+  glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
+  `changelog.md`). El título de esta sección (`El cerebro también se
+  alimenta`) es un `<h2 class="lam-title">` normal, **sin** `display:flex`
+  inline (se sacó en la misma tanda: causaba que el texto se envolviera
+  letra por letra en vez de fluir normal — ver `changelog.md` para el
+  detalle del bug); el ícono svg de puntitos decorativo va con la clase
+  `.lam-title-deco` (`inline-block`, no flex-item) para seguir pegado a
+  "alimenta". El `<span class="title-mark">` de "alimenta" tampoco tiene
+  ya la raya naranja tipo marcador (`#lam-02 .title-mark{background-image:
+  none}`, scopeado solo acá — `lam-03` a `lam-06` siguen con su trazo),
+  solo queda el color `var(--purple)` de la palabra. Se sacaron las
   decoraciones viejas de esa esquina (círculos, huevo, aceite de oliva)
   que competían con el arte nuevo. Ancho responsive con `clamp()`, oculto
   en mobile (`<900px`, mismo criterio que el resto de `.deco-fruit`).
