@@ -8,8 +8,10 @@ if(window.netlifyIdentity){
 
   const sinSesionEl = document.getElementById('miPlanSinSesion');
   const conSesionEl = document.getElementById('miPlanConSesion');
-  const btnLoginMiPlan = document.getElementById('btnLoginMiPlan');
-  const btnRegistrarseMiPlan = document.getElementById('btnRegistrarseMiPlan');
+  const tabLoginMiPlan = document.getElementById('tabLoginMiPlan');
+  const tabRegistroMiPlan = document.getElementById('tabRegistroMiPlan');
+  const formLoginMiPlan = document.getElementById('formLoginMiPlan');
+  const formRegistroMiPlan = document.getElementById('formRegistroMiPlan');
   const btnLogout = document.getElementById('btnLogout');
   const btnLogoutNav = document.getElementById('btnLogoutNav');
   const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
@@ -135,23 +137,201 @@ if(window.netlifyIdentity){
     if(btnLogoutNav) btnLogoutNav.classList.add('hidden');
   }
 
-  if(btnLoginMiPlan){
-    btnLoginMiPlan.addEventListener('click', function(e){
+  // ---------------------------------------------------------------------
+  // Login / registro propios (reemplazan al widget nativo de Identity)
+  // ---------------------------------------------------------------------
+  // Estrategia "híbrida", decidida con el usuario antes de escribir esto
+  // (ver memoria.md): la parte VISUAL del login/signup es nuestra, pero
+  // por debajo seguimos usando el cliente GoTrue que el widget ya expone
+  // (`netlifyIdentity.gotrue`) en vez de hacer fetch a mano contra
+  // /.netlify/identity. El motivo concreto: `netlifyIdentity.currentUser()`
+  // no devuelve un estado interno del widget, sino `gotrue.currentUser()`,
+  // que lee la sesión de localStorage — así que logueando por acá,
+  // js/plan-sync.js (que arma el header Authorization con
+  // `netlifyIdentity.currentUser()`) sigue funcionando sin tocarlo y sin
+  // recargar la página, igual que `user.update()` y `user.jwt()`.
+  //
+  // Dos efectos secundarios de NO pasar por el widget, resueltos abajo:
+  //  1. El evento `netlifyIdentity.on('login')` no se dispara (el widget lo
+  //     emite al cambiar SU estado interno, que acá no tocamos), así que
+  //     llamamos a mostrarEstadoConSesion(user) nosotros.
+  //  2. `netlifyIdentity.logout()` no cierra la sesión si esta se creó por
+  //     esta vía en la misma carga de página — ver doLogout().
+  //
+  // Nota para desarrollo local: si se abre el sitio en localhost sin
+  // haberle cargado antes la Site URL de Netlify, `netlifyIdentity.gotrue`
+  // es null y el widget abre su propio modal para pedirla. En el sitio
+  // desplegado no pasa.
+  function authGotrue(){
+    return window.netlifyIdentity ? netlifyIdentity.gotrue : null;
+  }
+
+  // Traduce los errores de GoTrue (vienen en inglés, en err.message) a los
+  // casos que el widget resolvía solo. El texto exacto lo manda el
+  // servidor, así que se compara por substring y siempre hay un fallback
+  // genérico para no dejar el formulario mudo ante un error inesperado.
+  function authMensajeError(err){
+    const msg = (err && err.message) ? String(err.message) : '';
+    if(/Invalid Password|No user found|Invalid login credentials/i.test(msg)){
+      return 'Ese correo o esa contraseña no coinciden.';
+    }
+    if(/Email not confirmed/i.test(msg)){
+      return 'Confirmá tu correo antes de entrar (revisá tu bandeja de entrada).';
+    }
+    if(/already (been )?registered|already exists|duplicate/i.test(msg)){
+      return 'Ese correo ya tiene una cuenta. Probá iniciar sesión.';
+    }
+    if(/Signups not allowed/i.test(msg)){
+      return 'El registro está cerrado por ahora. Escribinos desde el sitio.';
+    }
+    if(/[Pp]assword.*(6|characters|short)/.test(msg)){
+      return 'La contraseña es demasiado corta (al menos 8 caracteres).';
+    }
+    if(/Failed to fetch|NetworkError/i.test(msg)){
+      return 'No pudimos conectar con el servidor. Revisá tu conexión y probá de nuevo.';
+    }
+    return 'No pudimos completar la operación. Probá de nuevo en un momento.';
+  }
+
+  function authMostrarMsg(el, texto, esOk){
+    if(!el) return;
+    el.textContent = texto;
+    el.classList.toggle('is-ok', !!esOk);
+    el.classList.remove('hidden');
+  }
+  function authLimpiarMsg(el){
+    if(!el) return;
+    el.textContent = '';
+    el.classList.remove('is-ok');
+    el.classList.add('hidden');
+  }
+  function authBloquear(btn, textoMientras){
+    if(!btn) return function(){};
+    const original = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = textoMientras;
+    return function(){ btn.disabled = false; btn.textContent = original; };
+  }
+
+  // Toggle entre las 2 pestañas (layout "variante A", confirmado con el
+  // usuario): solo un formulario visible por vez, reusando la clase
+  // .hidden que ya usa el resto de la página.
+  function mostrarPanelAuth(cual){
+    const esLogin = cual === 'login';
+    if(tabLoginMiPlan){
+      tabLoginMiPlan.classList.toggle('is-active', esLogin);
+      tabLoginMiPlan.setAttribute('aria-selected', esLogin ? 'true' : 'false');
+    }
+    if(tabRegistroMiPlan){
+      tabRegistroMiPlan.classList.toggle('is-active', !esLogin);
+      tabRegistroMiPlan.setAttribute('aria-selected', esLogin ? 'false' : 'true');
+    }
+    if(formLoginMiPlan) formLoginMiPlan.classList.toggle('hidden', !esLogin);
+    if(formRegistroMiPlan) formRegistroMiPlan.classList.toggle('hidden', esLogin);
+    authLimpiarMsg(document.getElementById('loginMsgMiPlan'));
+    authLimpiarMsg(document.getElementById('registroMsgMiPlan'));
+  }
+  if(tabLoginMiPlan) tabLoginMiPlan.addEventListener('click', function(){ mostrarPanelAuth('login'); });
+  if(tabRegistroMiPlan) tabRegistroMiPlan.addEventListener('click', function(){ mostrarPanelAuth('registro'); });
+
+  if(formLoginMiPlan){
+    formLoginMiPlan.addEventListener('submit', function(e){
       e.preventDefault();
-      netlifyIdentity.open('login');
+      const msgEl = document.getElementById('loginMsgMiPlan');
+      const btn = document.getElementById('loginSubmitMiPlan');
+      const email = document.getElementById('loginEmailMiPlan').value.trim();
+      const pass = document.getElementById('loginPassMiPlan').value;
+      authLimpiarMsg(msgEl);
+
+      const auth = authGotrue();
+      if(!auth){
+        authMostrarMsg(msgEl, 'No pudimos conectar con el servidor. Probá de nuevo en un momento.');
+        return;
+      }
+      const restaurar = authBloquear(btn, 'Entrando…');
+      // El tercer parámetro (remember) es lo que hace que gotrue-js persista
+      // la sesión en localStorage — sin él, currentUser() devolvería null en
+      // la próxima carga y "Mi plan" pediría login de nuevo cada vez.
+      auth.login(email, pass, true).then(function(user){
+        mostrarEstadoConSesion(user);
+      }).catch(function(err){
+        restaurar();
+        authMostrarMsg(msgEl, authMensajeError(err));
+      });
     });
   }
 
-  if(btnRegistrarseMiPlan){
-    btnRegistrarseMiPlan.addEventListener('click', function(e){
+  if(formRegistroMiPlan){
+    formRegistroMiPlan.addEventListener('submit', function(e){
       e.preventDefault();
-      netlifyIdentity.open('signup'); // mismo widget de Identity, pestaña "Sign up"
+      const msgEl = document.getElementById('registroMsgMiPlan');
+      const btn = document.getElementById('registroSubmitMiPlan');
+      const nombre = document.getElementById('registroNombreMiPlan').value.trim();
+      const email = document.getElementById('registroEmailMiPlan').value.trim();
+      const pass = document.getElementById('registroPassMiPlan').value;
+      authLimpiarMsg(msgEl);
+
+      if(!nombre){
+        authMostrarMsg(msgEl, 'Necesitamos tu nombre para armar tu plan.');
+        return;
+      }
+      const auth = authGotrue();
+      if(!auth){
+        authMostrarMsg(msgEl, 'No pudimos conectar con el servidor. Probá de nuevo en un momento.');
+        return;
+      }
+      const restaurar = authBloquear(btn, 'Creando tu cuenta…');
+      // El 3er argumento de signup() es el `data` de la API de GoTrue, que
+      // el servidor guarda como user_metadata — por eso `full_name` es la
+      // misma clave que pintarMiPlan() ya leía del widget. Acá el nombre es
+      // obligatorio (required en el HTML + chequeo de arriba), así que el
+      // fallback "prefijo del email" de pintarMiPlan() deja de usarse para
+      // cuentas nuevas.
+      auth.signup(email, pass, {full_name: nombre}).then(function(){
+        // Con la confirmación por correo desactivada en el panel de Netlify
+        // (autoconfirm), el usuario ya queda habilitado y lo logueamos
+        // directo para que no tenga que escribir los datos dos veces. Si
+        // esa opción volviera a activarse, el login falla con "Email not
+        // confirmed" y se muestra el aviso en vez de un error: por eso se
+        // intenta el login en vez de leer settings() aparte.
+        return auth.login(email, pass, true).then(function(user){
+          mostrarEstadoConSesion(user);
+        }).catch(function(err){
+          restaurar();
+          const msg = (err && err.message) ? String(err.message) : '';
+          if(/Email not confirmed/i.test(msg)){
+            mostrarPanelAuth('login');
+            authMostrarMsg(document.getElementById('loginMsgMiPlan'),
+              'Te mandamos un correo para confirmar tu cuenta. Después de confirmarlo vas a poder entrar acá mismo.', true);
+          } else {
+            authMostrarMsg(msgEl, authMensajeError(err));
+          }
+        });
+      }).catch(function(err){
+        restaurar();
+        authMostrarMsg(msgEl, authMensajeError(err));
+      });
     });
   }
 
   function doLogout(e){
     if(e) e.preventDefault();
-    netlifyIdentity.logout();
+    // No se usa netlifyIdentity.logout(): ese método cierra la sesión del
+    // estado interno del widget, que queda vacío cuando el login se hizo
+    // con los formularios propios de arriba (en esa misma carga de página
+    // no haría nada y la sesión seguiría abierta). El objeto que devuelve
+    // currentUser() es el User de gotrue-js y su .logout() sí hace el POST
+    // /logout y limpia localStorage en los dos casos. Como tampoco se
+    // dispara el evento 'logout' del widget, el redirect va explícito acá.
+    const user = netlifyIdentity.currentUser();
+    if(!user){ window.location.href = 'index.html'; return; }
+    user.logout().then(function(){
+      window.location.href = 'index.html';
+    }).catch(function(){
+      // El .logout() de gotrue-js limpia la sesión local aunque el POST
+      // falle, así que igual sacamos a la persona de esta pantalla.
+      window.location.href = 'index.html';
+    });
   }
   if(btnLogout) btnLogout.addEventListener('click', doLogout);
   if(btnLogoutNav) btnLogoutNav.addEventListener('click', doLogout);

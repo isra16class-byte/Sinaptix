@@ -520,7 +520,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   position:relative;
   min-height:clamp(380px,48vh,460px);
   display:flex;align-items:center;justify-content:center;
-  padding:20px 0;
+  padding:8px 0;
 }
 
 /* Cerebro ilustrado (img/decoraciones-neurona/cerebro-mi-plan.webp, imagen
@@ -562,7 +562,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background:var(--paper);
   border-radius:26px;
   box-shadow:var(--shadow-lg);
-  padding:36px 40px 32px;
+  padding:30px 40px 28px;
   max-width:460px;
   width:100%;
   text-align:center;
@@ -581,7 +581,54 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   text-decoration:underline;text-underline-offset:3px;
 }
 .miplan-locked-back:hover{color:var(--purple)}
-@media(max-width:520px){.miplan-locked-card{padding:36px 26px 32px}}
+@media(max-width:520px){.miplan-locked-card{padding:30px 24px 28px}}
+
+/* Formularios propios de login/registro (reemplazan a los 2 botones que
+   abrían el widget nativo de Netlify Identity — ver memoria.md). Layout
+   "variante A": un solo formulario visible por vez, con 2 pestañas arriba
+   para alternar. El toggle es CSS + una clase que agrega js/mi-plan.js;
+   no hay librería ni componente nuevo.
+   Los inputs reusan el mismo tratamiento visual que .contact-form
+   (fondo --paper-2, borde --line, foco --purple) para que no aparezca un
+   segundo estilo de campo en el sitio. */
+/* Los <label> de cada campo van con .sr-only (solo lectores de pantalla):
+   el layout confirmado con el usuario muestra los campos con placeholder,
+   sin etiqueta visible. Se mantienen en el HTML para no dejar inputs sin
+   nombre accesible. */
+.miplan-auth{margin-top:18px;text-align:left}
+.miplan-auth-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:16px}
+.miplan-auth-tab{
+  flex:1;padding:10px 6px;background:none;border:none;cursor:pointer;
+  font-family:var(--font-b);font-size:14.5px;font-weight:600;
+  color:var(--panel-text);border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:color .2s,border-color .2s;
+}
+.miplan-auth-tab:hover{color:var(--ink)}
+.miplan-auth-tab.is-active{color:var(--purple);border-bottom-color:var(--purple)}
+.miplan-auth-form{display:flex;flex-direction:column;gap:10px}
+.miplan-auth-input{
+  background:var(--paper-2);border:1px solid var(--line);color:var(--ink);
+  padding:12px 14px;font-family:var(--font-b);font-size:14.5px;border-radius:var(--radius-sm);
+  outline:none;transition:border-color .2s;width:100%;
+}
+.miplan-auth-input::placeholder{color:var(--ink-faint)}
+.miplan-auth-input:focus{border-color:var(--purple)}
+/* Mensaje inline del formulario: por defecto es un error (rojo). Con
+   .is-ok pasa a verde y se usa para el aviso de "revisá tu correo" del
+   registro cuando Netlify todavía pide confirmar el email. */
+.miplan-auth-msg{
+  margin-top:10px;font-size:.88rem;line-height:1.45;
+  color:var(--red);text-align:left;
+}
+.miplan-auth-msg.is-ok{color:var(--green)}
+/* .btn/.btn-solid se escribieron para los <a> del sitio, así que no traen
+   border ni cursor propios — acá el submit es un <button> real y hace
+   falta neutralizar el borde nativo. */
+.miplan-auth-submit{
+  margin-top:12px;width:100%;display:flex;justify-content:center;
+  border:none;cursor:pointer;font-family:var(--font-m);
+}
+.miplan-auth-submit[disabled]{opacity:.6;pointer-events:none}
 
 /* Candado ilustrado (variante A): SVG inline, trazo fino sin relleno,
    mismo criterio que el resto de esta pantalla — no existe un asset de

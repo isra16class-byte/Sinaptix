@@ -219,13 +219,12 @@ próximos pasos).
   3. `.miplan-locked-card`: tarjeta blanca (`--paper`) redondeada, con
      candado inline SVG a mano (`.miplan-locked-lock`, trazo `--purple`)
      arriba del `eyebrow`/`h2.lam-title`/`p.lam-text` — estos no
-     cambiaron de texto ni de id/clase. Debajo, `.btn-row` con 2 acciones
-     reales: `#btnLoginMiPlan` (`btn-solid`, abre
-     `netlifyIdentity.open('login')`) y `#btnRegistrarseMiPlan`
-     (`btn-ghost`, agregado a pedido del usuario, abre
-     `netlifyIdentity.open('signup')` — mismo widget de Identity, solo
-     cambia la pestaña inicial, no hace falta backend nuevo). "Volver al
-     sitio" bajó de `btn-row` a link de texto simple debajo
+     cambiaron de texto ni de id/clase. Debajo, `.miplan-auth`: los
+     **formularios propios de login/registro** (ver su propio punto más
+     abajo) — reemplazaron a los 2 botones `#btnLoginMiPlan`/
+     `#btnRegistrarseMiPlan` que abrían el widget nativo de Netlify
+     Identity, que **ya no existen** ni en el HTML ni en `js/mi-plan.js`.
+     "Volver al sitio" bajó de `btn-row` a link de texto simple debajo
      (`.miplan-locked-back`, subrayado, `var(--panel-text)`) para no
      competir visualmente con las 2 acciones reales — con 3 `.btn` en la
      misma fila quedaba sobrecargado.
@@ -242,15 +241,95 @@ próximos pasos).
   (antes `104px 0 56px`, sin min-height/overflow; **afecta a ambos
   estados** de "Mi plan"), `#miPlan footer{margin-top:28px}` (antes
   `48px`), `.miplan-locked{min-height:clamp(380px,48vh,460px);padding:20px 0}`
-  (antes `clamp(460px,58vh,600px);28px 0`), `.miplan-locked-card{padding:36px 40px 32px}`
-  (antes `44px 46px 40px`). El título de la tarjeta **sigue heredando**
+  (antes `clamp(460px,58vh,600px);28px 0`), `.miplan-locked-card{padding:30px 40px 28px}`
+  (antes `44px 46px 40px`, después `36px 40px 32px`). El título de la tarjeta **sigue heredando**
   el tamaño de `.lam-title` (`clamp(40px,6vw,68px)`, wrap a 3 líneas,
   tarjeta angosta/alta) — se probó achicarlo pero el usuario prefirió la
   forma original, así que esa parte quedó revertida. `min-height:100vh` +
   `overflow:hidden` en `#miPlan` evita una franja blanca del `body` por
   debajo del footer en viewports altos (el `overflow:hidden` es acotado a
   esta sección, no toca `html`/`body`). Resultado: entra sin scroll hasta
-  ~825px de alto de viewport (medido con Playwright a 1440px de ancho).
+  ~986px de alto de viewport (medido con Playwright a 1440px de ancho).
+  **Ese número era ~825px antes de los formularios propios de
+  login/registro**: la tarjeta pasó de 618px a 841px de alto al cambiar 2
+  botones por pestañas + campos, y se recuperaron ~98px compactando
+  paddings (`.miplan-locked`, `.miplan-locked-card`) y ocultando los
+  `<label>` con `.sr-only`. La única palanca grande que queda para bajar
+  más es achicar el título, que el usuario ya evaluó y descartó en una
+  sesión anterior — no rehacerlo sin preguntarle.
+- **"Mi plan" — login/registro propios (`.miplan-auth`, reemplazan al
+  widget nativo de Netlify Identity)**: dentro de `.miplan-locked-card`,
+  layout "variante A" confirmado con el usuario: 2 pestañas
+  (`#tabLoginMiPlan`/`#tabRegistroMiPlan`, clase `.miplan-auth-tab`,
+  activa con `.is-active`) y un solo formulario visible por vez
+  (`#formLoginMiPlan` / `#formRegistroMiPlan`, se alternan con la clase
+  `.hidden` de siempre). Login pide correo + contraseña; registro pide
+  **nombre (`required`)** + correo + contraseña (`minlength=8`). Los
+  `<label>` existen pero van con `.sr-only` (el layout aprobado muestra
+  solo placeholders). Los inputs (`.miplan-auth-input`) reusan el mismo
+  tratamiento visual que `.contact-form`, no se inventó un segundo estilo
+  de campo. Mensajes inline por formulario
+  (`#loginMsgMiPlan`/`#registroMsgMiPlan`, `.miplan-auth-msg`, rojo
+  `--red`; con `.is-ok` pasan a verde para el aviso de "revisá tu
+  correo").
+  **Estrategia: híbrida, no 100% API.** `js/mi-plan.js` usa el cliente
+  GoTrue que el widget ya expone (`netlifyIdentity.gotrue`) —
+  `.login(email, pass, true)` y `.signup(email, pass, {full_name})` — en
+  vez de hacer `fetch` a mano contra `/.netlify/identity`. El motivo
+  concreto (verificado leyendo el fuente del widget, no asumido):
+  `netlifyIdentity.currentUser()` **no** devuelve un estado interno del
+  widget, devuelve `gotrue.currentUser()`, que lee la sesión de
+  `localStorage` — así que logueando por esta vía `js/plan-sync.js` (que
+  arma el header `Authorization` con `currentUser()`) sigue funcionando
+  **sin tocarlo y sin recargar la página**, igual que `user.update()` y
+  `user.jwt()`. El `true` del 3er argumento de `login()` (remember) es lo
+  que persiste la sesión; sin él no habría sesión en la próxima carga.
+  Dos consecuencias de saltear el widget, ya resueltas en el código:
+  1. El evento `netlifyIdentity.on('login')` **no se dispara** (el widget
+     lo emite al cambiar su estado interno, que acá no se toca), así que
+     `mostrarEstadoConSesion(user)` se llama a mano desde el `.then()`.
+  2. `netlifyIdentity.logout()` **no cierra la sesión** si esta se creó
+     por esta vía en la misma carga de página (su implementación no hace
+     nada cuando su estado interno está vacío). Por eso `doLogout()` usa
+     `netlifyIdentity.currentUser().logout()` (el `User` de gotrue-js, que
+     sí hace `POST /logout` y limpia `localStorage` en ambos casos) y
+     hace el `window.location.href='index.html'` explícito, porque
+     tampoco se dispara el evento `logout` del widget.
+  **API de GoTrue (confirmada contra el fuente de `gotrue-js`, no
+  adivinada)**: `POST /.netlify/identity/signup` es JSON
+  `{email, password, data}` y `data` es lo que el servidor guarda como
+  `user_metadata` (por eso `full_name` es la misma clave que ya leía
+  `pintarMiPlan()`); `POST /.netlify/identity/token` es
+  `application/x-www-form-urlencoded` con
+  `grant_type=password&username=…&password=…` (no JSON); los errores
+  llegan en `err.message` en inglés (`Invalid Password`,
+  `No user found with this email`, `Email not confirmed`,
+  `…already been registered`, `Signups not allowed for this instance`) y
+  `authMensajeError()` los mapea a castellano por substring, con
+  fallback genérico para no dejar el formulario mudo.
+  **Confirmación por correo: desactivada** por el usuario desde el panel
+  de Netlify (Identity → plantilla de confirmación → "Allow users to sign
+  up without verifying their email address"). Por eso, tras un signup
+  exitoso el código hace login automático y entra directo al dashboard,
+  sin pedir los datos dos veces. Igual **hay fallback**: si esa opción se
+  volviera a activar, el login post-signup falla con `Email not
+  confirmed`, y en vez de un error se vuelve a la pestaña de login con el
+  aviso verde de revisar el correo. Se eligió intentar el login en vez de
+  consultar `gotrue.settings()` aparte para no sumar un request más.
+  **Nota de desarrollo local**: si se abre el sitio en `localhost` sin
+  haberle cargado antes la Site URL de Netlify, `netlifyIdentity.gotrue`
+  es `null` y el widget abre su propio modal para pedirla; en el sitio
+  desplegado no pasa. El código lo contempla mostrando un mensaje de
+  error en vez de romper.
+  **Verificado con Playwright** (`netlifyIdentity` mockeado, sin red
+  real): toggle entre pestañas, registro → llamada a `signup` con
+  `{full_name}` → login automático → dashboard con avatar "A" y nombre
+  "Ana Pérez" pintados, credenciales inválidas, email ya registrado,
+  fallback de email sin confirmar, botón que se restaura tras el error,
+  mobile 390px, y `window.scrollX===0` tras forzar scroll horizontal. El
+  gap tarjeta↔cerebro (criterio de más arriba) se remidió en
+  900/1024/1280/1440/1600/1920: idéntico al de antes del cambio
+  (50-60px), porque la tarjeta creció en alto y no en ancho.
 - **Nav de `index.html` — "Iniciar sesión"/"Acceder"**: ambos son ahora
   links normales (`href="mi-plan.html"`), llevan a la pantalla de login
   propia del sitio. Antes `#btnLogin` abría el widget de Netlify Identity
@@ -367,11 +446,13 @@ próximos pasos).
   `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
   desde `user.user_metadata.full_name`, o el prefijo del email antes de
   la `@` como fallback si la persona no cargó nombre al registrarse en
-  Netlify Identity. Este fallback queda **superado, no pendiente**: en
-  "Pendientes conocidos" hay un plan a futuro (login/registro propios,
-  sin el widget nativo) que va a pedir el nombre siempre como campo
-  obligatorio, así que este caso va a dejar de existir cuando se
-  implemente — mientras tanto sigue funcionando como está.
+  Netlify Identity. Este fallback quedó **superado**: desde que existe el
+  registro propio (`.miplan-auth`, ver más abajo) el nombre es un campo
+  obligatorio, así que toda cuenta nueva trae `full_name`. El fallback
+  **se deja igual** como red de seguridad para las cuentas creadas antes
+  de este cambio (y para las creadas a mano desde el panel de Netlify),
+  que sí pueden no tener nombre — no es código muerto, pero ya no debería
+  activarse en el flujo normal.
   El texto "Sesión iniciada como {email}" (antes debajo del título
   "Tu progreso con SINAPTIX", `<p id="miPlanEmail">`) se movió dentro de
   esta misma tarjeta, pegado a los botones "Generar mi plan"/"Cerrar
@@ -417,59 +498,42 @@ próximos pasos).
 
 ## Pendientes conocidos
 
-**Plan a futuro — reemplazar el widget nativo de Netlify Identity por
-pantallas de login/registro propias (NO implementado todavía, a pedido
-explícito del usuario: "no quiero que lo hagas tú ahora, mejor genera un
-plan").** Con el flujo actual, entrar a la web y loguearse de verdad
-toma 3 acciones: nav de `index.html` ("Iniciar sesión"/"Acceder", ambos
-son simples links a `mi-plan.html`) → botón "Iniciar sesión" de
-`#miPlanSinSesion` (recién ahí abre el widget nativo, `netlifyIdentity.open('login')`)
-→ completar el formulario **dentro del widget** y confirmar. El usuario
-quiere que el click de "Iniciar sesión" del nav lleve directo a la
-pantalla de login (`mi-plan.html`, como ya pasa hoy) pero que esa
-pantalla tenga sus **propios campos de email/contraseña** (y de nombre en
-el registro), sin abrir el recuadro nativo de Netlify. Esto además
-resuelve dos pendientes que quedan **obsoletos** con este plan (no hace
-falta seguir arrastrándolos como preguntas sueltas):
-- El pendiente de "confirmar el criterio de fallback del avatar" (prefijo
-  del email cuando falta `full_name`) — con un form propio, el nombre se
-  pide siempre como campo obligatorio, así que ese caso deja de existir.
-- El "Opción B" charlado en la sesión de hoy (formulario propio de
-  registro contra la API de GoTrue en vez de `netlifyIdentity.open('signup')`)
-  — queda absorbido por este plan más amplio, que cubre login Y registro.
+**Login/registro propios — IMPLEMENTADO** (sesión 2026-09-15, tercera
+tanda). El plan que vivía acá como "a futuro" (reemplazar el widget
+nativo de Netlify Identity por pantallas propias en `mi-plan.html`) ya
+está hecho: ver "Estado actual del diseño" → "Mi plan — login/registro
+propios" para el detalle de qué se construyó, qué API se usa y por qué
+la estrategia quedó híbrida. Con esto quedaron **cerrados** los dos
+pendientes que este plan absorbía: el criterio de fallback del avatar
+(el nombre ahora es obligatorio en el registro) y la "Opción B" de un
+signup propio contra GoTrue.
 
-Alcance del plan (para cuando se implemente, en otra sesión):
-1. **Investigar la API de GoTrue de Netlify Identity directamente**
-   (`/.netlify/identity/signup`, `/.netlify/identity/token` con
-   `grant_type=password`, etc.) en vez de depender del widget — el widget
-   hoy se carga como script externo (`identity.netlify.com/v1/netlify-identity-widget.js`)
-   y es el que dibuja el recuadro nativo que el usuario quiere sacar.
-   Confirmar qué headers/formato exacto espera cada endpoint antes de
-   escribir el fetch.
-2. **`mi-plan.html` — `#miPlanSinSesion`**: reemplazar los botones que
-   hoy abren el widget (`btnLoginMiPlan`/`btnRegistrarseMiPlan`, ver
-   `js/mi-plan.js`) por dos formularios propios (login y registro, con
-   toggle entre ambos o un layout con los dos visibles — a definir con el
-   usuario antes de construir), estilizados con el resto del sitio.
-   Registro con nombre como campo **obligatorio** (`required`), a
-   diferencia de hoy.
-3. Manejar en el form propio los casos que el widget resolvía solo:
-   errores de credenciales inválidas, email ya registrado, confirmación
-   por correo (Netlify Identity por defecto pide confirmar el email antes
-   de poder loguearse — definir con el usuario si se mantiene ese paso o
-   se desactiva desde el panel de Netlify), y guardar el JWT/sesión de la
-   misma forma que hoy hace `netlifyIdentity.currentUser()` (o seguir
-   usando el objeto `netlifyIdentity` para lo que ya funciona —
-   `user.update()`, `.logout()` — y solo reemplazar la parte visual del
-   login/signup, evaluar cuál de las dos alternativas conviene antes de
-   escribir código).
-4. Una vez que exista el form propio, el nav de `index.html` no necesita
-   ningún cambio (ya lleva a `mi-plan.html`, que es donde va a vivir todo
-   el login) — la reducción de 3 acciones a 2 (nav → completar el form
-   propio ahí mismo) sale sola de este cambio, sin tocar `js/script.js`.
-5. Confirmar con el usuario el copy y diseño antes de escribir el HTML
-   final (mismo criterio que el resto del proyecto: no asumir layout de
-   formularios sin mostrar referencia).
+Lo que quedó abierto de este cambio, para una próxima sesión:
+- **Falta probarlo contra Netlify de verdad.** Toda la verificación se
+  hizo con `netlifyIdentity` mockeado y Playwright: el script real de
+  `identity.netlify.com` no es alcanzable desde el entorno de trabajo, y
+  no hay credenciales de Netlify. Falta confirmar en el sitio desplegado:
+  (a) que el signup con la confirmación por correo desactivada
+  efectivamente entra directo al dashboard, (b) los textos exactos que
+  devuelve el servidor para credenciales inválidas y email repetido — si
+  alguno no coincide con las expresiones de `authMensajeError()` en
+  `js/mi-plan.js`, se cae al mensaje genérico y hay que agregar el caso,
+  y (c) que `plan-sync.js` sigue sincronizando con el backend después de
+  un login hecho por esta vía.
+- **La pantalla volvió a necesitar scroll en viewports bajos** (entra sin
+  scroll desde ~986px de alto, antes ~825px). Ver el detalle y las
+  palancas que quedan en "Estado actual del diseño"; la única grande es
+  achicar el título, que el usuario ya descartó antes.
+- **No se tocó la recuperación de contraseña.** El widget ofrecía "Forgot
+  password?" y los formularios propios no tienen equivalente todavía. La
+  API existe (`POST /.netlify/identity/recover` con `{email}`, o
+  `gotrue.requestPasswordRecovery(email)`), y además el link del correo
+  vuelve al sitio con `#recovery_token=…` en la URL, que hoy nadie
+  atiende — si se implementa, hay que manejar ese fragmento además del
+  formulario. Alcance propio, charlarlo antes.
+- **Login con Google/GitHub**: sigue sin existir (tampoco existía antes).
+  `gotrue.loginExternalUrl(provider)` lo haría, pero requiere habilitar
+  el proveedor en el panel de Netlify primero.
 
 **Sesión 2026-09-15 (continuación) — email de sesión movido a la tarjeta
 "Cierre":** resuelto y commiteado en esta misma sesión (ver

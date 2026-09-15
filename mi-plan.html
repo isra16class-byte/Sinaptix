@@ -65,9 +65,31 @@
         <span class="eyebrow reveal in">Mi plan</span>
         <h2 class="lam-title reveal in d1" style="max-width:18ch">Iniciá sesión para ver tu plan</h2>
         <p class="lam-text reveal in d1" style="color:var(--panel-text)">Tu plan de neuroalimentación se guarda en tu cuenta de SINAPTIX. Iniciá sesión (o creá una cuenta) para verlo acá.</p>
-        <div class="btn-row reveal in d2" style="margin-top:20px">
-          <a href="#" class="btn btn-solid" id="btnLoginMiPlan">Iniciar sesión</a>
-          <a href="#" class="btn btn-ghost" id="btnRegistrarseMiPlan">Registrarme</a>
+        <div class="miplan-auth reveal in d2">
+          <div class="miplan-auth-tabs" role="tablist" aria-label="Iniciar sesión o registrarse">
+            <button type="button" class="miplan-auth-tab is-active" id="tabLoginMiPlan" role="tab" aria-selected="true" aria-controls="formLoginMiPlan">Iniciar sesión</button>
+            <button type="button" class="miplan-auth-tab" id="tabRegistroMiPlan" role="tab" aria-selected="false" aria-controls="formRegistroMiPlan">Registrarme</button>
+          </div>
+
+          <form class="miplan-auth-form" id="formLoginMiPlan" role="tabpanel" aria-labelledby="tabLoginMiPlan">
+            <label class="sr-only" for="loginEmailMiPlan">Correo</label>
+            <input class="miplan-auth-input" id="loginEmailMiPlan" type="email" name="email" placeholder="nombre@correo.com" autocomplete="email" autocapitalize="off" required>
+            <label class="sr-only" for="loginPassMiPlan">Contraseña</label>
+            <input class="miplan-auth-input" id="loginPassMiPlan" type="password" name="password" placeholder="Tu contraseña" autocomplete="current-password" required>
+            <p class="miplan-auth-msg hidden" id="loginMsgMiPlan" role="alert"></p>
+            <button type="submit" class="btn btn-solid miplan-auth-submit" id="loginSubmitMiPlan">Entrar</button>
+          </form>
+
+          <form class="miplan-auth-form hidden" id="formRegistroMiPlan" role="tabpanel" aria-labelledby="tabRegistroMiPlan">
+            <label class="sr-only" for="registroNombreMiPlan">Nombre</label>
+            <input class="miplan-auth-input" id="registroNombreMiPlan" type="text" name="full_name" placeholder="Tu nombre" autocomplete="name" required>
+            <label class="sr-only" for="registroEmailMiPlan">Correo</label>
+            <input class="miplan-auth-input" id="registroEmailMiPlan" type="email" name="email" placeholder="nombre@correo.com" autocomplete="email" autocapitalize="off" required>
+            <label class="sr-only" for="registroPassMiPlan">Contraseña</label>
+            <input class="miplan-auth-input" id="registroPassMiPlan" type="password" name="password" placeholder="Al menos 8 caracteres" autocomplete="new-password" minlength="8" required>
+            <p class="miplan-auth-msg hidden" id="registroMsgMiPlan" role="alert"></p>
+            <button type="submit" class="btn btn-solid miplan-auth-submit" id="registroSubmitMiPlan">Crear cuenta</button>
+          </form>
         </div>
         <a href="index.html" class="miplan-locked-back reveal in d2">Volver al sitio</a>
       </div>

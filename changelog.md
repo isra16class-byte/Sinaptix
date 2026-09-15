@@ -8,6 +8,116 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (tercera tanda) — Login y registro propios en "Mi plan" (adiós al widget nativo de Netlify Identity)
+
+Implementación del plan que quedó documentado como "a futuro" en la
+sesión anterior (ver "Pendientes conocidos" de `memoria.md` en su
+versión previa). Los 2 botones de `#miPlanSinSesion` que abrían el
+recuadro nativo de Netlify (`#btnLoginMiPlan` →
+`netlifyIdentity.open('login')` y `#btnRegistrarseMiPlan` →
+`open('signup')`) ya no existen: en su lugar hay formularios propios
+dentro de la misma tarjeta. Con esto entrar y loguearse pasa de 3
+acciones a 2 (nav de `index.html` → completar el form ahí mismo), sin
+tocar `index.html` ni `js/script.js`, tal como anticipaba el plan.
+
+**Investigación previa de la API de GoTrue** (punto 1 del plan; se hizo
+leyendo el fuente real de `gotrue-js` y del widget bajados de npm, no de
+memoria):
+- `POST /.netlify/identity/signup` → JSON `{email, password, data}`,
+  donde `data` es lo que el servidor guarda como `user_metadata`. Por eso
+  el nombre viaja como `{full_name: …}`: es la misma clave que
+  `pintarMiPlan()` ya leía.
+- `POST /.netlify/identity/token` → **no es JSON**:
+  `application/x-www-form-urlencoded` con
+  `grant_type=password&username=…&password=…`.
+- Los errores llegan en `err.message`, en inglés.
+
+**Decisiones confirmadas con el usuario antes de escribir código:**
+1. *Layout*: "variante A" — 2 pestañas y un formulario visible por vez
+   (se le mostró una maqueta con A y B lado a lado; B ponía los dos
+   formularios en 2 columnas y ensanchaba la tarjeta, con riesgo de
+   pisar el cerebro de la derecha).
+2. *Confirmación por correo*: se **desactiva** desde el panel de Netlify
+   (Identity → plantilla de confirmación → "Allow users to sign up
+   without verifying their email address"). Así el signup entra directo
+   al dashboard. Igual se dejó fallback por si se reactiva.
+3. *Estrategia*: **híbrida**, no 100% fetch contra la API. Se sigue
+   usando el cliente GoTrue que el widget expone
+   (`netlifyIdentity.gotrue`) y solo se reemplaza la parte visual.
+
+El motivo de la estrategia híbrida es concreto y salió de leer el fuente
+del widget: `netlifyIdentity.currentUser()` no devuelve un estado
+interno suyo, sino `gotrue.currentUser()`, que lee la sesión de
+`localStorage`. Logueando por esa vía, `js/plan-sync.js` (que arma el
+header `Authorization` con `currentUser()`) sigue funcionando **sin
+tocarlo y sin recargar la página**. Con un `fetch` a mano habría habido
+que reimplementar la persistencia de la sesión y probablemente parchear
+`plan-sync.js`.
+
+Eso sí, saltear el widget tiene dos efectos secundarios que hubo que
+resolver a mano y conviene no olvidar:
+- El evento `netlifyIdentity.on('login')` **no se dispara**, así que
+  `mostrarEstadoConSesion(user)` se llama desde el `.then()`.
+- `netlifyIdentity.logout()` **no cierra la sesión** cuando esta se creó
+  por esta vía en la misma carga de página (su implementación no hace
+  nada si su estado interno está vacío; la persona seguiría logueada).
+  `doLogout()` pasó a usar `netlifyIdentity.currentUser().logout()` —el
+  `User` de gotrue-js, que sí hace `POST /logout` y limpia
+  `localStorage`— y a redirigir explícitamente, porque tampoco se
+  dispara el evento `logout`.
+
+Cambios:
+- `mi-plan.html`: `.miplan-auth` con pestañas
+  `#tabLoginMiPlan`/`#tabRegistroMiPlan` y los formularios
+  `#formLoginMiPlan` (correo + contraseña) y `#formRegistroMiPlan`
+  (**nombre `required`** + correo + contraseña `minlength=8`). Los
+  `<label>` van con la clase `.sr-only` que ya existía: el layout
+  aprobado muestra solo placeholders, pero los inputs no quedan sin
+  nombre accesible. El eyebrow, el título, el párrafo y "Volver al
+  sitio" no cambiaron.
+- `css/styles.css`: bloque nuevo `.miplan-auth*`. Los inputs reusan el
+  tratamiento visual de `.contact-form` (fondo `--paper-2`, borde
+  `--line`, foco `--purple`) para no introducir un segundo estilo de
+  campo en el sitio. `.miplan-auth-submit` neutraliza el borde nativo del
+  `<button>`, porque `.btn`/`.btn-solid` se habían escrito para los `<a>`
+  del sitio y no traen `border`/`cursor`.
+- `js/mi-plan.js`: toggle de pestañas, submit de cada formulario,
+  `authMensajeError()` (mapea los mensajes de GoTrue a castellano por
+  substring, con fallback genérico), bloqueo del botón mientras responde
+  el servidor, y el `doLogout()` nuevo.
+
+**Efecto secundario medido y no del todo recuperado:** la tarjeta pasó de
+618px a 841px de alto (2 botones → pestañas + campos), así que `#miPlan`
+dejó de entrar sin scroll donde antes entraba. Se recuperaron ~98px
+compactando `.miplan-locked` (`padding:20px 0`→`8px 0`),
+`.miplan-locked-card` (`36px 40px 32px`→`30px 40px 28px`) y ocultando los
+labels. Resultado: entra sin scroll desde ~986px de alto de viewport,
+contra ~825px antes. La única palanca grande que queda es achicar el
+título, que el usuario ya evaluó y descartó en una sesión anterior, así
+que **no se tocó** — queda anotado en "Pendientes conocidos" por si lo
+quiere reconsiderar.
+
+**Verificado con Playwright** (`netlifyIdentity` mockeado, sin red real):
+toggle entre pestañas; registro → `signup` recibiendo
+`{full_name:"Ana Pérez"}` → login automático → dashboard con avatar "A" y
+nombre pintados; credenciales inválidas; email ya registrado; fallback de
+"Email not confirmed" (vuelve a la pestaña de login con el aviso verde);
+el botón se restaura tras el error; mobile 390px; `window.scrollX===0`
+tras forzar scroll horizontal. El gap tarjeta↔cerebro se remidió en
+900/1024/1280/1440/1600/1920 y es idéntico al de antes del cambio
+(50-60px): la tarjeta creció en alto, no en ancho.
+
+**Lo que NO se pudo probar** (y queda en "Pendientes conocidos"): nada de
+esto se ejercitó contra Netlify de verdad — no hay credenciales ni acceso
+de red a `netlify.com` desde el entorno. Falta confirmar en el deploy los
+textos exactos de error del servidor (si alguno no matchea, cae al
+mensaje genérico) y que el sync con el backend siga andando tras un login
+por esta vía. Tampoco se implementó la recuperación de contraseña, que el
+widget sí ofrecía.
+
+Archivos tocados: `mi-plan.html`, `css/styles.css`, `js/mi-plan.js`,
+`memoria.md`, `changelog.md`.
+
 ## 2026-09-15 (continuación) — Email de sesión movido a la tarjeta "Cierre" + plan a futuro de login/registro propios
 
 Sesión de seguimiento sobre el rediseño en 3 columnas del día anterior
