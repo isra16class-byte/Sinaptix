@@ -8,6 +8,44 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" sin sesión: volver al título largo (3 líneas) + arreglar franja blanca
+
+El ajuste de altura de la sesión anterior había achicado el título de la
+tarjeta a 2 líneas para ganar espacio; el usuario prefería la tarjeta
+"larguita" original (título en 3 líneas, forma angosta), solo que sin
+llegar a la altura total original. Además, al bajar la altura total, en
+viewports altos quedaba una franja blanca del `body` visible por debajo
+del footer, porque `#miPlan` (fondo `--panel`) terminaba antes que la
+ventana.
+
+- `css/styles.css`: se sacó la regla `.miplan-locked-card .lam-title{font-size:...}`
+  agregada en la sesión anterior — el título vuelve a heredar el tamaño de
+  `.lam-title` (`clamp(40px,6vw,68px)`), lo que le devuelve el wrap a 3
+  líneas y la forma angosta/alta de la tarjeta. El resto de los recortes
+  de esa sesión (paddings de `#miPlan`, `.miplan-locked`, la tarjeta, el
+  margen del footer) se mantienen.
+- `#miPlan` pasa a `min-height:100vh` (con `box-sizing:border-box`) para
+  que el fondo `--panel` llene toda la ventana cuando el contenido es más
+  bajo que el viewport, en vez de dejar ver el blanco del `body` por
+  debajo del footer.
+- Ese `min-height:100vh` por sí solo generaba ~24px de scroll de más en
+  viewports altos: alguna de las decoraciones absolutas (fruta/cerebro)
+  bleedea un poco por debajo del borde inferior de la sección, y sin
+  ningún `overflow` en la cadena eso empuja el `scrollHeight` del `body`
+  más allá del viewport (mismo mecanismo que describe la nota de
+  `overflow-x` más abajo en este archivo, pero en vertical). Se agregó
+  `overflow:hidden` a `#miPlan` — clip acotado a esta sección (no toca
+  `html`/`body`, no pisa la regla de `overflow-x` documentada), no recorta
+  ningún bleed horizontal porque la sección ocupa el ancho completo del
+  viewport; solo contiene lo que se pasaba de su borde inferior/superior.
+  Verificado que `#miPlanConSesion` (dashboard con sesión) no queda
+  recortado por este cambio (se probó forzando ese estado con JS, sin
+  login real).
+- Resultado (medido con Playwright, 1440px de ancho): entra sin scroll
+  hasta ~825px de alto de viewport (antes ~720px con el título chico,
+  ~937px con el diseño original); por debajo de eso pide scroll normal,
+  sin franja blanca en ningún caso.
+
 ## 2026-09-14 — "Mi plan" sin sesión: bajar la altura para que entre sin scroll
 
 Pedido del usuario tras la sesión anterior (cerebro ilustrado real): en

@@ -221,16 +221,19 @@ próximos pasos).
   referencia del usuario, mobile (390px) oculta los 2 cerebros
   correctamente, y `window.scrollX===0` tras forzar scroll horizontal —
   no rompe el criterio de `overflow-x` de más abajo pese al bleed de
-  `.is-right`. Altura total ajustada después a pedido del usuario (pasó
-  de necesitar scroll vertical en laptops de poca altura a entrar
-  completa): `#miPlan{padding:88px 0 40px}` (antes `104px 0 56px`,
-  **afecta a ambos estados** de "Mi plan"), `#miPlan footer{margin-top:28px}`
-  (antes `48px`), `.miplan-locked{min-height:clamp(380px,48vh,460px);padding:20px 0}`
+  `.is-right`. Altura total: `#miPlan{padding:88px 0 40px;min-height:100vh;overflow:hidden}`
+  (antes `104px 0 56px`, sin min-height/overflow; **afecta a ambos
+  estados** de "Mi plan"), `#miPlan footer{margin-top:28px}` (antes
+  `48px`), `.miplan-locked{min-height:clamp(380px,48vh,460px);padding:20px 0}`
   (antes `clamp(460px,58vh,600px);28px 0`), `.miplan-locked-card{padding:36px 40px 32px}`
-  (antes `44px 46px 40px`), título de la tarjeta con font-size propio
-  `clamp(30px,4vw,44px)` en vez de heredar el `clamp(40px,6vw,68px)` de
-  `.lam-title` (era el mayor contribuyente a la altura). Resultado: ~720px
-  de alto total (antes ~937px, medido con Playwright a 1440px de ancho).
+  (antes `44px 46px 40px`). El título de la tarjeta **sigue heredando**
+  el tamaño de `.lam-title` (`clamp(40px,6vw,68px)`, wrap a 3 líneas,
+  tarjeta angosta/alta) — se probó achicarlo pero el usuario prefirió la
+  forma original, así que esa parte quedó revertida. `min-height:100vh` +
+  `overflow:hidden` en `#miPlan` evita una franja blanca del `body` por
+  debajo del footer en viewports altos (el `overflow:hidden` es acotado a
+  esta sección, no toca `html`/`body`). Resultado: entra sin scroll hasta
+  ~825px de alto de viewport (medido con Playwright a 1440px de ancho).
 - **Backend real**: Netlify Database (Postgres) + Netlify Functions
   (`plan.mjs`) espejando `localStorage` al servidor cuando hay sesión.
   Verificado funcionando en producción (`master@94d6ba4`).
