@@ -417,7 +417,25 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
   padding:24px 22px;display:flex;flex-direction:column;gap:14px;
 }
+.miplan-cierre-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .miplan-cierre-title{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--purple-dark)}
+/* Avatar con inicial + nombre — el nombre solo existe si la persona lo
+   cargó al registrarse (user_metadata.full_name de Netlify Identity); si
+   no, js/mi-plan.js usa como fallback la parte del email antes de la @
+   (ver pintarMiPlan), así siempre hay algo que mostrar sin inventar un
+   nombre. Oculto si no hay nombre para mostrar (ver #miPlanCierreUser:empty
+   más abajo, aplica cuando el JS no llegó a completarlo por algún motivo). */
+.miplan-cierre-user{display:flex;align-items:center;gap:8px;font-family:var(--font-b);font-size:13.5px;font-weight:600;color:var(--ink)}
+.miplan-avatar{
+  width:30px;height:30px;border-radius:50%;flex:none;
+  background:var(--panel-2);color:var(--purple-dark);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-d);font-weight:800;font-size:13px;
+}
+/* El span de nombre va después del avatar en el DOM, así que :empty~ no
+   alcanza para ocultar el avatar hacia "atrás" — se usa :has() en el
+   contenedor (mismo mecanismo que .stat-box:has(...) más abajo). */
+#miPlanCierreUser:has(#miPlanUserName:empty){display:none}
 .miplan-cierre p.lam-text{font-size:14px;max-width:none;margin:0}
 .miplan-cierre-btns{flex-direction:row}
 .miplan-cierre-btns .btn{flex:1;text-align:center}
@@ -585,17 +603,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    quede separado de su lista o que una lista se parta a la mitad entre
    columnas. Escala solo a partir de 680px de ancho de viewport — más
    angosto que eso (mobile), sigue en una sola columna. */
+/* Reemplaza el `column-count` (masonry) que tenía esta sección: con el
+   rediseño de "Detalle del plan" en columnas propias (Plan / Prioridades y
+   Moderación, ver .nutri-plan-block abajo) ya no hace falta repartir los
+   `<div>` sueltos en 2 columnas de diario — cada `.nutri-plan-block` arma
+   su propio grid de 2 sub-columnas. Se mantiene el mismo breakpoint
+   (680px) para no ensanchar el layout en mobile. */
 @media(min-width:680px){
-  #miPlan .nutri-summary{
-    display:block;
-    column-count:2;column-gap:28px;
+  #miPlan .nutri-plan-block{
+    display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start;
   }
-  #miPlan .nutri-summary > div,
-  #miPlan .nutri-summary > p{margin:0 0 12px;break-inside:avoid-column}
-  #miPlan .nutri-summary h4{break-after:avoid-column}
-  #miPlan .nutri-summary .nutri-block-title{break-after:avoid-column;margin-top:12px}
-  #miPlan .nutri-summary ul{break-inside:avoid-column}
-  #miPlan .nutri-summary .nutri-dia-tipo{break-inside:avoid-column;grid-template-columns:1fr 1fr}
 }
 
 
@@ -918,3 +935,46 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
    de dorado, para diferenciarlo de "moderado" — ver
    plan-mejoras-mi-plan-y-encuesta.md, sección 4.2. */
 .nutri-note--alto{color:var(--red);background:rgba(179,38,30,.14)}
+
+/* ---------- Detalle del plan: rediseño en 2 sub-columnas (Plan / Prioridades y Moderación) ----------
+   Referencia del usuario: tarjeta blanca "Plan" (ícono+título, enfoque,
+   nutrientes clave, día tipo) a la izquierda + columna cálida "Prioridades
+   y Moderación" (Priorizar / Moderar / "Ajustado a tu caso") a la derecha.
+   `.nutri-plan-block` es un simple <div> más (uno por plan resuelto, ver
+   nutriBuildResumenHTML): por default apila sus 2 hijos en columna (mismo
+   comportamiento que el resto de `.nutri-summary`, para el modal angosto
+   de index.html); el grid de 2 columnas se activa solo dentro de #miPlan
+   (ver media query arriba de `.nutri-summary`, que reemplazó el viejo
+   `column-count`). */
+.nutri-plan-block{display:flex;flex-direction:column;gap:16px}
+.nutri-plan-head{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.nutri-plan-head h4{margin:0}
+.nutri-plan-icon{width:28px;height:28px;flex:none;color:var(--purple)}
+.nutri-plan-icon path{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nutri-plan-main{display:flex;flex-direction:column;gap:12px}
+.nutri-plan-side{
+  background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius-sm);
+  padding:16px;display:flex;flex-direction:column;gap:12px;
+}
+.nutri-side-title{
+  font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--purple-dark);margin:0;
+}
+.nutri-side-box{background:var(--paper);border-radius:var(--radius-sm);padding:12px 14px}
+.nutri-side-box-head{
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  font-family:var(--font-m);font-size:11.5px;font-weight:700;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.03em;
+}
+.nutri-side-icon{width:17px;height:17px;flex:none}
+.nutri-side-icon path,.nutri-side-icon circle{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nutri-side-icon .icon-dot{fill:currentColor;stroke:none}
+.nutri-side-box--priorizar .nutri-side-icon{color:var(--green)}
+.nutri-side-box--moderar .nutri-side-icon{color:var(--gold)}
+.nutri-side-box ul{margin:0;padding-left:16px;font-size:13px}
+.nutri-side-box li{margin-bottom:3px}
+/* "Ajustado a tu caso": única caja con color sólido (vs. las 2 de arriba,
+   blancas) para que resalte como la personalización real del plan — mismo
+   `--gold` (terracota) que ya usa el sitio como acento, no un color nuevo. */
+.nutri-side-box--ajustes{background:var(--gold);color:#fff}
+.nutri-side-box--ajustes .nutri-side-box-head{color:#fff}
+.nutri-side-box--ajustes ul{color:#fff}

@@ -8,6 +8,85 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 — "Detalle del plan de nutrición": rediseño en 3 columnas (Plan / Prioridades y Moderación / Cierre)
+
+**INCOMPLETO — sin commit ni patch generado todavía, ver "Pendientes
+inmediatos" en `memoria.md`.** Código ya escrito y verificado con
+Playwright en el filesystem de trabajo, pero la sesión se cortó antes de
+hacer `git commit`/`git format-patch`. La próxima sesión debe retomar
+desde ahí (no repetir el trabajo de diseño, solo commitear y generar el
+patch) — si el working tree ya no tiene estos cambios (sesión nueva,
+clon limpio), hay que rehacerlos siguiendo el detalle de abajo y en
+`memoria.md`.
+
+A partir de una referencia visual del usuario (mockup con 3 columnas:
+tarjeta blanca "Plan" a la izquierda, columna cálida "Prioridades y
+Moderación" al medio, tarjeta "Cierre" con avatar a la derecha),
+rediseño de `nutriBuildResumenHTML()` (`js/nutricion-planes.js`),
+compartida entre el paso 8 del wizard (`#nutriResumen`, modal de
+`index.html`) y "Mi plan" (`#miPlanDetalle`, `mi-plan.html`).
+
+Decisiones confirmadas con el usuario antes de construir:
+- El emoji 🧠 del título del plan se reemplaza por un ícono SVG lineal
+  a mano (mismo criterio que los íconos de las tarjetas
+  Antropometría/Objetivo cognitivo: trazo fino, `currentColor`, sin
+  imagen ni librería) — no imagen ni emoji.
+- La tarjeta "Cierre" suma avatar (inicial) + nombre. El nombre sale de
+  `user.user_metadata.full_name` (Netlify Identity); si la persona no lo
+  cargó al registrarse, se usa como fallback la parte del email antes de
+  la `@` — decisión propia de esta sesión, no se le preguntó
+  puntualmente al usuario cuál fallback prefería, documentarlo por si lo
+  quiere cambiar.
+
+Cambios:
+- `nutriBuildResumenHTML()` ahora arma, por cada plan resuelto, un
+  `.nutri-plan-block` con 2 sub-`<div>`: `.nutri-plan-main` (ícono+título,
+  enfoque, nutrientes clave, día tipo — igual que antes) y
+  `.nutri-plan-side` (Priorizar / Moderar, antes eran 2 `<ul>` sueltos en
+  el mismo nivel que nutrientes/día tipo). "Ajustado a tu caso" (viene de
+  `nutriConstruirAjustes`, es de la encuesta completa, no de un plan en
+  particular) se cuelga de `.nutri-plan-side` del **último** plan
+  resuelto — en el caso más común (un solo plan) coincide con la
+  referencia. Si no resolvió ningún plan pero sí hay ajustes (no debería
+  pasar en la práctica), hay un fallback que los muestra sueltos como
+  antes, para no perder el dato en silencio.
+- 3 íconos SVG nuevos como constantes en `js/nutricion-planes.js`
+  (`NUTRI_ICON_BRAIN`, `NUTRI_ICON_CHECK`, `NUTRI_ICON_WARN`), mismo
+  criterio de línea fina que `.miplan-card-icon`.
+- CSS nuevo en `css/styles.css`: `.nutri-plan-block`/`.nutri-plan-main`/
+  `.nutri-plan-side` (por defecto apilan en columna — así el modal
+  angosto de `index.html` sigue viéndose en una sola columna, sin CSS
+  especial), `.nutri-side-title`/`.nutri-side-box`/`.nutri-side-box-head`/
+  `.nutri-side-icon` (cajas "Priorizar"/"Moderar", blancas sobre el fondo
+  cálido `--panel` de `.nutri-plan-side`), `.nutri-side-box--ajustes`
+  (única caja con color sólido, `--gold` terracota + texto blanco, para
+  que resalte como la personalización real del plan — no se creó un
+  color nuevo).
+- **Se reemplazó el viejo `column-count:2` de `#miPlan .nutri-summary`**
+  (era un layout tipo "diario" para repartir los `<div>` sueltos del
+  resumen en 2 columnas, de una sesión anterior) **por un grid real** en
+  `#miPlan .nutri-plan-block{display:grid;grid-template-columns:1.6fr 1fr}`
+  (mismo breakpoint, `min-width:680px`) — ya no hace falta el
+  `column-count` porque ahora cada plan arma sus propias 2 columnas
+  explícitas (Plan / Prioridades y Moderación) en vez de repartir texto
+  suelto. Si algo dependía del comportamiento viejo de `column-count`,
+  ya no existe.
+- `mi-plan.html`: la tarjeta `.miplan-cierre` suma `.miplan-cierre-head`
+  (título "Cierre" + `.miplan-cierre-user` con avatar/nombre).
+- `js/mi-plan.js`: `pintarMiPlan()` suma el pintado de avatar+nombre
+  (5 líneas, ver más arriba el criterio de fallback). No se tocó nada
+  más de esa función.
+
+Verificado con Playwright (mockeando `netlifyIdentity` y datos en
+`localStorage`, sin acceso real a Netlify): desktop 1440px en
+`mi-plan.html` calza contra la referencia del usuario (3 columnas,
+avatar+nombre en Cierre); mobile 390px apila todo en una columna;
+modal de `index.html` (paso 8 del wizard) sigue viéndose apilado en una
+columna, sin romperse con este cambio.
+
+Archivos tocados: `js/nutricion-planes.js`, `css/styles.css`,
+`mi-plan.html`, `js/mi-plan.js`.
+
 ## 2026-09-14 — "Mi plan" con sesión: rediseño visual del dashboard (#miPlanConSesion)
 
 Rediseño visual del estado "con sesión" de `mi-plan.html` (el dashboard

@@ -145,11 +145,40 @@ function nutriConstruirAvisos(d){
   return avisos;
 }
 
+// Íconos SVG lineales a mano (mismo criterio que .miplan-card-icon: trazo
+// fino, currentColor, sin imagen ni librería) para el detalle del plan —
+// ver "Estado actual del diseño" en memoria.md, sesión del rediseño de
+// "Detalle del plan de nutrición" en 3 columnas (Plan / Prioridades y
+// Moderación / Cierre). Reemplaza el emoji 🧠 que usaba el título del plan
+// antes de esa sesión, para ser consistente con el resto de íconos del sitio.
+const NUTRI_ICON_BRAIN = '<svg class="nutri-plan-icon" aria-hidden="true" viewBox="0 0 40 40">'+
+  '<path d="M14 10c-3 0-5.2 2.4-5.2 5.4 0 1 .3 1.9.8 2.7C8.6 19 8 20.7 8 22.4 8 26 10.9 29 14.5 29H16"/>'+
+  '<path d="M26 10c3 0 5.2 2.4 5.2 5.4 0 1-.3 1.9-.8 2.7.9.9 1.6 2.5 1.6 4.3 0 3.6-2.9 6.6-6.5 6.6H24"/>'+
+  '<path d="M20 9v21"/>'+
+  '<path d="M14.5 16c1.7 0 2.5 1.2 2.5 2.6M25.5 16c-1.7 0-2.5 1.2-2.5 2.6M15.5 23c1.4 0 2.3-1 2.5-2M24.5 23c-1.4 0-2.3-1-2.5-2"/>'+
+  '</svg>';
+const NUTRI_ICON_CHECK = '<svg class="nutri-side-icon" aria-hidden="true" viewBox="0 0 24 24">'+
+  '<circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6L16 9.5"/></svg>';
+const NUTRI_ICON_WARN = '<svg class="nutri-side-icon" aria-hidden="true" viewBox="0 0 24 24">'+
+  '<path d="M12 4.2l9 15.8H3z" stroke-linejoin="round"/><path d="M12 10.2v4"/>'+
+  '<circle class="icon-dot" cx="12" cy="17" r="1"/></svg>';
+
 // Arma el HTML del plan resuelto a partir de una encuesta ya respondida.
 // Se usa tanto en el paso 8 del wizard (#nutriResumen, en index.html) como en
 // "Mi plan" (#miPlanDetalle, en mi-plan.html), reconstruyendo el mismo
 // resultado desde los datos guardados en localStorage sin tener que repetir
 // la lógica ni la encuesta.
+//
+// Estructura por plan: `.nutri-plan-block` con 2 sub-bloques,
+// `.nutri-plan-main` (título+ícono, enfoque, nutrientes clave, día tipo) y
+// `.nutri-plan-side` (Priorizar/Moderar + "Ajustado a tu caso" del último
+// plan, si hay ajustes). En el CSS de #miPlan esos 2 sub-bloques se ven en
+// columnas lado a lado (con la tarjeta "Cierre" ya existente en
+// mi-plan.html formando la 3ra columna vía .miplan-detalle-grid); en el
+// modal de index.html (#modalNutricion, más angosto) siguen apilados en una
+// sola columna, sin CSS especial — son simples <div>s en flujo normal ahí.
+// Si el objetivo resuelve en más de un plan combinado, se repite un
+// `.nutri-plan-block` completo por cada uno.
 function nutriBuildResumenHTML(d){
   const objetivos = nutriResolverObjetivo(d);
   const planes = objetivos.map(o=>NUTRI_PLANES[o]).filter(Boolean);
@@ -160,21 +189,48 @@ function nutriBuildResumenHTML(d){
   if(d.objetivo === 'No estoy seguro'){
     html += '<p>Con base en cómo te sentís día a día, el plan que más se ajusta a vos es:</p>';
   }
-  planes.forEach(p=>{
-    html += '<div><h4>'+p.nombre+'</h4><p>'+p.enfoque+'</p>'+
-      '<div class="nutri-block-title">Nutrientes clave</div><ul>'+p.nutrientes.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
-      '<div class="nutri-block-title">Priorizar</div><ul>'+p.priorizar.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
-      '<div class="nutri-block-title">Moderar</div><ul>'+p.moderar.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
-      (p.diaTipo && p.diaTipo.length ? '<div class="nutri-block-title">Un día tipo</div>'+
-        '<div class="nutri-dia-tipo">'+p.diaTipo.map(m=>
-          '<div class="dia-tipo-item">'+
-            '<span class="dia-tipo-momento">'+m.momento+'</span>'+
-            '<p class="dia-tipo-detalle">'+m.detalle+'</p>'+
-          '</div>'
-        ).join('')+'</div>' : '')+
-      '</div>';
+  planes.forEach((p, i)=>{
+    // "Ajustado a tu caso" es un dato de la encuesta completa, no de un plan
+    // en particular — se muestra una sola vez, en la columna lateral del
+    // último plan (en el caso más común, un solo plan, coincide con la
+    // referencia visual de esta sesión).
+    const esUltimo = i === planes.length - 1;
+    html += '<div class="nutri-plan-block">'+
+      '<div class="nutri-plan-main">'+
+        '<div class="nutri-plan-head">'+NUTRI_ICON_BRAIN+'<h4>'+p.nombre+'</h4></div>'+
+        '<p>'+p.enfoque+'</p>'+
+        '<div class="nutri-block-title">Nutrientes clave</div><ul>'+p.nutrientes.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
+        (p.diaTipo && p.diaTipo.length ? '<div class="nutri-block-title">Un día tipo</div>'+
+          '<div class="nutri-dia-tipo">'+p.diaTipo.map(m=>
+            '<div class="dia-tipo-item">'+
+              '<span class="dia-tipo-momento">'+m.momento+'</span>'+
+              '<p class="dia-tipo-detalle">'+m.detalle+'</p>'+
+            '</div>'
+          ).join('')+'</div>' : '')+
+      '</div>'+
+      '<div class="nutri-plan-side">'+
+        '<div class="nutri-side-title">Prioridades y Moderación</div>'+
+        '<div class="nutri-side-box nutri-side-box--priorizar">'+
+          '<div class="nutri-side-box-head">'+NUTRI_ICON_CHECK+'<span>Priorizar</span></div>'+
+          '<ul>'+p.priorizar.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
+        '</div>'+
+        '<div class="nutri-side-box nutri-side-box--moderar">'+
+          '<div class="nutri-side-box-head">'+NUTRI_ICON_WARN+'<span>Moderar</span></div>'+
+          '<ul>'+p.moderar.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
+        '</div>'+
+        (esUltimo && ajustes.length ? '<div class="nutri-side-box nutri-side-box--ajustes">'+
+          '<div class="nutri-side-box-head"><span>Ajustado a tu caso</span></div>'+
+          '<ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul>'+
+        '</div>' : '')+
+      '</div>'+
+    '</div>';
   });
-  if(ajustes.length){
+  // Caso borde: ningún objetivo resolvió a un plan conocido pero sí hay
+  // ajustes — no debería perderse esa info solo porque no hay plan al cual
+  // "colgarla" (no debería pasar en la práctica, ver NUTRI_PLANES, pero
+  // evita que el dato desaparezca en silencio si algún día se agrega un
+  // objetivo nuevo sin su entrada correspondiente ahí).
+  if(!planes.length && ajustes.length){
     html += '<div><div class="nutri-block-title">Ajustado a tu caso</div><ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul></div>';
   }
   avisos.forEach(a=>{

@@ -23,6 +23,17 @@ if(window.netlifyIdentity){
     const emailEl = document.getElementById('miPlanEmail');
     if(emailEl) emailEl.textContent = 'Sesión iniciada como '+user.email;
 
+    // Avatar + nombre de la tarjeta "Cierre" (ver memoria.md). full_name
+    // solo existe si la persona lo cargó al registrarse en Netlify
+    // Identity; si no, se usa la parte del email antes de la @ como
+    // fallback, para no dejar el nombre vacío ni inventar uno.
+    const avatarEl = document.getElementById('miPlanAvatar');
+    const nameEl = document.getElementById('miPlanUserName');
+    const fullName = user.user_metadata && user.user_metadata.full_name;
+    const nombreMostrado = fullName || (user.email ? user.email.split('@')[0] : '');
+    if(nameEl) nameEl.textContent = nombreMostrado;
+    if(avatarEl) avatarEl.textContent = nombreMostrado ? nombreMostrado.charAt(0).toUpperCase() : '';
+
     const antro = localStorage.getItem('sinaptix_antropometria');
     if(antro){
       try{

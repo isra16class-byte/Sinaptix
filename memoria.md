@@ -339,7 +339,43 @@ próximos pasos).
   3. `#miPlan .stat-box`/`.miplan-grid`/etc. (paddings, gaps, fondo
      `--paper` sobre `.dark`) no cambiaron — son las reglas ya
      documentadas más arriba, compartidas con el resto de "Mi plan".
-- Para el detalle completo de cada uno de estos puntos (por qué se
+- **"Detalle del plan de nutrición" — 3 columnas (Plan / Prioridades y
+  Moderación / Cierre)**: `nutriBuildResumenHTML()` (`js/nutricion-planes.js`,
+  compartida entre `#nutriResumen` del wizard en `index.html` y
+  `#miPlanDetalle` en `mi-plan.html`) arma, por cada plan resuelto, un
+  `.nutri-plan-block` con 2 hijos: `.nutri-plan-main` (ícono SVG de
+  cerebro `NUTRI_ICON_BRAIN` + título, enfoque, nutrientes clave, día
+  tipo) y `.nutri-plan-side` (cajas `.nutri-side-box--priorizar`/
+  `--moderar`, íconos `NUTRI_ICON_CHECK`/`NUTRI_ICON_WARN`, mismo
+  criterio de línea fina que `.miplan-card-icon`). "Ajustado a tu caso"
+  (de `nutriConstruirAjustes`, es de toda la encuesta, no de un plan en
+  particular) se cuelga del `.nutri-plan-side` del **último** plan
+  resuelto, como `.nutri-side-box--ajustes` con fondo sólido `--gold`
+  (única caja con color, para que resalte como la personalización real
+  — si no resolvió ningún plan pero sí hay ajustes, hay un fallback que
+  los muestra sueltos, caso borde que no debería darse en la práctica).
+  Por defecto (`.nutri-plan-block{flex-direction:column}`) los 2
+  sub-bloques se apilan — así el modal angosto de `index.html` sigue en
+  una sola columna sin CSS especial; el grid de 2 columnas
+  (`grid-template-columns:1.6fr 1fr`) solo se activa dentro de `#miPlan`
+  desde 680px de ancho. **Esto reemplazó el viejo `column-count:2` de
+  `#miPlan .nutri-summary`** (repartía los `<div>` sueltos del resumen
+  en 2 columnas tipo "diario") — ya no existe ese mecanismo, ahora cada
+  plan arma sus propias 2 columnas explícitas.
+  La tarjeta `.miplan-cierre` (3ra columna, vía `.miplan-detalle-grid`
+  ya existente) suma `.miplan-cierre-head` con avatar (inicial, círculo
+  `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
+  desde `user.user_metadata.full_name`, o el prefijo del email antes de
+  la `@` como fallback si la persona no cargó nombre al registrarse en
+  Netlify Identity (decisión propia de esta sesión, no confirmada
+  puntualmente con el usuario — revisar si la quiere cambiar).
+  Verificado con Playwright (mock de `netlifyIdentity`, sin red real):
+  desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
+  `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
+- Para el detalle completo de esta sesión (íconos SVG exactos, criterio
+  de fallback del avatar, capturas de verificación) ver la entrada
+  2026-09-15 en `changelog.md`.
+- Para el detalle completo del resto de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
 - **Overflow horizontal: NO poner `overflow-x` en `html`, solo en `body`**.
@@ -372,6 +408,28 @@ próximos pasos).
   esto) antes de tocar `overflow` en el elemento raíz.
 
 ## Pendientes conocidos
+
+**INMEDIATO — retomar acá antes que nada:** el rediseño de "Detalle del
+plan de nutrición" en 3 columnas (ver "Estado actual del diseño" arriba
+y la entrada 2026-09-15 en `changelog.md`) quedó con el código ya
+escrito y verificado con Playwright, pero **sin commit ni patch
+generado** — la sesión se cortó antes de ese paso. Próxima sesión:
+1. Verificar si el working tree todavía tiene estos cambios sin commitear
+   (`git status` en `js/nutricion-planes.js`, `css/styles.css`,
+   `mi-plan.html`, `js/mi-plan.js`). Si sí: seguir el flujo normal de
+   memoria.md ("Flujo de trabajo") — commit con la autoría correcta,
+   `git format-patch` y entregar el `.patch`. **No hace falta rehacer
+   el diseño ni volver a preguntarle al usuario las 2 confirmaciones**
+   (ícono SVG en vez de emoji, avatar+nombre en Cierre — ya están
+   resueltas, documentadas arriba).
+2. Si el working tree es un clon limpio (sin esos cambios, ej. sesión
+   nueva desde cero): rehacer los cambios siguiendo el detalle de la
+   entrada 2026-09-15 de `changelog.md` (qué archivos, qué clases, qué
+   íconos) antes de commitear.
+3. Antes de dar por cerrada esta sesión: confirmarle al usuario si el
+   criterio de fallback del avatar (prefijo del email cuando no hay
+   `full_name`) le sirve o si prefiere otra cosa (no se le preguntó
+   puntualmente, fue una decisión tomada sobre la marcha).
 
 - Ver `README.md` → "Próximos pasos" para el detalle funcional.
 - Varias piezas visuales (dashboard de "Mi plan", iconos ilustrados,
