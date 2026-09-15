@@ -8,6 +8,34 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (diecisieteava tanda) — Método (lam-03): frutas pequeñas + rayas del título en dorado
+
+A pedido del usuario: (1) se agregaron 3 `<img class="deco deco-fruit">`
+pequeñas (`fruta-fresa.webp` 48px arriba a la derecha, `fruta-arandanos.webp`
+54px a la izquierda entre los ítems 02/03 de la línea de tiempo, y
+`fruta-cereza.webp` 42px abajo a la izquierda, debajo del ítem 04) usando
+los assets ya existentes en `img/imagenes-frutas/` — mismo patrón que las
+decos existentes de la sección (`.deco`, z-index 0, detrás del contenido,
+animación `float` heredada de `.deco-fruit`, oculto en mobile por la regla
+general `@media(max-width:720px){.deco-fruit{display:none}}`). (2) Se
+recolorearon las 2 rayas naranjas del título ("Un método en cuatro fases,
+no una dieta **genérica**") de `#EDA23A` a `--gold` (`#C1703B`) para que
+combinen con la paleta morado/dorado del sitio en vez del naranja genérico
+del asset compartido: se creó `svg/deco-scribble-gold.svg` (copia de
+`deco-scribble.svg` con el `stroke` cambiado) y se referenció solo desde
+`#lam-03` — el `<img class="title-scribble">` del `<h2>` apunta directo al
+nuevo archivo, y el subrayado de "genérica" (`.title-mark`, que es
+`background-image` en el `<span>`) se sobreescribe con una regla
+`#lam-03 .title-mark{background-image:url(...)}` agregada después del
+bloque compartido `#lam-03 .title-mark, #lam-04 .title-mark{...}` (mismo
+peso de especificidad, gana por orden de declaración). Cambio scopeado
+100% a `#lam-03`: se verificó con Playwright que Pilares (`#lam-04`), que
+reutiliza el mismo asset `deco-scribble.svg` para sus propios 3 trazos,
+sigue con el naranja original sin cambios. El usuario había mencionado
+"3 rayas" pero en el código actual de `#lam-03` solo existen 2 (el
+subrayado y la línea curva bajo el título); se le mostró una captura y
+confirmó que eran esas 2 las que quería recolorear.
+
 ## 2026-09-15 (dieciseisava tanda) — Método (lam-03): vuelta al morado estándar del sitio
 
 A pedido del usuario ("el fondo de la sección 3 hace que sea color

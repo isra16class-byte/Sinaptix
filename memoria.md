@@ -222,6 +222,15 @@ próximos pasos).
   Verificado con Playwright, desktop 1440px y mobile 390px — no rompe el
   layout de las columnas (`.ben-grid`, `.contact-wrap`) ni el ancho del
   `<h2>` (`max-width:14ch` sin cambios).
+- **Método (`#lam-03`) — frutas pequeñas + rayas del título en dorado**:
+  la sección tiene 3 `deco-fruit` chicas de fruta real (fresa, arándanos,
+  cereza, de `img/imagenes-frutas/`) scatterizadas detrás del contenido, y
+  las 2 rayas naranjas del título (subrayado `.title-mark` de "genérica" +
+  `.title-scribble` curva bajo el `<h2>`) pasaron de `#EDA23A` a `--gold`
+  (`#C1703B`) vía un asset nuevo `svg/deco-scribble-gold.svg` referenciado
+  solo en `#lam-03` — Pilares (`#lam-04`) sigue con el naranja original
+  del asset compartido `deco-scribble.svg`. Detalle completo en
+  `changelog.md`, diecisieteava tanda.
 - **Método (`#lam-03`) — neuronas decorativas laterales reemplazadas**
   (sesión 2026-09-15): los 2 `<img class="deco deco-fruit">` sueltos a
   los costados del título (`neurona-izquierda.webp` a la izquierda,
