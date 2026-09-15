@@ -177,6 +177,51 @@ próximos pasos).
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma
   (con comparación antes/después si hay reevaluación), encuesta de
   nutrición inline (mismo `#formNutricion` que el modal de `index.html`).
+- **"Mi plan" — estado sin sesión (`#miPlanSinSesion`, clase
+  `.miplan-locked`)**: rediseño visual (no toca `js/mi-plan.js`, siguen
+  existiendo `#miPlanSinSesion` y `#btnLoginMiPlan` con el mismo
+  comportamiento). Combina dos referencias: candado ilustrado + tarjeta
+  crema (variante A) y una maraña de líneas tipo red neuronal/cerebro de
+  fondo (variante B). Estructura: `.miplan-locked` (flex centrado) con 3
+  capas —
+  1. `svg.miplan-locked-web`: SVG inline dibujado a mano (no existe un
+     asset así en `svg/`), generado con curvas Catmull-Rom (contorno
+     orgánico tipo cerebro + 4 trazos internos tipo "tangle" + 2 clusters
+     de dendritas con nodos). Mismo criterio de trazo fino sin relleno que
+     `deco-circles-vision.svg`; paleta `--gold` (contorno + dendritas) y
+     `--purple` (interior), sin colores nuevos. `opacity:.9` en el
+     contenedor, cada capa (`.bw-outline`/`.bw-scribble`/`.bw-dendrite`/
+     `.bw-node`) con su propia opacidad más baja. Oculto en mobile
+     (`<900px`, mismo breakpoint que `#lam-02 .vision-brain-bg`).
+  2. 3 `<img class="deco deco-fruit miplan-locked-fruit is-*">` reusando
+     `svg/deco-blob-avocado.svg`, `deco-blob-kiwi.svg`,
+     `deco-blob-almonds.svg` (mismos assets de siempre, clase
+     `.deco-fruit` ya trae animación float + ocultamiento `<720px`) —
+     posicionadas con clases `is-avocado`/`is-kiwi`/`is-almonds` propias
+     de este bloque, no confundir con las frutas a nivel de sección
+     `#miPlan` (esas son otro grupo de `<img>`, anteriores al `.wrap`, no
+     se tocaron).
+  3. `.miplan-locked-card`: tarjeta blanca (`--paper`) redondeada, con
+     candado inline SVG a mano (`.miplan-locked-lock`, trazo `--purple`)
+     arriba del `eyebrow`/`h2.lam-title`/`p.lam-text`/`.btn-row` — estos 4
+     elementos **no cambiaron de texto ni de id/clase**, solo quedaron
+     centrados dentro de la tarjeta nueva (antes estaban alineados a la
+     izquierda, sueltos en el `.wrap`).
+  CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.bw-*`,
+  `.lock-*`) en `css/styles.css`, no se tocó ninguna regla que afecte
+  `#miPlanConSesion` (el dashboard con datos, que queda pendiente para
+  otra sesión con otra referencia).
+  **Sin verificación visual real con Playwright** en esta sesión (sin
+  acceso a navegador/Chromium en el entorno) — se usó WeasyPrint para
+  validar el layout de caja (tarjeta, texto, botones, frutas quedan bien
+  centrados y espaciados) pero su motor SVG no aplica CSS por clase a dry
+  elementos `<svg>` inline, así que el candado y la maraña de líneas no se
+  pudieron ver renderizados con su color/trazo real ahí — sí se
+  verificaron por separado con un render aislado (cairosvg) de la maraña
+  de líneas, que se ve como se esperaba (contorno orgánico + tangle
+  interior + dendritas). Si en una sesión nueva hay acceso a
+  Playwright/Chromium, vale la pena revisar esta pantalla contra lo
+  documentado acá antes de asumir que está 100% pulida.
 - **Backend real**: Netlify Database (Postgres) + Netlify Functions
   (`plan.mjs`) espejando `localStorage` al servidor cuando hay sesión.
   Verificado funcionando en producción (`master@94d6ba4`).

@@ -8,6 +8,59 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan": rediseño visual del estado sin sesión (`#miPlanSinSesion`)
+
+Pedido del usuario con 2 referencias (mockups generados con IA): variante A
+(tarjeta crema con candado ilustrado + fruta) y variante B (maraña de
+líneas tipo red neuronal/cerebro con tarjeta chica superpuesta). Se pidió
+combinar elementos de ambas, usando solo la paleta/tipografía ya definidas
+en `css/styles.css` y los assets ya existentes en `svg/` para las frutas.
+Alcance acotado: **solo** `#miPlanSinSesion` (el bloque "Iniciá sesión para
+ver tu plan"); `#miPlanConSesion` (el dashboard con datos) queda para otra
+sesión con otra referencia, no se tocó.
+
+- `mi-plan.html`: `#miPlanSinSesion` pasa de ser texto+botones sueltos en
+  el `.wrap` a una estructura `.miplan-locked` (flex centrado, 3 capas):
+  1. `svg.miplan-locked-web` — maraña de líneas tipo red neuronal/cerebro,
+     SVG inline dibujado a mano con curvas Catmull-Rom (no existe un asset
+     así en `svg/`): contorno orgánico + 4 trazos internos tipo "tangle" +
+     2 clusters de dendritas con nodos en las puntas. Mismo criterio de
+     trazo fino sin relleno que `deco-circles-vision.svg`, paleta
+     `--gold` (contorno/dendritas) + `--purple` (interior), sin colores
+     nuevos.
+  2. 3 `<img class="deco deco-fruit miplan-locked-fruit is-*">`
+     reutilizando `deco-blob-avocado.svg`, `deco-blob-kiwi.svg` y
+     `deco-blob-almonds.svg` (assets ya existentes, animación float ya
+     definida por `.deco-fruit`).
+  3. `.miplan-locked-card` — tarjeta blanca (`--paper`) redondeada con
+     sombra, candado SVG inline a mano (`.miplan-locked-lock`, trazo
+     `--purple`) arriba del eyebrow/título/texto/botones **sin cambiar su
+     contenido, id ni clases** (`#btnLoginMiPlan` y el link "Volver al
+     sitio" siguen funcionando igual, `js/mi-plan.js` no se tocó); solo
+     pasaron de estar alineados a la izquierda y sueltos en el `.wrap` a
+     quedar centrados dentro de la tarjeta nueva.
+- `css/styles.css`: todo el CSS nuevo bajo selectores propios
+  (`.miplan-locked*`, `.bw-*`, `.lock-*`), agregado después del bloque de
+  layout del dashboard (`.miplan-grid`/`.miplan-detalle-grid`) — no se
+  modificó ninguna regla existente que afecte `#miPlanConSesion` ni el
+  resto del sitio. El SVG de la maraña se oculta en mobile (`<900px`,
+  mismo criterio que `#lam-02 .vision-brain-bg`); las frutas heredan el
+  ocultamiento `<720px` ya existente de `.deco-fruit`.
+- Verificación en este entorno (sin acceso a Playwright/Chromium):
+  balance de tags HTML y llaves CSS OK, validez XML del SVG generado OK,
+  render aislado de la maraña de líneas con cairosvg (se ve como un
+  contorno orgánico con tangle interior y dendritas, tal como se buscaba),
+  y un preview de layout de caja con WeasyPrint (tarjeta/texto/botones/
+  frutas quedan bien centrados y espaciados — limitación conocida: el
+  motor SVG de WeasyPrint no aplica CSS por clase a elementos `<svg>`
+  inline, así que en ese preview puntual el candado se vio como un bloque
+  sólido en vez de trazo fino; es una limitación del motor de preview, no
+  del código, que sí sigue el patrón estándar de CSS cascadeando a SVG
+  inline que soportan todos los navegadores reales). Sin verificación
+  visual real en navegador — si en una sesión nueva hay acceso a
+  Playwright/Chromium, vale la pena revisar esta pantalla contra lo
+  documentado acá antes de asumir que está 100% pulida.
+
 ## 2026-09-14 — Revertido: el scrollbar gris no era un bug de overflow, era el propio `overflow-x:hidden` de `html`
 
 El usuario reportó (con captura) el scrollbar gris feo tipo Windows
