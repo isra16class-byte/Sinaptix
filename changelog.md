@@ -8,6 +8,64 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (décima tanda) — Pilares: se sacan 6 de los 7 trazos "marcador" sueltos del título
+
+El usuario marcó con círculos rojos, sobre una captura del deploy real,
+qué trazos naranjas quería sacar de la zona del título "Cuatro frentes
+de trabajo" (sección Pilares, `#lam-04`): 3 en un grupo arriba a la
+derecha, 1 solo a la izquierda, 2 en un grupo abajo a la derecha — 6 en
+total — y pidió dejar los 3 que quedan pegados al título.
+
+Identificación de cuál trazo es cuál (la captura no trae nombres de
+clase, así que hubo que mapear geometría): se clonó el repo, se sirvió
+`index.html` localmente y se renderizó con Playwright a 1920×1000,
+forzando las clases `reveal` visibles y con scroll al inicio de
+`#lam-04`. Se detectaron por color (`#EDA23A`, componentes conexos)
+los 9 trazos naranjas visibles en esa zona de la captura del usuario y
+se ajustó una regresión lineal x/y entre las posiciones de los 7
+`<img class="deco-scribble">` del render propio y esos 9 componentes,
+usando como anclas los 4 trazos de match inequívoco (los 3 del grupo
+superior derecho + el de la izquierda). Eso reveló que los "9 trazos"
+no son 7 `<img>` + 1: son 7 `<img class="deco-scribble">` sueltos +
+el `<img class="title-scribble">` (bloque centrado debajo de todo el
+`<h2>`, ya existía, no está en el array de 7) + el subrayado de la
+palabra "trabajo" en sí (`.title-mark`, `background-image` en el
+`<span>`, no es una imagen suelta). Con esos dos elementos fijos
+identificados aparte, el resto cuadró 1 a 1 sin ambigüedad.
+
+Resultado del mapeo, `index.html` dentro de `.lam-title-frame`
+(`#lam-04`):
+- Grupo circulado arriba a la derecha (3): los 3 `<img>` con
+  `style="right:40px;top:-24px..."`,
+  `style="right:calc(50% - ...);top:-42px..."` y
+  `style="right:calc(50% - ...);top:-6px..."` — **eliminados**.
+- Circulado a la izquierda (1): el `<img>` con
+  `style="left:calc(50% - ...);bottom:-6px;width:170px..."` —
+  **eliminado**.
+- Grupo circulado abajo a la derecha (2): los `<img>` con
+  `style="right:-10px;bottom:-16px;width:100px..."` y
+  `style="right:calc(50% - ...);bottom:6px;width:190px..."` —
+  **eliminados**.
+- Los 3 que quedan pegados al título (sin circular, se mantienen sin
+  tocar): el `<img>` con
+  `style="right:110px;bottom:14px;width:320px..."` (el único
+  `deco-scribble` suelto que sobrevive), el `<img class="title-scribble">`
+  (línea aparte, ya existía, centrada debajo del `<h2>`) y el
+  subrayado de "trabajo" vía `.title-mark` (CSS, sin cambios).
+
+Cambio en el código: de los 7 `<img class="deco deco-scribble">` que
+había al principio de `.lam-title-frame` en `#lam-04`, se borraron 6 y
+quedó solo uno (el de `right:110px;bottom:14px;width:320px`). No se
+tocó `#lam-03` (Método) ni ninguna otra sección — usan el mismo patrón
+de trazos pero no fueron parte de este pedido.
+
+Verificado sirviendo el sitio localmente + Playwright: la captura de
+`#lam-04` después del cambio muestra únicamente las 2 líneas pegadas
+al título (el `deco-scribble` sobreviviente + `title-scribble`) más el
+subrayado de "trabajo", sin ninguno de los 6 trazos circulados.
+Pendiente (igual que el resto del sitio, ver "Pendientes conocidos"):
+confirmarlo también contra el deploy real de Netlify.
+
 ## 2026-09-15 (novena tanda) — Botón de "Datos clave" desnivelado: anclado al fondo de la tarjeta
 
 El usuario probó el cambio anterior (octava tanda) en el deploy real y

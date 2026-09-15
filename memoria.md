@@ -172,6 +172,20 @@ próximos pasos).
 - **Tipografía**: `Inter` para cuerpo/UI, `Fraunces` (800, normal+itálica)
   para títulos, `Caveat` (`--font-hand`, clase `.title-hand`) para títulos
   con look manuscrito (Método, Pilares, título de "Mi plan").
+- **Pilares (`#lam-04`) — trazos "marcador" del título**: dentro de
+  `.lam-title-frame` quedó **un solo** `<img class="deco deco-scribble">`
+  suelto (`style="right:110px;bottom:14px;width:320px..."`), más los 2
+  elementos fijos que ya existían aparte del array — `<img
+  class="title-scribble">` (centrado debajo del `<h2>`) y el subrayado
+  de la palabra "trabajo" vía `.title-mark` (CSS `background-image` en
+  el `<span>`, no es un `<img>`) — total 3 trazos visibles pegados al
+  título. Se sacaron los otros 6 `<img class="deco deco-scribble">` que
+  estaban dispersos más lejos del título (3 arriba a la derecha, 1 a la
+  izquierda, 2 abajo a la derecha) a pedido del usuario, que los marcó
+  con círculos sobre una captura del deploy real (ver `changelog.md`,
+  décima tanda, para el detalle de cómo se identificó cada uno). No se
+  tocó `#lam-03` (Método), que usa el mismo patrón de trazos sueltos y
+  sigue con los suyos intactos.
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma
