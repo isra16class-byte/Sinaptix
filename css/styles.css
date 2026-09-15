@@ -425,6 +425,65 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   .miplan-grid,.miplan-detalle-grid{grid-template-columns:1fr}
 }
 
+/* ---------- "Mi plan" con sesión: encabezado de tarjeta (ícono + anillo) ----------
+   Referencia del usuario (mockup IA): silueta corporal + anillo para
+   Antropometría, ícono de objetivo/brújula + anillo para Objetivo cognitivo.
+   Ninguno de los dos existe como asset en img/Iconos/, así que van como SVG
+   inline a mano (trazo fino, `currentColor`/`--purple`) — no inventar rutas
+   de imagen. Los anillos son SVG puro (`<circle>` + stroke-dasharray), sin
+   imagen ni librería: arrancan "vacíos" (stroke-dashoffset = circunferencia)
+   y `.miplan-ring.is-complete` (agregada por js/mi-plan.js, ver
+   memoria.md) los completa + muestra el check. No calculan un % real (no
+   hay un dato continuo de "progreso" para IMC/objetivo, solo
+   presente/ausente): es un indicador de dos estados, no un medidor. */
+.miplan-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.miplan-card-icon{width:32px;height:32px;flex:none;color:var(--purple)}
+.miplan-card-icon path,.miplan-card-icon circle{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.miplan-card-icon .icon-dot{fill:currentColor;stroke:none}
+.miplan-card-title{
+  font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--ink);
+  letter-spacing:-.01em;margin-bottom:12px;
+}
+.miplan-ring{position:relative;width:38px;height:38px;flex:none}
+.miplan-ring-svg{width:100%;height:100%;display:block;transform:rotate(-90deg)}
+.miplan-ring-track{fill:none;stroke:var(--panel-line);stroke-width:4}
+.miplan-ring-fill{
+  fill:none;stroke-width:4;stroke-linecap:round;
+  stroke-dasharray:100.5;stroke-dashoffset:100.5;
+  transition:stroke-dashoffset .6s ease;
+}
+.miplan-ring-check{
+  position:absolute;inset:0;margin:auto;width:15px;height:15px;
+  opacity:0;transition:opacity .3s ease .15s;
+}
+.miplan-ring-check path{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.miplan-ring.is-complete .miplan-ring-fill{stroke-dashoffset:0}
+.miplan-ring.is-complete .miplan-ring-check{opacity:1}
+#miPlanAntroRing .miplan-ring-fill,#miPlanAntroRing .miplan-ring-check path{stroke:var(--green)}
+#miPlanObjetivoRing .miplan-ring-fill,#miPlanObjetivoRing .miplan-ring-check path{stroke:var(--navy-bright)}
+
+.miplan-card-cta{
+  display:inline-flex;margin-top:14px;font-size:12.5px;font-weight:600;
+  padding:9px 18px;
+}
+/* Una vez completo (anillo lleno) el CTA de la tarjeta sobra: el dato ya
+   está cargado, la acción de "actualizar" vive en el CTA principal
+   (#btnAbrirNutricionMiPlan, abajo en .miplan-cierre) para no duplicar
+   botones de acción por la misma encuesta. */
+.stat-box:has(.miplan-ring.is-complete) .miplan-card-cta{display:none}
+
+/* Fila de íconos decorativos (mismos assets de img/Iconos/ que ya usa el
+   resto del sitio para nutrición/cerebro) en la tarjeta ancha de cierre —
+   solo visible mientras no hay plan generado todavía (mismo criterio que
+   #miPlanCta, que js/mi-plan.js oculta/muestra sin cambios: acá se resuelve
+   con CSS puro, siguiente-hermano de #miPlanCta, sin tocar esa lógica). */
+.miplan-cierre-icons{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+.miplan-cierre-icons img{
+  width:32px;height:32px;object-fit:contain;border-radius:10px;
+  background:var(--panel);padding:5px;
+}
+#miPlanCta.hidden + .miplan-cierre-icons{display:none}
+
 /* ---------- "Mi plan": pantalla sin sesión (#miPlanSinSesion) ----------
    Rediseño visual (ver memoria.md, sesión de esta pantalla): combina el
    candado ilustrado + tarjeta crema de la variante A de referencia con la

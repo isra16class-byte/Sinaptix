@@ -8,6 +8,53 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" con sesión: rediseño visual del dashboard (#miPlanConSesion)
+
+Rediseño visual del estado "con sesión" de `mi-plan.html` (el dashboard
+"Tu progreso con SINAPTIX"), a partir de un mockup IA de referencia
+(sidebar + tarjetas "Datos clave" con silueta corporal/brújula + tarjeta
+ancha "Detalle del plan"). No se tocó `#miPlanSinSesion` (rediseñado en
+una sesión anterior) ni la lógica de qué pinta cada dato en
+`js/mi-plan.js`/`js/nutricion-planes.js`.
+
+Decisiones de esta sesión:
+- **Sidebar descartada** (confirmado con el usuario antes de tocar el
+  `<header>`): reemplazar el `<nav>` superior fijo por una sidebar
+  afectaría el layout global compartido con `index.html` y con
+  `#miPlanSinSesion`, fuera del alcance pedido. Se adaptó la idea del
+  mockup a una sola columna con el nav superior existente, sin cambios
+  de estructura fuera de `#miPlanConSesion`.
+- Las 2 tarjetas de "Datos clave" (Antropometría / Objetivo cognitivo)
+  suman un header con ícono SVG inline a mano (silueta corporal y
+  "diana"/objetivo — no existen como asset en `img/Iconos/`, se
+  descartó inventar rutas de imagen) + un anillo de progreso de 2
+  estados (SVG `<circle>` + `stroke-dasharray`, sin imagen ni
+  librería): vacío por defecto, se completa (`.is-complete`, verde para
+  Antropometría/azul para Objetivo) cuando `js/mi-plan.js` ya logró
+  parsear esos datos. Esto sumó 4 líneas aditivas en `pintarMiPlan()`
+  (agregar la clase `is-complete` en los mismos `try` que ya existían) —
+  el resto del comportamiento de esa función no cambió.
+- Cada tarjeta suma un CTA propio (`.miplan-card-cta`) que hace scroll
+  (`<a href="#miplanCierreAnchor">`, `scroll-behavior:smooth` nativo, sin
+  JS nuevo) hasta el botón real "Generar mi plan" — no existe un flujo
+  separado para cargar solo antropometría o solo objetivo, ambos salen
+  de la misma encuesta de 8 pasos. El CTA se oculta solo (CSS
+  `:has()`, ya usado antes en este stylesheet para `.scale-opt`) una vez
+  que el anillo de esa tarjeta está completo.
+- `.miplan-cierre` (tarjeta ancha, ya existía) suma una fila de íconos
+  decorativos reusando los `img/Iconos/icon-*.webp` existentes (omega3,
+  neuronas, antioxidantes, hidratación, complejo B) — visible solo
+  mientras no hay plan generado, resuelto con CSS puro
+  (`#miPlanCta.hidden + .miplan-cierre-icons{display:none}`, hermano
+  inmediato del texto que `js/mi-plan.js` ya ocultaba/mostraba sin
+  cambios).
+
+Detalle completo de la decisión de la sidebar y de cada pieza visual en
+`memoria.md` (sección "Mi plan — estado con sesión").
+
+Archivos tocados: `mi-plan.html`, `css/styles.css`, `js/mi-plan.js` (solo
+las 4 líneas aditivas descritas arriba).
+
 ## 2026-09-14 — "Mi plan" sin sesión: cerebro más a la derecha (de verdad), botón Registrarme, y nav principal apunta al login
 
 Seguimiento del patch anterior (que había corrido el cerebro grande de

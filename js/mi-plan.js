@@ -53,6 +53,11 @@ if(window.netlifyIdentity){
           if(catEl) catEl.classList.remove('hidden');
           if(legendEl) legendEl.classList.remove('hidden');
         }
+        // Anillo de progreso de la tarjeta "Antropometría" (rediseño visual,
+        // ver memoria.md): solo se completa si los datos parsearon bien,
+        // no solo por existir la clave en localStorage.
+        const antroRingEl = document.getElementById('miPlanAntroRing');
+        if(antroRingEl) antroRingEl.classList.add('is-complete');
       }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
     }
 
@@ -83,6 +88,10 @@ if(window.netlifyIdentity){
           miPlanDetalleEl.classList.remove('hidden');
         }
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
+        // Anillo de progreso de la tarjeta "Objetivo cognitivo" (rediseño
+        // visual, ver memoria.md): mismo criterio que el de Antropometría.
+        const objetivoRingEl = document.getElementById('miPlanObjetivoRing');
+        if(objetivoRingEl) objetivoRingEl.classList.add('is-complete');
       }catch(err){ /* datos corruptos: se ignoran, se deja el placeholder */ }
     } else {
       if(miPlanBarrasEl) miPlanBarrasEl.classList.add('hidden');

@@ -231,8 +231,8 @@ próximos pasos).
      misma fila quedaba sobrecargado.
   CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.lock-*`) en
   `css/styles.css`, no se tocó ninguna regla que afecte `#miPlanConSesion`
-  (el dashboard con datos, que queda pendiente para otra sesión con otra
-  referencia).
+  (el dashboard con datos — su propio rediseño se hizo en una sesión
+  posterior, ver más abajo).
   **Verificado con Playwright** (esta sesión sí tuvo acceso a
   Chromium/Playwright): capturas a 1280px/1440px calzan contra la
   referencia del usuario, mobile (390px) oculta los 2 cerebros
@@ -288,6 +288,57 @@ próximos pasos).
   decoraciones viejas de esa esquina (círculos, huevo, aceite de oliva)
   que competían con el arte nuevo. Ancho responsive con `clamp()`, oculto
   en mobile (`<900px`, mismo criterio que el resto de `.deco-fruit`).
+- **"Mi plan" — estado con sesión (`#miPlanConSesion`, dashboard "Tu
+  progreso con SINAPTIX")**: rediseño visual sobre los mismos componentes
+  de datos de siempre (medidor de IMC tipo velocímetro, tarjeta de
+  objetivo, gráfico de barras, resumen de nutrición, `.miplan-cierre`) —
+  no se tocó `js/mi-plan.js` en su lógica de qué pinta cada dato, solo se
+  agregaron 4 líneas aditivas (ver abajo) y no se tocó `js/nutricion-planes.js`.
+  Referencia: mockup IA con sidebar + tarjetas "Datos clave" (silueta
+  corporal / brújula) + tarjeta ancha "Detalle del plan". **La sidebar no
+  se implementó** — a pedido explícito del usuario (afectaría el `<nav>`
+  fijo compartido por `index.html` y ambos estados de `mi-plan.html`,
+  fuera del alcance de esta sesión que solo tocaba `#miPlanConSesion`):
+  se adaptó a una sola columna con el nav superior existente, sin tocar
+  `<nav>`/`#miPlanSinSesion`.
+  1. Cada una de las 2 tarjetas de "Datos clave" (`.stat-box.miplan-card`)
+     suma un header (`.miplan-card-head`): ícono SVG inline a mano, trazo
+     fino `stroke:var(--purple)` (silueta corporal para Antropometría,
+     círculos concéntricos tipo "objetivo/diana" para Objetivo cognitivo
+     — no existen como asset en `img/Iconos/`, se descartó inventar una
+     ruta de imagen) + un anillo de progreso (`.miplan-ring`, SVG puro:
+     `<circle>` de fondo + `<circle>` con `stroke-dasharray`/
+     `stroke-dashoffset`, sin imagen ni librería). El anillo es un
+     indicador de **2 estados** (vacío/completo), no un medidor real: no
+     hay un dato continuo de "% de progreso" para IMC u objetivo, solo
+     presente/ausente. `.miplan-ring.is-complete` (verde `--green` para
+     `#miPlanAntroRing`, azul `--navy-bright` para `#miPlanObjetivoRing`)
+     rellena el círculo y muestra un check — la clase la agrega
+     `js/mi-plan.js` dentro de los mismos bloques `try` que ya parsean
+     `sinaptix_antropometria`/`sinaptix_objetivo` en `pintarMiPlan()`
+     (2 líneas nuevas por bloque, no se modificó nada de lo que ya
+     existía ahí). Debajo de cada tarjeta, un CTA propio
+     (`.miplan-card-cta`, `btn-ghost` chico) — como no existe un flujo
+     para cargar *solo* antropometría o *solo* objetivo por separado (los
+     dos salen de la misma encuesta de 8 pasos), el CTA es un simple
+     `<a href="#miplanCierreAnchor">` que hace scroll (nativo,
+     `scroll-behavior:smooth` ya en `html`) hasta el botón real
+     "Generar mi plan" — cero JS nuevo para esto. `.stat-box:has(.miplan-ring.is-complete)
+     .miplan-card-cta{display:none}` oculta el CTA de la tarjeta una vez
+     completa (evita 2 botones que abren la misma encuesta).
+  2. `.miplan-cierre` (tarjeta ancha "Detalle del plan de nutrición", ya
+     existía) suma una fila de íconos decorativos
+     (`.miplan-cierre-icons`, reusa los mismos `img/Iconos/icon-*.webp`
+     que ya usa el resto del sitio: omega3, neuronas, antioxidantes,
+     hidratación, complejo B — no se generó ningún ícono nuevo para esto)
+     entre el texto de `#miPlanCta` y los botones. Solo visible mientras
+     no hay plan generado: `#miPlanCta.hidden + .miplan-cierre-icons{display:none}`,
+     resuelto con CSS puro (hermano inmediato de `#miPlanCta`, que
+     `js/mi-plan.js` ya ocultaba/mostraba sin cambios) — no hizo falta
+     tocar JS para esto.
+  3. `#miPlan .stat-box`/`.miplan-grid`/etc. (paddings, gaps, fondo
+     `--paper` sobre `.dark`) no cambiaron — son las reglas ya
+     documentadas más arriba, compartidas con el resto de "Mi plan".
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
