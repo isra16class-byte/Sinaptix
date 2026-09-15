@@ -186,6 +186,28 @@ próximos pasos).
   décima tanda, para el detalle de cómo se identificó cada uno). No se
   tocó `#lam-03` (Método), que usa el mismo patrón de trazos sueltos y
   sigue con los suyos intactos.
+- **Beneficios (`#lam-05`) y Contacto (`#lam-06`) — títulos sin acento,
+  ahora con marker+scribble+chispa**: eran los 2 únicos `<h2 class="lam-title">`
+  del sitio sin ninguna decoración (a diferencia de `#lam-02` que ya tenía
+  un ícono svg inline, y `#lam-03`/`#lam-04` con `.title-mark`+
+  `.title-scribble` centrados). Se les sumó el mismo lenguaje visual pero
+  **sin centrar** (quedan alineados a la izquierda, como estaban): `<span
+  class="title-mark">` sobre "carga alta" (`lam-05`) y "asesoría"
+  (`lam-06`), `<img class="title-scribble" src="svg/deco-scribble.svg">`
+  suelto después del `<h2>` (mismo asset, `margin:6px 0 0` en vez de
+  `auto` — override en CSS por `#lam-05 .title-scribble,#lam-06
+  .title-scribble` porque la regla base lo centra), y 1-2 `<span
+  class="brain-spark">` (mismo asset que las chispas del hero,
+  `keyframes spark-twinkle`) posicionados con `position:relative` en el
+  propio `<h2>` — width/height reducidos a 7px vía `#lam-05 .lam-title
+  .brain-spark,#lam-06 .lam-title .brain-spark` para que no compitan con
+  el texto. **No se tocó la tipografía** (`--font-hand`/Caveat intacta,
+  pedido explícito del usuario) ni ningún otro título del sitio.
+  `.title-scribble` se sigue ocultando en mobile (`<720px`) por la regla
+  general ya existente, mismo comportamiento que `lam-03`/`lam-04`.
+  Verificado con Playwright, desktop 1440px y mobile 390px — no rompe el
+  layout de las columnas (`.ben-grid`, `.contact-wrap`) ni el ancho del
+  `<h2>` (`max-width:14ch` sin cambios).
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma

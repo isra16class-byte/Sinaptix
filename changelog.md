@@ -8,6 +8,40 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (onceava tanda) — Beneficios y Contacto: se les suma acento visual a los títulos que no tenían nada
+
+El usuario pidió darles impacto a "los títulos que no tienen nada" sin
+tocar la tipografía. Se identificaron `#lam-05` ("Pensado para mentes
+con carga alta") y `#lam-06` ("Empecemos tu asesoría") como los únicos
+`<h2 class="lam-title">` del sitio sin ningún acento (a diferencia de
+`#lam-02`, que ya tiene un ícono svg inline, y `#lam-03`/`#lam-04`, que
+tienen `.title-mark` + `.title-scribble` centrados).
+
+Se les sumó el mismo lenguaje visual que ya usa el sitio, pero alineado
+a la izquierda (no centrado, porque estos títulos no van en
+`.sec-head-center`):
+- `.title-mark` (subrayado tipo marcador, `background-image` con
+  `svg/deco-scribble.svg`) sobre "carga alta" (`lam-05`) y "asesoría"
+  (`lam-06`).
+- `<img class="title-scribble">` suelto después de cada `<h2>`, mismo
+  asset que Método/Pilares. Como la regla base lo centra
+  (`margin:6px auto 0`), se agregó override
+  `#lam-05 .title-scribble,#lam-06 .title-scribble{margin:6px 0 0}` para
+  que quede pegado al borde izquierdo del título en vez de centrado.
+- 1-2 `<span class="brain-spark">` por título (mismo asset/keyframe que
+  las chispas del Hero), como chispita sutil de "impacto" extra — el
+  `<h2>` pasó a `position:relative` para poder posicionarlas, y se
+  redujo su tamaño a 7px (`#lam-05 .lam-title .brain-spark,#lam-06
+  .lam-title .brain-spark{width:7px;height:7px}`) para que no compitan
+  con el texto.
+
+No se tocó `--font-hand`/Caveat ni ningún otro `.lam-title` del sitio.
+`.title-scribble` se sigue ocultando en mobile (`<720px`) por la regla
+general que ya existía. Verificado con Playwright (servidor estático
+local, `python3 -m http.server`) en desktop 1440px y mobile 390px:
+marcador y scribble visibles y alineados a la izquierda, sin romper
+`.ben-grid` ni `.contact-wrap`, ni el `max-width:14ch` de los títulos.
+
 ## 2026-09-15 (décima tanda) — Pilares: se sacan 6 de los 7 trazos "marcador" sueltos del título
 
 El usuario marcó con círculos rojos, sobre una captura del deploy real,
