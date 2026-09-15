@@ -172,6 +172,18 @@ próximos pasos).
 - **Tipografía**: `Inter` para cuerpo/UI, `Fraunces` (800, normal+itálica)
   para títulos, `Caveat` (`--font-hand`, clase `.title-hand`) para títulos
   con look manuscrito (Método, Pilares, título de "Mi plan").
+- **Títulos de sección — mismo color combinado que el Hero**: el Hero
+  combina `--ink` (grueso del título) + `--purple` (la palabra `<em>`,
+  "claridad") vía `.hero h1 em{color:var(--purple)}`. El resto de
+  `<h2 class="lam-title">` ahora sigue el mismo patrón vía
+  `.title-mark{color:var(--purple)}` (además del subrayado marcador que
+  ya tenía) — cubre "genérica" (`#lam-03`), "trabajo" (`#lam-04`), "carga
+  alta" (`#lam-05`) y "asesoría" (`#lam-06`). `#lam-02` no tenía ninguna
+  palabra remarcada (llevaba un ícono svg inline en vez de
+  `.title-mark`); se le agregó `<span class="title-mark">` sobre
+  "alimenta" en `index.html` para que las 6 secciones compartan el mismo
+  lenguaje. No aplica a `mi-plan.html`: sus `<h2 class="lam-title">` no
+  usan `.title-mark`, siguen 100% `--ink`.
 - **Pilares (`#lam-04`) — trazos "marcador" del título**: dentro de
   `.lam-title-frame` quedó **un solo** `<img class="deco deco-scribble">`
   suelto (`style="right:110px;bottom:14px;width:320px..."`), más los 2

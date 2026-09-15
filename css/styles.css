@@ -267,6 +267,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background-position:left bottom 2px;
   background-size:100% 32%;
   padding-bottom:4px;
+  color:var(--purple);
 }
 .title-scribble{
   display:block;

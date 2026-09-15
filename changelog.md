@@ -8,6 +8,40 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (doceava tanda) — Títulos de sección: mismo color combinado que el Hero
+
+El usuario pidió que los títulos de cada sección tuvieran "el color
+combinado así como la sección de inicio", dejando el criterio libre. En
+el Hero, `.hero h1 em{color:var(--purple)}` combina el `--ink` del resto
+del título con `--purple` en la palabra "claridad". El resto de los
+`<h2 class="lam-title">` no tenía esa combinación: eran 100% `--ink`,
+aunque 4 de los 5 ya usaban `.title-mark` (el span con el subrayado tipo
+marcador de `svg/deco-scribble.svg`) sobre una palabra clave.
+
+Cambio: `.title-mark{color:var(--purple)}` en `css/styles.css`. Con una
+sola línea, la palabra ya remarcada de cada título (`genérica` en
+`#lam-03`, `trabajo` en `#lam-04`, `carga alta` en `#lam-05`, `asesoría`
+en `#lam-06`) pasa a combinar tinta oscura + púrpura, igual que el Hero,
+sin tocar el marcador dorado (`#EDA23A`) que ya traía cada una — quedan
+las dos cosas juntas (color + subrayado), no una en lugar de la otra.
+
+`#lam-02` ("El cerebro también se alimenta") era el único título del
+sitio sin ninguna palabra remarcada (tiene un ícono svg inline en vez de
+`.title-mark`/`.title-scribble`). Para que las 6 secciones (Hero incluido)
+compartan el mismo lenguaje, se envolvió "alimenta" en
+`<span class="title-mark">` en `index.html` — hereda el color y el
+marcador sin CSS nuevo.
+
+No se tocó `mi-plan.html`: sus 3 `<h2 class="lam-title">` no usan
+`.title-mark`, así que no se vieron afectados por el cambio (quedan
+100% `--ink`, consistente con cómo estaban).
+
+Verificado con Playwright (servidor estático local, sin backend
+involucrado): las 6 secciones (`#lam-01` a `#lam-06`), desktop 1440px y
+mobile 390px. Se esperó a que terminara la animación `.reveal` antes de
+capturar (los títulos de `#lam-04`/`#lam-05`/`#lam-06` usan
+`reveal`/`reveal in` con transición de opacidad al entrar en viewport).
+
 ## 2026-09-15 (onceava tanda) — Beneficios y Contacto: se les suma acento visual a los títulos que no tenían nada
 
 El usuario pidió darles impacto a "los títulos que no tienen nada" sin
