@@ -8,6 +8,26 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (quinceava tanda) — Método (lam-03): nueva ilustración de neurona en los 2 decorativos laterales
+
+A pedido del usuario, que subió una imagen (neurona completa vista de
+frente, generada con IA, fondo blanco): se reemplazó el contenido de
+`img/decoraciones-neurona/neurona-izquierda.webp` y
+`neurona-derecha.webp` (mismos nombres de archivo, no se tocó
+`index.html` ni el `style` inline de posición/tamaño de los `<img
+class="deco deco-fruit">` que los usan en `#lam-03`). Los assets
+anteriores eran medias neuronas recortadas (pensadas para sangrar en el
+borde); la imagen nueva es la neurona completa, así que ahora se ve
+entera en la esquina en vez de solo la mitad — el usuario pidió
+explícitamente mantener la misma posición, no recortarla de nuevo. Se le
+quitó el fondo blanco (blanco puro → alpha 0, gradual según cercanía al
+blanco para conservar el degradé del resplandor central) para que siga
+flotando sobre el crema de la sección, y se reexportó a `.webp` (~640px
+de ancho, calidad 82, ambos archivos con el mismo contenido, sin
+espejar). Verificado con Playwright: desktop 1440px (la neurona nueva se
+ve completa en las 2 esquinas, mismo lugar que antes) y mobile 390px
+(sigue oculta, sin cambios en esa regla).
+
 ## 2026-09-15 (catorceava tanda) — Visión (lam-02): borde morado fino en las 4 tarjetas y párrafo más grande
 
 A pedido del usuario (mandó captura de la sección Visión): las 4

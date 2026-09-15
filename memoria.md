@@ -220,6 +220,27 @@ próximos pasos).
   Verificado con Playwright, desktop 1440px y mobile 390px — no rompe el
   layout de las columnas (`.ben-grid`, `.contact-wrap`) ni el ancho del
   `<h2>` (`max-width:14ch` sin cambios).
+- **Método (`#lam-03`) — neuronas decorativas laterales reemplazadas**
+  (sesión 2026-09-15): los 2 `<img class="deco deco-fruit">` sueltos a
+  los costados del título (`neurona-izquierda.webp` a la izquierda,
+  `neurona-derecha.webp` a la derecha — mismos nombres de archivo, mismo
+  `style` inline con `left`/`right`/`top`/`width`, sin tocar
+  `index.html`) ahora usan una sola ilustración nueva provista por el
+  usuario: neurona completa vista de frente (cuerpo dorado/violeta
+  brillante al centro, dendritas azul/violeta/dorado irradiando en
+  círculo), a diferencia de los assets anteriores que eran **medias
+  neuronas** recortadas (cuerpo cortado en el borde de la página,
+  pensadas para la posición de bleed). Se le quitó el fondo blanco
+  (conversión a alpha por canal, blanco puro → transparente) para que
+  siga flotando sobre el crema de `#lam-03` igual que antes, y se
+  reexportó a `.webp` (~640px de ancho, calidad 82) — ambos archivos
+  quedaron con el mismo contenido (no hay versión espejada). Como la
+  posición/tamaño no cambiaron, el resultado visual es la misma
+  ilustración completa "sangrando" en las mismas esquinas donde antes
+  solo se veía la mitad de la neurona. Verificado con Playwright,
+  desktop 1440px (visible) y mobile 390px (sigue oculto por la regla
+  general `@media(max-width:720px){.deco-fruit{display:none}}`, sin
+  cambios).
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma
