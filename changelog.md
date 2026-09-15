@@ -8,6 +8,26 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — Scrollbar de marca (reemplaza el gris nativo del SO)
+
+Pedido del usuario con captura: en Windows/Chrome se veía una franja gris
+sólida pegada al borde derecho de toda la página, que interpretó como
+"doble scroll". Se verificó pixel a pixel la captura: es una única franja
+continua (`rgb(139,139,139)`, ~11px) de arriba a abajo — el scrollbar
+nativo clásico de Windows (track + thumb + flechas arriba/abajo), no un
+bug de overflow del sitio ni dos scrollbars superpuestos (ya se había
+descartado overflow horizontal real: `html`/`body` ya tenían
+`overflow-x:hidden`, y no hay ningún contenedor con `overflow-y` propio
+que genere scroll anidado).
+
+- `css/styles.css`, justo después del reset `*{...}`/`html`/`body`: se
+  agrega scrollbar personalizado en vez de dejar el del SO por defecto —
+  `scrollbar-width:thin` + `scrollbar-color` (Firefox) y
+  `::-webkit-scrollbar*` (Chrome/Edge/Safari) con pista `var(--panel)` y
+  thumb `var(--purple)` (`var(--purple-dark)` en hover), 10px de ancho,
+  sin flechas. Esto resuelve la queja visual ("se ve gris") aunque no
+  había un bug de doble-scroll real de por medio.
+
 ## 2026-09-14 — Visión: fondo ilustrado más suave (blanquecino/difuminado)
 
 Pedido del usuario con captura: el fondo de cerebro/red neuronal se veía

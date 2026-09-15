@@ -208,6 +208,16 @@ próximos pasos).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
+- **Scrollbar de marca**: en `css/styles.css`, justo después del reset y
+  las reglas de `html`/`body`, hay un scrollbar personalizado (pista
+  `var(--panel)`, thumb `var(--purple)`/`var(--purple-dark)` en hover,
+  10px, sin flechas) vía `scrollbar-width`/`scrollbar-color` (Firefox) y
+  `::-webkit-scrollbar*` (Chrome/Edge/Safari). Se agregó porque el
+  scrollbar nativo de Windows/Chrome (gris, con flechas) se veía como una
+  franja gris sólida pegada al borde derecho y el usuario lo reportó como
+  "doble scroll" — verificado que era una única barra (el nativo del SO,
+  no un bug de overflow), pero igual se reemplaza por estética/consistencia
+  de marca.
 - **Salvaguarda global de overflow horizontal**: `html` (además de
   `body`, que ya lo tenía) lleva `overflow-x:hidden`. Se agregó tras un
   bug real: un bleed grande en `vision-brain-bg` (`right:-160px`) hizo
