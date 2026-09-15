@@ -384,8 +384,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    grandes) y el `margin-top:100px` del `footer` dejaban un scroll enorme
    acá sin necesidad. Se recorta solo en este contexto (no se toca
    `section`/`footer` en general, así que index.html sigue igual). */
-#miPlan{padding:104px 0 56px}
-#miPlan footer{margin-top:48px}
+#miPlan{padding:88px 0 40px}
+#miPlan footer{margin-top:28px}
 #miPlanConSesion .sec-head-center .lam-title{margin:14px 0 6px}
 #miPlanConSesion .sec-head-center .lam-text{margin:0}
 #miPlan .miplan-subhead{margin-bottom:12px}
@@ -435,9 +435,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    de la tarjeta sin sesión únicamente. */
 .miplan-locked{
   position:relative;
-  min-height:clamp(460px,58vh,600px);
+  min-height:clamp(380px,48vh,460px);
   display:flex;align-items:center;justify-content:center;
-  padding:28px 0;
+  padding:20px 0;
 }
 
 /* Cerebro ilustrado (img/decoraciones-neurona/cerebro-mi-plan.webp, imagen
@@ -483,12 +483,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background:var(--paper);
   border-radius:26px;
   box-shadow:var(--shadow-lg);
-  padding:44px 46px 40px;
+  padding:36px 40px 32px;
   max-width:460px;
   width:100%;
   text-align:center;
 }
 .miplan-locked-card .eyebrow{justify-content:center}
+.miplan-locked-card .lam-title{font-size:clamp(30px,4vw,44px);margin:14px 0 14px}
 .miplan-locked-card .lam-title,
 .miplan-locked-card .lam-text{margin-left:auto;margin-right:auto}
 .miplan-locked-card .btn-row{justify-content:center}

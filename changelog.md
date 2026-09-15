@@ -8,6 +8,34 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" sin sesión: bajar la altura para que entre sin scroll
+
+Pedido del usuario tras la sesión anterior (cerebro ilustrado real): en
+laptops con poca altura de viewport, la pantalla `#miPlanSinSesion`
+necesitaba scroll vertical para ver el footer. Se achicó la altura total
+de ~937px a ~720px (medido con Playwright a 1440px de ancho), sin tocar
+`#miPlanConSesion`.
+
+- `css/styles.css`:
+  - `#miPlan{padding:104px 0 56px}` → `88px 0 40px` y
+    `#miPlan footer{margin-top:48px}` → `28px` (afecta a ambos estados de
+    "Mi plan", pero el dashboard con sesión tiene contenido propio de sobra
+    como para no notarse; si algún día se ve muy pegado ahí, ajustar aparte
+    con un selector más específico).
+  - `.miplan-locked{min-height:clamp(460px,58vh,600px)}` →
+    `clamp(380px,48vh,460px)`, `padding:28px 0` → `20px 0`.
+  - `.miplan-locked-card{padding:44px 46px 40px}` → `36px 40px 32px`.
+  - Nueva regla `.miplan-locked-card .lam-title{font-size:clamp(30px,4vw,44px);margin:14px 0 14px}`
+    (el título manuscrito por defecto es `clamp(40px,6vw,68px)`, pensado
+    para títulos de sección hero — acá con 3 líneas de ese tamaño era el
+    mayor contribuyente a la altura total).
+  - `mi-plan.html`: `.btn-row` de esta tarjeta, margin-top inline
+    `26px` → `20px`.
+- Verificado con Playwright: `document.body.scrollHeight` pasa de 937px a
+  720px (ancho 1440px); entra sin scroll hasta viewports de ~720px de
+  alto. Capturas a 900px/800px/mobile (390px) revisadas, no se ve
+  apretado.
+
 ## 2026-09-14 — "Mi plan" sin sesión: cerebro ilustrado real reemplaza la maraña SVG
 
 Pedido del usuario con una imagen de referencia (screenshot de un mockup) y
