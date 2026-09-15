@@ -435,6 +435,23 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    tarjeta de Antropometría queda más alta que la de Objetivo cognitivo
    porque su placeholder de texto ocupa más líneas). Con "stretch" ambas
    columnas del grid toman la altura de la fila (la más alta de las 2). */
+/* Ambas tarjetas de "Datos clave" (Antropometría y Objetivo cognitivo)
+   comparten esta clase — pasa a flex-column para poder anclar el botón
+   (.miplan-card-cta) siempre al borde inferior con margin-top:auto (ver
+   esa regla más abajo). Sin esto, el botón queda a distinta altura entre
+   las 2 tarjetas cuando el contenido de arriba difiere en alto (el "—"/
+   valor de Antropometría es 36px y el de Objetivo cognitivo 22px, porque
+   este último necesita lugar para un objetivo largo tipo "Mejorar el
+   foco y la memoria" sin desbordar) — se veía "desparejo" (reportado por
+   el usuario con captura). No se define align-items acá a propósito:
+   Antropometría (sin otra regla que la toque) queda con el valor inicial
+   "normal" → se comporta como "stretch", que es lo que necesita para que
+   `.imc-gauge{margin:0 auto}` siga centrándose sobre el ancho completo de
+   la tarjeta igual que antes (bloque normal). Objetivo cognitivo sigue
+   gobernada por `.miplan-objetivo{align-items:flex-start}` (regla propia,
+   más abajo), que ya tiene su propio ajuste de ancho para `.miplan-card-head`
+   (ver esa regla). */
+.stat-box.miplan-card{display:flex;flex-direction:column}
 .miplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 .miplan-col{display:flex;flex-direction:column;gap:16px}
 /* flex:1 hace que la tarjeta en sí (no solo el wrapper .miplan-col, que
@@ -548,8 +565,18 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #miPlanAntroRing .miplan-ring-fill,#miPlanAntroRing .miplan-ring-check path{stroke:var(--green)}
 #miPlanObjetivoRing .miplan-ring-fill,#miPlanObjetivoRing .miplan-ring-check path{stroke:var(--navy-bright)}
 
+/* margin-top:auto (dentro del flex-column de .stat-box.miplan-card, ver
+   esa regla) empuja el botón siempre al borde inferior de la tarjeta,
+   sin importar cuánto contenido haya arriba — así Antropometría y
+   Objetivo cognitivo quedan con el botón a la misma altura pese a que
+   el bloque de arriba no mide lo mismo en las 2 (ver esa regla para el
+   detalle). align-self:flex-start evita que el botón se estire a todo
+   el ancho de la tarjeta (efecto por default de un flex-column sin
+   align-items:flex-start, ver .stat-box.miplan-card) — mantiene el
+   ancho compacto que ya tenía como inline-flex en el layout de bloque
+   anterior. */
 .miplan-card-cta{
-  display:inline-flex;margin-top:14px;font-size:12.5px;font-weight:600;
+  display:inline-flex;margin-top:auto;align-self:flex-start;font-size:12.5px;font-weight:600;
   padding:9px 18px;
 }
 /* Una vez completo (anillo lleno) el CTA de la tarjeta sobra: el dato ya

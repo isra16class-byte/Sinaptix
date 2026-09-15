@@ -8,6 +8,35 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (novena tanda) — Botón de "Datos clave" desnivelado: anclado al fondo de la tarjeta
+
+El usuario probó el cambio anterior (octava tanda) en el deploy real y
+mandó una captura: los botones "Cargar datos antropométricos" y
+"Establecer objetivo" quedaban a distinta altura entre las 2 tarjetas,
+se veía "imparejo".
+
+Causa: `.num` usa `font-size:36px` en Antropometría pero `22px` en
+Objetivo cognitivo (a propósito, para que un objetivo largo no
+desborde) — esa diferencia de alto entre los bloques de arriba corría
+el botón hacia abajo en la tarjeta verde. Igualar las fuentes no era
+opción (rompería el ajuste del objetivo largo), así que se ancló el
+botón siempre al borde inferior de la tarjeta en vez de dejarlo flotar
+según el contenido de arriba.
+
+Cambios, `css/styles.css`:
+- `.stat-box.miplan-card` (clase que comparten las 2 tarjetas):
+  `display:flex;flex-direction:column` (sin fijar `align-items`, para
+  no romper el centrado de `.imc-gauge` en Antropometría ni el fix ya
+  aplicado de `.miplan-objetivo` en Objetivo cognitivo).
+- `.miplan-card-cta`: `margin-top:14px` → `margin-top:auto` (empuja al
+  fondo) + `align-self:flex-start` (evita que se estire a todo el
+  ancho, efecto por default del flex-column recién agregado).
+
+Verificado con Playwright: estado sin datos (botones ya alineados,
+desktop 1440px y mobile 390px) y con plan generado (sin cambios, el
+botón se oculta en ese estado). Ver detalle en `memoria.md` → "Estado
+actual del diseño".
+
 ## 2026-09-15 (octava tanda) — Objetivo cognitivo: orden de texto + anillo a la derecha; "Tu estado actual" pasa a dorado
 
 El usuario mandó una captura señalando 3 ajustes en el dashboard de "Mi

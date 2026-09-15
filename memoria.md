@@ -684,6 +684,37 @@ próximos pasos).
   mobile — las 2 tarjetas de la columna derecha ("Objetivo cognitivo" y
   "Tu estado actual") quedan del mismo tono, sin afectar la tarjeta
   verde de Antropometría ni la lila de "Cierre".
+- **Botón de "Datos clave" desnivelado entre las 2 tarjetas — anclado al
+  borde inferior** (misma sesión, sexta tanda — el usuario mandó captura
+  del deploy real mostrando el problema apenas se aplicó el punto
+  anterior). Causa: `.num` usa `font-size:36px` en Antropometría pero
+  `22px` en Objetivo cognitivo (a propósito, para que un objetivo largo
+  tipo "Mejorar el foco y la memoria" no desborde) — esa diferencia de
+  alto entre los dos bloques de arriba hacía que el botón
+  (`.miplan-card-cta`) quedara a distinta altura en cada tarjeta en el
+  estado "sin datos" (con datos cargados el botón se oculta vía
+  `.stat-box:has(.miplan-ring.is-complete) .miplan-card-cta{display:none}`,
+  así que ahí no se notaba). Se igualaron fuentes en vez de forzar el
+  mismo tamaño (rompería el objetivo largo) anclando el botón siempre al
+  fondo de la tarjeta: `.stat-box.miplan-card` (clase que comparten las 2
+  tarjetas) pasa a `display:flex;flex-direction:column` — sin fijar
+  `align-items` en esa regla a propósito, así Antropometría (gobernada
+  solo por esta regla) hereda el valor inicial `normal` → se comporta
+  como `stretch` (igual que el bloque normal que tenía antes, necesario
+  para que `.imc-gauge{margin:0 auto}` se siga centrando sobre el ancho
+  completo) y Objetivo cognitivo sigue con su propio
+  `align-items:flex-start` (`.miplan-objetivo`, sin cambios, ya tenía el
+  fix de `.miplan-card-head{width:100%}` de la tanda anterior). Con la
+  tarjeta en flex-column, `.miplan-card-cta` suma `margin-top:auto`
+  (empuja el botón al fondo sin importar cuánto mida el contenido de
+  arriba) y `align-self:flex-start` (para que no se estire a todo el
+  ancho, efecto por default de un flex-column sin `align-items:flex-start`
+  — reemplaza el `margin-top:14px` fijo que tenía antes).
+  Verificado con Playwright: estado sin datos (los 2 botones ahora a la
+  misma altura, desktop 1440px y mobile 390px) y con plan generado (sigue
+  igual que antes, el botón no se ve porque está oculto). No se tocó
+  `index.html`: `.miplan-card`/`.miplan-card-cta` son clases exclusivas
+  de `mi-plan.html`.
 
 ## Pendientes conocidos
 
