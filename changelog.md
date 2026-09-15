@@ -17,6 +17,10 @@ demasiado marcado/saturado detrás de las tarjetas ya en tono morado.
   `filter:blur(2px) brightness(1.35) saturate(.75)` (difumina bordes,
   aclara y baja saturación para que quede más de fondo/lavado en vez de
   competir visualmente con las tarjetas y el texto).
+- Ajuste fino (mismo pedido, el usuario lo vio y quedó demasiado tenue):
+  `opacity:.55` -> `.8`, `filter:blur(2px) brightness(1.35) saturate(.75)`
+  -> `blur(1px) brightness(1.12) saturate(.88)` (mucho más leve, el arte
+  se sigue viendo con claridad pero un poco más suave que el original).
 
 ## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
 
