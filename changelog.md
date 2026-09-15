@@ -28,6 +28,15 @@ demasiado marcado/saturado detrás de las tarjetas ya en tono morado.
   Se agrega `transform:translateX(-110px)` (desplaza todo el fondo, sin
   tocar el `right`/bleed original contra el borde real que ya estaba
   bien) y `opacity` baja de `.8` a `.62`.
+- El usuario se equivocó de dirección: en realidad quería que bleedeara
+  más hacia la **derecha** (como las neuronas de Método,
+  `neurona-derecha` con `right:calc(...-200px)` y `opacity:.95` sin
+  blur/filtros) y que la imagen se viera **más nítida**, no difuminada.
+  Se revierte todo lo anterior: se quita el `transform:translateX` y los
+  `filter` (blur/brightness/saturate); el bleed del `right` en el
+  `<img>` (index.html) pasa de `-40px` a `-160px` (mismo criterio que
+  `neurona-derecha`, bleed más pronunciado hacia el borde real derecho);
+  `opacity` sube a `.92` (nítida, sin filtros que la empañen).
 
 ## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
 

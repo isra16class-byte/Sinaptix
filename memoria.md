@@ -188,11 +188,11 @@ próximos pasos).
   ilustrado (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro,
   red neuronal, rompecabezas) grande (`clamp(880px,84vw,1480px)`) y
   pegado/recortado contra el borde derecho real de la pantalla (bleed
-  `-40px`, para que parezca que "sale" del costado), igual criterio que
-  las neuronas de Método. El fondo lleva un suavizado leve
-  (`opacity:.62` + `filter:blur(1px) brightness(1.12) saturate(.88)` +
-  `transform:translateX(-110px)` para correrlo más hacia el contenido)
-  para no competir con las tarjetas sin perder presencia. La columna de tarjetas (`.reveal.d2` de esta
+  `-160px`, para que parezca que "sale" del costado), igual criterio que
+  las neuronas de Método. El fondo va nítido y sin filtros
+  (`opacity:.92`, sin blur/brightness/saturate ni transform) con bleed
+  `-160px` (mismo criterio que `neurona-derecha` de Método) para que
+  parezca que sale del borde derecho real. La columna de tarjetas (`.reveal.d2` de esta
   sección) baja `margin-top:90px` y el fondo arranca en `top:230px` para
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
