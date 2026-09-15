@@ -641,6 +641,49 @@ próximos pasos).
   comparar `scrollWidth` vs `clientWidth` — `scrollWidth` no baja aunque
   el contenido esté bien clippeado, así que no sirve para diagnosticar
   esto) antes de tocar `overflow` en el elemento raíz.
+- **Tarjeta "Objetivo cognitivo" (`.miplan-objetivo`): orden de textos y
+  anillo alineados con Antropometría** (sesión 2026-09-15, quinta tanda
+  continuación — a pedido del usuario con captura de referencia).
+  Dos ajustes en `mi-plan.html`/`css/styles.css`, sin tocar JS:
+  - **Orden del texto**: en `mi-plan.html` el bloque de esta tarjeta
+    mostraba primero `.lab` ("Objetivo cognitivo principal", itálica) y
+    debajo `.num` (`#miPlanObjetivo`, el valor real o el placeholder
+    `—`) — al revés que Antropometría, que muestra primero `.num`
+    (`#miPlanImc`) y debajo su `.lab`. Se invirtió el orden de los 2
+    `<div>` (mismos `id`/clases, nada de JS depende del orden en el DOM)
+    para que quede igual: título → `.num` (`—` o el objetivo resuelto) →
+    `.lab` en itálica.
+  - **Anillo pegado al ícono en vez de ir al borde derecho**: causa real,
+    no visual — `.miplan-objetivo{display:flex;flex-direction:column;
+    align-items:flex-start}` hace que sus hijos block (incluido
+    `.miplan-card-head`) se achiquen al ancho de su contenido en vez de
+    ocupar el ancho completo de la tarjeta, así que el
+    `justify-content:space-between` de `.miplan-card-head` no tenía
+    espacio para repartir. En Antropometría no pasaba porque `.stat-box`
+    no es flex, así que su `.miplan-card-head` ya ocupaba el 100% por
+    comportamiento default de bloque. Fix: `width:100%` agregado a la
+    regla general de `.miplan-card-head` (afecta a las 2 tarjetas que la
+    usan, no rompe Antropometría porque ahí ya se comportaba así).
+  Verificado con Playwright (mock de `netlifyIdentity`): estado sin
+  datos (placeholder `—` arriba, texto itálico abajo, anillo vacío a la
+  derecha) y con plan generado (objetivo real arriba, anillo relleno
+  a la derecha, igual que el check de Antropometría), desktop 1440px y
+  mobile 390px.
+- **Tarjeta "Tu estado actual" (`#miPlanBarras`/`.bar-chart-card`,
+  gráfico de barras foco/memoria/energía/calma) pasa a fondo dorado**
+  (mismo pedido/sesión que el punto anterior). Vive en la misma columna
+  que "Objetivo cognitivo" y depende del mismo dato (la encuesta de
+  objetivo), así que ahora comparte su color: `#miPlan .bar-chart-card`
+  pasó de `background:var(--paper)` (blanco) a
+  `background:var(--miplan-card-dorado)` (el mismo `#F6E7D6` que ya usa
+  `.miplan-objetivo`). No se tocó su padding/radius/tipografía, ni la
+  tarjeta blanca del wizard en `index.html` (esa no pasa por
+  `#miPlan .bar-chart-card`, sigue con el fondo genérico de
+  `.bar-chart-card` sin el override de esta página).
+  Verificado con Playwright: dashboard con plan generado, desktop y
+  mobile — las 2 tarjetas de la columna derecha ("Objetivo cognitivo" y
+  "Tu estado actual") quedan del mismo tono, sin afectar la tarjeta
+  verde de Antropometría ni la lila de "Cierre".
 
 ## Pendientes conocidos
 

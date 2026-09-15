@@ -383,7 +383,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    propia sección oscura — no afecta el uso de estas clases en otras
    páginas/secciones.*/
 #miPlan .stat-box,
-#miPlan .bar-chart-card{background:var(--paper)}
+/* "Tu estado actual" vive en la misma columna que Objetivo cognitivo y
+   comparte su tema (viene del mismo dato: la encuesta de objetivo), así
+   que pasa a compartir su color dorado (--miplan-card-dorado) en vez del
+   fondo blanco (--paper) genérico que usaba antes. */
+#miPlan .bar-chart-card{background:var(--miplan-card-dorado)}
 /* Las 3 tarjetas del dashboard pasan a fondo sólido de color (rediseño con
    ilustraciones): Antropometría verde, Objetivo cognitivo dorado, Cierre
    lila — mismo orden que la referencia del usuario. .miplan-objetivo y
@@ -500,7 +504,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    memoria.md) los completa + muestra el check. No calculan un % real (no
    hay un dato continuo de "progreso" para IMC/objetivo, solo
    presente/ausente): es un indicador de dos estados, no un medidor. */
-.miplan-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+/* width:100% es necesario acá (no solo display:flex/space-between): dentro
+   de .miplan-objetivo (flex-direction:column;align-items:flex-start) un
+   hijo block normal se achica al ancho de su propio contenido en vez de
+   ocupar el ancho completo de la tarjeta, así que space-between no tenía
+   dónde repartir el espacio y el anillo quedaba pegado a la ilustración
+   en vez de ir al borde derecho como en Antropometría (donde .stat-box no
+   es flex, así que el head ya ocupaba el 100% por default). */
+.miplan-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;width:100%}
 .miplan-card-icon{width:32px;height:32px;flex:none;color:var(--purple)}
 .miplan-card-icon path,.miplan-card-icon circle{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .miplan-card-icon .icon-dot{fill:currentColor;stroke:none}

@@ -8,6 +8,42 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (octava tanda) — Objetivo cognitivo: orden de texto + anillo a la derecha; "Tu estado actual" pasa a dorado
+
+El usuario mandó una captura señalando 3 ajustes en el dashboard de "Mi
+plan":
+
+1. En la tarjeta "Objetivo cognitivo", el texto "Objetivo cognitivo
+   principal" (itálica) aparecía **arriba** de la raya/valor (`—` o el
+   objetivo resuelto); en Antropometría es al revés (valor arriba, label
+   abajo) y el usuario quería que Objetivo cognitivo siguiera el mismo
+   orden.
+2. El anillo de progreso de "Objetivo cognitivo" quedaba pegado al
+   ícono del cerebro, no pegado al borde derecho de la tarjeta como el
+   de Antropometría.
+3. La tarjeta "Tu estado actual" (gráfico de barras foco/memoria/
+   energía/calma) debía pasar a compartir el color dorado de "Objetivo
+   cognitivo", en vez de su blanco genérico.
+
+Cambios:
+
+- `mi-plan.html`: se invirtió el orden de los `<div class="num">` y
+  `<div class="lab">` dentro de `.miplan-objetivo` (mismos `id`/clases,
+  sin tocar JS).
+- `css/styles.css`:
+  - `.miplan-card-head` suma `width:100%`. Causa del punto 2: dentro de
+    `.miplan-objetivo` (`flex-direction:column;align-items:flex-start`)
+    un hijo block se achica a su contenido en vez de ocupar el ancho
+    completo, así que `justify-content:space-between` no tenía espacio
+    para empujar el anillo al borde. Antropometría no tenía el problema
+    porque `.stat-box` no es flex.
+  - `#miPlan .bar-chart-card`: `background:var(--paper)` →
+    `background:var(--miplan-card-dorado)`.
+
+Verificado con Playwright (mock de `netlifyIdentity`, sin red real):
+estado sin datos y con plan generado, desktop 1440px y mobile 390px.
+Ver detalle completo en `memoria.md` → "Estado actual del diseño".
+
 ## 2026-09-15 (séptima tanda) — Antropometría y Objetivo cognitivo: mismo alto en desktop
 
 El usuario probó el cambio anterior en el deploy real y mandó una
