@@ -797,57 +797,34 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 
 
-/* ---------- 03 MÉTODO — paleta cálida (crema + café) ----------
-   A pedido del usuario, a partir de una imagen de referencia (mockup
-   generado con IA) con fondo beige/crema y acentos café en vez del panel
-   rosado/violeta que usan las demás secciones "dark" (Beneficios,
-   Contacto). Se logra sobreescribiendo, solo dentro de #lam-03, las
-   custom properties que section.dark y sus componentes ya usaban
-   (--panel*, --purple*): como son custom properties, heredan hacia todos
-   los descendientes (incluido el SVG de los anillos que arma
-   js/script.js con stroke="var(--panel-line)"), así que no hace falta
-   duplicar reglas — remaquetando solo estas variables ya recolorea fondo,
-   texto, línea/números de la línea de tiempo, tarjeta de "Mi
-   progreso"/"Mi IMC" (el switch y el estado activo) y los botones
-   .btn-solid/.btn-ghost de esta sección. El resto del sitio (lam-05,
-   lam-06, "Mi plan", etc.) no se ve afectado porque nunca leen estas
-   variables reescritas — solo lo hace lo que vive dentro de #lam-03.
-   Los colores semánticos de los medidores (gauge rojo/dorado/verde según
-   umbral, ej. IMC) NO se tocan a propósito: no son de marca, indican
-   estado de salud y deben verse igual en todas partes.
+/* ---------- 03 MÉTODO — vuelta al morado estándar del sitio ----------
+   La paleta café/crema (mockup de referencia) que tenía esta sección se
+   descartó a pedido del usuario: ahora usa el mismo morado/lila
+   (--panel, --purple, etc. definidos en :root) que ya usan las demás
+   secciones "dark" (Beneficios, Contacto), en vez de reescribir esas
+   custom properties acá adentro. Al no sobreescribirlas, todo lo que
+   dependía de ellas (fondo, texto, línea/números de la línea de tiempo,
+   tarjeta "Mi progreso"/"Mi IMC", botones .btn-solid/.btn-ghost) cae
+   solo al valor de :root — no hace falta duplicar reglas. Los colores
+   semánticos de los medidores (gauge rojo/dorado/verde según umbral, ej.
+   IMC) siguen sin tocarse: no son de marca, indican estado de salud.
 
-   El fondo NO es un color plano: la sesión anterior lo dejó como
-   background:var(--panel) sólido (heredado de section.dark), lo que
-   generaba una línea horizontal muy marcada contra el blanco de lam-02
-   arriba y lam-04 abajo (ambas #FFFFFF). El usuario pidió diluir esa
-   costura. Acá se sobreescribe "background" (con más especificidad que
+   El fondo NO es un color plano, eso sí se mantiene igual que antes: un
+   background sólido (heredado de section.dark) generaba una línea
+   horizontal muy marcada contra el blanco de lam-02 arriba y lam-04
+   abajo (ambas #FFFFFF), así que sigue el mismo difuminado de la vuelta
+   anterior — solo que ahora funde a --panel morado en vez de crema. Se
+   sobreescribe "background" (con más especificidad que
    `section.dark{background:var(--panel)}` por ser selector de ID) con un
    linear-gradient que arranca en --paper (blanco, igual que las
    secciones vecinas), funde a --panel a los ~200px y vuelve a fundir a
-   --paper en los últimos ~200px — la sección "flota" en crema en su
-   interior pero no corta en seco contra el blanco de arriba/abajo. Si el
+   --paper en los últimos ~200px — la sección "flota" en su color interior
+   pero no corta en seco contra el blanco de arriba/abajo. Si el
    contenido real de la sección algún día mide menos de ~450px de alto en
    pantallas muy chicas, los dos tramos de fundido se solaparían un poco
    (no rompe nada, solo se vería un pelín más claro en el medio); no hace
    falta resolverlo salvo que se note un problema real. */
 #lam-03{
-  --panel:#F1ECDE;
-  --panel-line:rgba(45,33,22,.16);
-  --panel-text:rgba(40,30,20,.62);
-  --purple:#82644E;
-  --purple-dark:#5F4A39;
-  --purple-soft:rgba(130,100,78,.12);
-  /* Color propio para la tarjeta .method-gauges (ver ese selector más
-     abajo): un blanco cálido, más claro que --panel (la crema de fondo
-     de esta sección) pero no blanco puro, para que la tarjeta se lea
-     como parte de la misma paleta café/crema en vez de un cuadro blanco
-     "de otro sitio" o, en el extremo opuesto, fundida al punto de perder
-     el borde de la tarjeta. --shadow también se sobreescribe acá con un
-     tono café en vez del violeta genérico del resto del sitio, para que
-     la sombra de la tarjeta (y la del tab activo del switch, que
-     reutiliza --shadow) combine con esta paleta. */
-  --gauge-card:#FBF7EE;
-  --shadow:0 10px 30px rgba(95,74,57,.14);
   background:linear-gradient(180deg,
     var(--paper) 0,
     var(--panel) 220px,

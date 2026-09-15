@@ -167,8 +167,10 @@ próximos pasos).
 - **Paleta** (`css/styles.css`, bloque `:root`): fondo blanco `--paper`,
   panel lavanda claro `--panel`, morado de marca `--purple`/`--purple-dark`
   como color estructural, acentos `--green`, `--gold` (terracota),
-  `--navy-bright`. Texto `--ink`. Método (`lam-03`) tiene además su propia
-  paleta cálida crema+café superpuesta.
+  `--navy-bright`. Texto `--ink`. Método (`lam-03`) tenía una paleta
+  cálida crema+café propia superpuesta (mockup de referencia); se
+  descartó en sesión 2026-09-15 y ahora usa el mismo `--panel`/`--purple`
+  estándar que el resto de las secciones "dark" (Beneficios, Contacto).
 - **Tipografía**: `Inter` para cuerpo/UI, `Fraunces` (800, normal+itálica)
   para títulos, `Caveat` (`--font-hand`, clase `.title-hand`) para títulos
   con look manuscrito (Método, Pilares, título de "Mi plan").
@@ -232,7 +234,9 @@ próximos pasos).
   neuronas** recortadas (cuerpo cortado en el borde de la página,
   pensadas para la posición de bleed). Se le quitó el fondo blanco
   (conversión a alpha por canal, blanco puro → transparente) para que
-  siga flotando sobre el crema de `#lam-03` igual que antes, y se
+  siga flotando sobre el fondo de `#lam-03` igual que antes (crema en su
+  momento, morado/lila desde la sesión 2026-09-15 que revirtió la
+  paleta — ver bullet de "vuelta al morado estándar" más abajo), y se
   reexportó a `.webp` (~640px de ancho, calidad 82) — ambos archivos
   quedaron con el mismo contenido (no hay versión espejada). Como la
   posición/tamaño no cambiaron, el resultado visual es la misma
@@ -241,6 +245,18 @@ próximos pasos).
   desktop 1440px (visible) y mobile 390px (sigue oculto por la regla
   general `@media(max-width:720px){.deco-fruit{display:none}}`, sin
   cambios).
+- **Método (`#lam-03`) — vuelta al morado estándar del sitio** (sesión
+  2026-09-15, a continuación de las neuronas decorativas): se borraron
+  las custom properties que `#lam-03` sobreescribía para su paleta propia
+  crema+café (`--panel`, `--panel-line`, `--panel-text`, `--purple`,
+  `--purple-dark`, `--purple-soft`, `--gauge-card`, `--shadow`), así que
+  ahora hereda el mismo morado/lila de `:root` que usan Beneficios y
+  Contacto (fondo, texto, línea de tiempo, tarjeta "Mi progreso"/"Mi
+  IMC", botones). El difuminado de fondo (`background:linear-gradient`
+  en `#lam-03`, blanco → panel → blanco para no cortar en seco contra
+  lam-02/lam-04) se mantuvo igual, solo cambia el color al que funde.
+  Colores semánticos de gauges sin cambios. Verificado con Playwright,
+  desktop 1440px.
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma

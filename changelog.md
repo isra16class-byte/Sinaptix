@@ -8,6 +8,32 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (dieciseisava tanda) — Método (lam-03): vuelta al morado estándar del sitio
+
+A pedido del usuario ("el fondo de la sección 3 hace que sea color
+morado, el que ya manejamos... ya déjalo igual al difuminado que ya
+tiene"): se descartó la paleta café/crema propia de `#lam-03` (mockup de
+referencia que se había usado en una sesión anterior) y la sección vuelve
+a usar el morado/lila estándar del sitio (`--panel`, `--purple`, etc.
+definidos en `:root`), el mismo que ya usan Beneficios y Contacto. Se
+logró simplemente borrando las custom properties que `#lam-03`
+sobreescribía (`--panel`, `--panel-line`, `--panel-text`, `--purple`,
+`--purple-dark`, `--purple-soft`, `--gauge-card`, `--shadow`): al no
+redefinirlas ahí, todo lo que dependía de ellas (fondo, texto,
+línea/números de la línea de tiempo, tarjeta "Mi progreso"/"Mi IMC",
+botones `.btn-solid`/`.btn-ghost` de la sección) cae solo al valor de
+`:root`, sin tocar ninguna otra regla. El difuminado de fondo (gradiente
+que arranca en `--paper` blanco, funde a `--panel` a los ~200px y vuelve
+a fundir a `--paper` en los últimos ~200px, para no cortar en seco contra
+el blanco de lam-02/lam-04) se mantuvo intacto tal cual pidió el usuario
+— solo cambia el color al que funde, de crema a morado/lila. Los colores
+semánticos de los medidores (gauge rojo/dorado/verde) no se tocaron.
+Verificado con Playwright (`file://` local, el servidor HTTP interno no
+es alcanzable desde el navegador en este entorno): desktop 1440px, la
+sección Método se ve con el mismo tono lila que Beneficios/Contacto y el
+difuminado sigue sin costura visible contra las secciones blancas
+vecinas.
+
 ## 2026-09-15 (quinceava tanda) — Método (lam-03): nueva ilustración de neurona en los 2 decorativos laterales
 
 A pedido del usuario, que subió una imagen (neurona completa vista de
