@@ -208,6 +208,17 @@ próximos pasos).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
+- **Salvaguarda global de overflow horizontal**: `html` (además de
+  `body`, que ya lo tenía) lleva `overflow-x:hidden`. Se agregó tras un
+  bug real: un bleed grande en `vision-brain-bg` (`right:-160px`) hizo
+  que `document.documentElement.scrollWidth` superara al `clientWidth`
+  (scroll horizontal en toda la página, no solo en la sección), porque
+  `overflow-x:hidden` solo en `body` no alcanza para contener el
+  desborde de hijos `position:absolute` de las `section` (que sí son
+  `position:relative`, pero el overflow se propaga al documento). Si se
+  agregan nuevas decoraciones con bleed grande (`right`/`left` muy
+  negativos), verificar con Playwright que `scrollWidth === clientWidth`
+  en varios anchos antes de darlas por buenas.
 
 ## Pendientes conocidos
 

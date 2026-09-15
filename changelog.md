@@ -37,6 +37,16 @@ demasiado marcado/saturado detrás de las tarjetas ya en tono morado.
   `<img>` (index.html) pasa de `-40px` a `-160px` (mismo criterio que
   `neurona-derecha`, bleed más pronunciado hacia el borde real derecho);
   `opacity` sube a `.92` (nítida, sin filtros que la empañen).
+- **Bug real encontrado y corregido** (reportado por el usuario: "se
+  movió toda la web"): el bleed de `-160px` hizo que el `scrollWidth`
+  del documento superara al `clientWidth` (confirmado con Playwright:
+  2120px vs 1920px en desktop), es decir apareció scroll horizontal real
+  en toda la página, no solo en la sección. La causa: `overflow-x:hidden`
+  estaba puesto solo en `body`, no en `html`, y con este bleed más grande
+  eso dejó de ser suficiente para contener el desborde. Fix: se agrega
+  `overflow-x:hidden` también a `html` (`html{scroll-behavior:smooth;
+  overflow-x:hidden}`). Verificado con Playwright en 1024/1366/1920px:
+  `scrollWidth === clientWidth` en los tres, sin scroll horizontal.
 
 ## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
 
