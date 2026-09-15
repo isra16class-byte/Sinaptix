@@ -317,7 +317,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    número/label. Es un ajuste **solo acá** (selector con #lam-02): en
    "Mi plan" (#miPlan) y el resto del sitio .stat-box sigue con su fondo
    sólido de siempre. */
-#lam-02 .vision-brain-bg{opacity:.8;filter:blur(1px) brightness(1.12) saturate(.88)}
+#lam-02 .vision-brain-bg{opacity:.62;filter:blur(1px) brightness(1.12) saturate(.88);transform:translateX(-110px)}
 @media(max-width:900px){#lam-02 .vision-brain-bg{display:none}}
 
 #lam-02 .stat-box{

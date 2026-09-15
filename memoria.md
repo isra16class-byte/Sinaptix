@@ -190,9 +190,9 @@ próximos pasos).
   pegado/recortado contra el borde derecho real de la pantalla (bleed
   `-40px`, para que parezca que "sale" del costado), igual criterio que
   las neuronas de Método. El fondo lleva un suavizado leve
-  (`opacity:.8` + `filter:blur(1px) brightness(1.12) saturate(.88)`) para
-  no competir con las tarjetas sin perder presencia (se probó más fuerte
-  -`opacity:.55`/blur 2px- y quedaba demasiado tenue). La columna de tarjetas (`.reveal.d2` de esta
+  (`opacity:.62` + `filter:blur(1px) brightness(1.12) saturate(.88)` +
+  `transform:translateX(-110px)` para correrlo más hacia el contenido)
+  para no competir con las tarjetas sin perder presencia. La columna de tarjetas (`.reveal.d2` de esta
   sección) baja `margin-top:90px` y el fondo arranca en `top:230px` para
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,

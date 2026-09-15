@@ -21,6 +21,13 @@ demasiado marcado/saturado detrás de las tarjetas ya en tono morado.
   `opacity:.55` -> `.8`, `filter:blur(2px) brightness(1.35) saturate(.75)`
   -> `blur(1px) brightness(1.12) saturate(.88)` (mucho más leve, el arte
   se sigue viendo con claridad pero un poco más suave que el original).
+- Nuevo pedido del usuario: correr el fondo más a la izquierda (que se
+  meta más hacia el contenido, sensación de que "sale" más de la
+  pantalla en vez de quedar pegado en la esquina) y bajarle un poco la
+  opacidad de nuevo para que el resto del sitio se siga viendo bien.
+  Se agrega `transform:translateX(-110px)` (desplaza todo el fondo, sin
+  tocar el `right`/bleed original contra el borde real que ya estaba
+  bien) y `opacity` baja de `.8` a `.62`.
 
 ## 2026-09-14 — Visión: las 4 tarjetas del stat-grid en tono morado
 
