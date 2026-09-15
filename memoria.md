@@ -184,14 +184,16 @@ próximos pasos).
   crema (variante A) y un cerebro ilustrado de fondo (variante B, hoy
   imagen real, ver abajo — reemplaza la maraña SVG de la sesión anterior).
   Estructura: `.miplan-locked` (flex centrado) con 3 capas —
-  1. 2 `<img class="deco miplan-locked-brain is-left|is-right">` con el
-     mismo asset `img/decoraciones-neurona/cerebro-mi-plan.webp` (imagen
-     provista por el usuario, no generada acá: cerebro con dendritas, línea
-     fina terracota/dorada) reusado a 2 escalas: `.is-left` chica arriba a
-     la par del aguacate (`width:clamp(140px,16vw,190px);left:15%;top:2%`),
-     `.is-right` grande sangrando sobre el borde derecho
-     (`width:clamp(420px,48vw,560px);right:-60px;top:-30px`), mismo
-     criterio de bleed que `neurona-derecha`/`vision-brain-bg`.
+  1. 1 `<img class="deco miplan-locked-brain is-right">` con el asset
+     `img/decoraciones-neurona/cerebro-mi-plan.webp` (imagen provista por
+     el usuario, no generada acá: cerebro con dendritas, línea fina
+     terracota/dorada), grande, sangrando sobre el borde derecho
+     (`width:clamp(420px,48vw,560px);right:-140px;top:-30px`), mismo
+     criterio de bleed que `neurona-derecha`/`vision-brain-bg`. La copia
+     chica junto al aguacate (`.is-left`) se quitó (HTML + CSS) a pedido
+     del usuario; el `right` de `.is-right` se corrió de `-60px` a
+     `-140px` para separarla más de la tarjeta y que se vea completa sin
+     quedar tapada/pegada contra el borde de `.miplan-locked-card`.
      `opacity:.92` sin filtros (el fondo de la imagen, `~#F6F0F4`, ya
      matchea `--panel` de esta sección, no hizo falta `mix-blend-mode`).
      Oculto en mobile (`<900px`, mismo breakpoint que

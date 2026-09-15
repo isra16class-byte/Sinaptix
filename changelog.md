@@ -8,6 +8,23 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" sin sesión: quitar cerebro chico y correr el grande más a la derecha
+
+A pedido del usuario, en el estado sin sesión de "Mi plan"
+(`#miPlanSinSesion` / `.miplan-locked`): se eliminó la copia chica del
+cerebro decorativo (`.miplan-locked-brain.is-left`, la que estaba junto
+al aguacate) de `mi-plan.html` y su regla CSS correspondiente en
+`css/styles.css`. La copia grande (`.is-right`) se corrió más hacia la
+derecha, de `right:-60px` a `right:-140px`, para separarla de la
+tarjeta central y que se vea completa (antes quedaba parcialmente
+pegada/tapada contra el borde de `.miplan-locked-card`).
+
+Verificado con Playwright en 1440px, 1280px y 390px: sin scroll
+horizontal real en ningún ancho (`window.scrollX` tras forzar
+`mouse.wheel`), cerebro oculto en mobile como antes (`<900px`), y el
+cerebro grande se ve completo y despegado de la tarjeta en desktop/
+tablet.
+
 ## 2026-09-14 — "Mi plan" sin sesión: volver al título largo (3 líneas) + arreglar franja blanca
 
 El ajuste de altura de la sesión anterior había achicado el título de la

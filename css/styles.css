@@ -455,12 +455,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   position:absolute;z-index:0;pointer-events:none;
   opacity:.92;
 }
-.miplan-locked-brain.is-left{
-  left:15%;top:2%;
-  width:clamp(140px,16vw,190px);
-}
 .miplan-locked-brain.is-right{
-  right:-60px;top:-30px;
+  right:-140px;top:-30px;
   width:clamp(420px,48vw,560px);
 }
 @media(max-width:900px){.miplan-locked-brain{display:none}}
