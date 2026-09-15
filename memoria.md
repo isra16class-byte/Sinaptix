@@ -208,27 +208,34 @@ próximos pasos).
 - Para el detalle completo de cada uno de estos puntos (por qué se
   diseñó así, decisiones descartadas, valores exactos de CSS, capturas
   de verificación) ver `historico/memoria-2026-09-14.md`.
-- **Scrollbar de marca**: en `css/styles.css`, justo después del reset y
-  las reglas de `html`/`body`, hay un scrollbar personalizado (pista
-  `var(--panel)`, thumb `var(--purple)`/`var(--purple-dark)` en hover,
-  10px, sin flechas) vía `scrollbar-width`/`scrollbar-color` (Firefox) y
-  `::-webkit-scrollbar*` (Chrome/Edge/Safari). Se agregó porque el
-  scrollbar nativo de Windows/Chrome (gris, con flechas) se veía como una
-  franja gris sólida pegada al borde derecho y el usuario lo reportó como
-  "doble scroll" — verificado que era una única barra (el nativo del SO,
-  no un bug de overflow), pero igual se reemplaza por estética/consistencia
-  de marca.
-- **Salvaguarda global de overflow horizontal**: `html` (además de
-  `body`, que ya lo tenía) lleva `overflow-x:hidden`. Se agregó tras un
-  bug real: un bleed grande en `vision-brain-bg` (`right:-160px`) hizo
-  que `document.documentElement.scrollWidth` superara al `clientWidth`
-  (scroll horizontal en toda la página, no solo en la sección), porque
-  `overflow-x:hidden` solo en `body` no alcanza para contener el
-  desborde de hijos `position:absolute` de las `section` (que sí son
-  `position:relative`, pero el overflow se propaga al documento). Si se
-  agregan nuevas decoraciones con bleed grande (`right`/`left` muy
-  negativos), verificar con Playwright que `scrollWidth === clientWidth`
-  en varios anchos antes de darlas por buenas.
+- **Overflow horizontal: NO poner `overflow-x` en `html`, solo en `body`**.
+  Historial de esto (para no repetir el error): se creyó en una sesión
+  anterior que el bleed grande de `vision-brain-bg` (`right:-160px`)
+  rompía el layout con scroll horizontal real, y se "corrigió" agregando
+  `overflow-x:hidden` también a `html`. **Ese diagnóstico era incorrecto**:
+  verificado con Playwright forzando scroll horizontal (`mouse.wheel` +
+  leer `window.scrollX`) en versiones con y sin el bleed grande, **nunca**
+  hubo scroll horizontal real — `body{overflow-x:hidden}` (que ya existía
+  desde antes) sola es suficiente para contener cualquier desborde de
+  decoraciones `position:absolute` dentro de `section`s `position:relative`,
+  sin importar cuánto "bleed" tengan.
+  El agregado de `overflow-x:hidden` en `html` sí tuvo un efecto secundario
+  real y visible: al fijar `overflow-x` sin fijar también `overflow-y`,
+  la spec de CSS fuerza `overflow-y` de `visible` a `auto` en el elemento
+  raíz. En Chrome/Windows, en cuanto `<html>` tiene **cualquier**
+  `overflow` explícito, el navegador dejar de usar el scrollbar nativo
+  "moderno" de la ventana y renderiza `<html>` como una caja de scroll
+  normal con el scrollbar **clásico** (gris sólido, con flechas
+  arriba/abajo) — eso es lo que el usuario reportó como "doble scroll"/
+  "se ve gris". Se revirtió: `html` vuelve a llevar solo
+  `scroll-behavior:smooth` (sin overflow), `body` sigue con
+  `overflow-x:hidden` (eso no se toca, es lo que realmente contiene el
+  desborde). **No volver a agregar `overflow-x`/`overflow-y` a `html`** ni
+  a `body` "para estar seguros": si aparece un desborde nuevo, verificar
+  primero con Playwright (`window.scrollX` tras forzar scroll, no solo
+  comparar `scrollWidth` vs `clientWidth` — `scrollWidth` no baja aunque
+  el contenido esté bien clippeado, así que no sirve para diagnosticar
+  esto) antes de tocar `overflow` en el elemento raíz.
 
 ## Pendientes conocidos
 

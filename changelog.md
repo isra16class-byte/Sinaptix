@@ -8,7 +8,49 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
-## 2026-09-14 — Scrollbar de marca (reemplaza el gris nativo del SO)
+## 2026-09-14 — Revertido: el scrollbar gris no era un bug de overflow, era el propio `overflow-x:hidden` de `html`
+
+El usuario reportó (con captura) el scrollbar gris feo tipo Windows
+clásico y pidió **quitarlo**, no decorarlo — la entrada anterior de este
+changelog ("Scrollbar de marca") diagnosticó mal el problema y lo tapó
+con un scrollbar morado en vez de arreglar la causa. Se investigó de
+nuevo con Playwright (no solo mirando la captura):
+
+- Se armó un worktree por commit (`5ceea72` confirmado bueno por el
+  usuario, `a76214f` bleed de Visión, `1117e49` fix de overflow-x en
+  html, `59ff47e` mi scrollbar decorado) y se midió en cada uno
+  `document.documentElement.scrollWidth`/`clientWidth` **y**, más
+  importante, se forzó scroll horizontal real con `page.mouse.wheel` y
+  se leyó `window.scrollX` después.
+- Resultado: `window.scrollX` se queda en `0` en **las 4 versiones**,
+  con y sin el bleed grande de `vision-brain-bg` (`-160px`) — nunca hubo
+  scroll horizontal real. `body{overflow-x:hidden}` (que ya existía
+  desde antes de todo esto) siempre fue suficiente para contener el
+  desborde de las decoraciones `position:absolute`. El `scrollWidth` del
+  documento sí queda en ~2130px (vs 1920 de viewport) en todas las
+  versiones — pero eso no indica scroll real, `scrollWidth` no cambia
+  aunque el contenido esté correctamente clippeado por overflow.
+- Es decir: el commit `1117e49` ("Fix: overflow-x:hidden en html")
+  solucionaba un problema que no existía. Y sí tuvo un efecto secundario
+  real: al fijar `overflow-x` en `html` sin fijar `overflow-y`, la spec
+  de CSS fuerza el `overflow-y` computado de `visible` a `auto` en el
+  elemento raíz. En Chrome/Windows, en cuanto `<html>` tiene **cualquier**
+  `overflow` explícito, dejar de usar el scrollbar nativo "moderno" de la
+  ventana y pasa a renderizar `<html>` como una caja de scroll CSS normal
+  con el scrollbar clásico (gris sólido, con flechas arriba/abajo) — el
+  que el usuario reportó como "doble scroll"/"se ve gris".
+- **Revertido en este commit**: `html` vuelve a `scroll-behavior:smooth`
+  a secas (sin `overflow-x`); se quita por completo el scrollbar
+  decorado (`::-webkit-scrollbar*`) de la entrada anterior. `body`
+  sigue con `overflow-x:hidden` sin cambios (nunca fue el problema).
+- El "desorden de pantalla" que el usuario vio justo después de aplicar
+  el bleed de Visión (`a76214f`) probablemente fue el efecto visual del
+  bleed más grande/sin blur en sí (una imagen de fondo mucho más grande
+  y nítida en esa sección), no un bug de scroll — si after de este
+  revert todavía se ve raro visualmente en Visión, es un tema de diseño
+  de esa sección puntual, no de overflow/scroll.
+
+## 2026-09-14 — Scrollbar de marca (reemplaza el gris nativo del SO) — DIAGNÓSTICO INCORRECTO, ver entrada de arriba
 
 Pedido del usuario con captura: en Windows/Chrome se veía una franja gris
 sólida pegada al borde derecho de toda la página, que interpretó como

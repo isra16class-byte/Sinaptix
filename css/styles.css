@@ -41,7 +41,7 @@
   --font-hand:'Caveat',cursive;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;overflow-x:hidden}
+html{scroll-behavior:smooth}
 body{
   background:var(--paper);
   color:var(--ink);
@@ -50,16 +50,6 @@ body{
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
-
-/* Scrollbar de marca: reemplaza el scrollbar nativo del SO (en Windows/Chrome
-   se ve como una franja gris sólida con flechas arriba/abajo, que algunos
-   usuarios perciben como "doble scroll" por tener varias piezas visuales)
-   por uno fino, sin flechas, en el morado de marca. */
-html{scrollbar-width:thin;scrollbar-color:var(--purple) var(--panel)}
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:var(--panel)}
-::-webkit-scrollbar-thumb{background:var(--purple);border-radius:var(--radius-pill)}
-::-webkit-scrollbar-thumb:hover{background:var(--purple-dark)}
 a{color:inherit;text-decoration:none}
 ::selection{background:var(--purple);color:#fff}
 .wrap{max-width:1180px;margin:0 auto;padding:0 40px;position:relative;z-index:1}
