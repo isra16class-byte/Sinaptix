@@ -445,7 +445,13 @@ próximos pasos).
   mismo tono blanco** (`rgba(255,255,255,.55)`, destacada `.7`) con blur
   suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en
   `var(--purple)` (`.lab` con `opacity:.82` para diferenciarse del
-  `.num`); sin `text-shadow` (ya no hace falta, el fondo es claro). Antes
+  `.num`); sin `text-shadow` (ya no hace falta, el fondo es claro). El
+  borde de las 4 tarjetas (`border`, antes `rgba(255,255,255,.7)` casi
+  invisible sobre fondo claro) es `1px solid var(--purple)` (sesión
+  2026-09-15, a pedido del usuario, para que las tarjetas se distingan
+  del fondo blanco de la sección aunque no tengan la ilustración detrás).
+  El texto de `.lab` pasó de `13px` a `15px` (mismo pedido) para que se
+  lea con más facilidad; no se tocó `.num` (`36px`). Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se

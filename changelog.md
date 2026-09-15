@@ -8,6 +8,23 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (catorceava tanda) — Visión (lam-02): borde morado fino en las 4 tarjetas y párrafo más grande
+
+A pedido del usuario (mandó captura de la sección Visión): las 4
+tarjetas del `stat-grid` (`#lam-02 .stat-box`, incluida la destacada
+`.is-featured`) tenían `border-color` en blanco translúcido
+(`rgba(255,255,255,.7)`), casi invisible sobre el fondo claro de la
+sección — solo se notaba en la tarjeta "1:1" porque ahí había ilustración
+oscura detrás. Se cambió a `border:1px solid var(--purple)` para que las
+4 queden delimitadas siempre, tengan o no arte detrás. Además, el párrafo
+debajo del número (`#lam-02 .stat-box .lab`) pasó de `font-size:13px` a
+`15px` para que se lea con más facilidad; no se tocó el tamaño del número
+(`.num`, sigue en `36px`). Cambio scopeado a `#lam-02` (no afecta las
+`.stat-box` de Manifiesto ni de `#miPlan`, que tienen sus propias reglas).
+
+Verificado con Playwright: desktop 1440px y mobile 390px, las 4 tarjetas
+con borde morado visible y texto legible, sin desbordes.
+
 ## 2026-09-15 (treceava tanda) — Visión (lam-02): título deformado corregido, sin raya naranja, tarjetas a blanco transparente
 
 El usuario mandó captura del deploy real mostrando el título de "Nuestra
