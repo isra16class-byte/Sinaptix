@@ -28,6 +28,14 @@
   --purple:#714B67;
   --purple-dark:#4B2E45;
   --purple-soft:rgba(113,75,103,.08);
+  /* Fondos sólidos pastel de las 3 tarjetas de "Mi plan" con sesión
+     (Antropometría/Objetivo cognitivo/Cierre) — sesión rediseño con
+     ilustraciones, ver memoria.md. Mismo criterio de familia de color que
+     --green/--gold/--purple pero como tinte opaco, no rgba, para que lean
+     como tarjeta de color sólido (no un estado/hover translúcido). */
+  --miplan-card-verde:#DFEEE4;
+  --miplan-card-dorado:#F6E7D6;
+  --miplan-card-lila:#EFE1EC;
   --red:#B3261E;
   --line:rgba(38,22,31,.12);
   --radius:16px;
@@ -376,6 +384,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    páginas/secciones.*/
 #miPlan .stat-box,
 #miPlan .bar-chart-card{background:var(--paper)}
+/* Las 3 tarjetas del dashboard pasan a fondo sólido de color (rediseño con
+   ilustraciones): Antropometría verde, Objetivo cognitivo dorado, Cierre
+   lila — mismo orden que la referencia del usuario. .miplan-objetivo y
+   .miplan-cierre necesitan más especificidad que la regla general de
+   arriba (#miPlan .stat-box/.bar-chart-card{background:var(--paper)}). */
+#miPlan .miplan-grid > .stat-box{background:var(--miplan-card-verde)}
+#miPlan .stat-box.miplan-objetivo{background:var(--miplan-card-dorado)}
+#miPlan .miplan-cierre{background:var(--miplan-card-lila)}
 #miPlan .nutri-summary{background:var(--paper);border:1px solid var(--line)}
 
 /* "Mi plan" es una pantalla de utilidad (dashboard), no una sección tipo
@@ -477,6 +493,17 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-card-icon{width:32px;height:32px;flex:none;color:var(--purple)}
 .miplan-card-icon path,.miplan-card-icon circle{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .miplan-card-icon .icon-dot{fill:currentColor;stroke:none}
+/* Ilustraciones (PNG con color fijo, no recoloreables por CSS a diferencia
+   de .miplan-card-icon) que reemplazan el ícono de línea morado en la
+   cabecera de Antropometría/Objetivo cognitivo — ver memoria.md. Cierre
+   conserva su ícono de línea (clipboard) porque no tiene una ilustración
+   propia de cabecera, la suya (tira de 5 íconos) va en el cuerpo de la
+   tarjeta, ver .miplan-cierre-icons-strip. Altura fija + object-fit:contain
+   para que el cuerpo (angosto/alto) y el cerebro (ancho/bajo) convivan con
+   el mismo alto visual pese a tener proporciones distintas; .is-wide
+   permite que el cerebro use más ancho horizontal sin agrandar el alto. */
+.miplan-card-illustration{height:40px;width:auto;max-width:34px;flex:none;object-fit:contain}
+.miplan-card-illustration.is-wide{max-width:54px}
 .miplan-card-title{
   font-family:var(--font-d);font-size:15px;font-weight:800;color:var(--ink);
   letter-spacing:-.01em;margin-bottom:12px;
@@ -514,11 +541,12 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    solo visible mientras no hay plan generado todavía (mismo criterio que
    #miPlanCta, que js/mi-plan.js oculta/muestra sin cambios: acá se resuelve
    con CSS puro, siguiente-hermano de #miPlanCta, sin tocar esa lógica). */
-.miplan-cierre-icons{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
-.miplan-cierre-icons img{
-  width:32px;height:32px;object-fit:contain;border-radius:10px;
-  background:var(--panel);padding:5px;
-}
+.miplan-cierre-icons{margin-top:2px}
+/* Reemplaza la fila anterior de 5 <img> redondos sueltos (img/Iconos/,
+   sin relación temática) por una sola imagen: la tira de 5 íconos con
+   línea+recuadro ya diseñada como una pieza (plato, cubiertos, cerebro,
+   bowl, hueso) — no se recorta en íconos individuales. */
+.miplan-cierre-icons-strip{display:block;height:44px;width:auto;max-width:100%;object-fit:contain}
 #miPlanCta.hidden + .miplan-cierre-icons{display:none}
 
 /* ---------- "Mi plan": pantalla sin sesión (#miPlanSinSesion) ----------

@@ -8,6 +8,67 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (sexta tanda) — Las 3 tarjetas del dashboard pasan a fondo de color + ilustración propia
+
+El usuario mostró una referencia nueva (mockup con 3 tarjetas de fondo de
+color — verde, dorado, lila — cada una con su propia ilustración
+temática) y pidió ir hacia ese estilo, reemplazando la unificación de
+cabecera hecha en la tanda anterior (quinta). Adjuntó 3 imágenes
+generadas con Gemini: silueta de cuerpo verde (Antropometría), cerebro de
+línea fina (Objetivo cognitivo — el usuario lo describió como "tonos
+dorados, low-poly" pero la imagen real es morado/berenjena, se usó tal
+cual se recibió) y una tira de 5 íconos con recuadro (plato, cubiertos,
+cerebro con pin, bowl, hueso) para "Cierre".
+
+Antes de tocar HTML/CSS se le mostraron 2 opciones de layout al usuario
+en el visualizador (fondo sólido vs. fondo blanco con acento) y se
+confirmaron 4 decisiones por separado: fondo sólido de color (no blanco
+con acento), el ícono de línea morado de la cabecera se **reemplaza**
+(no convive) por la ilustración, el anillo de progreso se mantiene igual
+arriba a la derecha, y la tira de 5 íconos **reemplaza** (no convive) a
+la fila de íconos redondos que ya existía en "Cierre".
+
+Cambios:
+- **Assets**: las 3 imágenes recibidas no tenían transparencia real pese
+  a pedirse "fondo transparente" — eran JPEG con un patrón de cuadros
+  gris/blanco dibujado como píxeles reales. Se procesaron con Pillow
+  (máscara por saturación/valor para generar alpha real, recorte al
+  bounding box) y se guardaron como PNG en `img/ilustraciones-mi-plan/`
+  (`antropometria-cuerpo.png`, `objetivo-cerebro.png`,
+  `cierre-iconos-plan.png`) — no quedaron sueltas en
+  `/mnt/user-data/uploads`.
+- **Fondos de color** (`css/styles.css`, bloque `:root`): 3 variables
+  nuevas `--miplan-card-verde`/`--miplan-card-dorado`/`--miplan-card-lila`
+  (tintes opacos). Aplicadas con selectores con más especificidad que la
+  regla general `#miPlan .stat-box,.bar-chart-card{background:var(--paper)}`
+  que ya existía: `#miPlan .miplan-grid > .stat-box` (Antropometría),
+  `#miPlan .stat-box.miplan-objetivo` (dorado), `#miPlan .miplan-cierre`
+  (lila).
+- **Cabeceras** (`mi-plan.html`): el `<svg class="miplan-card-icon">` de
+  Antropometría y Objetivo cognitivo se reemplazó por
+  `<img class="miplan-card-illustration">` con las imágenes nuevas
+  (`.is-wide` para el cerebro, más ancho que alto). "Cierre" conserva su
+  ícono (clipboard con check) — ninguna de las 3 imágenes era para ese
+  lugar. El `.miplan-ring` no se tocó (misma posición/tamaño/lógica).
+- **Tira de íconos de "Cierre"**: `.miplan-cierre-icons` pasó de 5
+  `<img>` sueltos (`img/Iconos/icon-*.webp`, sin relación temática) a un
+  único `<img class="miplan-cierre-icons-strip">` con la pieza nueva ya
+  diseñada como tira — mismo criterio de visibilidad que antes
+  (`#miPlanCta.hidden + .miplan-cierre-icons{display:none}`, CSS puro).
+
+No se tocó `js/mi-plan.js`, `js/nutricion-planes.js` ni la encuesta de
+nutrición — todos los datos siguen pintándose con la misma lógica de
+siempre, solo cambió el fondo/ilustraciones alrededor.
+
+**Verificado con Playwright**: dashboard sin datos (CTA + tira de íconos
+visibles, 3 tarjetas con su color propio), con datos seedeados (gauge de
+IMC, objetivo y anillos completos conviven con el fondo de color sin
+romper el layout) y mobile 390px (tarjetas apiladas, ilustraciones
+escalan bien). `window.scrollX===0` tras forzar scroll horizontal — sin
+romper el criterio de `overflow-x` documentado en `memoria.md`. Se
+confirmó que `index.html` sigue cargando normalmente (cambios acotados a
+`mi-plan.html`/`css/styles.css`).
+
 ## 2026-09-15 (quinta tanda) — Las 3 tarjetas del dashboard ("Mi plan" con sesión) ahora se ven como una familia
 
 El usuario mostró una captura del sitio real al lado del mockup de

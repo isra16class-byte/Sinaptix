@@ -415,7 +415,67 @@ próximos pasos).
   fuera del alcance de esta sesión que solo tocaba `#miPlanConSesion`):
   se adaptó a una sola columna con el nav superior existente, sin tocar
   `<nav>`/`#miPlanSinSesion`.
-  0. **Las 3 tarjetas del dashboard (Antropometría / Objetivo cognitivo /
+  0. **Las 3 tarjetas del dashboard tienen fondo de color sólido +
+     ilustración propia** (sesión 2026-09-15, sexta tanda — reemplaza el
+     punto anterior de "misma cabecera", que sigue documentado abajo por
+     el contexto de por qué existe `.miplan-card-head`/`.miplan-ring`).
+     El usuario mostró una referencia nueva: 3 tarjetas con fondo sólido
+     (verde/dorado/lila) y su propia ilustración, y pidió ir hacia ese
+     estilo. Decisiones tomadas con el usuario antes de construir (se le
+     mostró una maqueta con 2 opciones en el visualizador):
+     - Fondo sólido de color (no blanco con acento) — 3 variables nuevas
+       en `:root`, `--miplan-card-verde`/`--miplan-card-dorado`/
+       `--miplan-card-lila` (tintes opacos, no rgba, para leer como
+       tarjeta de color, no como estado hover). Aplicadas con
+       `#miPlan .miplan-grid > .stat-box` (Antropometría, verde),
+       `#miPlan .stat-box.miplan-objetivo` (dorado) y
+       `#miPlan .miplan-cierre` (lila) — necesitan más especificidad que
+       la regla general `#miPlan .stat-box,.bar-chart-card{background:
+       var(--paper)}` que ya existía.
+     - El ícono de línea morado de la cabecera **se reemplazó** (no
+       convive) por la ilustración en Antropometría y Objetivo cognitivo:
+       `<img class="miplan-card-illustration">` en el mismo lugar del
+       `<svg class="miplan-card-icon">` que tenían antes. "Cierre" **no**
+       tiene ilustración de cabecera (de las 3 imágenes que dio el
+       usuario, ninguna era para ese lugar) — conserva su ícono de línea
+       (clipboard con check) sin cambios.
+     - El anillo de progreso (`.miplan-ring`) se mantuvo igual, arriba a
+       la derecha de la cabecera — no se tocó su CSS ni posición.
+     - La tira de 5 íconos nueva **reemplazó** (no convive) a la fila de
+       íconos redondos sueltos que ya existía en "Cierre"
+       (`.miplan-cierre-icons`, antes 5 `<img>` de `img/Iconos/` sin
+       relación temática). Ahora es un único `<img class="miplan-cierre-
+       icons-strip">` — la pieza ya viene diseñada como una tira
+       (plato/cubiertos/cerebro/bowl/hueso, cada uno en su recuadro), no
+       se recorta en íconos sueltos. Sigue el mismo criterio de
+       visibilidad que antes (`#miPlanCta.hidden + .miplan-cierre-icons
+       {display:none}`, CSS puro, sin tocar JS).
+     Assets: las 3 imágenes que dio el usuario (generadas con Gemini) NO
+     tenían transparencia real pese a decir "fondo transparente" — eran
+     JPEG con un patrón de cuadros gris/blanco **dibujado como píxeles
+     reales** (falsa transparencia, típico de algunos generadores). Se
+     procesaron (`Pillow`: máscara por saturación/valor para detectar el
+     patrón de cuadros y convertirlo a alpha real, recorte al bounding
+     box, exportadas como PNG) antes de copiarlas a
+     `img/ilustraciones-mi-plan/` (`antropometria-cuerpo.png`,
+     `objetivo-cerebro.png`, `cierre-iconos-plan.png`). Si en el futuro
+     el usuario sube más imágenes de Gemini para este sitio, revisar
+     primero si el "fondo transparente" es real (`Image.open(...).mode`)
+     antes de asumirlo.
+     Nota sobre el pedido original: el cerebro de "Objetivo cognitivo" se
+     describió como "tonos dorados, low-poly" pero la imagen real
+     entregada es un dibujo de línea fina morado/berenjena (no dorado, no
+     low-poly relleno) — se usó la imagen tal como se recibió, no la
+     descripción; el fondo dorado de la tarjeta le da contraste igual.
+     **Verificado con Playwright**: dashboard sin datos (CTA + tira de
+     íconos visibles, 3 tarjetas con su color), con datos seedeados
+     (gauge de IMC, objetivo y anillos completos no rompen el layout de
+     color) y mobile 390px (tarjetas apiladas, ilustraciones escalan
+     bien). `window.scrollX===0` tras forzar scroll horizontal — el
+     bleed de las ilustraciones no rompe el criterio de `overflow-x` de
+     más abajo. Se confirmó que `index.html` sigue cargando normalmente
+     (no se tocó nada fuera de `mi-plan.html`/`css/styles.css`).
+  0.1 **Las 3 tarjetas del dashboard (Antropometría / Objetivo cognitivo /
      Cierre) tienen la misma cabecera** (sesión 2026-09-15, quinta tanda —
      a pedido del usuario, con una captura de la referencia original al
      lado del estado real del sitio, mostrando que "Cierre" se veía como
