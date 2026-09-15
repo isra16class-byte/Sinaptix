@@ -9,6 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;1,800&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
 <link rel="icon" href="img/sinaptix-icon.png">
 <link rel="stylesheet" href="css/styles.css">
+<script>
+/* El correo de recuperación de contraseña de Netlify Identity vuelve al
+   sitio con #recovery_token=... sobre la URL raíz, pero el login/registro
+   vive en mi-plan.html — así que se reenvía ahí. Tiene que correr ANTES
+   del <script> del widget: si el widget llega a ver ese fragmento, abre
+   su modal nativo, que es justo lo que este flujo reemplaza. */
+(function(){
+  var m = (window.location.hash || '').match(/recovery_token=([^&]+)/);
+  if(m) window.location.replace('mi-plan.html#recovery_token=' + m[1]);
+})();
+</script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>

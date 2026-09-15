@@ -10,8 +10,13 @@ if(window.netlifyIdentity){
   const conSesionEl = document.getElementById('miPlanConSesion');
   const tabLoginMiPlan = document.getElementById('tabLoginMiPlan');
   const tabRegistroMiPlan = document.getElementById('tabRegistroMiPlan');
+  const tabsMiPlan = document.querySelector('.miplan-auth-tabs');
   const formLoginMiPlan = document.getElementById('formLoginMiPlan');
   const formRegistroMiPlan = document.getElementById('formRegistroMiPlan');
+  const formRecuperarMiPlan = document.getElementById('formRecuperarMiPlan');
+  const formNuevaPassMiPlan = document.getElementById('formNuevaPassMiPlan');
+  const linkOlvideMiPlan = document.getElementById('linkOlvideMiPlan');
+  const linkVolverLoginMiPlan = document.getElementById('linkVolverLoginMiPlan');
   const btnLogout = document.getElementById('btnLogout');
   const btnLogoutNav = document.getElementById('btnLogoutNav');
   const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
@@ -213,23 +218,34 @@ if(window.netlifyIdentity){
     return function(){ btn.disabled = false; btn.textContent = original; };
   }
 
-  // Toggle entre las 2 pestañas (layout "variante A", confirmado con el
+  // Toggle entre paneles (layout "variante A", confirmado con el
   // usuario): solo un formulario visible por vez, reusando la clase
-  // .hidden que ya usa el resto de la página.
+  // .hidden que ya usa el resto de la página. Las 2 pestañas cubren
+  // login/registro; los paneles de recuperación no tienen pestaña (se
+  // llega desde el link del login o desde el correo de Netlify), así que
+  // en esos casos la fila de pestañas se oculta y el panel muestra su
+  // propio encabezado.
   function mostrarPanelAuth(cual){
     const esLogin = cual === 'login';
+    const esRegistro = cual === 'registro';
     if(tabLoginMiPlan){
       tabLoginMiPlan.classList.toggle('is-active', esLogin);
       tabLoginMiPlan.setAttribute('aria-selected', esLogin ? 'true' : 'false');
     }
     if(tabRegistroMiPlan){
-      tabRegistroMiPlan.classList.toggle('is-active', !esLogin);
-      tabRegistroMiPlan.setAttribute('aria-selected', esLogin ? 'false' : 'true');
+      tabRegistroMiPlan.classList.toggle('is-active', esRegistro);
+      tabRegistroMiPlan.setAttribute('aria-selected', esRegistro ? 'true' : 'false');
     }
+    if(tabsMiPlan) tabsMiPlan.classList.toggle('hidden', !esLogin && !esRegistro);
+    const card = document.querySelector('.miplan-locked-card');
+    if(card) card.classList.toggle('is-recuperando', !esLogin && !esRegistro);
     if(formLoginMiPlan) formLoginMiPlan.classList.toggle('hidden', !esLogin);
-    if(formRegistroMiPlan) formRegistroMiPlan.classList.toggle('hidden', esLogin);
-    authLimpiarMsg(document.getElementById('loginMsgMiPlan'));
-    authLimpiarMsg(document.getElementById('registroMsgMiPlan'));
+    if(formRegistroMiPlan) formRegistroMiPlan.classList.toggle('hidden', !esRegistro);
+    if(formRecuperarMiPlan) formRecuperarMiPlan.classList.toggle('hidden', cual !== 'recuperar');
+    if(formNuevaPassMiPlan) formNuevaPassMiPlan.classList.toggle('hidden', cual !== 'nueva');
+    ['loginMsgMiPlan','registroMsgMiPlan','recuperarMsgMiPlan','nuevaPassMsgMiPlan'].forEach(function(id){
+      authLimpiarMsg(document.getElementById(id));
+    });
   }
   if(tabLoginMiPlan) tabLoginMiPlan.addEventListener('click', function(){ mostrarPanelAuth('login'); });
   if(tabRegistroMiPlan) tabRegistroMiPlan.addEventListener('click', function(){ mostrarPanelAuth('registro'); });
@@ -307,6 +323,118 @@ if(window.netlifyIdentity){
             authMostrarMsg(msgEl, authMensajeError(err));
           }
         });
+      }).catch(function(err){
+        restaurar();
+        authMostrarMsg(msgEl, authMensajeError(err));
+      });
+    });
+  }
+
+  // --- Recuperación de contraseña, parte 1: pedir el enlace -------------
+  // Reemplaza al "Forgot password?" que ofrecía el widget nativo. La API
+  // es `requestPasswordRecovery(email)` (POST /.netlify/identity/recover
+  // con {email}); Netlify manda el correo con el enlace.
+  if(linkOlvideMiPlan){
+    linkOlvideMiPlan.addEventListener('click', function(){
+      mostrarPanelAuth('recuperar');
+      // Si ya escribió el correo en el login, no se lo hacemos tipear de nuevo.
+      const emailLogin = document.getElementById('loginEmailMiPlan').value.trim();
+      const campo = document.getElementById('recuperarEmailMiPlan');
+      if(emailLogin && campo) campo.value = emailLogin;
+    });
+  }
+  if(linkVolverLoginMiPlan){
+    linkVolverLoginMiPlan.addEventListener('click', function(){ mostrarPanelAuth('login'); });
+  }
+
+  if(formRecuperarMiPlan){
+    formRecuperarMiPlan.addEventListener('submit', function(e){
+      e.preventDefault();
+      const msgEl = document.getElementById('recuperarMsgMiPlan');
+      const btn = document.getElementById('recuperarSubmitMiPlan');
+      const email = document.getElementById('recuperarEmailMiPlan').value.trim();
+      authLimpiarMsg(msgEl);
+
+      const auth = authGotrue();
+      if(!auth){
+        authMostrarMsg(msgEl, 'No pudimos conectar con el servidor. Probá de nuevo en un momento.');
+        return;
+      }
+      const restaurar = authBloquear(btn, 'Enviando…');
+      auth.requestPasswordRecovery(email).then(function(){
+        restaurar();
+        // A propósito NO se distingue entre "correo enviado" y "ese correo
+        // no existe": responder distinto permitiría averiguar qué correos
+        // tienen cuenta en el sitio. El mensaje es el mismo en los dos
+        // casos (GoTrue igual suele responder 200 aunque no exista).
+        authMostrarMsg(msgEl, 'Si ese correo tiene una cuenta, te llega un enlace en unos minutos. Revisá también el spam.', true);
+      }).catch(function(err){
+        restaurar();
+        authMostrarMsg(msgEl, authMensajeError(err));
+      });
+    });
+  }
+
+  // --- Recuperación de contraseña, parte 2: volver desde el correo ------
+  // El enlace del correo vuelve al sitio con #recovery_token=… ; el script
+  // inline del <head> de mi-plan.html (y el de index.html, que reenvía
+  // acá) lo levanta y limpia el fragmento antes de que el widget lo vea,
+  // y lo deja en window.SINAPTIX_RECOVERY_TOKEN.
+  //
+  // `recover(token, true)` canjea ese token por una sesión real — o sea
+  // que a partir de acá la persona ya está logueada, aunque todavía no
+  // eligió su contraseña nueva. Por eso el paso siguiente es un
+  // `user.update({password})` normal y no hace falta volver a loguear.
+  // Mismo comportamiento que tenía el widget.
+  function iniciarRecuperacion(token){
+    const auth = authGotrue();
+    // Aunque haya sesión previa en este navegador, se muestra el panel de
+    // contraseña nueva: la persona llegó desde el correo justamente para
+    // cambiarla.
+    mostrarEstadoSinSesion();
+    mostrarPanelAuth('nueva');
+    const msgEl = document.getElementById('nuevaPassMsgMiPlan');
+    const btn = document.getElementById('nuevaPassSubmitMiPlan');
+    if(!auth){
+      authMostrarMsg(msgEl, 'No pudimos conectar con el servidor. Probá de nuevo en un momento.');
+      return;
+    }
+    const restaurar = authBloquear(btn, 'Verificando el enlace…');
+    auth.recover(token, true).then(function(){
+      restaurar();
+    }).catch(function(){
+      // Token vencido o ya usado: no tiene sentido dejarla escribir una
+      // contraseña que no vamos a poder guardar, así que se vuelve al
+      // panel de pedir el enlace con el aviso.
+      mostrarPanelAuth('recuperar');
+      authMostrarMsg(document.getElementById('recuperarMsgMiPlan'),
+        'Ese enlace ya venció o se usó antes. Pedí uno nuevo.');
+    });
+  }
+
+  if(formNuevaPassMiPlan){
+    formNuevaPassMiPlan.addEventListener('submit', function(e){
+      e.preventDefault();
+      const msgEl = document.getElementById('nuevaPassMsgMiPlan');
+      const btn = document.getElementById('nuevaPassSubmitMiPlan');
+      const pass = document.getElementById('nuevaPassMiPlan').value;
+      const pass2 = document.getElementById('nuevaPassRepetirMiPlan').value;
+      authLimpiarMsg(msgEl);
+
+      if(pass !== pass2){
+        authMostrarMsg(msgEl, 'Las dos contraseñas no coinciden.');
+        return;
+      }
+      const user = netlifyIdentity.currentUser();
+      if(!user){
+        mostrarPanelAuth('recuperar');
+        authMostrarMsg(document.getElementById('recuperarMsgMiPlan'),
+          'Ese enlace ya venció o se usó antes. Pedí uno nuevo.');
+        return;
+      }
+      const restaurar = authBloquear(btn, 'Guardando…');
+      user.update({password: pass}).then(function(userActualizado){
+        mostrarEstadoConSesion(userActualizado);
       }).catch(function(err){
         restaurar();
         authMostrarMsg(msgEl, authMensajeError(err));
@@ -402,6 +530,14 @@ if(window.netlifyIdentity){
   }
 
   netlifyIdentity.on('init', function(user){
+    // Si se llegó desde el correo de recuperación, ese flujo manda sobre
+    // todo lo demás (incluso sobre una sesión ya abierta en este
+    // navegador): la persona vino justamente a cambiar la contraseña.
+    if(window.SINAPTIX_RECOVERY_TOKEN){
+      iniciarRecuperacion(window.SINAPTIX_RECOVERY_TOKEN);
+      window.SINAPTIX_RECOVERY_TOKEN = null; // un token se canjea una sola vez
+      return;
+    }
     if(user) mostrarEstadoConSesion(user); else mostrarEstadoSinSesion();
   });
   netlifyIdentity.on('login', function(user){

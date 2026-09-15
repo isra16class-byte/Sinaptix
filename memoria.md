@@ -249,7 +249,8 @@ próximos pasos).
   `overflow:hidden` en `#miPlan` evita una franja blanca del `body` por
   debajo del footer en viewports altos (el `overflow:hidden` es acotado a
   esta sección, no toca `html`/`body`). Resultado: entra sin scroll hasta
-  ~986px de alto de viewport (medido con Playwright a 1440px de ancho).
+  ~1024px de alto de viewport (medido con Playwright a 1440px de ancho;
+  eran ~986px antes de sumar el link "¿Olvidaste tu contraseña?").
   **Ese número era ~825px antes de los formularios propios de
   login/registro**: la tarjeta pasó de 618px a 841px de alto al cambiar 2
   botones por pestañas + campos, y se recuperaron ~98px compactando
@@ -321,6 +322,35 @@ próximos pasos).
   es `null` y el widget abre su propio modal para pedirla; en el sitio
   desplegado no pasa. El código lo contempla mostrando un mensaje de
   error en vez de romper.
+  **Recuperación de contraseña (`#formRecuperarMiPlan` /
+  `#formNuevaPassMiPlan`)**: reemplaza al "Forgot password?" del widget.
+  Son 2 paneles más dentro del mismo `.miplan-auth`, sin pestaña propia
+  (se llega desde el link `#linkOlvideMiPlan` debajo del login, o desde
+  el correo) — cuando están visibles, `mostrarPanelAuth()` oculta la fila
+  de pestañas y agrega `.is-recuperando` a la tarjeta, que esconde el
+  `.lam-text` (el párrafo "Iniciá sesión (o creá una cuenta)" ya no
+  describe lo que la persona está haciendo; el título sí se mantiene).
+  Flujo: `gotrue.requestPasswordRecovery(email)` (POST
+  `/.netlify/identity/recover` con `{email}`) manda el correo; la
+  respuesta al usuario es **la misma exista o no la cuenta**, a propósito
+  — responder distinto permitiría averiguar qué correos están
+  registrados. El enlace del correo vuelve con `#recovery_token=…`, y
+  `gotrue.recover(token, true)` lo canjea por una **sesión real**: a
+  partir de ahí la persona ya está logueada aunque no haya elegido
+  contraseña, así que el paso final es un `user.update({password})`
+  normal (mismo comportamiento que tenía el widget). Si `recover()` falla
+  (token vencido o ya usado) se vuelve al panel de pedir el enlace con el
+  aviso, en vez de dejarla escribir una contraseña que no se va a poder
+  guardar.
+  **El token se intercepta antes de que el widget lo vea**, con scripts
+  inline en el `<head>` de las dos páginas, ubicados **antes** del
+  `<script>` de `identity.netlify.com` (si el widget ve ese fragmento,
+  abre su modal nativo, que es justo lo que este flujo reemplaza):
+  `index.html` reenvía a `mi-plan.html#recovery_token=…` (el correo
+  apunta a la raíz del sitio, no a "Mi plan"), y `mi-plan.html` guarda el
+  valor en `window.SINAPTIX_RECOVERY_TOKEN` y limpia el hash con
+  `history.replaceState`. El handler de `on('init')` le da prioridad a
+  ese flujo por sobre una sesión ya abierta en el navegador.
   **Verificado con Playwright** (`netlifyIdentity` mockeado, sin red
   real): toggle entre pestañas, registro → llamada a `signup` con
   `{full_name}` → login automático → dashboard con avatar "A" y nombre
@@ -329,7 +359,12 @@ próximos pasos).
   mobile 390px, y `window.scrollX===0` tras forzar scroll horizontal. El
   gap tarjeta↔cerebro (criterio de más arriba) se remidió en
   900/1024/1280/1440/1600/1920: idéntico al de antes del cambio
-  (50-60px), porque la tarjeta creció en alto y no en ancho.
+  (50-60px), porque la tarjeta creció en alto y no en ancho. La
+  recuperación de contraseña se verificó aparte: link con el correo
+  precargado desde el login, pedido del enlace, vuelta desde el correo
+  (hash capturado y limpiado), contraseñas que no coinciden, token
+  vencido, prioridad sobre una sesión previa, y el reenvío de
+  `index.html` a `mi-plan.html`.
 - **Nav de `index.html` — "Iniciar sesión"/"Acceder"**: ambos son ahora
   links normales (`href="mi-plan.html"`), llevan a la pantalla de login
   propia del sitio. Antes `#btnLogin` abría el widget de Netlify Identity
@@ -524,13 +559,21 @@ Lo que quedó abierto de este cambio, para una próxima sesión:
   scroll desde ~986px de alto, antes ~825px). Ver el detalle y las
   palancas que quedan en "Estado actual del diseño"; la única grande es
   achicar el título, que el usuario ya descartó antes.
-- **No se tocó la recuperación de contraseña.** El widget ofrecía "Forgot
-  password?" y los formularios propios no tienen equivalente todavía. La
-  API existe (`POST /.netlify/identity/recover` con `{email}`, o
-  `gotrue.requestPasswordRecovery(email)`), y además el link del correo
-  vuelve al sitio con `#recovery_token=…` en la URL, que hoy nadie
-  atiende — si se implementa, hay que manejar ese fragmento además del
-  formulario. Alcance propio, charlarlo antes.
+- **La recuperación de contraseña ya está implementada** (sesión
+  2026-09-15, cuarta tanda; ver "Estado actual del diseño"), pero
+  **tampoco se probó contra Netlify de verdad**. Lo que más conviene
+  mirar en el deploy: que la plantilla del correo de recuperación apunte
+  a `{{ .SiteURL }}/#recovery_token={{ .Token }}` (con eso, el script
+  inline de `index.html` reenvía solo a "Mi plan"); si el usuario le
+  cambió el destino desde el panel de Netlify, hay que ajustar el
+  intercepto. También falta confirmar que el token vencido devuelva un
+  error y no un 200.
+- **Cambio de correo**: el widget atendía también `#email_change_token=…`
+  y eso no se reemplazó. Hoy ese fragmento llegaría a `index.html`, donde
+  el widget seguiría abriendo su modal nativo — el intercepto del
+  `<head>` solo mira `recovery_token`. No hay ninguna parte del sitio que
+  ofrezca cambiar el correo, así que no es alcanzable en la práctica,
+  pero si algún día se agrega hay que cubrir ese caso.
 - **Login con Google/GitHub**: sigue sin existir (tampoco existía antes).
   `gotrue.loginExternalUrl(provider)` lo haría, pero requiere habilitar
   el proveedor en el panel de Netlify primero.

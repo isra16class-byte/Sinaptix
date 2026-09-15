@@ -621,6 +621,26 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   color:var(--red);text-align:left;
 }
 .miplan-auth-msg.is-ok{color:var(--green)}
+/* Paneles de recuperación de contraseña: no tienen pestaña propia (se
+   llega desde el link de abajo del login, o desde el correo de Netlify),
+   así que llevan su propio encabezado dentro del formulario. */
+.miplan-auth-head{font-family:var(--font-d);font-size:1.32rem;line-height:1.2;margin:0 0 2px}
+/* En los paneles de recuperación el párrafo de arriba ("Iniciá sesión (o
+   creá una cuenta) para verlo acá") ya no describe lo que la persona está
+   haciendo, así que se oculta y manda el encabezado del panel. El título
+   sí se mantiene: es la identidad de la pantalla. */
+.miplan-locked-card.is-recuperando .lam-text{display:none}
+.miplan-auth-hint{font-size:.9rem;line-height:1.45;color:var(--panel-text);margin:0 0 4px}
+/* Acciones secundarias del bloque ("¿Olvidaste tu contraseña?", "Volver
+   a iniciar sesión"): mismo tratamiento de link de texto que
+   .miplan-locked-back, pero como <button> porque no navegan a ningún
+   lado, solo cambian de panel. */
+.miplan-auth-link{
+  display:block;margin:12px auto 0;background:none;border:none;cursor:pointer;
+  font-family:var(--font-b);font-size:.88rem;color:var(--panel-text);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.miplan-auth-link:hover{color:var(--purple)}
 /* .btn/.btn-solid se escribieron para los <a> del sitio, así que no traen
    border ni cursor propios — acá el submit es un <button> real y hace
    falta neutralizar el borde nativo. */

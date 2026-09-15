@@ -8,6 +8,78 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (cuarta tanda) — Recuperación de contraseña propia (cierra el último hueco del widget)
+
+El usuario confirmó que el login/registro propios de la tanda anterior
+funcionan en el deploy real, y pidió cerrar lo único que el widget
+nativo todavía hacía mejor: el "Forgot password?". Con esto ya no queda
+ningún flujo que dependa del recuadro de Netlify.
+
+Son 2 paneles nuevos dentro del mismo `.miplan-auth`, sin pestaña propia
+(se llega desde un link debajo del login, o desde el correo):
+`#formRecuperarMiPlan` (pide el correo) y `#formNuevaPassMiPlan`
+(contraseña nueva + repetirla). Cuando alguno está visible se oculta la
+fila de pestañas y la tarjeta toma `.is-recuperando`, que esconde el
+párrafo "Iniciá sesión (o creá una cuenta) para verlo acá" — ahí ya no
+describe lo que la persona está haciendo. El título grande se mantiene.
+
+**La parte con más filo fue el token del correo.** El enlace de
+recuperación de Netlify vuelve al sitio con `#recovery_token=…` sobre la
+**raíz** del sitio, no sobre `mi-plan.html`. Y el widget de Identity, al
+inicializarse, mira ese fragmento y abre su modal nativo de "nueva
+contraseña" — exactamente lo que este trabajo viene sacando. Solución:
+scripts inline en el `<head>` de las dos páginas, ubicados **antes** del
+`<script>` de `identity.netlify.com` para ganarle:
+- `index.html` detecta el fragmento y hace `location.replace` a
+  `mi-plan.html#recovery_token=…`.
+- `mi-plan.html` lo guarda en `window.SINAPTIX_RECOVERY_TOKEN` y limpia
+  el hash con `history.replaceState`, así el widget no lo ve nunca.
+
+Si ese orden se rompe (por ejemplo moviendo el `<script>` del widget más
+arriba), vuelve a aparecer el modal nativo: está anotado en `memoria.md`.
+
+Flujo y decisiones:
+- `gotrue.requestPasswordRecovery(email)` manda el correo. **La respuesta
+  al usuario es la misma exista o no la cuenta** ("si ese correo tiene
+  una cuenta, te llega un enlace…"): responder distinto dejaría averiguar
+  qué correos están registrados en el sitio.
+- `gotrue.recover(token, true)` canjea el token por una **sesión real**,
+  así que a partir de ahí la persona ya está logueada aunque todavía no
+  eligió contraseña — el paso final es un `user.update({password})`
+  normal, sin volver a loguear. Es lo mismo que hacía el widget.
+- `recover()` se llama **al cargar**, no al enviar el formulario: si el
+  token venció o ya se usó, se vuelve al panel de pedir el enlace con el
+  aviso, en vez de dejarla escribir una contraseña que no se iba a poder
+  guardar.
+- Si ya había sesión abierta en ese navegador, **el flujo de recuperación
+  manda igual**: la persona llegó desde el correo justamente a cambiar la
+  contraseña.
+- El correo escrito en el login se precarga en el panel de recuperación,
+  para no hacerlo tipear dos veces.
+
+Archivos tocados: `mi-plan.html`, `index.html` (solo el script inline del
+`<head>`; el nav y `js/script.js` siguen sin cambios), `css/styles.css`,
+`js/mi-plan.js`, `memoria.md`, `changelog.md`.
+
+**Verificado con Playwright** (`netlifyIdentity` mockeado): link con el
+correo precargado, pedido del enlace con mensaje neutro en verde, vuelta
+desde el correo con el hash capturado y limpiado, contraseñas que no
+coinciden, `update({password})` → dashboard con el nombre pintado, token
+vencido, prioridad sobre una sesión previa, y el reenvío de `index.html`
+a `mi-plan.html`. Se re-corrió además la verificación completa de la
+tanda anterior: sin regresiones.
+
+**Lo que NO se pudo probar** (mismo límite de siempre: no hay
+credenciales ni acceso de red a `netlify.com`): que la plantilla del
+correo de recuperación apunte efectivamente a
+`{{ .SiteURL }}/#recovery_token={{ .Token }}`. Si el usuario le cambió el
+destino desde el panel, hay que ajustar el intercepto del `<head>`.
+
+Efecto en la altura: la sección pasa de ~986px a ~1024px de alto mínimo
+sin scroll, por el link "¿Olvidaste tu contraseña?" que suma una línea al
+panel de login. Los paneles de recuperación, en cambio, son más bajos que
+el de login porque ocultan el párrafo.
+
 ## 2026-09-15 (tercera tanda) — Login y registro propios en "Mi plan" (adiós al widget nativo de Netlify Identity)
 
 Implementación del plan que quedó documentado como "a futuro" en la
