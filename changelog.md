@@ -10,14 +10,10 @@
 
 ## 2026-09-15 — "Detalle del plan de nutrición": rediseño en 3 columnas (Plan / Prioridades y Moderación / Cierre)
 
-**INCOMPLETO — sin commit ni patch generado todavía, ver "Pendientes
-inmediatos" en `memoria.md`.** Código ya escrito y verificado con
-Playwright en el filesystem de trabajo, pero la sesión se cortó antes de
-hacer `git commit`/`git format-patch`. La próxima sesión debe retomar
-desde ahí (no repetir el trabajo de diseño, solo commitear y generar el
-patch) — si el working tree ya no tiene estos cambios (sesión nueva,
-clon limpio), hay que rehacerlos siguiendo el detalle de abajo y en
-`memoria.md`.
+Commit `0a06514` (autoreado correctamente), patch generado y entregado
+al usuario para aplicar con `git am`. Pendiente real: confirmarle al
+usuario el criterio de fallback del avatar de "Cierre" (ver más abajo)
+— no bloquea, es un detalle menor a validar cuando pueda.
 
 A partir de una referencia visual del usuario (mockup con 3 columnas:
 tarjeta blanca "Plan" a la izquierda, columna cálida "Prioridades y

@@ -409,27 +409,19 @@ próximos pasos).
 
 ## Pendientes conocidos
 
-**INMEDIATO — retomar acá antes que nada:** el rediseño de "Detalle del
-plan de nutrición" en 3 columnas (ver "Estado actual del diseño" arriba
-y la entrada 2026-09-15 en `changelog.md`) quedó con el código ya
-escrito y verificado con Playwright, pero **sin commit ni patch
-generado** — la sesión se cortó antes de ese paso. Próxima sesión:
-1. Verificar si el working tree todavía tiene estos cambios sin commitear
-   (`git status` en `js/nutricion-planes.js`, `css/styles.css`,
-   `mi-plan.html`, `js/mi-plan.js`). Si sí: seguir el flujo normal de
-   memoria.md ("Flujo de trabajo") — commit con la autoría correcta,
-   `git format-patch` y entregar el `.patch`. **No hace falta rehacer
-   el diseño ni volver a preguntarle al usuario las 2 confirmaciones**
-   (ícono SVG en vez de emoji, avatar+nombre en Cierre — ya están
-   resueltas, documentadas arriba).
-2. Si el working tree es un clon limpio (sin esos cambios, ej. sesión
-   nueva desde cero): rehacer los cambios siguiendo el detalle de la
-   entrada 2026-09-15 de `changelog.md` (qué archivos, qué clases, qué
-   íconos) antes de commitear.
-3. Antes de dar por cerrada esta sesión: confirmarle al usuario si el
-   criterio de fallback del avatar (prefijo del email cuando no hay
-   `full_name`) le sirve o si prefiere otra cosa (no se le preguntó
-   puntualmente, fue una decisión tomada sobre la marcha).
+**Nota de la sesión 2026-09-15 (Detalle del plan en 3 columnas):** el
+commit y el `.patch` de este rediseño **ya se generaron** (commit
+`0a06514`, autoreado correctamente) y se le entregaron al usuario para
+aplicar con `git am` + `git push origin main`. Si estás leyendo esto y
+`git log` no muestra ese commit en `main`, es porque el usuario todavía
+no aplicó el patch — no hace falta rehacer el trabajo, solo esperar a
+que lo aplique o pedírselo. Si ya está aplicado, no queda nada
+pendiente de esta sesión salvo lo que se detalla abajo:
+- **Falta confirmar con el usuario** el criterio de fallback del avatar
+  de la tarjeta "Cierre" (usa el prefijo del email cuando la persona no
+  cargó `full_name` en Netlify Identity) — fue una decisión tomada sobre
+  la marcha, no se le preguntó puntualmente. Ver detalle en "Estado
+  actual del diseño" arriba y en la entrada 2026-09-15 de `changelog.md`.
 
 - Ver `README.md` → "Próximos pasos" para el detalle funcional.
 - Varias piezas visuales (dashboard de "Mi plan", iconos ilustrados,
