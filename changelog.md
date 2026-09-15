@@ -8,6 +8,55 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (quinta tanda) — Las 3 tarjetas del dashboard ("Mi plan" con sesión) ahora se ven como una familia
+
+El usuario mostró una captura del sitio real al lado del mockup de
+referencia original: en el mockup las 3 tarjetas ("Datos clave -
+Antropometría", "Datos clave - Meta cerebral", "Detalle del plan") tienen
+la misma cabecera con ícono, mientras que en el sitio "Cierre" se veía
+como un componente distinto (sin ícono, título más grande y de otro
+color, inline con el avatar en vez de arriba). Pidió unificar las 3.
+
+Fondo, padding y `border-radius` de las 3 tarjetas ya eran idénticos
+desde antes (`#miPlan .stat-box, .bar-chart-card, .miplan-cierre{padding:
+20px 20px}`, sin cambios acá) — la diferencia real estaba en la
+cabecera. Cambios, todos en `.miplan-cierre`:
+- Se agregó un ícono nuevo a `.miplan-cierre-head` (clipboard con check,
+  dibujado con `<path>` para heredar el mismo trazo `stroke:currentColor`
+  que ya usan los íconos de Antropometría/Objetivo cognitivo — un `<rect>`
+  no hereda esa regla, por eso el diseño se armó solo con `path`), en el
+  mismo lugar donde las otras 2 tarjetas tienen su ícono propio.
+- El avatar+nombre (`#miPlanCierreUser`) se mantuvo del lado derecho de
+  esa misma fila — es la misma posición donde las otras 2 tienen el
+  anillo de progreso, aunque acá no es un anillo real (esta tarjeta no
+  tiene un dato de "progreso", es la identidad de la cuenta).
+- El título "Cierre" pasó de tener su propia clase (`.miplan-cierre-title`,
+  18px, `--purple-dark`, **ahora eliminada del CSS**) a usar directamente
+  `.miplan-card-title` — la misma clase que ya usan "Antropometría" y
+  "Objetivo cognitivo" — para que las 3 tarjetas queden con la tipografía
+  exactamente igual, no solo parecida. Se agregó
+  `.miplan-cierre .miplan-card-title{margin-bottom:0}` porque esa clase
+  trae `margin-bottom:12px` pensado para bloques sueltos, y acá el padre
+  (`.miplan-cierre`) ya es `flex column` con `gap:14px` — sin cancelarlo
+  el espacio después del título quedaba más grande que el del resto de
+  los elementos de la tarjeta.
+
+Archivos tocados: `mi-plan.html` (reordenó el head de `.miplan-cierre` y
+sumó el ícono), `css/styles.css` (ícono nuevo cubierto por reglas ya
+existentes, quitó `.miplan-cierre-title`, agregó el override de margen).
+No se tocó `js/mi-plan.js`: `pintarMiPlan()` sigue completando
+`#miPlanAvatar`/`#miPlanUserName` igual que antes, mismos ids.
+
+**Verificado con Playwright**: dashboard sin datos (capturas a 1200px),
+con datos seedeados (IMC, objetivo y barras de estado ya pintados no
+rompen el layout nuevo) y mobile 390px — las 3 tarjetas se ven
+consistentes en los 3 casos. Se confirmó por `getComputedStyle` que
+`.miplan-grid .stat-box` y `.miplan-cierre` comparten tipografía del
+título, fondo, padding y `border-radius`. Se re-verificó que el estado
+sin sesión y los formularios de login/registro/recuperación de las 2
+tandas anteriores siguen intactos (no se tocó nada de `#miPlanSinSesion`
+en esta sesión).
+
 ## 2026-09-15 (cuarta tanda) — Recuperación de contraseña propia (cierra el último hueco del widget)
 
 El usuario confirmó que el login/registro propios de la tanda anterior

@@ -418,7 +418,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   padding:24px 22px;display:flex;flex-direction:column;gap:14px;
 }
 .miplan-cierre-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.miplan-cierre-title{font-family:var(--font-d);font-size:18px;font-weight:800;color:var(--purple-dark)}
+/* El título de "Cierre" reusa .miplan-card-title (misma tipografía que
+   "Antropometría"/"Objetivo cognitivo") para que las 3 tarjetas de "Mi
+   plan" se vean como una familia — antes tenía su propio tamaño/color
+   (18px, --purple-dark) y sin ícono en la cabecera, lo que la hacía ver
+   como un componente distinto en vez de una tercera tarjeta igual a las
+   otras 2. El ícono de la cabecera (clipboard con check, ver HTML) ocupa
+   el lugar donde las otras 2 tarjetas tienen su ícono propio; el avatar+
+   nombre sigue del lado derecho, en el mismo lugar donde ellas tienen el
+   anillo de progreso — no es un anillo real porque "Cierre" no tiene un
+   dato de progreso propio, es la identidad de la cuenta.
+   .miplan-card-title trae margin-bottom:12px pensado para el flujo común
+   (bloque suelto); acá el padre ya es flex column con gap:14px, así que
+   se cancela ese margen para no duplicar el espaciado. */
+.miplan-cierre .miplan-card-title{margin-bottom:0}
 /* Avatar con inicial + nombre — el nombre solo existe si la persona lo
    cargó al registrarse (user_metadata.full_name de Netlify Identity); si
    no, js/mi-plan.js usa como fallback la parte del email antes de la @

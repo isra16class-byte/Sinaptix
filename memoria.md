@@ -415,6 +415,42 @@ próximos pasos).
   fuera del alcance de esta sesión que solo tocaba `#miPlanConSesion`):
   se adaptó a una sola columna con el nav superior existente, sin tocar
   `<nav>`/`#miPlanSinSesion`.
+  0. **Las 3 tarjetas del dashboard (Antropometría / Objetivo cognitivo /
+     Cierre) tienen la misma cabecera** (sesión 2026-09-15, quinta tanda —
+     a pedido del usuario, con una captura de la referencia original al
+     lado del estado real del sitio, mostrando que "Cierre" se veía como
+     un componente distinto). Fondo, padding y `border-radius` ya eran
+     idénticos entre las 3 desde antes (`#miPlan .stat-box, .bar-chart-card,
+     .miplan-cierre{padding:20px 20px}`, más arriba en este archivo) — lo
+     que las diferenciaba era la cabecera: las 2 primeras llevan
+     `.miplan-card-head` (ícono a la izquierda + anillo de progreso a la
+     derecha) y el título en `.miplan-card-title` (15px, `--ink`) debajo;
+     "Cierre" no tenía ícono y el título iba inline con el avatar, en su
+     propia clase `.miplan-cierre-title` (18px, `--purple-dark`) — **esa
+     clase ya no existe**, se quitó del CSS. Ahora `.miplan-cierre-head`
+     tiene un ícono nuevo (clipboard con check, dibujado a mano con
+     `<path>` para heredar el mismo estilo de trazo que los otros 2 —
+     `rect` no hereda esa regla) en el lugar donde las otras 2 tienen su
+     ícono propio, y el avatar+nombre (`#miPlanCierreUser`) sigue del lado
+     derecho, en el mismo lugar donde ellas tienen el anillo (no es un
+     anillo real: "Cierre" no tiene un dato de progreso propio, es la
+     identidad de la cuenta). El título "Cierre" pasó a usar directamente
+     la clase `.miplan-card-title` (no una copia con los mismos valores)
+     para que quede garantizado que las 3 tarjetas usan la tipografía
+     exacta, con `.miplan-cierre .miplan-card-title{margin-bottom:0}`
+     porque esa clase trae `margin-bottom:12px` pensado para bloques
+     sueltos, y acá el padre ya es flex column con `gap:14px` — sin
+     cancelarlo el espaciado quedaba más grande que el del resto de los
+     hijos de `.miplan-cierre`.
+     **Verificado con Playwright**: dashboard sin datos (avatar+ícono+
+     título alineados igual en las 3 tarjetas), con plan generado
+     (gauge de IMC, objetivo y barras de estado ya pintados no rompen el
+     layout), y mobile 390px (las 3 tarjetas apiladas mantienen la misma
+     cabecera). Tipografía/fondo/padding/radio confirmados iguales por
+     `getComputedStyle` entre `.miplan-grid .stat-box` y `.miplan-cierre`.
+     No se tocó el estado sin sesión (`#miPlanSinSesion`) ni los
+     formularios de login/registro/recuperación de las tandas anteriores
+     — se re-verificó que siguen intactos.
   1. Cada una de las 2 tarjetas de "Datos clave" (`.stat-box.miplan-card`)
      suma un header (`.miplan-card-head`): ícono SVG inline a mano, trazo
      fino `stroke:var(--purple)` (silueta corporal para Antropometría,
