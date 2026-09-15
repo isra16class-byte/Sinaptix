@@ -9,6 +9,7 @@ if(window.netlifyIdentity){
   const sinSesionEl = document.getElementById('miPlanSinSesion');
   const conSesionEl = document.getElementById('miPlanConSesion');
   const btnLoginMiPlan = document.getElementById('btnLoginMiPlan');
+  const btnRegistrarseMiPlan = document.getElementById('btnRegistrarseMiPlan');
   const btnLogout = document.getElementById('btnLogout');
   const btnLogoutNav = document.getElementById('btnLogoutNav');
   const btnAbrirNutricionMiPlan = document.getElementById('btnAbrirNutricionMiPlan');
@@ -118,6 +119,13 @@ if(window.netlifyIdentity){
     btnLoginMiPlan.addEventListener('click', function(e){
       e.preventDefault();
       netlifyIdentity.open('login');
+    });
+  }
+
+  if(btnRegistrarseMiPlan){
+    btnRegistrarseMiPlan.addEventListener('click', function(e){
+      e.preventDefault();
+      netlifyIdentity.open('signup'); // mismo widget de Identity, pestaña "Sign up"
     });
   }
 

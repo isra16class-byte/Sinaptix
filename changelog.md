@@ -8,6 +8,36 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" sin sesión: cerebro más a la derecha (de verdad), botón Registrarme, y nav principal apunta al login
+
+Seguimiento del patch anterior (que había corrido el cerebro grande de
+`right:-60px` a `right:-140px`): el usuario reportó con una captura de
+producción que la tarjeta seguía tapando el cerebro. Medido con
+Playwright (`getBoundingClientRect()` de `.miplan-locked-card` y
+`.miplan-locked-brain.is-right` en 901/950/1024/1100/1280/1440/1600/
+1920px), con `-140px` había ~100px de solapamiento **constante** en
+todo el rango de anchos grandes — no se notaba en una sola captura
+porque el instructivo visual (líneas del SVG) tiene "aire" antes de
+empezar a dibujar. Se subió a `right:-300px`, verificado el mismo
+chequeo: gap real de ~48-60px en todo el rango, sin solapamiento.
+
+Se agregó `#btnRegistrarseMiPlan` (`btn-ghost`) junto a
+`#btnLoginMiPlan` dentro de `.miplan-locked-card` — abre
+`netlifyIdentity.open('signup')` (mismo widget de Identity, pestaña de
+registro, no requiere backend nuevo). Para que la tarjeta no quedara
+con 3 botones de igual peso, "Volver al sitio" bajó de `.btn-row` a un
+link de texto simple debajo (`.miplan-locked-back`).
+
+En `index.html`, los botones de nav "Iniciar sesión" y "Acceder" ahora
+son links normales a `mi-plan.html` (antes "Iniciar sesión" abría el
+widget de Identity inline y "Acceder" hacía scroll a `#lam-06`) — se
+sacó ese comportamiento de `js/script.js` para que todo el flujo de
+login/registro pase por la pantalla propia de "Mi plan".
+
+Verificado con Playwright: sin scroll horizontal en 1440/1600/390px,
+sin errores de consola al cargar `mi-plan.html`, y click en "Acceder"
+navega correctamente a `mi-plan.html`.
+
 ## 2026-09-14 — "Mi plan" sin sesión: quitar cerebro chico y correr el grande más a la derecha
 
 A pedido del usuario, en el estado sin sesión de "Mi plan"

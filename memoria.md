@@ -188,12 +188,20 @@ próximos pasos).
      `img/decoraciones-neurona/cerebro-mi-plan.webp` (imagen provista por
      el usuario, no generada acá: cerebro con dendritas, línea fina
      terracota/dorada), grande, sangrando sobre el borde derecho
-     (`width:clamp(420px,48vw,560px);right:-140px;top:-30px`), mismo
+     (`width:clamp(420px,48vw,560px);right:-300px;top:-30px`), mismo
      criterio de bleed que `neurona-derecha`/`vision-brain-bg`. La copia
      chica junto al aguacate (`.is-left`) se quitó (HTML + CSS) a pedido
-     del usuario; el `right` de `.is-right` se corrió de `-60px` a
-     `-140px` para separarla más de la tarjeta y que se vea completa sin
-     quedar tapada/pegada contra el borde de `.miplan-locked-card`.
+     del usuario. El `right` de `.is-right` pasó por `-60px` → `-140px` →
+     `-300px`: los primeros dos valores parecían suficientes probando
+     local, pero en producción a anchos grandes (~1600px) la tarjeta
+     seguía tapando ~100px del cerebro (el gap tarjeta↔cerebro es
+     **constante en todo el rango de anchos** porque ambos elementos
+     escalan igual al centrarse, así que no alcanza con probar un solo
+     ancho: medir `getBoundingClientRect()` de `.miplan-locked-card` y
+     `.miplan-locked-brain.is-right` con Playwright en varios anchos
+     — 900/1024/1280/1440/1600/1920 — es la forma confiable de confirmar
+     que no se solapan, no alcanza con una sola captura visual). Con
+     `-300px` el gap real es de ~48-60px en todo ese rango.
      `opacity:.92` sin filtros (el fondo de la imagen, `~#F6F0F4`, ya
      matchea `--panel` de esta sección, no hizo falta `mix-blend-mode`).
      Oculto en mobile (`<900px`, mismo breakpoint que
@@ -210,10 +218,17 @@ próximos pasos).
      se tocaron).
   3. `.miplan-locked-card`: tarjeta blanca (`--paper`) redondeada, con
      candado inline SVG a mano (`.miplan-locked-lock`, trazo `--purple`)
-     arriba del `eyebrow`/`h2.lam-title`/`p.lam-text`/`.btn-row` — estos 4
-     elementos **no cambiaron de texto ni de id/clase**, solo quedaron
-     centrados dentro de la tarjeta nueva (antes estaban alineados a la
-     izquierda, sueltos en el `.wrap`).
+     arriba del `eyebrow`/`h2.lam-title`/`p.lam-text` — estos no
+     cambiaron de texto ni de id/clase. Debajo, `.btn-row` con 2 acciones
+     reales: `#btnLoginMiPlan` (`btn-solid`, abre
+     `netlifyIdentity.open('login')`) y `#btnRegistrarseMiPlan`
+     (`btn-ghost`, agregado a pedido del usuario, abre
+     `netlifyIdentity.open('signup')` — mismo widget de Identity, solo
+     cambia la pestaña inicial, no hace falta backend nuevo). "Volver al
+     sitio" bajó de `btn-row` a link de texto simple debajo
+     (`.miplan-locked-back`, subrayado, `var(--panel-text)`) para no
+     competir visualmente con las 2 acciones reales — con 3 `.btn` en la
+     misma fila quedaba sobrecargado.
   CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.lock-*`) en
   `css/styles.css`, no se tocó ninguna regla que afecte `#miPlanConSesion`
   (el dashboard con datos, que queda pendiente para otra sesión con otra
@@ -236,6 +251,15 @@ próximos pasos).
   debajo del footer en viewports altos (el `overflow:hidden` es acotado a
   esta sección, no toca `html`/`body`). Resultado: entra sin scroll hasta
   ~825px de alto de viewport (medido con Playwright a 1440px de ancho).
+- **Nav de `index.html` — "Iniciar sesión"/"Acceder"**: ambos son ahora
+  links normales (`href="mi-plan.html"`), llevan a la pantalla de login
+  propia del sitio. Antes `#btnLogin` abría el widget de Netlify Identity
+  inline (`netlifyIdentity.open('login'/'user')`, con `e.preventDefault()`)
+  y `#btnAcceder` hacía scroll a `#lam-06` (contacto) — se sacó ese
+  comportamiento de `js/script.js` a pedido del usuario, para unificar
+  todo el flujo de login/registro en `mi-plan.html`. `setLoginButton()`
+  sigue cambiando el texto de `#btnLogin` a "Mi cuenta"/nombre cuando hay
+  sesión (esa parte no se tocó), solo cambió qué pasa al hacer click.
 - **Backend real**: Netlify Database (Postgres) + Netlify Functions
   (`plan.mjs`) espejando `localStorage` al servidor cuando hay sesión.
   Verificado funcionando en producción (`master@94d6ba4`).

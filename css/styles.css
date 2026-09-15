@@ -456,7 +456,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   opacity:.92;
 }
 .miplan-locked-brain.is-right{
-  right:-140px;top:-30px;
+  right:-300px;top:-30px;
   width:clamp(420px,48vw,560px);
 }
 @media(max-width:900px){.miplan-locked-brain{display:none}}
@@ -488,6 +488,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-locked-card .lam-title,
 .miplan-locked-card .lam-text{margin-left:auto;margin-right:auto}
 .miplan-locked-card .btn-row{justify-content:center}
+/* "Volver al sitio" baja de categoría a link de texto (antes btn-ghost
+   en el mismo btn-row que "Iniciar sesión") para dejar sitio a
+   "Registrarme" como segunda acción real sin que la tarjeta quede con
+   3 botones de igual peso visual. */
+.miplan-locked-back{
+  display:block;margin-top:14px;
+  font-size:.92rem;color:var(--panel-text);
+  text-decoration:underline;text-underline-offset:3px;
+}
+.miplan-locked-back:hover{color:var(--purple)}
 @media(max-width:520px){.miplan-locked-card{padding:36px 26px 32px}}
 
 /* Candado ilustrado (variante A): SVG inline, trazo fino sin relleno,

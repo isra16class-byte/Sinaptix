@@ -49,17 +49,9 @@
       }
     }
 
-    if(btnLogin){
-      btnLogin.addEventListener('click', function(e){
-        e.preventDefault();
-        const current = netlifyIdentity.currentUser();
-        if(current){
-          netlifyIdentity.open('user'); // ya con sesión: abre panel de cuenta
-        } else {
-          netlifyIdentity.open('login'); // el modal de Identity también permite "Sign up"
-        }
-      });
-    }
+    // "Iniciar sesión"/"Acceder" ahora son links normales a mi-plan.html
+    // (la pantalla de login propia del sitio), no abren el widget de
+    // Identity acá ni hacen scroll a contacto — ver memoria.md.
 
     netlifyIdentity.on('init', user => {
       setLoginButton(user);
