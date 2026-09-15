@@ -181,18 +181,23 @@ próximos pasos).
   `.miplan-locked`)**: rediseño visual (no toca `js/mi-plan.js`, siguen
   existiendo `#miPlanSinSesion` y `#btnLoginMiPlan` con el mismo
   comportamiento). Combina dos referencias: candado ilustrado + tarjeta
-  crema (variante A) y una maraña de líneas tipo red neuronal/cerebro de
-  fondo (variante B). Estructura: `.miplan-locked` (flex centrado) con 3
-  capas —
-  1. `svg.miplan-locked-web`: SVG inline dibujado a mano (no existe un
-     asset así en `svg/`), generado con curvas Catmull-Rom (contorno
-     orgánico tipo cerebro + 4 trazos internos tipo "tangle" + 2 clusters
-     de dendritas con nodos). Mismo criterio de trazo fino sin relleno que
-     `deco-circles-vision.svg`; paleta `--gold` (contorno + dendritas) y
-     `--purple` (interior), sin colores nuevos. `opacity:.9` en el
-     contenedor, cada capa (`.bw-outline`/`.bw-scribble`/`.bw-dendrite`/
-     `.bw-node`) con su propia opacidad más baja. Oculto en mobile
-     (`<900px`, mismo breakpoint que `#lam-02 .vision-brain-bg`).
+  crema (variante A) y un cerebro ilustrado de fondo (variante B, hoy
+  imagen real, ver abajo — reemplaza la maraña SVG de la sesión anterior).
+  Estructura: `.miplan-locked` (flex centrado) con 3 capas —
+  1. 2 `<img class="deco miplan-locked-brain is-left|is-right">` con el
+     mismo asset `img/decoraciones-neurona/cerebro-mi-plan.webp` (imagen
+     provista por el usuario, no generada acá: cerebro con dendritas, línea
+     fina terracota/dorada) reusado a 2 escalas: `.is-left` chica arriba a
+     la par del aguacate (`width:clamp(140px,16vw,190px);left:15%;top:2%`),
+     `.is-right` grande sangrando sobre el borde derecho
+     (`width:clamp(420px,48vw,560px);right:-60px;top:-30px`), mismo
+     criterio de bleed que `neurona-derecha`/`vision-brain-bg`.
+     `opacity:.92` sin filtros (el fondo de la imagen, `~#F6F0F4`, ya
+     matchea `--panel` de esta sección, no hizo falta `mix-blend-mode`).
+     Oculto en mobile (`<900px`, mismo breakpoint que
+     `#lam-02 .vision-brain-bg`). El diseño anterior (SVG inline
+     `svg.miplan-locked-web`/`.bw-*` dibujado a mano con curvas
+     Catmull-Rom) quedó descartado — detalle en `historico/` si hace falta.
   2. 3 `<img class="deco deco-fruit miplan-locked-fruit is-*">` reusando
      `svg/deco-blob-avocado.svg`, `deco-blob-kiwi.svg`,
      `deco-blob-almonds.svg` (mismos assets de siempre, clase
@@ -207,21 +212,16 @@ próximos pasos).
      elementos **no cambiaron de texto ni de id/clase**, solo quedaron
      centrados dentro de la tarjeta nueva (antes estaban alineados a la
      izquierda, sueltos en el `.wrap`).
-  CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.bw-*`,
-  `.lock-*`) en `css/styles.css`, no se tocó ninguna regla que afecte
-  `#miPlanConSesion` (el dashboard con datos, que queda pendiente para
-  otra sesión con otra referencia).
-  **Sin verificación visual real con Playwright** en esta sesión (sin
-  acceso a navegador/Chromium en el entorno) — se usó WeasyPrint para
-  validar el layout de caja (tarjeta, texto, botones, frutas quedan bien
-  centrados y espaciados) pero su motor SVG no aplica CSS por clase a dry
-  elementos `<svg>` inline, así que el candado y la maraña de líneas no se
-  pudieron ver renderizados con su color/trazo real ahí — sí se
-  verificaron por separado con un render aislado (cairosvg) de la maraña
-  de líneas, que se ve como se esperaba (contorno orgánico + tangle
-  interior + dendritas). Si en una sesión nueva hay acceso a
-  Playwright/Chromium, vale la pena revisar esta pantalla contra lo
-  documentado acá antes de asumir que está 100% pulida.
+  CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.lock-*`) en
+  `css/styles.css`, no se tocó ninguna regla que afecte `#miPlanConSesion`
+  (el dashboard con datos, que queda pendiente para otra sesión con otra
+  referencia).
+  **Verificado con Playwright** (esta sesión sí tuvo acceso a
+  Chromium/Playwright): capturas a 1280px/1440px calzan contra la
+  referencia del usuario, mobile (390px) oculta los 2 cerebros
+  correctamente, y `window.scrollX===0` tras forzar scroll horizontal —
+  no rompe el criterio de `overflow-x` de más abajo pese al bleed de
+  `.is-right`.
 - **Backend real**: Netlify Database (Postgres) + Netlify Functions
   (`plan.mjs`) espejando `localStorage` al servidor cuando hay sesión.
   Verificado funcionando en producción (`master@94d6ba4`).

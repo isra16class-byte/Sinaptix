@@ -8,6 +8,42 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-14 — "Mi plan" sin sesión: cerebro ilustrado real reemplaza la maraña SVG
+
+Pedido del usuario con una imagen de referencia (screenshot de un mockup) y
+el asset final (`Gemini_Generated_Image_lhlw1blhlw1blhlw.jpg`, ilustración
+de un cerebro con dendritas, línea fina terracota/dorada sobre fondo muy
+claro). Reemplaza la maraña de líneas SVG dibujada a mano de la sesión
+anterior (`svg.miplan-locked-web` / `.bw-*`) dentro de `#miPlanSinSesion`.
+Alcance igual de acotado que la sesión anterior: solo esta pantalla, no se
+tocó `#miPlanConSesion`.
+
+- Imagen del usuario convertida a `img/decoraciones-neurona/cerebro-mi-plan.webp`
+  (mismo folder/criterio que `fondo-vision-red.webp` / `neurona-*.webp` de
+  Visión/Método). Fondo de la imagen (~`#F6F0F4`) ya es casi idéntico a
+  `--panel` de esta sección, así que no hizo falta `mix-blend-mode`: mismo
+  criterio que `#lam-02 .vision-brain-bg` (solo `opacity`, sin filtros).
+- `mi-plan.html`: se borró todo el `<svg class="miplan-locked-web">`
+  (grupos `bw-outline-g`/`bw-scribble-g`/`bw-dendrite-g`) y se agregaron 2
+  `<img class="deco miplan-locked-brain is-left|is-right">` con el mismo
+  asset reusado a distinta escala (mismo criterio de reuso que
+  `svg/deco-blob-*.svg` para las frutas).
+- `css/styles.css`: se borraron `.miplan-locked-web`/`.bw-outline`/
+  `.bw-scribble`/`.bw-dendrite`/`.bw-node`. Reglas nuevas
+  `.miplan-locked-brain` (position:absolute, z-index:0, pointer-events:none,
+  opacity:.92) + `.is-left` (chica, `left:15%;top:2%;width:clamp(140px,16vw,190px)`,
+  arriba a la par del aguacate) + `.is-right` (grande,
+  `right:-60px;top:-30px;width:clamp(420px,48vw,560px)`, sangra sobre el
+  borde derecho con las dendritas bajando hacia esa esquina, igual criterio
+  de bleed que `neurona-derecha`/`vision-brain-bg`). Mismo breakpoint
+  `<900px` que el resto de los `.deco` grandes para ocultarlas en mobile.
+- Verificado con Playwright en este entorno (sí había acceso a
+  Chromium/Playwright esta sesión, a diferencia de la anterior): capturas a
+  1280px/1440px calzan contra la referencia del usuario, mobile (390px)
+  oculta ambos cerebros correctamente, y se confirmó `window.scrollX===0`
+  tras forzar scroll horizontal con el bleed de `.is-right` — no rompe el
+  criterio de `overflow-x` documentado en `memoria.md`.
+
 ## 2026-09-14 — "Mi plan": rediseño visual del estado sin sesión (`#miPlanSinSesion`)
 
 Pedido del usuario con 2 referencias (mockups generados con IA): variante A

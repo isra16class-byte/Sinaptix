@@ -440,28 +440,30 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   padding:28px 0;
 }
 
-/* Maraña de líneas tipo red neuronal/cerebro, SVG inline dibujado a mano
-   (no existe un asset así en svg/) — mismo criterio de trazo fino sin
-   relleno que deco-circles-vision.svg / deco-espiga.svg, con la paleta de
-   marca: --gold para el contorno + las dendritas de los extremos, --purple
-   para el interior (mismo criterio de mezclar 2 colores de marca que ya
-   usa deco-circles-vision.svg con --green/--navy-bright). Vive detrás de
-   la tarjeta (z-index menor), bleed hacia el borde derecho del .wrap para
-   que se sienta grande sin invadir el contenido de texto, oculta en
-   mobile (mismo criterio que el resto de los .deco grandes del sitio,
-   breakpoint 900px). */
-.miplan-locked-web{
+/* Cerebro ilustrado (img/decoraciones-neurona/cerebro-mi-plan.webp, imagen
+   provista por el usuario: contorno anatómico + dendritas, línea fina
+   terracota/dorada sobre fondo muy claro que ya matchea --panel de esta
+   sección) — reemplaza la maraña de líneas SVG dibujada a mano que había
+   antes acá (ver historico/ para ese diseño descartado). Mismo asset
+   reusado 2 veces a distinta escala/posición (mismo criterio de reuso que
+   svg/deco-blob-*.svg): una copia chica arriba a la izquierda, junto al
+   aguacate, y una grande sobre el borde derecho, con dendritas bajando
+   hacia la esquina inferior. Ambas detrás de la tarjeta (z-index 0),
+   ocultas en mobile (mismo criterio que el resto de los .deco grandes del
+   sitio, breakpoint 900px). */
+.miplan-locked-brain{
   position:absolute;z-index:0;pointer-events:none;
-  top:50%;right:-70px;
-  width:clamp(460px,54vw,640px);
-  transform:translateY(-50%);
-  opacity:.9;
+  opacity:.92;
 }
-.bw-outline{fill:none;stroke:var(--gold);stroke-width:1.4;opacity:.55}
-.bw-scribble{fill:none;stroke:var(--purple);stroke-width:.9;opacity:.4}
-.bw-dendrite{stroke:var(--gold);stroke-width:1.1;stroke-linecap:round;opacity:.55}
-.bw-node{fill:var(--gold);opacity:.55}
-@media(max-width:900px){.miplan-locked-web{display:none}}
+.miplan-locked-brain.is-left{
+  left:15%;top:2%;
+  width:clamp(140px,16vw,190px);
+}
+.miplan-locked-brain.is-right{
+  right:-60px;top:-30px;
+  width:clamp(420px,48vw,560px);
+}
+@media(max-width:900px){.miplan-locked-brain{display:none}}
 
 /* Frutas de acento alrededor de la tarjeta (mismos assets svg/deco-blob-*
    de siempre, clase .deco-fruit ya trae la animación float + el
