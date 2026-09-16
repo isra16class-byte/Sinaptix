@@ -666,8 +666,11 @@ Prioridad 2.
   incluida la destacada `.is-featured`) son translúcidas, **todas en el
   mismo tono blanco** (`rgba(255,255,255,.55)`, destacada `.7`) con blur
   suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en
-  `var(--purple)` (`.lab` con `opacity:.82` para diferenciarse del
-  `.num`); sin `text-shadow` (ya no hace falta, el fondo es claro). El
+  `var(--purple-dark)` (`.lab` con `opacity:.85` para diferenciarse un
+  poco del `.num`; antes ambos en `var(--purple)` a secas, mismo `.lab`
+  con `opacity:.82` — se oscureció a pedido del usuario en sesión
+  2026-09-16, el morado claro contra el fondo translúcido casi no se
+  distinguía); sin `text-shadow` (ya no hace falta, el fondo es claro). El
   borde de las 4 tarjetas (`border`, antes `rgba(255,255,255,.7)` casi
   invisible sobre fondo claro) es `1px solid var(--purple)` (sesión
   2026-09-15, a pedido del usuario, para que las tarjetas se distingan
@@ -689,6 +692,14 @@ Prioridad 2.
   decoraciones viejas de esa esquina (círculos, huevo, aceite de oliva)
   que competían con el arte nuevo. Ancho responsive con `clamp()`, oculto
   en mobile (`<900px`, mismo criterio que el resto de `.deco-fruit`).
+- **Visión (`#lam-02`) — subtítulos de los 3 bullets en morado** (sesión
+  2026-09-16): `.vision-bullets strong` ("Atención individualizada.",
+  "No más dietas genéricas.", "Rendimiento cognitivo.") pasó de
+  `var(--ink)` (casi negro) a `var(--purple)`, el mismo morado que ya
+  usa la palabra "alimenta" del título (`.title-mark{color:var(--purple)}`),
+  a pedido del usuario, para que combinen. El resto del texto de cada
+  bullet (`.vision-bullets span`, sin `<strong>`) sigue en `var(--ink-soft)`
+  sin cambios; los íconos de línea siguen en `var(--gold)`.
 - **"Mi plan" — estado con sesión (`#miPlanConSesion`, dashboard "Tu
   progreso con SINAPTIX")**: rediseño visual sobre los mismos componentes
   de datos de siempre (medidor de IMC tipo velocímetro, tarjeta de

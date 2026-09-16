@@ -8,6 +8,25 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (octava tanda) — Subtítulos de Visión en morado + más contraste en las 4 tarjetas
+
+El usuario pidió dos cosas en la sección Visión (`#lam-02`, "El cerebro
+también se alimenta"):
+
+1. Los 3 subtítulos en negrita de los bullets ("Atención
+   individualizada.", "No más dietas genéricas.", "Rendimiento
+   cognitivo.") pasaron de `var(--ink)` (casi negro) a `var(--purple)`,
+   el mismo morado que ya tenía la palabra "alimenta" del título.
+2. El texto de las 4 tarjetas de estadísticas (`#lam-02 .stat-box`) —
+   número y descripción — casi no se veía/no resaltaba: pasó de
+   `var(--purple)` a `var(--purple-dark)` (más oscuro, más contraste
+   contra el fondo translúcido blanco de las tarjetas), y el label subió
+   de `opacity:.82` a `.85`.
+
+Cambio en `css/styles.css`, 2 reglas (`.vision-bullets strong`,
+`#lam-02 .stat-box .num`/`.lab`). Sin cambios en HTML ni JS. Verificado
+con Playwright, desktop 1440px y mobile 390px.
+
 ## 2026-09-16 (séptima tanda) — Ajuste: morado más oscuro + sacar rayas duplicadas en Beneficios/Contacto
 
 El usuario probó el patch anterior (rayas de naranja/dorado a morado) y

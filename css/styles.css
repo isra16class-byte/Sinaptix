@@ -364,8 +364,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(2px);
 }
-#lam-02 .stat-box .num{color:var(--purple);text-shadow:none}
-#lam-02 .stat-box .lab{color:var(--purple);opacity:.82;font-size:15px}
+#lam-02 .stat-box .num{color:var(--purple-dark);text-shadow:none}
+#lam-02 .stat-box .lab{color:var(--purple-dark);opacity:.85;font-size:15px}
 #lam-02 .stat-box.is-featured{background:rgba(255,255,255,.7);border-color:var(--purple)}
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
@@ -373,7 +373,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .vision-bullets li{display:flex;gap:16px;align-items:flex-start}
 .vision-bullets svg{flex:none;width:26px;height:26px;margin-top:2px;color:var(--gold)}
 .vision-bullets span{font-size:16px;color:var(--ink-soft);max-width:48ch}
-.vision-bullets strong{color:var(--ink);font-weight:700}
+.vision-bullets strong{color:var(--purple);font-weight:700}
 
 /* Medidor de IMC tipo velocímetro (semicírculo), en el stat-box de "Mi
    plan" — ver plan-mejoras-mi-plan-y-encuesta.md y
