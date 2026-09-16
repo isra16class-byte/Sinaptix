@@ -8,6 +8,22 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (quinta tanda) — Rediseño estético de los círculos numerados del timeline de Método
+
+El usuario pidió mejorar estéticamente los números 1-2-3-4 del lado
+izquierdo de la sección "Método" (`#lam-03`). Se propusieron 3
+direcciones (círculos con degradado y sombra / línea curva tipo trazo a
+mano / números tipográficos grandes sin círculo) y el usuario eligió la
+primera.
+
+Cambio en `css/styles.css`, solo `.tl-num` y `.tl-line`: los círculos
+pasan de blanco liso + borde fino a relleno en degradado
+`var(--purple)` → `var(--purple-dark)` con número en blanco, sombra
+difusa y un anillo del color de fondo de la sección para separarlos de
+la línea vertical (que ahora también es un degradado en vez de color
+plano). Sin cambios en HTML ni JS. Verificado con Playwright (desktop
+1440px, mobile 390px).
+
 ## 2026-09-16 (cuarta tanda) — Fix: texto libre sin espacios desbordaba todo el modal del wizard
 
 El usuario, probando el patch anterior, pegó una cadena larga sin

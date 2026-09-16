@@ -366,6 +366,21 @@ Prioridad 2.
   estado de la captura (objetivo + reevaluación en `localStorage`),
   desktop 1600px y mobile 390px — en mobile el orden visual (timeline →
   botones → tarjeta de progreso) tampoco cambió.
+- **Método (`#lam-03`) — círculos numerados del timeline con degradado y
+  sombra** (sesión 2026-09-16): `.tl-num` (los círculos 01-04 de
+  `.timeline`, `css/styles.css`) pasó de círculo blanco liso con borde
+  fino (`1px solid var(--panel-line)`, número en `--purple`) a círculo
+  con relleno `linear-gradient(135deg,var(--purple),var(--purple-dark))`,
+  número en blanco, y `box-shadow` de dos capas: sombra difusa
+  (`0 8px 20px rgba(75,46,69,.28)`) + un anillo sólido del color de fondo
+  de la sección (`0 0 0 4px var(--panel)`) que separa visualmente el
+  círculo de `.tl-line` (la línea vertical que pasa detrás, ahora también
+  en degradado `var(--purple)` → transparente en vez de color plano, para
+  que se note más arriba y se vaya diluyendo hacia abajo). Solo CSS, no
+  se tocó el HTML (`.tl-item`/`.tl-num` en `index.html`) ni JS. Elegido
+  por el usuario entre 3 propuestas (esta opción "A"; las otras eran una
+  línea curva tipo trazo a mano y números tipográficos grandes sin
+  círculo). Verificado con Playwright, desktop 1440px y mobile 390px.
 - **Método (`#lam-03`) — pestaña "Mi IMC" con la misma jerarquía que "Mi
   progreso"** (sesión 2026-09-15, continuación; a pedido del usuario, que
   la vio "simple, no resalta" al lado de la tarjeta de progreso ya
