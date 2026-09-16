@@ -8,6 +8,26 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigesimoprimera tanda) — Columna de tarjetas de `#lam-02` centrada respecto al texto (align-items, no más margin-top a ojo)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Después de dos rondas ajustando un `margin-top` fijo en px (300px,
+250px) a pedido del usuario, pidió directamente centrarla respecto a la
+columna de texto en vez de seguir afinando a ojo.
+
+- `css/styles.css`: se agrega `#lam-02 .split{align-items:center}`
+  (sobreescribe el `align-items:start` del `.split` genérico, solo para
+  esta sección — el resto del sitio depende de que sus columnas arranquen
+  alineadas arriba, no se tocó nada fuera de `#lam-02`).
+  `.vision-stats-col` queda en `margin-top:0` en desktop (el centrado
+  ahora lo resuelve el grid) y mantiene `margin-top:90px` en mobile
+  (`max-width:900px`, sin cambios ahí).
+- Verificado con Playwright (bounding boxes): en 1440px el centro
+  vertical de la columna de texto y el de la columna de tarjetas caen en
+  la misma coordenada Y (459.6px ambos). En 390px, screenshot idéntico
+  al de antes de este cambio.
+
 ## 2026-09-16 (vigésima tanda) — Ajuste fino: columna de tarjetas de `#lam-02` un poco más arriba
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

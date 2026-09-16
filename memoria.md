@@ -774,9 +774,14 @@ Prioridad 2.
   pedido del usuario se bajó, casi a la altura de ese párrafo. El
   `margin-top:90px` que tenía **inline** en `index.html` (en el
   `<div class="reveal d2">` que envuelve el `.stat-grid`) se sacó y pasó
-  a CSS con una clase (`vision-stats-col`): `margin-top:250px` en
-  desktop (primero se probó `300px`, quedaba muy abajo pegado al
-  párrafo — el usuario pidió subirla un poco, se bajó a `250px`), pero se mantiene el valor original `90px` en mobile
+  a CSS con una clase (`vision-stats-col`): se probó primero `300px`
+  (quedaba pegada al párrafo) y después `250px` (ajuste fino a pedido
+  del usuario), pero en vez de seguir afinando un valor fijo a ojo, el
+  usuario pidió centrarla de verdad respecto a la columna de texto. La
+  solución final es `#lam-02 .split{align-items:center}` (el grid de
+  `.split` usa `align-items:start` en el resto del sitio, acá se
+  sobreescribe solo para esta sección) — `vision-stats-col` quedó en
+  `margin-top:0` en desktop (el centrado ya lo resuelve el grid), pero se mantiene el valor original `90px` en mobile
   (`max-width:900px`, mismo breakpoint que `.split`) para no dejar un
   hueco enorme cuando las columnas se apilan — ahí las tarjetas van
   justo debajo de los bullets, no tienen por qué bajar tanto. Antes

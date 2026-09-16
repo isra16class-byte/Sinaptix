@@ -363,7 +363,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    original en mobile, donde las columnas se apilan (`.split` a 1
    columna, ver media query) y un margin-top tan grande dejaría un hueco
    enorme entre los bullets y las tarjetas. */
-.vision-stats-col{margin-top:250px}
+/* Columna de tarjetas de Visión (#lam-02): en vez de seguir ajustando a
+   ojo un margin-top fijo en px (300px, luego 250px, sesión 2026-09-16),
+   el usuario pidió centrarla de verdad respecto a la columna de texto.
+   Se resuelve con align-items:center en el grid de `.split`, solo para
+   esta sección — el resto del sitio sigue con align-items:start (varias
+   secciones dependen de que sus columnas arranquen alineadas arriba). */
+#lam-02 .split{align-items:center}
+.vision-stats-col{margin-top:0}
 @media(max-width:900px){.vision-stats-col{margin-top:90px}}
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
