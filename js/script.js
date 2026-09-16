@@ -465,11 +465,33 @@
   // "Mi progreso" (ver llamada a setGaugesView('progreso') en el arranque,
   // más abajo). Reusa imcCategoria/imcGaugeAngulo de nutricion-planes.js,
   // el mismo medidor semicircular que ya existía en "Mi plan".
+  // Frase de insight para la pestaña "Mi IMC" — mismo patrón que
+  // methodInsightHtml (Progreso): un mensaje corto y accionable en vez de
+  // dejar que la persona interprete sola el número. Texto fijo por zona
+  // (no hay "antes/después" para el IMC como sí para foco/memoria/
+  // energía/calma, así que no hace falta comparar con una medición
+  // previa).
+  function methodImcInsightHtml(zona){
+    const textos = {
+      bajo: 'Tu IMC está en zona de bajo peso — sumar calorías de calidad puede ayudar a sostener tu energía mental durante el día.',
+      saludable: 'Tu IMC está en rango saludable — buen punto de partida para sostener tu rendimiento cognitivo.',
+      sobrepeso: 'Tu IMC está en sobrepeso — un plan de neuroalimentación puede ayudarte a acercarlo al rango saludable.',
+      vigilar: 'Tu IMC está en un rango a vigilar — vale la pena acompañarlo con seguimiento profesional además del plan de nutrición.'
+    };
+    return '<div class="gauge-insight">'+
+      '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '<p>'+(textos[zona] || textos.saludable)+'</p>'+
+    '</div>';
+  }
+
   function renderMethodImc(){
     const el = document.getElementById('methodGaugesImc');
     if(!el) return;
 
-    const header = '<span class="eyebrow">Tu progreso</span>'+
+    // Antes decía "Tu progreso" acá también (copiado del header de la
+    // otra pestaña) — se corrige a "Antropometría" para que el eyebrow
+    // describa esta pestaña y no la de al lado.
+    const header = '<span class="eyebrow">Antropometría</span>'+
       '<h3 class="method-gauges-title">Tu IMC</h3>';
 
     let antro = null;
@@ -489,20 +511,40 @@
     const info = imcCategoria(antro.imc);
     const catLabel = info.cat.charAt(0).toUpperCase()+info.cat.slice(1);
 
+    // Rango de peso saludable (IMC 18.5–24.9) para la talla registrada —
+    // dato extra que le da a la persona algo concreto para "apuntar", no
+    // solo un número y una etiqueta de categoría.
+    let rangoHtml = '';
+    if(antro.tallaCm){
+      const tallaM = antro.tallaCm/100;
+      const min = (18.5*tallaM*tallaM).toFixed(1);
+      const max = (24.9*tallaM*tallaM).toFixed(1);
+      rangoHtml = '<p class="method-imc-range">Peso saludable estimado para tu talla: <strong>'+min+'–'+max+' kg</strong></p>';
+    }
+
+    // El medidor + número + categoría se agrupan en una sola tarjeta con
+    // borde propio (.method-imc-featured), mismo tratamiento que el área
+    // destacada de la pestaña "Mi progreso" (.gauge-item.is-featured): le
+    // da un límite visual claro en vez de que el número "flote" suelto
+    // sobre el fondo de la tarjeta general.
     el.innerHTML = header+
-      '<div class="imc-gauge" aria-hidden="true">'+
-        '<svg viewBox="0 0 220 140" width="100%">'+
-          '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
-          '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
-          '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
-          '<path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
-          '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
-          '<circle class="imc-pivote" cx="110" cy="115" r="6"/>'+
-        '</svg>'+
+      methodImcInsightHtml(info.zona)+
+      '<div class="method-imc-featured">'+
+        '<div class="imc-gauge" aria-hidden="true">'+
+          '<svg viewBox="0 0 220 140" width="100%">'+
+            '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
+            '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
+            '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
+            '<path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+            '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
+            '<circle class="imc-pivote" cx="110" cy="115" r="6"/>'+
+          '</svg>'+
+        '</div>'+
+        '<div class="num">'+antro.imc.toFixed(1)+'</div>'+
+        '<div class="lab">IMC estimado (última medición registrada)</div>'+
+        '<span class="gauge-tier-badge imc-tier-'+info.zona+'">'+catLabel+'</span>'+
       '</div>'+
-      '<div class="num">'+antro.imc.toFixed(1)+'</div>'+
-      '<div class="lab">IMC estimado (última medición registrada)</div>'+
-      '<div class="imc-cat imc-cat-'+info.zona+'">'+catLabel+'</div>'+
+      rangoHtml+
       '<ul class="imc-legend">'+
         '<li><span class="imc-dot imc-dot-bajo"></span>Bajo peso</li>'+
         '<li><span class="imc-dot imc-dot-saludable"></span>Saludable</li>'+

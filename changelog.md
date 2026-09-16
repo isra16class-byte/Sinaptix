@@ -8,6 +8,68 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veinteava tanda) — Método (lam-03): pestaña "Mi IMC" con la misma jerarquía que "Mi progreso"
+
+A pedido del usuario: "esta parte de imc se ve como simple, no resalta,
+puede mejorarla asi como hiciste con otro grafico de anillos?" — refiriéndose
+al rediseño de "Mi progreso" de la dieciochoava tanda. `renderMethodImc()`
+(`js/script.js`) suma 3 piezas nuevas, mismo lenguaje visual que
+`renderMethodGauges()`:
+
+- **Frase de insight** (`methodImcInsightHtml(zona)`, función nueva):
+  mensaje fijo por zona de IMC, mismo `.gauge-insight` (ícono lightbulb +
+  texto) que ya existía. No hay comparación antes/después para IMC (a
+  diferencia de foco/memoria/energía/calma), así que el texto es estático
+  por zona, no calculado:
+  - bajo: "Tu IMC está en zona de bajo peso — sumar calorías de calidad
+    puede ayudar a sostener tu energía mental durante el día."
+  - saludable: "Tu IMC está en rango saludable — buen punto de partida
+    para sostener tu rendimiento cognitivo."
+  - sobrepeso: "Tu IMC está en sobrepeso — un plan de neuroalimentación
+    puede ayudarte a acercarlo al rango saludable."
+  - vigilar: "Tu IMC está en un rango a vigilar — vale la pena
+    acompañarlo con seguimiento profesional además del plan de
+    nutrición."
+- **Zona destacada con borde propio** (`.method-imc-featured`, clase
+  nueva en `css/styles.css`, escopada bajo `#methodGaugesImc` para no
+  afectar `mi-plan.html`): agrupa medidor + número + label + categoría en
+  una tarjeta con `border:1.5px solid var(--purple-dark);border-
+  radius:12px;padding:20px 16px 18px`, mismo tratamiento visual que
+  `.gauge-item.is-featured` de la pestaña de al lado. La categoría deja
+  de ser texto plano (`.imc-cat`, que se sigue usando tal cual en
+  `mi-plan.html`) y pasa a un badge: `<span class="gauge-tier-badge
+  imc-tier-{zona}">` — reusa `.gauge-tier-badge` de "Mi progreso" y suma
+  4 modificadores de color nuevos (`.imc-tier-bajo`/`.imc-tier-sobrepeso`
+  dorado, `.imc-tier-saludable` verde, `.imc-tier-vigilar` rojo — mismos
+  `var(--gold)`/`var(--green)`/`var(--red)` que ya coloreaban las zonas
+  del arco).
+- **Rango de peso saludable** (`.method-imc-range`, párrafo nuevo debajo
+  de la tarjeta destacada): "Peso saludable estimado para tu talla:
+  **X–Y kg**", calculado en `renderMethodImc()` con IMC 18.5 y 24.9 sobre
+  `antro.tallaCm` (`min = 18.5 * talla²`, `max = 24.9 * talla²`, talla en
+  metros) — dato derivado del mismo registro de antropometría, no pide
+  nada nuevo a la persona. Solo se muestra si `antro.tallaCm` existe.
+- **Bug menor corregido de paso**: el `eyebrow` de esta pestaña decía "Tu
+  progreso" (copiado del header de la otra pestaña al escribir la
+  primera versión) — ahora dice "Antropometría".
+
+**Alcance verificado explícitamente para no afectar `mi-plan.html`**: la
+tarjeta "Antropometría" de "Mi plan" reusa `.imc-gauge`/`.imc-cat`/
+`.imc-legend` con su propio layout (`.stat-box`) — esas reglas de base no
+se tocaron. Las clases nuevas de esta tanda (`.method-imc-featured`,
+`.method-imc-range`) están escopadas con el selector `#methodGaugesImc`, y
+`.imc-tier-*` son clases que no existen en el markup de `mi-plan.html`
+(su badge sigue siendo `.imc-cat`, sin cambios), así que no hay overlap
+posible.
+
+Verificado con Playwright, 4 capturas (una por zona, calculando el peso
+para mantener la misma talla de 172cm): bajo peso (IMC 16.9), saludable
+(22.0), sobrepeso (26.4, el mismo caso de la captura que mandó el
+usuario), a vigilar (32.1) — badge, insight y rango coinciden con la zona
+en los 4 casos. También el estado vacío (sin `sinaptix_antropometria` en
+`localStorage`) sigue mostrando el mismo texto/botón de antes, sin
+cambios.
+
 ## 2026-09-15 (diecinoveava tanda) — Método (lam-03): botones pegados al final del timeline, no a la fila completa
 
 A pedido del usuario, que mandó una captura del deploy real mostrando el

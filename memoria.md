@@ -299,6 +299,43 @@ próximos pasos).
   estado de la captura (objetivo + reevaluación en `localStorage`),
   desktop 1600px y mobile 390px — en mobile el orden visual (timeline →
   botones → tarjeta de progreso) tampoco cambió.
+- **Método (`#lam-03`) — pestaña "Mi IMC" con la misma jerarquía que "Mi
+  progreso"** (sesión 2026-09-15, continuación; a pedido del usuario, que
+  la vio "simple, no resalta" al lado de la tarjeta de progreso ya
+  rediseñada). `renderMethodImc()` en `js/script.js` gana 3 piezas nuevas,
+  mismo lenguaje visual que `renderMethodGauges()`:
+  1. **Frase de insight** (`methodImcInsightHtml(zona)`, nueva función):
+     mensaje fijo por zona (bajo/saludable/sobrepeso/vigilar), mismo
+     `.gauge-insight` (ícono + texto) que ya usaba "Mi progreso" — no hay
+     comparación antes/después para IMC, así que el texto es fijo, no
+     calculado a partir de una medición previa.
+  2. **Zona destacada con borde propio** (`.method-imc-featured`, nueva
+     clase, escopada a `#methodGaugesImc`): agrupa el medidor + número +
+     label + categoría en una tarjeta con `border:1.5px solid
+     var(--purple-dark)`, mismo tratamiento que `.gauge-item.is-featured`
+     de la otra pestaña, en vez de dejar el número suelto sobre el fondo
+     general. La categoría pasa de texto plano (`.imc-cat`) a un badge
+     (`.gauge-tier-badge`, reusa la clase de "Mi progreso") con una
+     variante de color por zona (`.imc-tier-bajo/-sobrepeso` dorado,
+     `-saludable` verde, `-vigilar` rojo — mismos colores que ya usaban
+     las zonas del arco, ahora también en el badge).
+  3. **Rango de peso saludable** (`.method-imc-range`, nuevo párrafo):
+     "Peso saludable estimado para tu talla: X–Y kg", calculado con
+     IMC 18.5–24.9 sobre `antro.tallaCm` (dato ya guardado, no pide nada
+     nuevo). Solo se muestra si hay `tallaCm` en el registro.
+  De paso se corrigió un bug menor: el eyebrow de esta pestaña decía "Tu
+  progreso" (copiado sin querer del header de la otra pestaña) — ahora
+  dice "Antropometría".
+  **Nada de esto toca `mi-plan.html`**: la tarjeta "Antropometría" de "Mi
+  plan" sigue usando `.imc-gauge`/`.imc-cat`/`.imc-legend` con su CSS
+  original sin cambios (esas reglas de base no se tocaron); las clases
+  nuevas (`.method-imc-featured`, `.method-imc-range`, `.imc-tier-*`) o
+  están escopadas con el selector `#methodGaugesImc` o son clases que
+  simplemente no existen en el markup de `mi-plan.html`.
+  Verificado con Playwright: las 4 categorías (bajo peso IMC 16.9,
+  saludable 22.0, sobrepeso 26.4, a vigilar 32.1) con el color del badge
+  coincidiendo con la zona del arco, y el estado vacío (sin datos
+  antropométricos) sin cambios.
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma

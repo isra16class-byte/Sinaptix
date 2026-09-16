@@ -396,6 +396,26 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-dot-saludable{background:var(--green)}
 .imc-dot-vigilar{background:var(--red)}
 
+/* Pestaña "Mi IMC" de Método (#lam-03) — mismo tratamiento de jerarquía
+   que la pestaña "Mi progreso" (gauge-insight arriba + una zona destacada
+   con borde propio en vez de un número suelto sobre el fondo de la
+   tarjeta). Escopado a #methodGaugesImc para no afectar la tarjeta
+   "Antropometría" de mi-plan.html, que reusa .imc-gauge/.imc-cat/
+   .imc-legend con su propio layout (.stat-box) y no debe cambiar. */
+#methodGaugesImc .method-imc-featured{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  border:1.5px solid var(--purple-dark);border-radius:12px;
+  padding:20px 16px 18px;margin-bottom:14px;
+}
+#methodGaugesImc .method-imc-featured .imc-gauge{margin-bottom:2px}
+#methodGaugesImc .method-imc-featured .num{font-size:34px}
+#methodGaugesImc .method-imc-featured .gauge-tier-badge{margin-top:8px}
+.gauge-tier-badge.imc-tier-bajo,.gauge-tier-badge.imc-tier-sobrepeso{color:var(--gold)}
+.gauge-tier-badge.imc-tier-saludable{color:var(--green)}
+.gauge-tier-badge.imc-tier-vigilar{color:var(--red)}
+.method-imc-range{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;text-align:center}
+.method-imc-range strong{color:var(--purple-dark);font-weight:700}
+
 /* "Mi plan" (mi-plan.html) es una sección .dark: su fondo es --panel
    (#F7F1F5). .stat-box/.bar-chart-card usan --paper-2 (#FAF7F9, casi el
    mismo tono) y .nutri-summary usa --panel directamente (el mismo color
