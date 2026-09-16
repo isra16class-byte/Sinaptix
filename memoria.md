@@ -279,6 +279,26 @@ próximos pasos).
   lam-02/lam-04) se mantuvo igual, solo cambia el color al que funde.
   Colores semánticos de gauges sin cambios. Verificado con Playwright,
   desktop 1440px.
+- **Método (`#lam-03`) — botones pegados al final del timeline en vez de
+  a la fila completa** (sesión 2026-09-15, continuación): `.method-cta`
+  (los 2 botones "Generar nutrición especializada"/"Registrar datos
+  antropométricos") vivía como hermano de `.method-body` (la grilla de 2
+  columnas timeline/`.method-gauges`), así que se ubicaba debajo de la
+  fila entera, a la altura de la columna más alta. Cuando `.method-gauges`
+  crece mucho (caso real: diagnóstico + reevaluación con los 4 anillos +
+  insight + leyenda, como en la captura que mandó el usuario), el timeline
+  queda mucho más corto y dejaba un hueco vacío entre el paso 04 y los
+  botones. Fix: nuevo wrapper `.method-left` (flex-column, sin estilos de
+  layout propios más que eso) envuelve `.timeline` + `.method-cta` como
+  primer hijo de `.method-body`; `.method-gauges` sigue siendo el segundo
+  hijo/columna. Con esto los botones quedan siempre pegados al final del
+  timeline sin importar cuánto crezca la tarjeta de la derecha, que ahora
+  vive en su propia columna independiente. No se tocó ningún `id` ni la
+  lógica de `js/script.js` (que solo usa `getElementById`, no depende de
+  la jerarquía del DOM). Verificado con Playwright reproduciendo el mismo
+  estado de la captura (objetivo + reevaluación en `localStorage`),
+  desktop 1600px y mobile 390px — en mobile el orden visual (timeline →
+  botones → tarjeta de progreso) tampoco cambió.
 - **"Mi plan"** es el flujo más complejo del sitio: página propia,
   dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma

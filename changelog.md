@@ -8,6 +8,42 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (diecinoveava tanda) — Método (lam-03): botones pegados al final del timeline, no a la fila completa
+
+A pedido del usuario, que mandó una captura del deploy real mostrando el
+problema: los botones "Generar nutrición especializada"/"Registrar datos
+antropométricos" (`.method-cta`) se ubicaban debajo de toda la fila de
+`.method-body` (la grilla de 2 columnas timeline/`.method-gauges`), a la
+altura de la columna más alta. Con la tarjeta "Tu progreso" ya crecida
+(diagnóstico + reevaluación, los 4 anillos + insight + leyenda — el caso
+real de la captura), el timeline quedaba mucho más corto que la tarjeta y
+dejaba un hueco vacío entre el paso 04 ("Reevaluación de resultados") y
+los botones.
+
+- **`index.html`**: nuevo `<div class="method-left">` envuelve `.timeline`
+  y `.method-cta` (antes `.method-cta` era hermano de `.method-body`,
+  fuera de la grilla). `.method-left` pasa a ser el primer hijo/columna de
+  `.method-body`, `.method-gauges` sigue siendo el segundo. Ningún `id` se
+  tocó.
+- **`css/styles.css`**: `.method-left{display:flex;flex-direction:column}`
+  (nueva regla) — con eso los botones se apilan justo debajo del timeline
+  por flujo normal, en vez de depender de cómo el grid reparte la altura
+  entre columnas. `.method-body` y `.timeline` sin cambios de layout más
+  allá de que ahora `.timeline` no es hijo directo de `.method-body` sino
+  de `.method-left` (su regla `position:relative` sigue igual). `.method-
+  cta` y `.method-gauges` sin cambios de CSS.
+- No se tocó `js/script.js`: los listeners de `#btnNutricion` y
+  `#btnAntropometria` usan `getElementById`, no dependen de la jerarquía
+  del DOM.
+
+Verificado con Playwright, reproduciendo el mismo estado de la captura del
+usuario (`sinaptix_objetivo` + `sinaptix_reevaluacion` seedeados en
+`localStorage` para que la tarjeta muestre los 4 anillos con datos, no el
+estado vacío "Generar mi diagnóstico"): desktop 1600px (botones pegados al
+timeline, tarjeta de la derecha crece libre sin dejar hueco a la
+izquierda) y mobile 390px (orden visual timeline → botones → tarjeta de
+progreso, sin cambios respecto a antes del fix).
+
 ## 2026-09-15 (dieciochoava tanda) — Método (lam-03): rediseño de la tarjeta "Tu progreso" con jerarquía
 
 A pedido del usuario, que mostró capturas de la tarjeta real (`.method-

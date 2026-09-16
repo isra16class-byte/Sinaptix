@@ -842,8 +842,17 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 
 /* ---------- 03 PROCESO ---------- */
+/* Antes .method-cta vivía como hermano fuera de .method-body (la grilla de
+   2 columnas), así que quedaba debajo de la fila completa, a la altura de
+   la columna más alta (.method-gauges). Cuando el timeline (columna
+   izquierda) es más corto que la tarjeta de progreso, eso dejaba un hueco
+   vacío entre el último paso del timeline y los botones. Fix: .timeline y
+   .method-cta ahora comparten un wrapper (.method-left) que se apila con
+   flexbox normal, así los botones quedan siempre pegados al final del
+   timeline sin importar cuánto mida .method-gauges en su propia columna. */
 .method-body{display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:start;margin-top:70px}
 @media(max-width:900px){.method-body{grid-template-columns:1fr;gap:48px}}
+.method-left{display:flex;flex-direction:column}
 .timeline{position:relative}
 .tl-line{position:absolute;left:27px;top:10px;bottom:10px;width:1px;background:var(--panel-line)}
 .tl-item{position:relative;padding-left:76px;padding-bottom:56px}
