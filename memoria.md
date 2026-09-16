@@ -774,8 +774,9 @@ Prioridad 2.
   pedido del usuario se bajó, casi a la altura de ese párrafo. El
   `margin-top:90px` que tenía **inline** en `index.html` (en el
   `<div class="reveal d2">` que envuelve el `.stat-grid`) se sacó y pasó
-  a CSS con una clase (`vision-stats-col`): `margin-top:300px` en
-  desktop, pero se mantiene el valor original `90px` en mobile
+  a CSS con una clase (`vision-stats-col`): `margin-top:250px` en
+  desktop (primero se probó `300px`, quedaba muy abajo pegado al
+  párrafo — el usuario pidió subirla un poco, se bajó a `250px`), pero se mantiene el valor original `90px` en mobile
   (`max-width:900px`, mismo breakpoint que `.split`) para no dejar un
   hueco enorme cuando las columnas se apilan — ahí las tarjetas van
   justo debajo de los bullets, no tienen por qué bajar tanto. Antes

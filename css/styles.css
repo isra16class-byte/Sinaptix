@@ -363,7 +363,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    original en mobile, donde las columnas se apilan (`.split` a 1
    columna, ver media query) y un margin-top tan grande dejaría un hueco
    enorme entre los bullets y las tarjetas. */
-.vision-stats-col{margin-top:300px}
+.vision-stats-col{margin-top:250px}
 @media(max-width:900px){.vision-stats-col{margin-top:90px}}
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}

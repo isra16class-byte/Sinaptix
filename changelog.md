@@ -8,6 +8,22 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigésima tanda) — Ajuste fino: columna de tarjetas de `#lam-02` un poco más arriba
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario probó el `margin-top:300px` de la tanda anterior (mismo día)
+en su entorno local y lo vio "demasiado" bajado; pidió subirlo un poco.
+
+- `css/styles.css`: `.vision-stats-col` de `margin-top:300px` a `250px`
+  en desktop (el valor de mobile, `90px` dentro de
+  `@media(max-width:900px)`, no se tocó).
+- Verificado con Playwright: en 1440px el `.stat-grid` arranca ahora
+  ~48px por encima del párrafo (antes quedaban casi en la misma Y),
+  visualmente entre el final del título y el párrafo, sin volver a la
+  posición original (muy arriba, pegada al título) ni quedar tan abajo
+  como en la tanda anterior.
+
 ## 2026-09-16 (décimonovena tanda) — Columna de tarjetas de `#lam-02` bajada, a la altura del párrafo
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
