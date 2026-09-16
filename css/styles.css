@@ -560,6 +560,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-objetivo{display:flex;flex-direction:column;align-items:flex-start;flex:1}
 .miplan-detalle-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
 .miplan-detalle-grid .nutri-summary{margin:0}
+/* min-width:0: por default un hijo de grid no se achica por debajo de su
+   min-content (el ancho de su palabra/token más largo sin espacios) por
+   más que la columna sea "1fr" — un texto libre largo sin espacios (ej.
+   el campo "disgustos" de la encuesta) puede "explotar" la columna
+   angosta y comerse el espacio de la ancha (bug reportado por el usuario:
+   la columna de "Foco y Concentración"/"Prioridades y Moderación" quedó
+   comprimida a una tira vertical). Se agrega acá, a nivel de grid, además
+   del overflow-wrap de más abajo, como red de seguridad para cualquier
+   contenido futuro que tampoco rompa línea. */
+.miplan-detalle-grid > *{min-width:0}
 /* Columna derecha de "Detalle del plan": antes tenía una sola tarjeta
    (Cierre); ahora agrupa 2 apiladas (Ajustado a tu caso arriba, Cierre
    debajo) — a pedido del usuario, "Ajustado a tu caso" se sacó de adentro
@@ -572,10 +582,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-detalle-side{display:flex;flex-direction:column;gap:16px}
 /* Mismo tratamiento visual (fondo dorado, texto blanco) que tenía como
    `.nutri-side-box--ajustes` dentro del side — se mantiene la identidad de
-   "dato ajustado", solo cambia el contenedor a tarjeta independiente. */
+   "dato ajustado", solo cambia el contenedor a tarjeta independiente.
+   overflow-wrap/word-break: mismo motivo que ya tenía `.nutri-side-box`
+   (texto libre sin espacios, ej. "disgustos" de la encuesta) — se había
+   quedado afuera al mover este bloque a tarjeta propia (bug reportado por
+   el usuario, ver comentario de min-width:0 arriba). */
 .miplan-ajustes{
   background:var(--gold);color:#fff;border-radius:var(--radius);
-  padding:20px 20px;
+  padding:20px 20px;overflow-wrap:anywhere;word-break:break-word;
 }
 .miplan-ajustes .miplan-card-title{margin-bottom:10px;color:#fff}
 .miplan-ajustes ul{margin:0;padding-left:16px;font-size:13px}
@@ -895,6 +909,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #miPlan .nutri-plan-block{
     display:grid;grid-template-columns:1.6fr 1fr;gap:22px;align-items:start;
   }
+  /* Mismo motivo que .miplan-detalle-grid > *{min-width:0} más arriba:
+     sin esto, un texto libre largo sin espacios en cualquiera de los 2
+     sub-bloques podría volver a "explotar" esta grilla interna igual que
+     pasó con la de afuera. */
+  #miPlan .nutri-plan-block > *{min-width:0}
 }
 
 

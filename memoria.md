@@ -975,6 +975,17 @@ Prioridad 2.
   ahora es un wrapper `.miplan-detalle-side` (flex-column, mismo gap que
   el resto de "Mi plan") con `.miplan-ajustes` arriba y `.miplan-cierre`
   debajo, sin cambios de contenido en esta última.
+  **Ojo con `min-width:0` y `overflow-wrap`** (bug reportado por el
+  usuario en la tanda siguiente, décimotercera, con captura: un texto
+  largo sin espacios en "disgustos" comprimía la columna del plan a una
+  tira vertical y hacía desbordar `.miplan-ajustes` fuera del viewport):
+  `.miplan-ajustes` necesita `overflow-wrap:anywhere;word-break:break-word`
+  (mismo motivo que ya tenía `.nutri-side-box`) y las 2 grillas de esta
+  pantalla (`.miplan-detalle-grid` y, dentro de `#miPlan`,
+  `.nutri-plan-block`) necesitan `min-width:0` en sus hijos directos —
+  si se agrega alguna tarjeta/columna nueva a este layout con texto libre
+  del usuario adentro, revisar que tenga las 2 protecciones o puede volver
+  a pasar lo mismo.
   `.miplan-cierre` suma `.miplan-cierre-head` con avatar (inicial, círculo
   `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
   desde `user.user_metadata.full_name`, o el prefijo del email antes de

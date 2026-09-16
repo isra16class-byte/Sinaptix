@@ -8,6 +8,43 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimotercera tanda) — Fix: texto largo sin espacios rompía la grilla de "Mi plan"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Bug reportado por el usuario con captura, apenas aplicado el patch de la
+tanda anterior (tarjeta propia para "Ajustado a tu caso"): al escribir un
+texto largo sin espacios en el campo "disgustos" de la encuesta, la
+columna izquierda de "Detalle del plan" (Plan / Prioridades y
+Moderación) quedaba comprimida a una tira vertical angosta, con el texto
+partido letra por letra, mientras la tarjeta "Ajustado a tu caso"
+desbordaba hacia la derecha, fuera del viewport.
+
+Causa: al mover ese bloque a tarjeta propia (`.miplan-ajustes`, ver
+tanda anterior) se perdió el `overflow-wrap:anywhere;word-break:break-word`
+que `.nutri-side-box` ya traía puesto exactamente para este caso (texto
+libre sin espacios). Sin esa propiedad, una palabra/token larguísimo no
+rompe línea; en un grid con columnas `fr`, un hijo no se achica por
+debajo de su min-content por default, así que ese token "empuja" la
+columna angosta mucho más allá de su `1fr` asignado y se come el espacio
+de la ancha.
+
+Fix, en `css/styles.css`:
+- `.miplan-ajustes{overflow-wrap:anywhere;word-break:break-word}` — el
+  arreglo puntual del caso reportado.
+- `.miplan-detalle-grid > *{min-width:0}` y
+  `#miPlan .nutri-plan-block > *{min-width:0}` — red de seguridad a nivel
+  de grid en las 2 grillas de esta pantalla (la de "Ajustado a tu
+  caso"/"Cierre" y la interna de cada `.nutri-plan-block`), para que
+  cualquier otro contenido futuro que tampoco rompa línea no pueda volver
+  a "explotar" una columna.
+
+Verificado con Playwright (mock de `netlifyIdentity`, sin red real),
+reproduciendo el mismo texto largo sin espacios del reporte: sin overflow
+horizontal del documento, ancho de la grilla igual al del contenedor, en
+desktop (1600px) y mobile (390px, apilado en 1 columna). Suite de unit
+tests sin cambios: 54/54 ok.
+
 ## 2026-09-16 (décimosegunda tanda) — "Ajustado a tu caso" pasa a tarjeta propia en "Mi plan"
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
