@@ -8,6 +8,27 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigesimosegunda tanda) — Columna de tarjetas de `#lam-02` corrida a la derecha y centrada en su espacio
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario sintió la columna de tarjetas "muy cerca" de la columna de
+texto y pidió correrla más a la derecha y centrarla.
+
+- `css/styles.css`: `#lam-02 .split` sube su `gap` de `70px` a `130px`
+  en desktop; dentro de `@media(max-width:900px)` se resetea a `44px`
+  (el valor original de `.split` ahí) para que esta sección no herede el
+  gap grande de desktop en mobile.
+- `#lam-02 .vision-stats-col` (solo `min-width:901px`) deja de estirarse
+  a todo el ancho de su columna: `max-width:400px` +
+  `margin-left:auto;margin-right:auto`, así queda centrada dentro del
+  espacio (más grande, por el gap nuevo) que le corresponde en el grid,
+  en vez de pegada contra el límite izquierdo de esa columna.
+- Verificado con Playwright en 1440px, 1920px (ancho real del navegador
+  del usuario en sus capturas) y 390px: en desktop las tarjetas quedan
+  claramente más separadas del texto y con aire simétrico a los costados;
+  en mobile, screenshot idéntico al de antes de este cambio.
+
 ## 2026-09-16 (vigesimoprimera tanda) — Columna de tarjetas de `#lam-02` centrada respecto al texto (align-items, no más margin-top a ojo)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

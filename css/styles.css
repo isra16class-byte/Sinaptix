@@ -369,9 +369,26 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    Se resuelve con align-items:center en el grid de `.split`, solo para
    esta sección — el resto del sitio sigue con align-items:start (varias
    secciones dependen de que sus columnas arranquen alineadas arriba). */
-#lam-02 .split{align-items:center}
+#lam-02 .split{align-items:center;gap:130px}
 .vision-stats-col{margin-top:0}
-@media(max-width:900px){.vision-stats-col{margin-top:90px}}
+@media(max-width:900px){
+  .vision-stats-col{margin-top:90px}
+  #lam-02 .split{gap:44px}
+}
+
+/* La columna de tarjetas ocupaba el 100% de su columna del grid, pegada
+   contra el gap que la separa del texto — el usuario la sintió "muy
+   cerca" del texto y pidió correrla más a la derecha y centrarla. Se
+   agranda el gap entre columnas (130px, antes 70px) y además se angosta
+   la columna de tarjetas (deja de estirarse a todo el ancho de su
+   columna) centrándola dentro de ese espacio con margin:auto, así queda
+   con aire a los dos lados y notoriamente más lejos del texto. Solo en
+   desktop: en mobile (`.split` a 1 columna, gap normal) se sigue
+   estirando a todo el ancho, no hay "columna de al lado" de la que
+   alejarse. */
+@media(min-width:901px){
+  #lam-02 .vision-stats-col{max-width:400px;margin-left:auto;margin-right:auto}
+}
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}

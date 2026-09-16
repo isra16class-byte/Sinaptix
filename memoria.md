@@ -784,7 +784,22 @@ Prioridad 2.
   `margin-top:0` en desktop (el centrado ya lo resuelve el grid), pero se mantiene el valor original `90px` en mobile
   (`max-width:900px`, mismo breakpoint que `.split`) para no dejar un
   hueco enorme cuando las columnas se apilan — ahí las tarjetas van
-  justo debajo de los bullets, no tienen por qué bajar tanto. Antes
+  justo debajo de los bullets, no tienen por qué bajar tanto.
+  **Corrida a la derecha y centrada en su espacio (misma sesión,
+  continuación):** el usuario sintió la columna de tarjetas "muy cerca"
+  del texto y pidió correrla más a la derecha y centrarla. El `gap` de
+  `#lam-02 .split` sube de `70px` (heredado de `.split` base) a `130px`
+  en desktop (en mobile, dentro de `max-width:900px`, se fija de nuevo
+  en `44px`, el valor original de `.split` en esa media query, para que
+  `#lam-02 .split` no herede el `130px` de desktop). Además
+  `#lam-02 .vision-stats-col` deja de estirarse a todo el ancho de su
+  columna del grid: `max-width:400px` (antes ~515px, todo el ancho de la
+  columna) con `margin-left:auto;margin-right:auto` para centrarla
+  dentro de esa columna — solo en desktop (`min-width:901px`; en mobile
+  no hay "columna de al lado" de la que alejarse, sigue a ancho
+  completo). Efecto combinado: las tarjetas quedan notoriamente más
+  lejos del texto y con aire de los dos lados en vez de pegadas al borde
+  izquierdo de su columna. Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se
