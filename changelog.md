@@ -8,6 +8,38 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimoséptima tanda) — Iconos de `#lam-02` más grandes + fix de recorte en `icon-conversacion.svg`
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió agrandar los 4 iconos de las tarjetas de Visión,
+señalando que el de "dos personas conversando" se veía más chico que
+los otros tres.
+
+- **Causa encontrada (no era solo tamaño)**: al medir con Pillow qué
+  porcentaje de su propio `viewBox` ocupa el dibujo en cada SVG
+  (renderizar a PNG y sacar el bounding box de los píxeles no blancos),
+  los 3 iconos vectorizados con recorte de bounding box (`icon-bateria-
+  rayo`, `icon-calendario-check`, `icon-red-nodos`) ocupan ~95-97% de su
+  lienzo, pero `icon-conversacion.svg` —vectorizado en una sesión previa
+  sin recortar al bounding box del contenido, se usó el lienzo completo
+  de la imagen de referencia (1132×928)— ocupaba solo ~72% x 73%. Con
+  `object-fit:contain` en un cuadro del mismo tamaño, ese margen extra
+  hace que el dibujo se vea notoriamente más chico aunque el `<img>`
+  mida lo mismo.
+  Fix: se cambió solo el `viewBox` de `svg/icon-conversacion.svg` (de
+  `0 0 1132 928` a `178 102 859 721`, recorte ajustado al contenido real
+  con un margen chico) — el `<path>` no se tocó, solo la ventana de
+  recorte. Ahora ocupa ~95% como los otros 3.
+- **Tamaño general**: `#lam-02 .stat-icon` pasa de 40×40px a 60×60px
+  (`css/styles.css`); se subió también `padding-right` de `.num`/`.lab`
+  de esa sección (50px → 74px) para que el texto no quede pisado por el
+  icono más grande, y los atributos `width`/`height` de los 4 `<img>` en
+  `index.html` se actualizaron de 40 a 60 (evita salto de layout, el
+  navegador reserva el espacio correcto antes de que cargue el CSS).
+- Verificado de nuevo con Playwright headless + zoom sobre la captura:
+  los 4 iconos quedan visualmente parejos en tamaño.
+
 ## 2026-09-16 (décimosexta tanda) — Iconos de `#lam-02` reemplazados por los 4 SVG de línea
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

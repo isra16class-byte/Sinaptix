@@ -163,11 +163,13 @@ próximos pasos).
   `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
   conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
   sin `stroke`, color `--ink`), usados como `.stat-icon` en las 4
-  tarjetas de `#lam-02` (Visión) — ver mapeo en `changelog.md`. Antes
-  usaban los `.webp` ilustrados de `img/Iconos/` (`icon-energia-cerebral`,
-  `icon-neuronas`, `icon-semanas`, `icon-acompanamiento`); esos archivos
-  siguen en el repo por si se necesitan en otro lado, pero ya no están
-  referenciados en `index.html`.
+  tarjetas de `#lam-02` (Visión) a 60×60px (`#lam-02 .stat-icon`, ver
+  `changelog.md` para el porqué de `icon-conversacion.svg` tener un
+  `viewBox` recortado distinto a los otros 3). Antes usaban los `.webp`
+  ilustrados de `img/Iconos/` (`icon-energia-cerebral`, `icon-neuronas`,
+  `icon-semanas`, `icon-acompanamiento`); esos archivos siguen en el
+  repo por si se necesitan en otro lado, pero ya no están referenciados
+  en `index.html`.
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests

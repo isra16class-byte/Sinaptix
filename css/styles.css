@@ -398,9 +398,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    (en flujo normal, empujando num/lab hacia abajo) a quedar fijo en la
    esquina superior derecha de la tarjeta, a pedido del usuario, para que
    resalte como un sello/badge y no compita con el número. */
-#lam-02 .stat-icon{position:absolute;top:22px;right:22px;margin-bottom:0}
+#lam-02 .stat-icon{position:absolute;top:20px;right:20px;margin-bottom:0;width:60px;height:60px}
 #lam-02 .stat-box .num,
-#lam-02 .stat-box .lab{padding-right:50px}
+#lam-02 .stat-box .lab{padding-right:74px}
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}
