@@ -1159,6 +1159,33 @@ repo, mismo criterio que otros planes de sesión).
   `nutriValidarRango`, `nutriValidarNombre`, `nutriEscaparHTML` y el
   escapado dentro de `nutriConstruirAjustes`. Suite completa: 46/46 ok.
 
+**Cadenas sin espacios en texto libre de la encuesta desbordan el modal
+(sesión 2026-09-16, cuarta tanda) — corregido.** El usuario probó
+pegar una cadena larga sin espacios (ej. 200 "c" seguidas) en
+"Alimentos que no te gustan" (paso 7) para ver si rompía algo: rompía —
+`.nutri-summary`/`.nutri-side-box`/`.nutri-note` (paso 8, donde
+`nutriConstruirAjustes`/`nutriConstruirAvisos` insertan ese texto vía
+`innerHTML`, ver `js/nutricion-planes.js`) no tenían
+`overflow-wrap`/`word-break`, así que una cadena sin espacios no tenía
+dónde cortar y estiraba `.modal-card` entero — como ese es el
+contenedor con scroll propio (`max-height:88vh;overflow:auto`), el
+resultado visual era **todo el modal** ensanchado con scroll horizontal
+Y vertical a la vez, no solo el texto desbordado. Confirmado con
+Playwright que el bug ya existía antes de este patch (mismo
+`scrollWidth`/`clientWidth` en el commit anterior). Fix en
+`css/styles.css`: `overflow-wrap:anywhere;word-break:break-word` en
+`.nutri-summary`, `.nutri-side-box` y `.nutri-note` (los 3 contenedores
+que pueden recibir texto libre de la encuesta — `disgustos` y
+`alergiaOtra`, ambos ya escapados con `nutriEscaparHTML` desde el
+patch de validación anterior, esto es aparte, es un tema de layout no
+de seguridad). Mismas clases se reusan en `#miPlan` (`mi-plan.html`),
+así que el fix aplica ahí también sin tocar nada más. Verificado con
+Playwright: con la cadena de 200 caracteres sin espacios,
+`modal-card.scrollWidth === clientWidth` (antes: 1456 vs 560) y
+captura visual confirmando que el texto se corta en varias líneas
+dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
+tests sin cambios (46/46 ok, este fix es puro CSS).
+
 ## Pendientes conocidos
 
 **Auto-scroll del wizard al mensaje final (sesión 2026-09-16) — falta

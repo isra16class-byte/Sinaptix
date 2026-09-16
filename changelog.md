@@ -8,6 +8,35 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (cuarta tanda) — Fix: texto libre sin espacios desbordaba todo el modal del wizard
+
+El usuario, probando el patch anterior, pegó una cadena larga sin
+espacios (200 "c" seguidas) en "Alimentos que no te gustan" (paso 7)
+para ver si rompía algo — y rompía: aparecían scroll horizontal y
+vertical en todo el modal (`#modalNutricion .modal-card`), no solo el
+texto desbordado. Confirmado con Playwright que el bug **ya existía
+antes del patch de la tanda anterior** (mismo `scrollWidth` en el
+commit previo) — no lo introdujo ese cambio, ya estaba.
+
+- **Causa**: `.nutri-summary`, `.nutri-side-box` y `.nutri-note`
+  (`css/styles.css`) — los 3 contenedores donde `js/nutricion-planes.js`
+  (`nutriBuildResumenHTML`/`nutriConstruirAjustes`) insertan el texto
+  libre de `disgustos`/`alergiaOtra` vía `innerHTML` — no tenían
+  `overflow-wrap`/`word-break`. Una cadena sin espacios no tiene dónde
+  cortar y estira la caja; como esas cajas viven dentro de
+  `.modal-card` (`overflow:auto`), el navegador ensancha el contenedor
+  entero en vez de solo desbordar el texto.
+- **Fix**: `overflow-wrap:anywhere;word-break:break-word` agregado a
+  las 3 clases. Mismas clases se reusan en `#miPlan` (`mi-plan.html`),
+  así que el fix cubre ambos lugares sin tocar nada más.
+- Verificado con Playwright: antes del fix, `modal-card.scrollWidth`
+  1456 vs `clientWidth` 560 con la cadena de prueba; después, iguales
+  (560 = 560). Captura visual confirma que el texto ahora se corta en
+  varias líneas dentro del ancho normal de la caja "Ajustado a tu
+  caso".
+- Suite de unit tests sin cambios (46/46 ok) — fix puro de CSS, no toca
+  JS.
+
 ## 2026-09-16 (tercera tanda) — Nombre/correo del wizard: ocultar/prellenar con sesión + precargar login
 
 A partir de una consulta del usuario por chat sobre para qué se usan
