@@ -253,28 +253,32 @@ Prioridad 2.
   "alimenta" en `index.html` para que las 6 secciones compartan el mismo
   lenguaje. No aplica a `mi-plan.html`: sus `<h2 class="lam-title">` no
   usan `.title-mark`, siguen 100% `--ink`.
-- **Títulos de sección — trazos "marcador" (subrayado + curva) en morado
-  en todo el sitio** (sesión 2026-09-16): las 2 rayas que acompañan cada
-  título (el subrayado detrás de la palabra remarcada vía `.title-mark`
-  y la línea curva `.title-scribble` debajo del `<h2>`) eran naranja/
-  dorado (`#EDA23A` genérico, o `#C1703B`/`--gold` en `#lam-03`) y pasaron
-  a `--purple` (`#714B67`) para que combinen con el color de la propia
-  palabra resaltada (`.title-mark` ya usaba `color:var(--purple)` para el
-  texto). Nuevo asset único `svg/deco-scribble-purple.svg` (mismo path
-  `M8,17 Q200,9 392,13`, solo cambia el `stroke`) reemplaza tanto
-  `deco-scribble.svg` como `deco-scribble-gold.svg` en las 5 secciones que
-  usan este lenguaje: `#lam-03` (subrayado "genérica" + curva), `#lam-04`
-  (subrayado "trabajo" + curva + el `<img class="deco deco-scribble">`
-  suelto de `.lam-title-frame`, ver entrada de abajo),
-  `#lam-05` ("carga alta") y `#lam-06` ("asesoría"). `#lam-02` no tenía
-  curva propia y sigue sin ella (el subrayado de "alimenta" ya estaba
-  desactivado a propósito, `background-image:none`, sin cambios). El
-  default de `.title-mark` en CSS ahora apunta directo al asset morado,
-  así que se sacó el override específico de `#lam-03` que antes lo hacía
-  dorado (ya no hace falta, coincide con el default). Los `deco-espiga.svg`
-  (motivo de espigas sueltas, no relacionado) no se tocaron. Solo CSS +
-  `index.html` (5 atributos `src`), nada de JS. Verificado con Playwright,
-  desktop 1440px, las 5 secciones.
+- **Títulos de sección — trazos "marcador" (subrayado ± curva) en morado
+  oscuro** (sesión 2026-09-16, con ajuste a continuación): las rayas que
+  acompañan los títulos eran naranja/dorado y pasaron a un único asset
+  `svg/deco-scribble-purple.svg` (`stroke="#4B2E45"`, `--purple-dark` —
+  primer intento con `--purple` #714B67 quedó muy claro/poco contraste
+  a criterio del usuario, se oscureció) que reemplaza a `deco-scribble.svg`
+  y `deco-scribble-gold.svg` en todo el sitio. Estado final por sección:
+  - `#lam-03` (Método) y `#lam-04` (Pilares): título centrado, con
+    **ambos** elementos — subrayado `.title-mark` (detrás de "genérica"/
+    "trabajo") + curva `.title-scribble` centrada debajo del `<h2>` (en
+    Pilares también el `<img class="deco deco-scribble">` suelto de
+    `.lam-title-frame`, ver entrada de abajo) — se ven bien distinguidos
+    porque la curva queda centrada bajo todo el título, no pegada a una
+    sola palabra.
+  - `#lam-05` (Beneficios) y `#lam-06` (Contacto): título alineado a la
+    izquierda. Acá **se sacó** el `.title-scribble` (quedaba como una
+    segunda raya redundante pegada justo debajo del subrayado de
+    `.title-mark`, mismo color — el usuario lo marcó como "repetida"/
+    "sobrante"). Queda solo el subrayado de `.title-mark` sobre "carga
+    alta"/"asesoría". CSS: se sacó la regla `#lam-05 .title-scribble,
+    #lam-06 .title-scribble{margin:6px 0 0}` (ya no aplica a nada).
+  - `#lam-02` (Visión): sin curva ni subrayado, sin cambios (ya estaba
+    así a propósito).
+  Los `deco-espiga.svg` (motivo de espigas sueltas, no relacionado) no se
+  tocaron. Solo CSS + `index.html` (atributos `src`/markup), nada de JS.
+  Verificado con Playwright, desktop 1440px, las 4 secciones con acento.
 - **Pilares (`#lam-04`) — trazos "marcador" del título**: dentro de
   `.lam-title-frame` quedó **un solo** `<img class="deco deco-scribble">`
   suelto (`style="right:110px;bottom:14px;width:320px..."`), más los 2

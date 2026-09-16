@@ -302,11 +302,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 /* ---------- lam-05 / lam-06: títulos que antes no tenían ningún acento
    (a diferencia de lam-02 con su icono, lam-03/04 con mark+scribble
-   centrados). Se les suma el mismo lenguaje visual (marker + scribble +
-   un par de chispas ya usadas en el hero) pero sin centrar, porque acá
-   el título va alineado a la izquierda dentro de su columna. ---------- */
-#lam-05 .title-scribble,
-#lam-06 .title-scribble{margin:6px 0 0}
+   centrados). Se les sumó el mismo lenguaje visual (marker + scribble +
+   un par de chispas ya usadas en el hero) sin centrar, porque acá el
+   título va alineado a la izquierda dentro de su columna. El
+   `.title-scribble` (línea curva suelta debajo de todo el `<h2>`, sin
+   relación visual clara con ninguna palabra puntual) se sacó después
+   (sesión 2026-09-16): quedaba como una segunda raya redundante justo
+   debajo del subrayado de `.title-mark`, ambas ya del mismo morado. Queda
+   solo el marker + las chispas. ---------- */
 #lam-05 .lam-title .brain-spark,
 #lam-06 .lam-title .brain-spark{width:7px;height:7px}
 

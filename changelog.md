@@ -8,6 +8,29 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (séptima tanda) — Ajuste: morado más oscuro + sacar rayas duplicadas en Beneficios/Contacto
+
+El usuario probó el patch anterior (rayas de naranja/dorado a morado) y
+pidió dos ajustes:
+
+1. El morado (`--purple` #714B67) quedaba muy claro/poco contraste →
+   se cambió el `stroke` de `svg/deco-scribble-purple.svg` a
+   `--purple-dark` (#4B2E45), más oscuro. Como es un asset único
+   compartido, el cambio aplica a todas las secciones que lo usan.
+2. En Beneficios (`#lam-05`, "carga alta") y Contacto (`#lam-06`,
+   "asesoría") había dos rayas apiladas: el subrayado de `.title-mark`
+   pegado a la palabra + una curva `.title-scribble` suelta justo debajo,
+   sin relación con ninguna palabra puntual — se veía redundante ahora
+   que ambas son del mismo color. Se sacó el `<img class="title-scribble">`
+   de esas 2 secciones (queda solo el subrayado). Método y Pilares no se
+   tocaron: ahí la curva queda centrada bajo todo el título (título
+   centrado, no alineado a la izquierda) y no se ve duplicada.
+
+Cambio en `svg/deco-scribble-purple.svg` (1 línea), `index.html` (se
+sacan 2 `<img class="title-scribble">`) y `css/styles.css` (se saca la
+regla de margin que ya no aplicaba a nada). Verificado con Playwright,
+desktop 1440px.
+
 ## 2026-09-16 (sexta tanda) — Rayas bajo los títulos de naranja/dorado a morado en todo el sitio
 
 El usuario pidió que las rayas naranjas que acompañan los títulos de
