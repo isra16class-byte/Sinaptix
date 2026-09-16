@@ -8,6 +8,40 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veinticuatroava tanda) — Antropometría: "—" placeholder igualado al de Objetivo cognitivo
+
+A pedido del usuario, con captura del dashboard "Mi plan" en estado sin
+datos: la tarjeta verde de Antropometría se veía "despareja" contra la
+dorada de Objetivo cognitivo — el "—" y el texto de abajo quedaban en
+distinta posición vertical.
+
+- **Causa**: `.stat-box .num` (36px) es el tamaño por defecto, pensado
+  para el IMC real de Antropometría (un número corto); Objetivo
+  cognitivo lo overridea a 22px inline porque necesita lugar para un
+  objetivo largo sin desbordar (`css/styles.css`/`mi-plan.html`, ya
+  documentado). Antes de cargar cualquier dato, ambas tarjetas muestran
+  el mismo placeholder "—" — pero seguía saliendo a 36px en Antropometría
+  y 22px en Objetivo cognitivo, así que el placeholder en sí se veía más
+  grande y corría el resto del contenido hacia abajo en la tarjeta verde.
+- **`mi-plan.html`**: `<div class="num" id="miPlanImc">—</div>` pasa a
+  `<div class="num is-placeholder" id="miPlanImc">—</div>`.
+- **`css/styles.css`**: nueva regla `.stat-box.miplan-card
+  .num.is-placeholder{font-size:22px}`, junto al resto de las reglas de
+  `.miplan-card`/`.miplan-grid`, con comentario explicando por qué el
+  placeholder se iguala pero el valor real no.
+- **`js/mi-plan.js`** (`pintarMiPlan()`): al pintar el IMC real se agrega
+  `imcEl.classList.remove('is-placeholder')`, así el número real vuelve
+  a 36px (protagonismo, como antes) — solo el placeholder se iguala a
+  22px, no cualquier valor.
+- Verificado con Playwright (servidor estático local, sin credenciales
+  de Netlify — mismo enfoque de sesiones anteriores): estado sin datos
+  en desktop 1440px y mobile 390px (ambos "—" al mismo tamaño y altura,
+  botones siguen anclados al fondo, sin romper lo del punto anterior) y
+  estado con IMC cargado, simulando el DOM ya pintado, para confirmar
+  que el número real vuelve a 36px y que Objetivo cognitivo no cambió.
+- **Actualiza `memoria.md`**: entrada agregada a continuación del punto
+  "Botón de 'Datos clave' desnivelado..." en "Estado actual del diseño".
+
 ## 2026-09-15 (veintitresava tanda) — Tests unitarios para netlify/functions/plan.mjs (Prioridad 2 de plan-tests-sinaptix.md)
 
 A pedido del usuario ("continuemos con la prioridad 2"): segunda tanda

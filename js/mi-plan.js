@@ -48,6 +48,7 @@ if(window.netlifyIdentity){
         const imcEl = document.getElementById('miPlanImc');
         const imcLabEl = document.getElementById('miPlanImcLab');
         if(imcEl) imcEl.textContent = d.imc.toFixed(1);
+        if(imcEl) imcEl.classList.remove('is-placeholder');
         if(imcLabEl) imcLabEl.textContent = 'IMC estimado (última medición registrada)';
 
         // Medidor tipo velocímetro: la aguja se recorta a [15, 40] solo para

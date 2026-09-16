@@ -963,6 +963,28 @@ Prioridad 2.
   igual que antes, el botón no se ve porque está oculto). No se tocó
   `index.html`: `.miplan-card`/`.miplan-card-cta` son clases exclusivas
   de `mi-plan.html`.
+- **"—" placeholder de Antropometría desparejo contra el de Objetivo
+  cognitivo** (sesión 2026-09-15, continuación — el usuario mandó captura del estado
+  sin datos mostrando el problema; el botón ya quedaba anclado al fondo
+  por el punto anterior, pero el "—" en sí seguía viéndose más grande y
+  más abajo en la tarjeta verde). Causa: igual que el punto anterior,
+  `.num` es 36px en Antropometría y 22px en Objetivo cognitivo — eso no
+  se tocó (sigue haciendo falta para el objetivo largo), pero antes de
+  cargar un dato real ambos elementos muestran el mismo placeholder "—",
+  así que no había motivo para que se vieran distintos en ese estado.
+  Fix: el `<div class="num">` de Antropometría (`#miPlanImc`) suma la
+  clase `is-placeholder` en el HTML; `.stat-box.miplan-card
+  .num.is-placeholder{font-size:22px}` (`css/styles.css`) lo iguala al
+  tamaño de Objetivo cognitivo mientras no hay dato. En
+  `js/mi-plan.js` (`pintarMiPlan()`), al pintar el IMC real se agrega
+  `imcEl.classList.remove('is-placeholder')` — así el número real (ej.
+  "24.2") vuelve a mostrarse grande (36px), que es lo que se quiere para
+  un dato protagonista; solo el placeholder debía igualarse. Objetivo
+  cognitivo no se tocó (ya usaba 22px siempre, con o sin dato).
+  Verificado con Playwright: estado sin datos (los 2 "—" al mismo
+  tamaño y altura, desktop 1440px y mobile 390px, botones siguen
+  parejos) y estado con IMC cargado (vuelve a 36px, sin afectar
+  Objetivo cognitivo).
 
 - **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
   al lado del botón de acción** (sesión 2026-09-15, continuación): antes

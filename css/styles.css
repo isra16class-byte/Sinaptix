@@ -498,6 +498,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    más abajo), que ya tiene su propio ajuste de ancho para `.miplan-card-head`
    (ver esa regla). */
 .stat-box.miplan-card{display:flex;flex-direction:column}
+/* El "—" placeholder de Antropometría (antes del primer dato cargado)
+   heredaba el font-size:36px de `.stat-box .num` (pensado para el IMC
+   real, un número corto) mientras que Objetivo cognitivo usa 22px inline
+   siempre (ver comentario arriba) — con las 2 tarjetas en flex-column y
+   el botón ya anclado al fondo, ese "—" más grande seguía notándose
+   desparejo contra el de Objetivo cognitivo (reportado por el usuario
+   con captura, estado sin datos). `.is-placeholder` iguala el "—" al
+   tamaño de Objetivo cognitivo mientras no hay dato; en cuanto
+   `js/mi-plan.js` (`pintarMiPlan()`) carga el IMC real, saca esta clase
+   del elemento y el número vuelve a 36px (sí queremos que un IMC real,
+   un valor corto, se vea grande y protagonista — solo el placeholder
+   debía igualarse). */
+.stat-box.miplan-card .num.is-placeholder{font-size:22px}
 .miplan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 .miplan-col{display:flex;flex-direction:column;gap:16px}
 /* flex:1 hace que la tarjeta en sí (no solo el wrapper .miplan-col, que
