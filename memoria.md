@@ -700,6 +700,21 @@ Prioridad 2.
   a pedido del usuario, para que combinen. El resto del texto de cada
   bullet (`.vision-bullets span`, sin `<strong>`) sigue en `var(--ink-soft)`
   sin cambios; los íconos de línea siguen en `var(--gold)`.
+- **Visión (`#lam-02`) — ícono de las 4 tarjetas movido a la esquina
+  superior derecha** (sesión 2026-09-16): `.stat-icon` (el `<img>` de
+  40x40, antes arriba a la izquierda en flujo normal, empujando `.num`/
+  `.lab` hacia abajo con `margin-bottom:14px`) pasa a
+  `position:absolute;top:22px;right:22px` dentro de `#lam-02 .stat-box`
+  (que ahora necesita `position:relative`, agregado a la regla que ya
+  existía para fondo/borde/blur de esta sección). Efecto: el ícono queda
+  fijo como un sello/badge en la esquina, y `.num`/`.lab` arrancan arriba
+  a la izquierda de la tarjeta (ya no hay hueco donde estaba el ícono).
+  Se sumó `padding-right:50px` a `.num`/`.lab` (solo `#lam-02`) para que
+  el texto no quede pegado al ícono si algún número/label fuera más
+  ancho. Cambio scopeado 100% a `#lam-02` — el resto del sitio que
+  reusa `.stat-box`/`.stat-icon` (Método con sus gauges, "Mi plan") no se
+  toca. Verificado con Playwright, desktop 1440px y mobile 390px, sin
+  superposición en ninguna de las 4 tarjetas.
 - **"Mi plan" — estado con sesión (`#miPlanConSesion`, dashboard "Tu
   progreso con SINAPTIX")**: rediseño visual sobre los mismos componentes
   de datos de siempre (medidor de IMC tipo velocímetro, tarjeta de

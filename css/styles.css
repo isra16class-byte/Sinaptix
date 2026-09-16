@@ -363,10 +363,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   border:1px solid var(--purple);
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(2px);
+  position:relative;
 }
 #lam-02 .stat-box .num{color:var(--purple-dark);text-shadow:none}
 #lam-02 .stat-box .lab{color:var(--purple-dark);opacity:.85;font-size:15px}
 #lam-02 .stat-box.is-featured{background:rgba(255,255,255,.7);border-color:var(--purple)}
+
+/* Ícono de las 4 tarjetas de Visión: pasa de estar arriba a la izquierda
+   (en flujo normal, empujando num/lab hacia abajo) a quedar fijo en la
+   esquina superior derecha de la tarjeta, a pedido del usuario, para que
+   resalte como un sello/badge y no compita con el número. */
+#lam-02 .stat-icon{position:absolute;top:22px;right:22px;margin-bottom:0}
+#lam-02 .stat-box .num,
+#lam-02 .stat-box .lab{padding-right:50px}
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}

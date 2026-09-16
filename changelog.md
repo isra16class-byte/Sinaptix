@@ -8,6 +8,24 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (novena tanda) — Ícono de las tarjetas de Visión a la esquina superior derecha
+
+El usuario pidió que el ícono de las 4 tarjetas de estadísticas
+(`#lam-02 .stat-box`) se pusiera en el borde derecho, bien ajustado y
+"obvio".
+
+`.stat-icon` pasó de estar en flujo normal arriba a la izquierda
+(empujando el número hacia abajo) a `position:absolute` en la esquina
+superior derecha de la tarjeta (`top:22px;right:22px`), quedando como
+un sello/badge fijo. `#lam-02 .stat-box` necesitó `position:relative`
+para que el absolute se ancle a la tarjeta y no a un ancestro más
+arriba. Se agregó `padding-right:50px` a `.num`/`.lab` (solo en
+`#lam-02`) para que el texto nunca quede debajo del ícono.
+
+Cambio scopeado 100% a `#lam-02` — no afecta `.stat-icon`/`.stat-box`
+en otras secciones. Solo `css/styles.css`. Verificado con Playwright,
+desktop 1440px y mobile 390px.
+
 ## 2026-09-16 (octava tanda) — Subtítulos de Visión en morado + más contraste en las 4 tarjetas
 
 El usuario pidió dos cosas en la sección Visión (`#lam-02`, "El cerebro
