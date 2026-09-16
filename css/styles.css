@@ -386,20 +386,45 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 
 /* Medidor de IMC tipo velocímetro (semicírculo), en el stat-box de "Mi
    plan" — ver plan-mejoras-mi-plan-y-encuesta.md y
-   continuar-grafico-imc.md. Los 4 arcos de color son fijos (siempre
-   representan los mismos umbrales de IMC); lo único que cambia por
-   usuario es la rotación de la aguja (js/mi-plan.js, vía
-   imcGaugeAngulo en js/nutricion-planes.js) y el texto/color de la
-   categoría debajo. Mismo criterio de color que los avisos graduados:
-   dorado = atención moderada, rojo = alto, verde = saludable. */
+   continuar-grafico-imc.md. Los 4 <path> del arco siguen representando
+   los mismos umbrales fijos de IMC (18.5/25/30); lo que cambia (sesión
+   2026-09-16) es que ya no son 4 franjas de color sólido — comparten un
+   único <linearGradient id="imcGaugeGradient"> (definido inline en cada
+   <svg>: a mano en mi-plan.html, generado por imcGaugeGradientDefsHtml
+   en js/nutricion-planes.js para renderMethodImc/js/script.js) para que
+   el color se lea como una transición continua. Los anclajes de color
+   son los mismos rojo/dorado/verde de gaugeColorForPercent (ver
+   imcGaugeGradientStops, js/nutricion-planes.js), mismo criterio que los
+   anillos de "Método". Lo que cambia por usuario es la rotación de la
+   aguja (imcGaugeAgujaDeg) y la posición del marcador fijo
+   (imcGaugeMarkerPos), ambas en js/nutricion-planes.js. */
 .imc-gauge{max-width:220px;margin:0 auto -8px}
-.imc-zone{fill:none;stroke-width:18;stroke-linecap:butt}
-.imc-zone-bajo{stroke:var(--gold)}
-.imc-zone-saludable{stroke:var(--green)}
-.imc-zone-sobrepeso{stroke:var(--gold)}
-.imc-zone-vigilar{stroke:var(--red)}
-.imc-aguja{stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+.imc-zone{fill:none;stroke-width:18;stroke-linecap:butt;stroke:url(#imcGaugeGradient)}
+/* Clases de los <stop> del degradado estático de mi-plan.html (el de
+   renderMethodImc/js/script.js se arma en JS con el hex ya resuelto vía
+   gaugeColorForPercent, no necesita estas clases). Mismas variables que
+   ya usaban los .imc-zone-* de antes, así el resultado visual es
+   idéntico en los mismos 3 colores. */
+.imc-stop-gold{stop-color:var(--gold)}
+.imc-stop-green{stop-color:var(--green)}
+.imc-stop-red{stop-color:var(--red)}
+/* Barrido de la aguja al cargar el plan (pintarMiPlan, js/mi-plan.js):
+   arranca en el extremo mínimo del arco y anima hasta su posición real
+   con este transition — no aparece ya ubicada. Ver
+   @media(prefers-reduced-motion:reduce) más abajo para el caso sin
+   animación (el marcador fijo, .imc-gauge-marker, sigue visible en ese
+   caso, independiente de la aguja). */
+.imc-aguja{stroke:var(--ink);stroke-width:3;stroke-linecap:round;transition:transform .7s cubic-bezier(.16,.84,.44,1)}
 .imc-pivote{fill:var(--ink)}
+/* Marcador fijo del valor exacto sobre el arco (imcGaugeMarkerPos,
+   js/nutricion-planes.js) — independiente de la aguja, visible aunque
+   la aguja todavía esté animando o si prefers-reduced-motion la dejó
+   fija. Blanco+contorno oscuro para distinguirse de cualquier color del
+   degradado que tenga detrás. */
+.imc-gauge-marker{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+@media(prefers-reduced-motion:reduce){
+  .imc-aguja{transition:none}
+}
 .imc-cat{font-family:var(--font-m);font-size:13px;font-weight:700;margin-top:2px}
 .imc-cat-bajo,.imc-cat-sobrepeso{color:var(--gold)}
 .imc-cat-saludable{color:var(--green)}

@@ -32,6 +32,11 @@ const {
   nutriGuardarAntropometriaSiFalta,
   imcCategoria,
   imcGaugeAngulo,
+  imcGaugeAgujaDeg,
+  imcGaugeAgujaDegInicial,
+  imcGaugeMarkerPos,
+  imcGaugeGradientStops,
+  imcGaugeGradientDefsHtml,
   gaugeComputeAreas,
   gaugeColorForPercent,
   gaugeDeltaHtml,
@@ -192,6 +197,76 @@ test('imcGaugeAngulo — mínimo, máximo, punto medio y recorte fuera de rango'
   assert.strictEqual(imcGaugeAngulo(27.5), 90);
   assert.strictEqual(imcGaugeAngulo(5), imcGaugeAngulo(15));   // se recorta al mínimo
   assert.strictEqual(imcGaugeAngulo(60), imcGaugeAngulo(40));  // se recorta al máximo
+});
+
+// ===================== imcGaugeAgujaDeg / imcGaugeAgujaDegInicial =====================
+// (sesión 2026-09-16 — degradado + barrido de la aguja del medidor de IMC)
+
+test('imcGaugeAgujaDeg — mismos grados que la fórmula que reemplaza (90 - imcGaugeAngulo)', () => {
+  assert.strictEqual(imcGaugeAgujaDeg(15), 90 - imcGaugeAngulo(15));
+  assert.strictEqual(imcGaugeAgujaDeg(27.5), 90 - imcGaugeAngulo(27.5));
+  assert.strictEqual(imcGaugeAgujaDeg(40), 90 - imcGaugeAngulo(40));
+});
+
+test('imcGaugeAgujaDegInicial — coincide con el extremo mínimo del arco (IMC 15)', () => {
+  assert.strictEqual(imcGaugeAgujaDegInicial(), imcGaugeAgujaDeg(15));
+  // el mínimo se recorta igual que cualquier valor por debajo de 15
+  assert.strictEqual(imcGaugeAgujaDegInicial(), imcGaugeAgujaDeg(5));
+});
+
+// ===================== imcGaugeMarkerPos =====================
+
+test('imcGaugeMarkerPos — extremos del arco caen en los mismos puntos que los <path> del arco', () => {
+  // Los <path> del arco en mi-plan.html arrancan en (25,115) y terminan
+  // en (195,115) — mismos extremos que debe dar el marcador en IMC 15/40.
+  const min = imcGaugeMarkerPos(15);
+  const max = imcGaugeMarkerPos(40);
+  assert.strictEqual(min.x, 25);
+  assert.strictEqual(min.y, 115);
+  assert.strictEqual(max.x, 195);
+  assert.strictEqual(max.y, 115);
+});
+
+test('imcGaugeMarkerPos — el centro del rango cae arriba de todo (mismo x que el pivote)', () => {
+  const centro = imcGaugeMarkerPos(27.5); // ángulo 90°, tope del semicírculo
+  assert.strictEqual(centro.x, 110);
+  assert.strictEqual(centro.y, 30); // 115 - 85
+});
+
+test('imcGaugeMarkerPos — se recorta al mismo rango [15,40] que la aguja', () => {
+  assert.deepStrictEqual(imcGaugeMarkerPos(5), imcGaugeMarkerPos(15));
+  assert.deepStrictEqual(imcGaugeMarkerPos(60), imcGaugeMarkerPos(40));
+});
+
+// ===================== imcGaugeGradientStops / imcGaugeGradientDefsHtml =====================
+
+test('imcGaugeGradientStops — 4 anclajes en el centro de cada zona, mismos colores que gaugeColorForPercent', () => {
+  const stops = imcGaugeGradientStops();
+  assert.strictEqual(stops.length, 4);
+  // offsets: centro de [15,18.5]=16.75→7%, [18.5,25]=21.75→27%,
+  // [25,30]=27.5→50%, [30,40]=35→80% (sobre el rango de display 15-40)
+  assert.strictEqual(stops[0].offset, 7);
+  assert.strictEqual(stops[1].offset, 27);
+  assert.strictEqual(stops[2].offset, 50);
+  assert.strictEqual(stops[3].offset, 80);
+  assert.strictEqual(stops[0].color, gaugeColorForPercent(50));  // bajo → dorado
+  assert.strictEqual(stops[1].color, gaugeColorForPercent(100)); // saludable → verde
+  assert.strictEqual(stops[2].color, gaugeColorForPercent(50));  // sobrepeso → dorado
+  assert.strictEqual(stops[3].color, gaugeColorForPercent(0));   // vigilar → rojo
+});
+
+test('imcGaugeGradientDefsHtml — arma un <linearGradient> con los 4 <stop> y el id pedido', () => {
+  const html = imcGaugeGradientDefsHtml('miTestId');
+  assert.match(html, /<defs>/);
+  assert.match(html, /id="miTestId"/);
+  assert.match(html, /gradientUnits="userSpaceOnUse"/);
+  const stopCount = (html.match(/<stop /g) || []).length;
+  assert.strictEqual(stopCount, 4);
+});
+
+test('imcGaugeGradientDefsHtml — usa "imcGaugeGradient" como id por defecto', () => {
+  const html = imcGaugeGradientDefsHtml();
+  assert.match(html, /id="imcGaugeGradient"/);
 });
 
 // ===================== gaugeComputeAreas =====================

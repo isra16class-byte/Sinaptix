@@ -56,12 +56,44 @@ if(window.netlifyIdentity){
         // de arriba siempre muestra el IMC real sin recortar.
         const gaugeEl = document.getElementById('miPlanImcGauge');
         const agujaEl = document.getElementById('miPlanImcAguja');
+        const marcadorEl = document.getElementById('miPlanImcMarcador');
         const catEl = document.getElementById('miPlanImcCat');
         const legendEl = document.getElementById('miPlanImcLegend');
         if(typeof imcGaugeAngulo === 'function' && typeof imcCategoria === 'function'){
-          if(agujaEl){
-            const deg = 90 - imcGaugeAngulo(d.imc);
-            agujaEl.setAttribute('transform', 'rotate('+deg.toFixed(2)+' 110 115)');
+          if(agujaEl && typeof imcGaugeAgujaDeg === 'function'){
+            const degFinal = imcGaugeAgujaDeg(d.imc);
+            const reducedMotion = !!(window.matchMedia &&
+              window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            if(reducedMotion || typeof imcGaugeAgujaDegInicial !== 'function'){
+              // Sin barrido: aparece directo en su posición final (el
+              // marcador fijo de más abajo ya cubre el caso de "quiero ver
+              // el valor sin depender de una animación").
+              agujaEl.setAttribute('transform', 'rotate('+degFinal.toFixed(2)+' 110 115)');
+            } else {
+              // Arranca en el extremo mínimo del arco (IMC_GAUGE_MIN) y
+              // recién en el frame siguiente se pinta la rotación final —
+              // mismo truco de "doble requestAnimationFrame" que ya usa
+              // gaugeAnimateArcs (js/script.js) para el barrido de los
+              // anillos de Método: si el transform final se asignara en el
+              // mismo frame que el inicial, el navegador puede saltar
+              // directo al valor final sin barrido. La duración/easing del
+              // barrido viven en CSS (.imc-aguja{transition:transform...}).
+              agujaEl.setAttribute('transform', 'rotate('+imcGaugeAgujaDegInicial().toFixed(2)+' 110 115)');
+              requestAnimationFrame(function(){
+                requestAnimationFrame(function(){
+                  agujaEl.setAttribute('transform', 'rotate('+degFinal.toFixed(2)+' 110 115)');
+                });
+              });
+            }
+          }
+          // Marcador fijo del valor exacto, independiente de la aguja: no
+          // depende de la animación ni de prefers-reduced-motion, siempre
+          // se pinta directo en su posición final (imcGaugeMarkerPos ya
+          // recorta al mismo rango [15,40] que la aguja).
+          if(marcadorEl && typeof imcGaugeMarkerPos === 'function'){
+            const pos = imcGaugeMarkerPos(d.imc);
+            marcadorEl.setAttribute('cx', pos.x);
+            marcadorEl.setAttribute('cy', pos.y);
           }
           const info = imcCategoria(d.imc);
           if(catEl){

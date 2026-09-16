@@ -152,10 +152,27 @@
           <div class="miplan-card-title">Antropometría</div>
           <div class="imc-gauge hidden" id="miPlanImcGauge" aria-hidden="true">
             <svg viewBox="0 0 220 140" width="100%">
+              <!-- Degradado continuo del arco (sesión 2026-09-16): mismos
+                   offsets/colores que arma imcGaugeGradientStops en
+                   js/nutricion-planes.js (7%/27%/50%/80% ≈ centro de cada
+                   zona bajo/saludable/sobrepeso/vigilar sobre el rango
+                   15–40), escrito a mano acá porque este HTML es estático
+                   (no hay JS corriendo todavía cuando el navegador lo
+                   parsea). Si esos umbrales/centros cambiaran alguna vez
+                   en nutricion-planes.js, actualizar también acá. -->
+              <defs>
+                <linearGradient id="imcGaugeGradient" gradientUnits="userSpaceOnUse" x1="25" y1="115" x2="195" y2="115">
+                  <stop offset="7%" class="imc-stop-gold"/>
+                  <stop offset="27%" class="imc-stop-green"/>
+                  <stop offset="50%" class="imc-stop-gold"/>
+                  <stop offset="80%" class="imc-stop-red"/>
+                </linearGradient>
+              </defs>
               <path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>
               <path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>
               <path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>
               <path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>
+              <circle class="imc-gauge-marker" id="miPlanImcMarcador" cx="110" cy="30" r="4"/>
               <line class="imc-aguja" id="miPlanImcAguja" x1="110" y1="115" x2="110" y2="45"/>
               <circle class="imc-pivote" cx="110" cy="115" r="6"/>
             </svg>

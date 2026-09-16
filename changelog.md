@@ -8,6 +8,102 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimoprimera tanda) — Medidor de IMC ("Mi plan"): degradado continuo + barrido de la aguja
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió mejorar el medidor de IMC tipo velocímetro (`.imc-gauge`,
+compartido entre "Mi plan" y el switch "Mi IMC" de Método): hasta ahora
+era un SVG con 4 arcos de color sólido y una aguja que aparecía directo
+en su posición final, sin animación ni marcador de valor. Se combinaron
+dos mejoras, ambas construidas sobre funciones nuevas en
+`js/nutricion-planes.js` (no en `js/mi-plan.js`, para no duplicar
+lógica ni tener que repetirla en `js/script.js`, que arma el mismo
+componente para Método):
+
+1. **Degradado continuo del arco** en vez de 4 franjas sólidas. Los 4
+   `<path>` del arco siguen dibujando exactamente los mismos umbrales
+   (18.5/25/30, sin cambios) pero ahora comparten un único
+   `<linearGradient id="imcGaugeGradient">` en vez de tener cada uno su
+   propio `stroke` fijo. Los 3 colores de anclaje (dorado/verde/rojo)
+   son **exactamente** los que ya devuelve `gaugeColorForPercent` —
+   `imcGaugeGradientStops()` los pide llamando a esa misma función
+   (`gaugeColorForPercent(50)`/`(100)`/`(0)`) en vez de escribir los hex
+   de nuevo, así el criterio de color queda compartido de verdad con los
+   anillos de "Método", no solo "parecido". Cada ancla se ubica en el
+   **centro** de su zona de IMC (no en el umbral exacto), para que la
+   transición de color ocurra alrededor del umbral real en vez de que el
+   degradado arranque recién ahí (se vería casi tan cortado como antes).
+   `imcGaugeGradientDefsHtml(id)` arma el `<defs>` completo como string,
+   usado por `renderMethodImc` (`js/script.js`, que ya arma todo el SVG
+   como template string). `mi-plan.html` es HTML estático — su `<defs>`
+   equivalente está escrito a mano con los mismos offsets/colores
+   (7%/27%/50%/80%, vía clases `.imc-stop-gold/-green/-red` que apuntan
+   a `var(--gold)/--green/--red`, los mismos hex), con un comentario que
+   avisa mantenerlo sincronizado si esos centros cambiaran algún día en
+   `nutricion-planes.js`. `gradientUnits="userSpaceOnUse"` con
+   `x1`/`x2` en las coordenadas reales del arco (25/195) — con el
+   default (`objectBoundingBox`) cada uno de los 4 `<path>` tiene su
+   propio bounding box angosto y el degradado se habría visto
+   cortado/repetido en cada segmento en vez de continuo.
+2. **Animación de barrido de la aguja al cargar** (`pintarMiPlan`,
+   `js/mi-plan.js`): la aguja arranca en `imcGaugeAgujaDegInicial()`
+   (extremo mínimo del arco, `IMC_GAUGE_MIN`) y recién en el frame
+   siguiente se le asigna la rotación final (`imcGaugeAgujaDeg(imc)`) —
+   mismo truco de "doble `requestAnimationFrame`" que ya usa
+   `gaugeAnimateArcs` (`js/script.js`) para los anillos de Método, para
+   que el navegador alcance a pintar el estado inicial antes de animar
+   al final. La duración/easing viven en CSS
+   (`.imc-aguja{transition:transform .7s cubic-bezier(.16,.84,.44,1)}`,
+   mismo cubic-bezier que ya usan los anillos). `imcGaugeAgujaDeg`
+   también reemplaza la fórmula `90 - imcGaugeAngulo(imc)` que antes
+   estaba duplicada tal cual en `js/mi-plan.js` **y** `js/script.js`.
+   Además, un **marcador fijo** (`.imc-gauge-marker`, círculo blanco con
+   contorno oscuro) se agregó sobre el arco en el valor exacto,
+   independiente de la aguja — usa `imcGaugeMarkerPos(imc)` (mismo
+   centro/radio que el arco, recortado al mismo rango `[15,40]` que la
+   aguja) y se actualiza siempre a su posición final, sin animar, así
+   sigue siendo útil incluso durante el barrido o si
+   `prefers-reduced-motion: reduce` está activo. Ese caso se cubre en
+   dos capas: JS (`pintarMiPlan` detecta `matchMedia` y salta directo a
+   `imcGaugeAgujaDeg(imc)` sin la secuencia de rAF) y CSS
+   (`@media(prefers-reduced-motion:reduce){.imc-aguja{transition:none}}`
+   como red adicional).
+
+`renderMethodImc` (`js/script.js`, el switch "Mi IMC" de Método) también
+se actualizó para usar `imcGaugeGradientDefsHtml`/`imcGaugeAgujaDeg`/
+`imcGaugeMarkerPos` — mismo degradado y mismo marcador ahí, sin barrido
+(esa pestaña ya renderizaba todo de una sola vez, sin animación previa,
+y el pedido de barrido era específico de `pintarMiPlan`). No se tocó el
+estado "sin datos" (el gauge sigue con `class="hidden"` hasta que existe
+`sinaptix_antropometria`) ni el número mostrado al lado del gauge (sigue
+siendo el IMC real sin recortar — solo la posición de la aguja/marcador
+se recorta a [15,40], igual que antes).
+
+Sin dependencias nuevas (SVG + CSS + JS vanilla, sin build step).
+
+**Tests**: se agregaron 8 tests nuevos en `tests/nutricion-planes.test.js`
+para las funciones nuevas (`imcGaugeAgujaDeg`, `imcGaugeAgujaDegInicial`,
+`imcGaugeMarkerPos`, `imcGaugeGradientStops`, `imcGaugeGradientDefsHtml`).
+Suite completa: 54/54 ok (46 preexistentes + 8 nuevos).
+
+**Verificado con Playwright** (sí hubo acceso a Chromium en esta sesión,
+a diferencia de la tanda anterior de anillos de Método): las 4 zonas de
+IMC de prueba (16.8 bajo peso, 22.1 saludable, 27.4 sobrepeso, 33.9 a
+vigilar) — degradado continuo visible en el arco, aguja capturada a
+mitad de barrido (~100ms) en una posición distinta a la final,
+confirmando que no aparece ya ubicada, y en su posición final correcta
+a los ~900ms; marcador siempre en la posición exacta del IMC en las 4
+capturas. Estado sin datos: `#miPlanImcGauge` sigue con
+`class="imc-gauge hidden"`. `prefers-reduced-motion: reduce` (con
+`reducedMotion:'reduce'` en el context de Playwright): la aguja ya está
+en su posición final a los 50ms (sin esperar el barrido) y
+`getComputedStyle(...).transitionDuration` da `0s`. Switch "Mi IMC" de
+Método (`index.html`): mismo degradado (`<linearGradient>` presente) y
+mismo marcador, sin romper nada del resto de la tarjeta. Script de
+verificación ad hoc, no vive en el repo (mismo criterio que otras
+verificaciones visuales del proyecto).
+
 ## 2026-09-16 (décima tanda) — Anillos de Método: animación de llenado + marcador de "antes"
 
 El usuario pidió mejorar los anillos de progreso de la tarjeta "Método"

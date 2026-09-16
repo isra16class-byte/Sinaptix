@@ -169,12 +169,14 @@ Sesión 2026-09-15: se armó `plan-tests-sinaptix.md` (entregado al
 usuario, no vive en el repo) y se implementaron su Prioridad 1 y
 Prioridad 2.
 
-- **Qué cubre**: `tests/nutricion-planes.test.js` — 30 tests con
+- **Qué cubre**: `tests/nutricion-planes.test.js` — 54 tests con
   `node --test` (nativo de Node, sin dependencias nuevas) sobre las
   funciones de cálculo puro de `js/nutricion-planes.js`
   (`nutriResolverObjetivo`, `nutriConstruirAjustes`,
   `nutriConstruirAvisos`, `nutriGuardarAntropometriaSiFalta`,
-  `imcCategoria`, `imcGaugeAngulo`, `gaugeComputeAreas`,
+  `imcCategoria`, `imcGaugeAngulo`, `imcGaugeAgujaDeg`,
+  `imcGaugeAgujaDegInicial`, `imcGaugeMarkerPos`, `imcGaugeGradientStops`,
+  `imcGaugeGradientDefsHtml`, `gaugeComputeAreas`,
   `gaugeColorForPercent`, `gaugeDeltaHtml`). No cubre las que arman HTML
   (`nutriBuildResumenHTML`, `nutriBuildBarChartHTML`) ni el contenido de
   `NUTRI_PLANES` — no son cálculo, quedan fuera de esta tanda a propósito.
@@ -447,6 +449,61 @@ Prioridad 2.
   de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma
   (con comparación antes/después si hay reevaluación), encuesta de
   nutrición inline (mismo `#formNutricion` que el modal de `index.html`).
+- **Medidor de IMC tipo velocímetro (`.imc-gauge`) — degradado continuo +
+  barrido de la aguja (sesión 2026-09-16, décimoprimera tanda).**
+  Componente compartido entre `mi-plan.html` (markup estático,
+  `#miPlanImcGauge`) y el switch "Mi IMC" de Método
+  (`renderMethodImc`/`#methodGaugesImc`, `js/script.js`, arma el mismo
+  SVG como string). Antes: 4 `<path>` con `stroke` sólido fijo por zona
+  y la aguja apareciendo directo en su posición final. Ahora:
+  - Los 4 `<path>` (mismos umbrales de IMC 18.5/25/30, sin cambios)
+    comparten un único `<linearGradient id="imcGaugeGradient">` en vez
+    de tener cada uno su color fijo — degradado continuo dorado→
+    verde→dorado→rojo. Los 3 colores de anclaje son los mismos hex que
+    devuelve `gaugeColorForPercent` (compartida con los anillos de
+    Método): `imcGaugeGradientStops()` (`js/nutricion-planes.js`) los
+    pide llamando a esa función en vez de hardcodearlos de nuevo, con
+    anclas en el centro de cada zona de IMC (no en el umbral exacto).
+    `imcGaugeGradientDefsHtml(id)` arma el `<defs>` como string (lo usa
+    `renderMethodImc`); en `mi-plan.html` (HTML estático) el `<defs>`
+    equivalente está escrito a mano con los mismos offsets
+    (7%/27%/50%/80%) vía clases `.imc-stop-gold/-green/-red` → mismas
+    `var(--gold)/--green/--red`.
+  - La aguja (`.imc-aguja`) ahora tiene `transition:transform .7s
+    cubic-bezier(.16,.84,.44,1)` (CSS). En `pintarMiPlan`
+    (`js/mi-plan.js`) arranca en `imcGaugeAgujaDegInicial()` (extremo
+    mínimo del arco) y, tras un doble `requestAnimationFrame` (mismo
+    truco que `gaugeAnimateArcs` para los anillos de Método), se le
+    asigna la rotación final `imcGaugeAgujaDeg(imc)`. `renderMethodImc`
+    (Método) sigue sin barrido — pinta directo en la posición final,
+    como siempre; el pedido de animación era específico de "Mi plan".
+    `prefers-reduced-motion: reduce` lo desactiva en dos capas: JS
+    (`pintarMiPlan` detecta `matchMedia` y salta la secuencia de rAF) y
+    CSS (`@media(prefers-reduced-motion:reduce){.imc-aguja{transition:
+    none}}` como red adicional).
+  - Marcador fijo nuevo (`.imc-gauge-marker`, círculo blanco con
+    contorno oscuro) sobre el arco en el valor exacto del IMC,
+    independiente de la aguja — usa `imcGaugeMarkerPos(imc)` (mismo
+    centro/radio que el arco, recortado al mismo rango `[15,40]` que la
+    aguja). Siempre en su posición final sin animar, así sigue siendo
+    útil durante el barrido o con `prefers-reduced-motion` activo (por
+    ejemplo, para capturas). Presente en ambos lugares (`mi-plan.html` y
+    `renderMethodImc`).
+  - `imcGaugeAgujaDeg(imc)` (= `90 - imcGaugeAngulo(imc)`) reemplaza la
+    misma fórmula que antes estaba duplicada tal cual en `js/mi-plan.js`
+    y `js/script.js`.
+  - No cambió: el número mostrado sigue siendo el IMC real sin recortar
+    (solo la posición de aguja/marcador se recorta a `[15,40]`); el
+    estado "sin datos" sigue con `class="hidden"` en `#miPlanImcGauge`
+    hasta que existe `sinaptix_antropometria`; sin dependencias nuevas
+    (SVG + CSS + JS vanilla).
+  - Verificado con Playwright (sí hubo acceso a Chromium en esta
+    sesión): las 4 zonas de prueba (16.8/22.1/27.4/33.9), barrido
+    confirmado (captura a mitad de camino ≠ captura final), marcador en
+    la posición correcta en las 4, estado sin datos sin romperse,
+    `prefers-reduced-motion: reduce` saltando la animación, y el switch
+    "Mi IMC" de Método con el mismo degradado/marcador funcionando sin
+    tocar nada más de esa tarjeta.
 - **"Mi plan" — estado sin sesión (`#miPlanSinSesion`, clase
   `.miplan-locked`)**: rediseño visual (no toca `js/mi-plan.js`, siguen
   existiendo `#miPlanSinSesion` y `#btnLoginMiPlan` con el mismo

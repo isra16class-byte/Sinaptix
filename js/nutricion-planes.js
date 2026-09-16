@@ -324,6 +324,105 @@ function imcGaugeAngulo(imc){
   return 180 - (v - IMC_GAUGE_MIN) / (IMC_GAUGE_MAX - IMC_GAUGE_MIN) * 180;
 }
 
+// Centro/radio fijos del semicírculo (mismas coordenadas que ya usan los
+// <path> del arco y el pivote de la aguja en mi-plan.html y en
+// renderMethodImc, js/script.js) — se centralizan acá para no repetir
+// "110/115/85" sueltos en cada lugar que necesite ubicar algo sobre el
+// arco (aguja, marcador, degradado).
+const IMC_GAUGE_CX = 110;
+const IMC_GAUGE_CY = 115;
+const IMC_GAUGE_R = 85;
+
+// Grados de rotación de la aguja sobre su pivote (IMC_GAUGE_CX,
+// IMC_GAUGE_CY) para un IMC dado. Antes "Mi plan" (js/mi-plan.js) y la
+// pestaña "Mi IMC" de Método (js/script.js) calculaban cada uno por su
+// lado "90 - imcGaugeAngulo(imc)" — se unifica acá para no tener la
+// misma fórmula duplicada en dos archivos.
+function imcGaugeAgujaDeg(imc){
+  return 90 - imcGaugeAngulo(imc);
+}
+
+// Posición de arranque del barrido de la aguja (usada por
+// pintarMiPlan en js/mi-plan.js): el extremo mínimo del arco
+// (IMC_GAUGE_MIN), no un ángulo arbitrario — así la animación siempre
+// recorre el arco completo de punta a punta, sin importar el IMC real
+// de la persona. Vive acá (no en mi-plan.js) porque es un cálculo puro
+// sobre el mismo rango que ya define imcGaugeAngulo.
+function imcGaugeAgujaDegInicial(){
+  return imcGaugeAgujaDeg(IMC_GAUGE_MIN);
+}
+
+// Marcador fijo del valor exacto sobre el propio arco (independiente de
+// la aguja): un punto ubicado sobre el mismo radio que el trazo del
+// arco (IMC_GAUGE_R), en el ángulo correspondiente al IMC (recortado al
+// mismo rango de display que la aguja, vía imcGaugeAngulo). Sirve para
+// que el valor se vea aunque la aguja todavía esté en pleno barrido, o
+// si prefers-reduced-motion desactivó la animación (ver css/styles.css,
+// .imc-gauge-marker). Compartido entre js/mi-plan.js y renderMethodImc
+// (js/script.js).
+function imcGaugeMarkerPos(imc){
+  const rad = imcGaugeAngulo(imc) * Math.PI / 180;
+  return {
+    x: +(IMC_GAUGE_CX + IMC_GAUGE_R * Math.cos(rad)).toFixed(2),
+    y: +(IMC_GAUGE_CY - IMC_GAUGE_R * Math.sin(rad)).toFixed(2)
+  };
+}
+
+// ===================== Medidor de IMC: degradado continuo del arco =====================
+// Antes el arco se pintaba con 4 <path> de color sólido, uno por zona
+// (.imc-zone-bajo/-saludable/-sobrepeso/-vigilar en css/styles.css). Los
+// 4 <path> y sus mismos umbrales (18.5/25/30) NO cambian — lo que cambia
+// es que ahora comparten un único <linearGradient> para que el color se
+// lea como una transición continua en vez de bloques con un corte
+// brusco entre zonas.
+// Los 3 colores de anclaje son EXACTAMENTE los mismos que ya usa
+// gaugeColorForPercent para los anillos de "Método" (0=rojo/GAUGE_LOW,
+// 50=dorado/GAUGE_MID, 100=verde/GAUGE_HIGH) — se piden llamando a esa
+// misma función en vez de escribir los hex de nuevo, para que el
+// criterio de color quede compartido de verdad, no solo "parecido".
+// Cada ancla se ubica en el CENTRO de su zona de IMC (no en el umbral):
+// así la transición entre colores ocurre alrededor del umbral real, que
+// sigue siendo el límite semántico, en vez de que el color cambie recién
+// en el punto exacto del umbral (eso se vería como un corte casi tan
+// duro como antes).
+function imcGaugeGradientStops(){
+  const centroBajo = (IMC_GAUGE_MIN + 18.5) / 2;
+  const centroSaludable = (18.5 + 25) / 2;
+  const centroSobrepeso = (25 + 30) / 2;
+  const centroVigilar = (30 + IMC_GAUGE_MAX) / 2;
+  const offset = imc => +((imc - IMC_GAUGE_MIN) / (IMC_GAUGE_MAX - IMC_GAUGE_MIN) * 100).toFixed(2);
+  return [
+    { offset: offset(centroBajo), color: gaugeColorForPercent(50) },       // bajo peso → dorado
+    { offset: offset(centroSaludable), color: gaugeColorForPercent(100) }, // saludable → verde
+    { offset: offset(centroSobrepeso), color: gaugeColorForPercent(50) },  // sobrepeso → dorado
+    { offset: offset(centroVigilar), color: gaugeColorForPercent(0) }      // a vigilar → rojo
+  ];
+}
+
+// Arma el <defs><linearGradient>…</linearGradient></defs> a insertar
+// dentro del <svg> del medidor (usado por renderMethodImc, js/script.js,
+// que arma el SVG entero como string en cada render). mi-plan.html NO
+// llama a esta función — es HTML estático, así que su <defs> equivalente
+// está escrito a mano con los mismos offsets/colores (ver comentario en
+// mi-plan.html) en vez de generarse en el navegador.
+// gradientUnits="userSpaceOnUse" + los mismos x1/x2 que las coordenadas
+// reales del arco (IMC_GAUGE_CX ± IMC_GAUGE_R) para que el degradado
+// quede horizontal y alineado con el arco completo: con
+// objectBoundingBox (el default), cada uno de los 4 <path> tiene su
+// propio bounding box angosto y el degradado se vería cortado/repetido
+// en cada segmento en vez de continuo.
+function imcGaugeGradientDefsHtml(gradientId){
+  const id = gradientId || 'imcGaugeGradient';
+  const stops = imcGaugeGradientStops().map(function(s){
+    return '<stop offset="'+s.offset+'%" stop-color="'+s.color+'"/>';
+  }).join('');
+  return '<defs><linearGradient id="'+id+'" gradientUnits="userSpaceOnUse" '+
+    'x1="'+(IMC_GAUGE_CX-IMC_GAUGE_R)+'" y1="'+IMC_GAUGE_CY+'" '+
+    'x2="'+(IMC_GAUGE_CX+IMC_GAUGE_R)+'" y2="'+IMC_GAUGE_CY+'">'+
+    stops+
+  '</linearGradient></defs>';
+}
+
 // ===================== Guardar antropometría automáticamente desde la encuesta =====================
 // Si la persona todavía no tiene "datos antropométricos" guardados
 // (sinaptix_antropometria — normalmente se registran aparte en
@@ -498,6 +597,11 @@ if(typeof module !== 'undefined' && module.exports){
     nutriGuardarAntropometriaSiFalta,
     imcCategoria,
     imcGaugeAngulo,
+    imcGaugeAgujaDeg,
+    imcGaugeAgujaDegInicial,
+    imcGaugeMarkerPos,
+    imcGaugeGradientStops,
+    imcGaugeGradientDefsHtml,
     gaugeComputeAreas,
     gaugeColorForPercent,
     gaugeDeltaHtml,

@@ -634,7 +634,8 @@
 
     if(ctaImcEl) ctaImcEl.innerHTML = '';
 
-    const deg = 90 - imcGaugeAngulo(antro.imc);
+    const deg = imcGaugeAgujaDeg(antro.imc);
+    const marcador = imcGaugeMarkerPos(antro.imc);
     const info = imcCategoria(antro.imc);
     const catLabel = info.cat.charAt(0).toUpperCase()+info.cat.slice(1);
 
@@ -659,10 +660,12 @@
       '<div class="method-imc-featured">'+
         '<div class="imc-gauge" aria-hidden="true">'+
           '<svg viewBox="0 0 220 140" width="100%">'+
+            imcGaugeGradientDefsHtml()+
             '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
             '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
             '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
             '<path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+            '<circle class="imc-gauge-marker" cx="'+marcador.x+'" cy="'+marcador.y+'" r="4"/>'+
             '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
             '<circle class="imc-pivote" cx="110" cy="115" r="6"/>'+
           '</svg>'+
