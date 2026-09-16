@@ -8,6 +8,41 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimosegunda tanda) — "Ajustado a tu caso" pasa a tarjeta propia en "Mi plan"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario reportó que la tarjeta "Prioridades y Moderación" quedaba fea
+cuando el bloque "Ajustado a tu caso" (dentro de `.nutri-plan-side`) tenía
+varios ítems: la tarjeta se alargaba mucho más que el plan de al lado.
+Pidió sacarlo a una tarjeta aparte, en la posición donde hoy vive
+"Cierre" (columna derecha de `.miplan-detalle-grid`, ver `mi-plan.html`).
+
+- `js/nutricion-planes.js`: `nutriBuildResumenHTML(d, opts)` ahora acepta
+  un segundo parámetro opcional; `opts.incluirAjustesEnSide` (default
+  `true`) decide si el bloque se embebe en `.nutri-plan-side` como antes.
+  El wizard de `index.html` (paso 8, `js/nutricion-wizard.js`) sigue
+  llamando sin ese parámetro — comportamiento sin cambios ahí. La lista de
+  datos (`nutriConstruirAjustes(d)`) no cambió.
+- `mi-plan.html`: se agregó un wrapper `.miplan-detalle-side` en la
+  columna derecha de `.miplan-detalle-grid`, con 2 tarjetas apiladas:
+  `#miPlanAjustes` (nueva, título "Ajustado a tu caso" + lista) arriba, y
+  `.miplan-cierre` (sin cambios de contenido) debajo.
+- `js/mi-plan.js` (`pintarMiPlan()`): llama a `nutriBuildResumenHTML` con
+  `{incluirAjustesEnSide:false}` y pinta `#miPlanAjustesList` aparte con
+  `nutriConstruirAjustes(o.encuesta)`; oculta `#miPlanAjustes` si no hay
+  ajustes o si no hay objetivo guardado (mismo criterio que ya usaban
+  `miPlanDetalleEl`/`miPlanBarrasEl`).
+- `css/styles.css`: `.miplan-ajustes` es una tarjeta propia con el mismo
+  tratamiento visual (fondo dorado, texto blanco) que ya tenía
+  `.nutri-side-box--ajustes` dentro del side — no es un componente nuevo
+  a nivel visual, solo cambia el contenedor.
+- Suite de unit tests sin cambios de comportamiento por defecto: 54/54 ok
+  (verificado con Node evaluando el nuevo parámetro opcional a mano, ver
+  sesión). No se pudo correr Playwright en esta sesión (sin acceso de red
+  al dominio de descarga del browser desde este entorno) — falta
+  verificación visual en un navegador real.
+
 ## 2026-09-16 (décimoprimera tanda) — Medidor de IMC ("Mi plan"): degradado continuo + barrido de la aguja
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

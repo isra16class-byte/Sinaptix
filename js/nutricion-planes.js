@@ -186,7 +186,15 @@ const NUTRI_ICON_WARN = '<svg class="nutri-side-icon" aria-hidden="true" viewBox
 // sola columna, sin CSS especial — son simples <div>s en flujo normal ahí.
 // Si el objetivo resuelve en más de un plan combinado, se repite un
 // `.nutri-plan-block` completo por cada uno.
-function nutriBuildResumenHTML(d){
+// `opts.incluirAjustesEnSide` (default true) controla si el bloque
+// "Ajustado a tu caso" se embebe en `.nutri-plan-side` como antes (paso 8
+// del wizard, index.html) o se omite acá porque el llamador lo va a pintar
+// en su propia tarjeta aparte (mi-plan.html, ver `.miplan-ajustes` en
+// css/styles.css y `pintarMiPlan()` en js/mi-plan.js) — la lista de datos
+// (`nutriConstruirAjustes(d)`) es la misma en los dos casos, esto solo
+// decide dónde termina el HTML.
+function nutriBuildResumenHTML(d, opts){
+  const incluirAjustesEnSide = !opts || opts.incluirAjustesEnSide !== false;
   const objetivos = nutriResolverObjetivo(d);
   const planes = objetivos.map(o=>NUTRI_PLANES[o]).filter(Boolean);
   const ajustes = nutriConstruirAjustes(d);
@@ -225,7 +233,7 @@ function nutriBuildResumenHTML(d){
           '<div class="nutri-side-box-head">'+NUTRI_ICON_WARN+'<span>Moderar</span></div>'+
           '<ul>'+p.moderar.map(n=>'<li>'+n+'</li>').join('')+'</ul>'+
         '</div>'+
-        (esUltimo && ajustes.length ? '<div class="nutri-side-box nutri-side-box--ajustes">'+
+        (incluirAjustesEnSide && esUltimo && ajustes.length ? '<div class="nutri-side-box nutri-side-box--ajustes">'+
           '<div class="nutri-side-box-head"><span>Ajustado a tu caso</span></div>'+
           '<ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul>'+
         '</div>' : '')+
@@ -237,7 +245,7 @@ function nutriBuildResumenHTML(d){
   // "colgarla" (no debería pasar en la práctica, ver NUTRI_PLANES, pero
   // evita que el dato desaparezca en silencio si algún día se agrega un
   // objetivo nuevo sin su entrada correspondiente ahí).
-  if(!planes.length && ajustes.length){
+  if(incluirAjustesEnSide && !planes.length && ajustes.length){
     html += '<div><div class="nutri-block-title">Ajustado a tu caso</div><ul>'+ajustes.map(a=>'<li>'+a+'</li>').join('')+'</ul></div>';
   }
   avisos.forEach(a=>{

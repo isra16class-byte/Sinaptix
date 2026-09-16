@@ -135,8 +135,23 @@ if(window.netlifyIdentity){
           miPlanBarrasEl.classList.remove('hidden');
         }
         if(miPlanDetalleEl && o.encuesta && typeof nutriBuildResumenHTML === 'function'){
-          miPlanDetalleEl.innerHTML = nutriBuildResumenHTML(o.encuesta);
+          // "Ajustado a tu caso" no va embebido acá (a diferencia del paso 8
+          // del wizard en index.html): tiene su propia tarjeta, ver más
+          // abajo y .miplan-ajustes en css/styles.css.
+          miPlanDetalleEl.innerHTML = nutriBuildResumenHTML(o.encuesta, {incluirAjustesEnSide: false});
           miPlanDetalleEl.classList.remove('hidden');
+        }
+        const miPlanAjustesEl = document.getElementById('miPlanAjustes');
+        const miPlanAjustesListEl = document.getElementById('miPlanAjustesList');
+        if(miPlanAjustesEl && miPlanAjustesListEl && o.encuesta && typeof nutriConstruirAjustes === 'function'){
+          const ajustes = nutriConstruirAjustes(o.encuesta);
+          if(ajustes.length){
+            miPlanAjustesListEl.innerHTML = ajustes.map(a=>'<li>'+a+'</li>').join('');
+            miPlanAjustesEl.classList.remove('hidden');
+          } else {
+            miPlanAjustesListEl.innerHTML = '';
+            miPlanAjustesEl.classList.add('hidden');
+          }
         }
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
         // Anillo de progreso de la tarjeta "Objetivo cognitivo" (rediseño
@@ -147,6 +162,8 @@ if(window.netlifyIdentity){
     } else {
       if(miPlanBarrasEl) miPlanBarrasEl.classList.add('hidden');
       if(miPlanDetalleEl) miPlanDetalleEl.classList.add('hidden');
+      const miPlanAjustesElVacio = document.getElementById('miPlanAjustes');
+      if(miPlanAjustesElVacio) miPlanAjustesElVacio.classList.add('hidden');
       if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');
     }
   }

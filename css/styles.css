@@ -500,7 +500,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #miPlan .nutri-summary{padding:20px 20px}
 #miPlan .miplan-grid,
 #miPlan .miplan-col,
-#miPlan .miplan-detalle-grid{gap:14px}
+#miPlan .miplan-detalle-grid,
+#miPlan .miplan-detalle-side{gap:14px}
 
 /* ---------- "Mi plan": layout tipo dashboard (Datos clave / Detalle) ----------
    Reordena los mismos componentes que ya existían (medidor de IMC, tarjeta de
@@ -559,6 +560,26 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-objetivo{display:flex;flex-direction:column;align-items:flex-start;flex:1}
 .miplan-detalle-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start}
 .miplan-detalle-grid .nutri-summary{margin:0}
+/* Columna derecha de "Detalle del plan": antes tenía una sola tarjeta
+   (Cierre); ahora agrupa 2 apiladas (Ajustado a tu caso arriba, Cierre
+   debajo) — a pedido del usuario, "Ajustado a tu caso" se sacó de adentro
+   de la tarjeta "Prioridades y Moderación" (donde con muchos ajustes
+   quedaba muy larga y desbalanceada contra la altura del plan) y pasó a
+   tener tarjeta propia, en el lugar donde antes arrancaba "Cierre". El
+   HTML del bloque (`nutriBuildResumenHTML(d,{incluirAjustesEnSide:false})`)
+   ya no lo incluye adentro de `.nutri-plan-side`; `pintarMiPlan()` en
+   js/mi-plan.js arma esta tarjeta aparte con `nutriConstruirAjustes(d)`. */
+.miplan-detalle-side{display:flex;flex-direction:column;gap:16px}
+/* Mismo tratamiento visual (fondo dorado, texto blanco) que tenía como
+   `.nutri-side-box--ajustes` dentro del side — se mantiene la identidad de
+   "dato ajustado", solo cambia el contenedor a tarjeta independiente. */
+.miplan-ajustes{
+  background:var(--gold);color:#fff;border-radius:var(--radius);
+  padding:20px 20px;
+}
+.miplan-ajustes .miplan-card-title{margin-bottom:10px;color:#fff}
+.miplan-ajustes ul{margin:0;padding-left:16px;font-size:13px}
+.miplan-ajustes li{margin-bottom:3px}
 .miplan-cierre{
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
   padding:24px 22px;display:flex;flex-direction:column;gap:14px;

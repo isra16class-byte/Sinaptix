@@ -935,30 +935,47 @@ Prioridad 2.
      `--paper` sobre `.dark`) no cambiaron — son las reglas ya
      documentadas más arriba, compartidas con el resto de "Mi plan".
 - **"Detalle del plan de nutrición" — 3 columnas (Plan / Prioridades y
-  Moderación / Cierre)**: `nutriBuildResumenHTML()` (`js/nutricion-planes.js`,
-  compartida entre `#nutriResumen` del wizard en `index.html` y
-  `#miPlanDetalle` en `mi-plan.html`) arma, por cada plan resuelto, un
-  `.nutri-plan-block` con 2 hijos: `.nutri-plan-main` (ícono SVG de
-  cerebro `NUTRI_ICON_BRAIN` + título, enfoque, nutrientes clave, día
-  tipo) y `.nutri-plan-side` (cajas `.nutri-side-box--priorizar`/
+  Moderación / columna derecha apilada)**: `nutriBuildResumenHTML(d, opts)`
+  (`js/nutricion-planes.js`, compartida entre `#nutriResumen` del wizard en
+  `index.html` y `#miPlanDetalle` en `mi-plan.html`) arma, por cada plan
+  resuelto, un `.nutri-plan-block` con 2 hijos: `.nutri-plan-main` (ícono
+  SVG de cerebro `NUTRI_ICON_BRAIN` + título, enfoque, nutrientes clave,
+  día tipo) y `.nutri-plan-side` (cajas `.nutri-side-box--priorizar`/
   `--moderar`, íconos `NUTRI_ICON_CHECK`/`NUTRI_ICON_WARN`, mismo
-  criterio de línea fina que `.miplan-card-icon`). "Ajustado a tu caso"
-  (de `nutriConstruirAjustes`, es de toda la encuesta, no de un plan en
-  particular) se cuelga del `.nutri-plan-side` del **último** plan
-  resuelto, como `.nutri-side-box--ajustes` con fondo sólido `--gold`
-  (única caja con color, para que resalte como la personalización real
-  — si no resolvió ningún plan pero sí hay ajustes, hay un fallback que
-  los muestra sueltos, caso borde que no debería darse en la práctica).
-  Por defecto (`.nutri-plan-block{flex-direction:column}`) los 2
-  sub-bloques se apilan — así el modal angosto de `index.html` sigue en
-  una sola columna sin CSS especial; el grid de 2 columnas
+  criterio de línea fina que `.miplan-card-icon`). Por defecto
+  (`.nutri-plan-block{flex-direction:column}`) los 2 sub-bloques se
+  apilan — así el modal angosto de `index.html` sigue en una sola columna
+  sin CSS especial; el grid de 2 columnas
   (`grid-template-columns:1.6fr 1fr`) solo se activa dentro de `#miPlan`
   desde 680px de ancho. **Esto reemplazó el viejo `column-count:2` de
   `#miPlan .nutri-summary`** (repartía los `<div>` sueltos del resumen
   en 2 columnas tipo "diario") — ya no existe ese mecanismo, ahora cada
   plan arma sus propias 2 columnas explícitas.
-  La tarjeta `.miplan-cierre` (3ra columna, vía `.miplan-detalle-grid`
-  ya existente) suma `.miplan-cierre-head` con avatar (inicial, círculo
+  "Ajustado a tu caso" (de `nutriConstruirAjustes(d)`, es de toda la
+  encuesta, no de un plan en particular) tiene **tratamiento distinto
+  según el contexto** (sesión 2026-09-16, décimosegunda tanda): en el
+  wizard de `index.html` sigue colgado del `.nutri-plan-side` del
+  **último** plan resuelto, como `.nutri-side-box--ajustes` con fondo
+  sólido `--gold` (llamado sin el 2do parámetro de
+  `nutriBuildResumenHTML`, que por default lo embebe ahí — sin cambios,
+  ese modal angosto no tenía el problema de tarjeta desbalanceada). En
+  `mi-plan.html` en cambio pasó a tarjeta propia (`.miplan-ajustes`,
+  mismo fondo `--gold`/texto blanco): con muchos ajustes, el bloque
+  embebido dejaba "Prioridades y Moderación" mucho más alta que el plan
+  de al lado. `js/mi-plan.js` (`pintarMiPlan()`) llama
+  `nutriBuildResumenHTML(o.encuesta,{incluirAjustesEnSide:false})` para
+  que no se duplique, y pinta `#miPlanAjustesList` aparte llamando
+  directo a `nutriConstruirAjustes(o.encuesta)`; la tarjeta
+  (`#miPlanAjustes`) se oculta si no hay ajustes o no hay objetivo
+  guardado. Si ningún plan resolvió pero sí hay ajustes (caso borde que
+  no debería darse en la práctica), el fallback que los muestra sueltos
+  sigue existiendo pero solo aplica cuando `incluirAjustesEnSide` es
+  `true` (o sea, en el wizard).
+  La columna derecha de `.miplan-detalle-grid` (antes solo `.miplan-cierre`)
+  ahora es un wrapper `.miplan-detalle-side` (flex-column, mismo gap que
+  el resto de "Mi plan") con `.miplan-ajustes` arriba y `.miplan-cierre`
+  debajo, sin cambios de contenido en esta última.
+  `.miplan-cierre` suma `.miplan-cierre-head` con avatar (inicial, círculo
   `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
   desde `user.user_metadata.full_name`, o el prefijo del email antes de
   la `@` como fallback si la persona no cargó nombre al registrarse en
