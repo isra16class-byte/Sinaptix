@@ -8,6 +8,46 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimosexta tanda) — Iconos de `#lam-02` reemplazados por los 4 SVG de línea
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Los 4 iconos de línea agregados en la tanda anterior
+(`svg/icon-calendario-check.svg`, `icon-red-nodos.svg`,
+`icon-conversacion.svg`, `icon-bateria-rayo.svg`) coinciden temáticamente
+con las 4 tarjetas del `stat-grid` de "Visión" (`#lam-02`), así que el
+usuario pidió usarlos ahí en vez de los `.webp` ilustrados que tenía cada
+tarjeta.
+
+- `index.html`, `#lam-02 .stat-grid`: se cambió el `src` de los 4
+  `img.stat-icon`, manteniendo mapeo semántico:
+  - `icon-energia-cerebral.webp` → `svg/icon-bateria-rayo.svg` (tarjeta
+    "20% energía diaria")
+  - `icon-neuronas.webp` → `svg/icon-red-nodos.svg` (tarjeta "86B
+    neuronas")
+  - `icon-semanas.webp` → `svg/icon-calendario-check.svg` (tarjeta "4–6
+    semanas")
+  - `icon-acompanamiento.webp` → `svg/icon-conversacion.svg` (tarjeta
+    "1:1 acompañamiento")
+  No se tocaron `width`/`height`/`loading` de los `<img>` ni ninguna
+  regla CSS: los nuevos SVG heredan el mismo `.stat-icon{width:40px;
+  height:40px;object-fit:contain}` y la posición absoluta esquina
+  superior derecha que ya tenía `#lam-02 .stat-icon`.
+- No hizo falta ningún ajuste de color: dentro de `#lam-02` las 4
+  `.stat-box` (incluida `.is-featured`) tienen fondo claro translúcido
+  (`rgba(255,255,255,.55)`/`.7`, override específico de esta sección, ver
+  bloque de CSS ya comentado ahí) — el `fill` oscuro (`--ink`) de los SVG
+  contrasta bien tal cual, sin necesitar `filter:invert()` ni variante de
+  color.
+- Verificado con Playwright headless (`page.screenshot` de `#lam-02`,
+  forzando `.reveal.in` a mano porque el reveal-on-scroll normal no
+  dispara sin scroll real) — los 4 iconos se leen bien incluso al tamaño
+  real de 40×40 (se probó zoom 2x sobre la captura).
+- Los `.webp` viejos (`icon-energia-cerebral`, `icon-neuronas`,
+  `icon-semanas`, `icon-acompanamiento`) **no se borraron** de
+  `img/Iconos/`, quedan sin referenciar por si se quieren reusar en otro
+  lado.
+
 ## 2026-09-16 (décimoquinta tanda) — 4 iconos de línea (`svg/icon-*.svg`)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

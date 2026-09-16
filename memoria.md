@@ -161,12 +161,13 @@ próximos pasos).
 - `svg/`, `img/` — assets (decoraciones SVG tipo `deco-*`, frutas
   `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
   `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
-  conversacion, bateria-rayo): set de 4 iconos de línea genéricos
-  (calendario con check, red de nodos, dos personas conversando, batería
-  cargando), entregados sueltos en esta tanda — **todavía no están
-  referenciados en ningún HTML/CSS**, quedan disponibles en el repo para
-  cuando se decida dónde usarlos. Ver `changelog.md` (entrada de esta
-  fecha) para cómo se generaron.
+  conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
+  sin `stroke`, color `--ink`), usados como `.stat-icon` en las 4
+  tarjetas de `#lam-02` (Visión) — ver mapeo en `changelog.md`. Antes
+  usaban los `.webp` ilustrados de `img/Iconos/` (`icon-energia-cerebral`,
+  `icon-neuronas`, `icon-semanas`, `icon-acompanamiento`); esos archivos
+  siguen en el repo por si se necesitan en otro lado, pero ya no están
+  referenciados en `index.html`.
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests
