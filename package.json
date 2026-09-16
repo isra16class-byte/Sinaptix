@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "description": "Sitio estático de SINAPTIX (HTML/CSS/JS puro, sin build step propio — ver netlify.toml). Este package.json existe solo para declarar las dependencias @netlify/database y @netlify/identity que usan las Netlify Functions en netlify/functions/, y para que Netlify pueda instalarlas y auto-provisionar Netlify Database en cada build/deploy. Ver memoria.md, sección \"Backend real para Mi plan\".",
+  "scripts": {
+    "test": "node --test"
+  },
   "dependencies": {
     "@netlify/database": "^1.0.0",
     "@netlify/identity": "^1.0.0"

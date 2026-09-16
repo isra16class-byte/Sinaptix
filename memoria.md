@@ -161,6 +161,48 @@ próximos pasos).
 - `svg/`, `img/` — assets (decoraciones SVG tipo `deco-*`, frutas
   `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
   `img/generadas*`).
+- `tests/` — tests unitarios (ver sección "Tests" abajo).
+
+## Tests
+
+Sesión 2026-09-15: se armó `plan-tests-sinaptix.md` (entregado al
+usuario, no vive en el repo) y se implementó su Prioridad 1.
+
+- **Qué cubre**: `tests/nutricion-planes.test.js` — 30 tests con
+  `node --test` (nativo de Node, sin dependencias nuevas) sobre las
+  funciones de cálculo puro de `js/nutricion-planes.js`
+  (`nutriResolverObjetivo`, `nutriConstruirAjustes`,
+  `nutriConstruirAvisos`, `nutriGuardarAntropometriaSiFalta`,
+  `imcCategoria`, `imcGaugeAngulo`, `gaugeComputeAreas`,
+  `gaugeColorForPercent`, `gaugeDeltaHtml`). No cubre las que arman HTML
+  (`nutriBuildResumenHTML`, `nutriBuildBarChartHTML`) ni el contenido de
+  `NUTRI_PLANES` — no son cálculo, quedan fuera de esta tanda a propósito.
+- **Cómo correrlos**: `npm test` (= `node --test`, sin ruta — pasarle
+  `tests/` como argumento posicional lo resuelve como *módulo* a
+  requerir, no como carpeta a explorar, y falla con `MODULE_NOT_FOUND`;
+  sin argumentos, Node descubre solo los `*.test.js` bajo `tests/`).
+- **Por qué corre en Node sin romper el navegador**:
+  `js/nutricion-planes.js` se carga como `<script>` plano en
+  `index.html`/`mi-plan.html` (sin `export`/`import`), así que al final
+  del archivo se agregó un bloque guardado
+  `if(typeof module !== 'undefined' && module.exports){...}` que solo se
+  ejecuta cuando Node lo `require()`; en el navegador `module` no existe,
+  así que ese bloque no hace nada ahí.
+- **Mock de `localStorage`**: `nutriGuardarAntropometriaSiFalta` usa
+  `localStorage` como variable global (asume navegador). El test file
+  define un mock in-memory (`crearLocalStorageMock()`) y lo asigna a
+  `global.localStorage` **antes** de requerir el módulo, para que esa
+  referencia libre la encuentre.
+- **No se testea (a propósito, ver `plan-tests-sinaptix.md`)**:
+  `netlify/functions/plan.mjs` (depende de Netlify Identity/Database,
+  no mockeables sin tocar el archivo — queda como Prioridad 2, todavía
+  no implementada) ni el diseño/layout del sitio (cambia cada sesión, se
+  sigue verificando con Playwright ad hoc en cada patch de UI, no en una
+  suite fija).
+- **CI**: no hay pipeline configurado — `netlify.toml` tiene
+  `command = ""`, así que Netlify no corre `npm test` en el deploy. Correr
+  los tests es manual (`npm test`) antes de generar cada patch que toque
+  `js/nutricion-planes.js`.
 
 ## Estado actual del diseño (resumen)
 

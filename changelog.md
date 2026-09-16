@@ -8,6 +8,69 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veintidosava tanda) — Tests unitarios para js/nutricion-planes.js (Prioridad 1 de plan-tests-sinaptix.md)
+
+A pedido del usuario ("oye para este tipo de web se necesita test?" →
+"arma el plan para los test" → "arranca con la prioridad 1"): primera
+tanda de tests automatizados del repo. Se armó primero un documento de
+plan (`plan-tests-sinaptix.md`, entregado como archivo aparte al
+usuario, no vive en el repo) priorizando `js/nutricion-planes.js` (cálculo
+puro, alto impacto si falla, barato de testear) por sobre
+`netlify/functions/plan.mjs` (depende de servicios externos, más caro de
+mockear) y por sobre el diseño/layout (cambia cada sesión, se sigue
+verificando con Playwright ad hoc, no con una suite fija). Esta tanda
+implementa la Prioridad 1 completa del plan.
+
+- **`js/nutricion-planes.js`**: se agregó al final un bloque
+  `if(typeof module !== 'undefined' && module.exports){ module.exports =
+  {...} }` que exporta 9 funciones de cálculo puro
+  (`nutriResolverObjetivo`, `nutriConstruirAjustes`,
+  `nutriConstruirAvisos`, `nutriGuardarAntropometriaSiFalta`,
+  `imcCategoria`, `imcGaugeAngulo`, `gaugeComputeAreas`,
+  `gaugeColorForPercent`, `gaugeDeltaHtml`). No exporta `NUTRI_PLANES` ni
+  las funciones que arman HTML (`nutriBuildResumenHTML`,
+  `nutriBuildBarChartHTML`) — quedan fuera de esta tanda a propósito, ver
+  plan. El bloque es un no-op en el navegador: `index.html`/`mi-plan.html`
+  cargan este archivo como `<script>` plano, donde `module` no existe.
+- **`tests/nutricion-planes.test.js`** (archivo nuevo): 30 tests con
+  `node --test` (nativo de Node desde la v18, estable desde la v20 — el
+  repo ya fija `NODE_VERSION = "20"` en `netlify.toml`, así que no hace
+  falta ninguna dependencia nueva). Cubre, por función: valores límite de
+  cada rango de IMC (`imcCategoria`: 18.49/18.5, 24.99/25, 29.99/30),
+  mínimo/máximo/recorte del medidor (`imcGaugeAngulo`), resolución de
+  objetivo por escala más alta y el caso de empate entre 2 escalas
+  (`nutriResolverObjetivo`), cada rama de ajuste individual y su
+  combinación (`nutriConstruirAjustes`), cada aviso individual **y** los
+  2 avisos combinados que solo disparan con 2 condiciones a la vez —
+  sueño malo + estrés alto, estrés + fatiga altos — verificando también
+  que NO disparen con una sola de las dos (`nutriConstruirAvisos`),
+  inversión de escala y default sin datos (`gaugeComputeAreas`), los 3
+  colores exactos de la interpolación y el recorte fuera de 0-100
+  (`gaugeColorForPercent`), los 3 casos de delta — positivo/negativo/cero
+  — más el caso sin "después" (`gaugeDeltaHtml`), y los 3 casos de
+  `nutriGuardarAntropometriaSiFalta` (no pisa dato existente, rechaza
+  datos fuera de rango, guarda y calcula bien el IMC con datos válidos).
+  `localStorage` se mockea con un objeto in-memory simple
+  (`crearLocalStorageMock()`) asignado a `global.localStorage` antes de
+  requerir el módulo bajo test, porque `nutriGuardarAntropometriaSiFalta`
+  lo usa como variable global (pensado para el navegador).
+- **`package.json`**: se agregó `"scripts": {"test": "node --test"}`. Se
+  probó primero con `"node --test tests/"` (con la ruta como argumento) y
+  falló con `MODULE_NOT_FOUND` — Node intenta *requerir* `tests/` como si
+  fuera un módulo en vez de explorarlo como carpeta cuando se le pasa un
+  path posicional. Sin argumentos, `node --test` descubre solo los
+  archivos `*.test.js` bajo `tests/` (comportamiento default del test
+  runner desde Node 18.9), así que quedó `"node --test"` a secas.
+- **Actualiza `memoria.md`**: sección "Tests" nueva (después de
+  "Estructura de archivos"), documentando qué cubre, cómo correrlos, por
+  qué no rompe el navegador, y qué queda deliberadamente afuera
+  (`plan.mjs`, diseño/layout).
+
+Verificado corriendo `npm test` localmente: 30/30 tests pasan, exit code
+0. No se tocó ningún archivo del sitio en sí (`index.html`, `css/`,
+`js/script.js`, etc.) — este patch es 100% infraestructura de testing,
+sin cambios de comportamiento visible para quien visita el sitio.
+
 ## 2026-09-15 (veintiunava tanda) — Método (lam-03): interruptor "Mi progreso"/"Mi IMC" al lado del botón de acción, y botón "Actualizar" sin texto largo
 
 A pedido del usuario: "el interruptor lo podemos poner alado del boton de

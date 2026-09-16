@@ -418,3 +418,26 @@ function nutriBuildBarChartHTML(objetivo, reeval){
   }
   return html;
 }
+
+// ===================== Exports para tests (Node) =====================
+// Este archivo se carga como <script> plano en index.html/mi-plan.html —
+// ahí `module` no existe, así que este bloque no hace nada en el
+// navegador. Sirve solo para que `tests/nutricion-planes.test.mjs` pueda
+// importar estas funciones con Node (ver plan-tests-sinaptix.md,
+// Prioridad 1). No exporta NUTRI_PLANES completo ni las funciones que
+// arman HTML (nutriBuildResumenHTML, nutriBuildBarChartHTML) porque no
+// son el foco de esta primera tanda de tests — son las que combinan
+// texto, no cálculo.
+if(typeof module !== 'undefined' && module.exports){
+  module.exports = {
+    nutriResolverObjetivo,
+    nutriConstruirAjustes,
+    nutriConstruirAvisos,
+    nutriGuardarAntropometriaSiFalta,
+    imcCategoria,
+    imcGaugeAngulo,
+    gaugeComputeAreas,
+    gaugeColorForPercent,
+    gaugeDeltaHtml
+  };
+}
