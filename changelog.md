@@ -8,6 +8,69 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (segunda tanda) — Validación de respuestas irracionales en la encuesta de nutrición
+
+A pedido del usuario ("que no se puedan poder respuestas irracionales"),
+después de acordar el plan (`plan-validacion-encuesta-nutricion.md`,
+entregado al usuario) y el rango de edad (14–120, ajustado tras el
+comentario del usuario de que hay gente real con más de 110 años — el
+primer borrador tenía tope 90).
+
+- **`js/nutricion-planes.js`**: nuevo bloque `NUTRI_RANGOS` (edad
+  14–120, peso 30–250 kg, talla 100–230 cm, pantallas 0–18 h) +
+  `nutriValidarRango(campo, valor)`, `nutriValidarNombre(valor)` y
+  `nutriEscaparHTML(texto)`. Se aplica el escape a `alergiaOtra` y
+  `disgustos` dentro de `nutriConstruirAjustes` (ver más abajo, punto de
+  seguridad). Las 4 funciones/constante nuevas se agregan al
+  `module.exports` para tests.
+- **Hallazgo al implementar**: `js/script.js` (`#formAntro`) y
+  `nutriGuardarAntropometriaSiFalta` (`js/nutricion-planes.js`) **ya**
+  tenían su propia validación de peso/talla/edad, pero con números
+  distintos y más laxos que los que se estaban por agregar al wizard
+  (peso hasta 400, talla hasta 250, edad sin mínimo) — es decir, antes
+  de este patch ya existía una inconsistencia entre "cuánta gente
+  irracional" dejaba pasar cada formulario. Los tres puntos ahora usan
+  `nutriValidarRango` como única fuente de rangos.
+- **`index.html` / `mi-plan.html`** (idéntico en ambos, tienen su propia
+  copia del wizard): `min`/`max` en los 4 `<input type="number">`
+  libres del wizard (`nutriEdad`, `nutriPeso`, `nutriTalla`,
+  `nutriPantallas`); `minlength="2" maxlength="60"
+  pattern=".*[A-Za-zÀ-ÿ].*"` en `nutriNombre`; `maxlength="80"`/`"200"`
+  en `nutriAlergiaOtra`/`nutriDisgustos`.
+- **`index.html`** además: `min`/`max` en `antroPeso`/`antroTalla`/`antroEdad`
+  (modal de antropometría, no existe en `mi-plan.html`).
+- **`js/nutricion-wizard.js`**: `nutriValidateStep()` ahora distingue,
+  vía `invalid.validity` (`rangeUnderflow`/`rangeOverflow`/
+  `patternMismatch`/`tooShort`), el mensaje de "valor fuera de rango" o
+  "nombre inválido" del genérico "completá los campos obligatorios" que
+  usaba para cualquier `:invalid` — no hizo falta agregar la validación
+  en sí ahí, los atributos HTML5 nuevos ya la disparan a través del
+  mismo `:invalid` que ya usaba esta función para `required`. También
+  se agregó el listener de "Prefiero no decir" (grupo `nutriCondicion`,
+  paso 5): tildar esa opción destilda las demás y viceversa.
+- **`js/script.js`**: `#formAntro` pasa de tener sus 3 chequeos de rango
+  hardcodeados a llamar `nutriValidarRango('peso'|'talla'|'edad', …)`.
+- **Seguridad, no solo "irracional"**: `nutriAlergiaOtra` y
+  `nutriDisgustos` se concatenaban sin escapar en
+  `nutriConstruirAjustes`, y esas strings terminan con `innerHTML` en
+  `nutriBuildResumenHTML` (wizard paso 8 y "Mi plan") — alguien podía
+  escribir una etiqueta con un atributo de evento ahí y que se
+  ejecutara. Fix: `nutriEscaparHTML` aplicado en el único punto donde
+  ese texto entra al HTML del resumen.
+- **`tests/nutricion-planes.test.js`**: 16 casos nuevos (rangos
+  válidos/inválidos con límites inclusive, vacío-no-es-irracional,
+  no-numérico, campo sin rango definido, nombre válido/vacío/corto/
+  solo-números, escape de `<img onerror>` y de `<script>`, y que
+  `nutriConstruirAjustes` efectivamente escape antes de concatenar).
+  Suite completa: 46/46 ok (`npm test`).
+- Verificado a mano (sin Playwright, mismo motivo que el patch
+  anterior): revisión de código, `node --check` en los 3 archivos JS
+  tocados, y `npm test` en verde.
+- **Fuera de esta pasada** (ver el plan entregado, sección 5): el
+  formulario de contacto (mismo problema, no tocado) y validación
+  cruzada de IMC imposible con peso/talla individualmente válidos (no
+  se bloquea, para no rechazar casos reales atípicos).
+
 ## 2026-09-16 — Wizard de nutrición: auto-scroll al mensaje final + botón "Iniciar sesión"
 
 A pedido del usuario: ya con el patch del botón real de "Iniciar sesión"

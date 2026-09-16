@@ -101,13 +101,47 @@ function nutriValidateStep(n){
   if(!stepEl) return true;
   const invalid = stepEl.querySelector(':invalid');
   if(invalid){
-    nutriErrorEl.textContent = 'Completa los campos obligatorios de este paso antes de continuar.';
+    // `:invalid` acá también agarra los min/max/minlength/pattern que se
+    // agregaron a edad/peso/talla/pantallas/nombre (ver
+    // plan-validacion-encuesta-nutricion.md), no solo `required` como
+    // antes — se distingue el mensaje según el tipo de violación para no
+    // decir "completá los campos obligatorios" cuando en realidad el
+    // campo tiene un valor, solo que fuera de rango.
+    const v = invalid.validity;
+    if(v.rangeUnderflow || v.rangeOverflow){
+      nutriErrorEl.textContent = 'Uno de los valores de este paso está fuera del rango permitido — revisalo antes de continuar.';
+    } else if(v.patternMismatch || v.tooShort){
+      nutriErrorEl.textContent = 'El nombre tiene que tener al menos 2 caracteres e incluir alguna letra.';
+    } else {
+      nutriErrorEl.textContent = 'Completa los campos obligatorios de este paso antes de continuar.';
+    }
     nutriErrorEl.classList.add('show');
     if(invalid.reportValidity) invalid.reportValidity();
     return false;
   }
   nutriErrorEl.classList.remove('show');
   return true;
+}
+
+// "Prefiero no decir" (paso 5, condiciones de salud) es mutuamente
+// excluyente con el resto de checkboxes del mismo grupo — hoy se podía
+// tildar "Prefiero no decir" y, por ejemplo, "Diabetes" al mismo tiempo,
+// lo cual no tiene sentido. Al tildar una, se destilda la otra rama.
+const nutriCondicionInputs = Array.from(document.querySelectorAll('input[name="nutriCondicion"]'));
+if(nutriCondicionInputs.length){
+  nutriCondicionInputs.forEach(function(input){
+    input.addEventListener('change', function(){
+      if(!input.checked) return;
+      const esPrefieroNoDecir = input.value === 'Prefiero no decir';
+      nutriCondicionInputs.forEach(function(otro){
+        if(otro === input) return;
+        const otroEsPrefieroNoDecir = otro.value === 'Prefiero no decir';
+        if(esPrefieroNoDecir || (!esPrefieroNoDecir && otroEsPrefieroNoDecir)){
+          otro.checked = false;
+        }
+      });
+    });
+  });
 }
 
 if(nutriNextBtn){

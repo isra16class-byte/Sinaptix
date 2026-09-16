@@ -79,7 +79,12 @@ function nutriResolverObjetivo(d){
 function nutriConstruirAjustes(d){
   const ajustes = [];
   if(d.alergias.length || d.alergiaOtra){
-    const lista = d.alergias.concat(d.alergiaOtra ? [d.alergiaOtra] : []).join(', ');
+    // d.alergias viene de checkboxes de opciones fijas (no hace falta
+    // escapar); d.alergiaOtra es texto libre y sí se pinta con innerHTML
+    // más abajo (nutriBuildResumenHTML), así que se escapa acá, en el
+    // único lugar donde entra al HTML del resumen.
+    const otra = d.alergiaOtra ? nutriEscaparHTML(d.alergiaOtra) : '';
+    const lista = d.alergias.concat(otra ? [otra] : []).join(', ');
     ajustes.push('Se excluye de las recomendaciones: '+lista+', sustituido por alternativas equivalentes del mismo grupo nutricional.');
   }
   if(d.restriccion === 'Vegetariano' || d.restriccion === 'Vegano'){
@@ -95,7 +100,9 @@ function nutriConstruirAjustes(d){
     ajustes.push('Recomendaciones simplificadas a preparaciones rápidas o de compra directa.');
   }
   if(d.disgustos){
-    ajustes.push('Se excluye de las recomendaciones lo que marcaste que no te gusta: '+d.disgustos+'.');
+    // Mismo motivo que alergiaOtra arriba: es texto libre que termina en
+    // innerHTML, se escapa antes de concatenarlo.
+    ajustes.push('Se excluye de las recomendaciones lo que marcaste que no te gusta: '+nutriEscaparHTML(d.disgustos)+'.');
   }
   if(d.horaExigencia && d.horaExigencia !== 'Variable'){
     ajustes.push('El snack de refuerzo se ubica cerca de tu bloque de mayor exigencia mental ('+d.horaExigencia.toLowerCase()+').');
@@ -240,6 +247,60 @@ function nutriBuildResumenHTML(d){
   return html;
 }
 
+// ===================== Validación de rangos y saneo de texto libre =====================
+// Rangos "razonables" para los 4 campos numéricos libres de la encuesta
+// (edad/peso/talla/horas de pantalla) — se usan tanto en el wizard
+// (index.html y mi-plan.html, vía atributos min/max en el HTML) como en
+// el formulario de antropometría (js/script.js, formAntro), para que los
+// dos caminos que piden estos mismos datos validen exactamente igual. No
+// buscan validar "es tu dato real", buscan bloquear lo humanamente
+// imposible (negativos, cero, valores absurdos). Ver
+// plan-validacion-encuesta-nutricion.md (entregado al usuario) para el
+// detalle de por qué se eligió cada rango — en particular, el máximo de
+// edad (120) cubre casos reales documentados de longevidad extrema, no
+// es un tope arbitrario "típico".
+const NUTRI_RANGOS = {
+  edad:      { min: 14,  max: 120, label: 'la edad',                                  unidad: 'años' },
+  peso:      { min: 30,  max: 250, label: 'el peso',                                  unidad: 'kg' },
+  talla:     { min: 100, max: 230, label: 'la talla',                                 unidad: 'cm' },
+  pantallas: { min: 0,   max: 18,  label: 'las horas de pantalla/estudio seguido',    unidad: 'h' }
+};
+
+// Devuelve null si el valor es válido (vacío incluido — que un campo
+// opcional esté vacío no es "irracional", eso lo decide `required`
+// aparte) o un mensaje de error listo para mostrar si está fuera de
+// rango o no es un número.
+function nutriValidarRango(campo, valor){
+  const r = NUTRI_RANGOS[campo];
+  if(!r) return null;
+  if(valor === '' || valor === null || valor === undefined) return null;
+  const n = parseFloat(valor);
+  if(isNaN(n)) return 'Ingresá un número válido para '+r.label+'.';
+  if(n < r.min || n > r.max) return 'Revisá '+r.label+': tiene que estar entre '+r.min+' y '+r.max+' '+r.unidad+'.';
+  return null;
+}
+
+// Nombre: rechaza vacío, solo espacios o solo símbolos/números — sin
+// exigir un formato más estricto (hay nombres cortos, con guion, con
+// apóstrofe, etc., y no vale la pena una lista blanca de caracteres).
+function nutriValidarNombre(valor){
+  const v = (valor || '').trim();
+  if(v.length < 2) return 'Ingresá tu nombre.';
+  if(!/[a-zA-ZÀ-ÿ]/.test(v)) return 'El nombre tiene que incluir al menos una letra.';
+  return null;
+}
+
+// Escapa HTML antes de insertar texto libre (alergiaOtra, disgustos) con
+// innerHTML en nutriBuildResumenHTML — sin esto, alguien podía escribir
+// una etiqueta con un atributo de evento en esos campos y que se
+// ejecutara en el navegador de quien viera el resumen (wizard paso 8 y
+// "Mi plan").
+function nutriEscaparHTML(texto){
+  return String(texto).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
 // ===================== IMC: categoría y medidor tipo velocímetro =====================
 // Compartido entre el formulario de antropometría (js/script.js, que calcula
 // el IMC) y el medidor de "Mi plan" (js/mi-plan.js, que lo pinta) — antes cada
@@ -284,13 +345,14 @@ function nutriGuardarAntropometriaSiFalta(d){
   const edad = parseInt(d.edad, 10);
   const sexo = d.sexo;
 
-  // Mismos rangos de validación que #formAntro en js/script.js — si algo no
+  // Mismos rangos de validación que #formAntro en js/script.js y el paso 2
+  // del wizard (NUTRI_RANGOS, más arriba en este archivo) — si algo no
   // luce como un dato real (vacío, fuera de rango), no se guarda nada: se
   // deja que la persona lo complete cuando quiera desde el formulario
   // dedicado, en vez de guardar un IMC basado en datos incompletos.
-  if(!peso || peso<=0 || peso>400) return false;
-  if(!tallaCm || tallaCm<=0 || tallaCm>250) return false;
-  if(!edad || edad<=0 || edad>120) return false;
+  if(!peso || nutriValidarRango('peso', peso)) return false;
+  if(!tallaCm || nutriValidarRango('talla', tallaCm)) return false;
+  if(!edad || nutriValidarRango('edad', edad)) return false;
   if(!sexo) return false;
 
   const talla = tallaCm/100;
@@ -438,6 +500,10 @@ if(typeof module !== 'undefined' && module.exports){
     imcGaugeAngulo,
     gaugeComputeAreas,
     gaugeColorForPercent,
-    gaugeDeltaHtml
+    gaugeDeltaHtml,
+    NUTRI_RANGOS,
+    nutriValidarRango,
+    nutriValidarNombre,
+    nutriEscaparHTML
   };
 }

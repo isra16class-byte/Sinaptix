@@ -403,7 +403,7 @@
         <div class="modal-row">
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriNombre">Nombre <span class="req" aria-hidden="true">*</span></label>
-            <input class="modal-input" type="text" id="nutriNombre" placeholder="Nombre" required>
+            <input class="modal-input" type="text" id="nutriNombre" placeholder="Nombre" minlength="2" maxlength="60" pattern=".*[A-Za-zÀ-ÿ].*" title="Ingresá tu nombre (al menos 2 caracteres, con alguna letra)." required>
           </div>
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriEmail">Correo electrónico <span class="req" aria-hidden="true">*</span></label>
@@ -418,7 +418,7 @@
         <div class="modal-row">
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriEdad">Edad <span class="req" aria-hidden="true">*</span></label>
-            <input class="modal-input" type="number" id="nutriEdad" placeholder="Edad" required>
+            <input class="modal-input" type="number" id="nutriEdad" placeholder="Edad" min="14" max="120" required>
           </div>
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriSexo">Sexo biológico <span class="req" aria-hidden="true">*</span></label>
@@ -433,11 +433,11 @@
         <div class="modal-row" id="nutriAntroInputs">
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriPeso">Peso (kg)</label>
-            <input class="modal-input" type="number" id="nutriPeso" placeholder="Peso (kg)">
+            <input class="modal-input" type="number" id="nutriPeso" placeholder="Peso (kg)" min="30" max="250">
           </div>
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriTalla">Talla (cm)</label>
-            <input class="modal-input" type="number" id="nutriTalla" placeholder="Talla (cm)">
+            <input class="modal-input" type="number" id="nutriTalla" placeholder="Talla (cm)" min="100" max="230">
           </div>
         </div>
         <div class="nutri-antro-resumen hidden" id="nutriAntroResumen">
@@ -492,7 +492,7 @@
           </div>
           <div class="nutri-group">
             <label class="nutri-field-label" for="nutriPantallas">Horas de pantalla / estudio seguido</label>
-            <input class="modal-input" type="number" id="nutriPantallas" placeholder="Horas aprox.">
+            <input class="modal-input" type="number" id="nutriPantallas" placeholder="Horas aprox." min="0" max="18">
           </div>
         </div>
         <div class="nutri-group">
@@ -590,7 +590,7 @@
             <label class="check-row"><input type="checkbox" name="nutriAlergia" value="Gluten"><span>Gluten</span></label>
           </div>
           <label class="nutri-field-label" for="nutriAlergiaOtra">Otra alergia o intolerancia</label>
-          <input class="modal-input" type="text" id="nutriAlergiaOtra" placeholder="Otra alergia o intolerancia">
+          <input class="modal-input" type="text" id="nutriAlergiaOtra" placeholder="Otra alergia o intolerancia" maxlength="80">
         </div>
         <div class="nutri-group">
           <label class="nutri-field-label" for="nutriRestriccion">Restricción o estilo alimentario <span class="req" aria-hidden="true">*</span></label>
@@ -672,7 +672,7 @@
         <legend class="nutri-legend">7. Preferencias</legend>
         <div class="nutri-group">
           <label class="nutri-field-label" for="nutriDisgustos">Alimentos que no te gustan o no vas a comer</label>
-          <textarea class="modal-input" id="nutriDisgustos" rows="3" placeholder="Alimentos que no te gustan o no vas a comer"></textarea>
+          <textarea class="modal-input" id="nutriDisgustos" rows="3" placeholder="Alimentos que no te gustan o no vas a comer" maxlength="200"></textarea>
         </div>
         <div class="nutri-group">
           <label class="nutri-field-label" for="nutriPresupuesto">Presupuesto aproximado para alimentación especializada <span class="req" aria-hidden="true">*</span></label>
@@ -717,13 +717,13 @@
     <form class="modal-form" id="formAntro">
       <div class="modal-row">
         <label class="sr-only" for="antroPeso">Peso en kilogramos</label>
-        <input class="modal-input" type="number" id="antroPeso" placeholder="Peso (kg)" required>
+        <input class="modal-input" type="number" id="antroPeso" placeholder="Peso (kg)" min="30" max="250" required>
         <label class="sr-only" for="antroTalla">Talla en centímetros</label>
-        <input class="modal-input" type="number" id="antroTalla" placeholder="Talla (cm)" required>
+        <input class="modal-input" type="number" id="antroTalla" placeholder="Talla (cm)" min="100" max="230" required>
       </div>
       <div class="modal-row">
         <label class="sr-only" for="antroEdad">Edad</label>
-        <input class="modal-input" type="number" id="antroEdad" placeholder="Edad" required>
+        <input class="modal-input" type="number" id="antroEdad" placeholder="Edad" min="14" max="120" required>
         <label class="sr-only" for="antroSexo">Sexo</label>
         <select class="modal-input" id="antroSexo" required>
           <option value="" disabled selected>Sexo</option>

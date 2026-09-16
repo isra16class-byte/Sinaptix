@@ -101,23 +101,32 @@
     const edad = parseInt(document.getElementById('antroEdad').value, 10);
     const sexo = document.getElementById('antroSexo').value;
 
-    // Validación real de los datos ingresados
-    if(!peso || peso <= 0 || peso > 400){
+    // Validación real de los datos ingresados — mismos rangos que el
+    // wizard de nutrición (NUTRI_RANGOS en js/nutricion-planes.js), para
+    // que los dos caminos que piden peso/talla/edad (esta pantalla y el
+    // paso 2 de la encuesta) acepten y rechacen exactamente lo mismo. Antes
+    // este formulario tenía sus propios límites, más laxos (peso hasta
+    // 400, talla hasta 250, sin mínimo de edad) y desalineados de los del
+    // wizard — ver plan-validacion-encuesta-nutricion.md.
+    const errPeso = nutriValidarRango('peso', document.getElementById('antroPeso').value);
+    if(errPeso){
       res.style.display='block';
       res.style.color='#B3261E';
-      res.textContent = 'Ingresa un peso válido (entre 1 y 400 kg).';
+      res.textContent = errPeso;
       return;
     }
-    if(!tallaCm || tallaCm <= 0 || tallaCm > 250){
+    const errTalla = nutriValidarRango('talla', document.getElementById('antroTalla').value);
+    if(errTalla){
       res.style.display='block';
       res.style.color='#B3261E';
-      res.textContent = 'Ingresa una talla válida (entre 1 y 250 cm).';
+      res.textContent = errTalla;
       return;
     }
-    if(!edad || edad <= 0 || edad > 120){
+    const errEdad = nutriValidarRango('edad', document.getElementById('antroEdad').value);
+    if(errEdad){
       res.style.display='block';
       res.style.color='#B3261E';
-      res.textContent = 'Ingresa una edad válida.';
+      res.textContent = errEdad;
       return;
     }
     if(!sexo){

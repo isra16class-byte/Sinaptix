@@ -34,7 +34,11 @@ const {
   imcGaugeAngulo,
   gaugeComputeAreas,
   gaugeColorForPercent,
-  gaugeDeltaHtml
+  gaugeDeltaHtml,
+  NUTRI_RANGOS,
+  nutriValidarRango,
+  nutriValidarNombre,
+  nutriEscaparHTML
 } = require(path.join('..', 'js', 'nutricion-planes.js'));
 
 // ===================== nutriResolverObjetivo =====================
@@ -255,4 +259,80 @@ test('nutriGuardarAntropometriaSiFalta — datos válidos guardan el IMC calcula
   const guardado = JSON.parse(global.localStorage.getItem('sinaptix_antropometria'));
   const imcEsperado = 70 / (1.75 * 1.75);
   assert.ok(Math.abs(guardado.imc - imcEsperado) < 0.0001);
+});
+
+// ===================== NUTRI_RANGOS / nutriValidarRango =====================
+test('nutriValidarRango — dentro del rango devuelve null', () => {
+  assert.strictEqual(nutriValidarRango('edad', 30), null);
+  assert.strictEqual(nutriValidarRango('edad', 14), null); // límite inferior inclusive
+  assert.strictEqual(nutriValidarRango('edad', 120), null); // límite superior inclusive
+  assert.strictEqual(nutriValidarRango('peso', 70), null);
+  assert.strictEqual(nutriValidarRango('talla', 175), null);
+  assert.strictEqual(nutriValidarRango('pantallas', 8), null);
+});
+
+test('nutriValidarRango — fuera de rango devuelve un mensaje', () => {
+  assert.ok(nutriValidarRango('edad', 13)); // por debajo del mínimo
+  assert.ok(nutriValidarRango('edad', 121)); // por encima del máximo (incluye longevidad extrema real)
+  assert.ok(nutriValidarRango('edad', -5));
+  assert.ok(nutriValidarRango('peso', 0));
+  assert.ok(nutriValidarRango('peso', 251));
+  assert.ok(nutriValidarRango('talla', 99));
+  assert.ok(nutriValidarRango('talla', 999));
+  assert.ok(nutriValidarRango('pantallas', -1));
+  assert.ok(nutriValidarRango('pantallas', 19));
+});
+
+test('nutriValidarRango — valor vacío no es "irracional", es opcional', () => {
+  assert.strictEqual(nutriValidarRango('peso', ''), null);
+  assert.strictEqual(nutriValidarRango('talla', undefined), null);
+});
+
+test('nutriValidarRango — no numérico devuelve mensaje', () => {
+  assert.ok(nutriValidarRango('edad', 'abc'));
+});
+
+test('nutriValidarRango — campo sin rango definido no valida (no rompe)', () => {
+  assert.strictEqual(nutriValidarRango('objetivo', 'cualquier cosa'), null);
+});
+
+// ===================== nutriValidarNombre =====================
+test('nutriValidarNombre — nombre válido devuelve null', () => {
+  assert.strictEqual(nutriValidarNombre('Ana'), null);
+  assert.strictEqual(nutriValidarNombre('María José'), null);
+  assert.strictEqual(nutriValidarNombre("O'Higgins"), null);
+});
+
+test('nutriValidarNombre — vacío, solo espacios o muy corto devuelve mensaje', () => {
+  assert.ok(nutriValidarNombre(''));
+  assert.ok(nutriValidarNombre('   '));
+  assert.ok(nutriValidarNombre('A'));
+});
+
+test('nutriValidarNombre — solo números o símbolos devuelve mensaje', () => {
+  assert.ok(nutriValidarNombre('12345'));
+  assert.ok(nutriValidarNombre('....'));
+});
+
+// ===================== nutriEscaparHTML =====================
+test('nutriEscaparHTML — neutraliza tags y atributos de evento', () => {
+  const resultado = nutriEscaparHTML('<img src=x onerror="alert(1)">');
+  assert.ok(!resultado.includes('<img'));
+  assert.ok(resultado.includes('&lt;img'));
+});
+
+test('nutriEscaparHTML — texto normal no cambia de significado', () => {
+  assert.strictEqual(nutriEscaparHTML('Maní y kiwi'), 'Maní y kiwi');
+});
+
+test('nutriConstruirAjustes — alergiaOtra y disgustos con HTML quedan escapados', () => {
+  const ajustes = nutriConstruirAjustes(baseAjustes({
+    alergiaOtra: '<b>test</b>',
+    disgustos: '<script>x</script>'
+  }));
+  const texto = ajustes.join(' ');
+  assert.ok(!texto.includes('<b>'));
+  assert.ok(!texto.includes('<script>'));
+  assert.ok(texto.includes('&lt;b&gt;'));
+  assert.ok(texto.includes('&lt;script&gt;'));
 });

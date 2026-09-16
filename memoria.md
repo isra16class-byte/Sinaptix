@@ -1062,6 +1062,57 @@ Prioridad 2.
   pestañas, desktop 1440px y mobile 390px (el footer envuelve en 2 líneas
   si no entran en una fila).
 
+## Validación de respuestas irracionales en la encuesta (sesión 2026-09-16)
+
+A pedido del usuario, se agregó validación de rango/formato a los **7
+campos libres** del wizard de nutrición (el resto son selects/radios de
+opciones fijas, ahí no hace falta nada). Plan completo entregado al
+usuario en `plan-validacion-encuesta-nutricion.md` (no vive en el
+repo, mismo criterio que otros planes de sesión).
+
+- **Rangos numéricos** (`NUTRI_RANGOS` en `js/nutricion-planes.js`,
+  **fuente única** compartida por los 3 lugares que antes tenían sus
+  propios límites, desalineados entre sí): edad 14–120 (el máximo cubre
+  casos reales documentados de longevidad extrema, no es "típico"),
+  peso 30–250 kg, talla 100–230 cm, horas de pantalla/estudio seguido
+  0–18 h. `nutriValidarRango(campo, valor)` devuelve `null` si es válido
+  (vacío incluido, en campos opcionales) o un mensaje de error. Se
+  aplican en dos capas: atributos `min`/`max` en `index.html` y
+  `mi-plan.html` (los 4 inputs numéricos del wizard) + el mismo
+  `min`/`max` en `#antroPeso`/`#antroTalla`/`#antroEdad`; y en JS, en
+  `#formAntro` (`js/script.js`) y en `nutriGuardarAntropometriaSiFalta`
+  (`js/nutricion-planes.js`), que antes tenían cada uno sus propios
+  números hardcodeados (peso hasta 400, talla hasta 250, sin mínimo de
+  edad) — ahora los tres usan `nutriValidarRango`.
+- **`nutriNombre`**: `minlength="2"` + `pattern=".*[A-Za-zÀ-ÿ].*"` (al
+  menos una letra, rechaza vacío-con-espacios/solo-números/solo-símbolos)
+  + `maxlength="60"`, resuelto con validación nativa del navegador — no
+  hizo falta JS nuevo, `nutriValidateStep()` (`js/nutricion-wizard.js`)
+  ya usaba `:invalid` para el chequeo de cada paso, así que estos
+  atributos ya quedan cubiertos por ese mismo mecanismo. Se ajustó el
+  mensaje de `nutriValidateStep` para distinguir "fuera de rango"/
+  "nombre inválido" de "campo obligatorio" (antes un solo mensaje
+  genérico para los tres casos).
+- **`nutriAlergiaOtra`/`nutriDisgustos`** (`maxlength="80"`/`"200"`)
+  además tenían un **XSS real**: `nutriConstruirAjustes` los concatenaba
+  tal cual en strings que `nutriBuildResumenHTML` mete con `innerHTML`
+  (wizard paso 8 y "Mi plan"). Se agregó `nutriEscaparHTML(texto)` y se
+  aplica a los dos en `nutriConstruirAjustes`, antes de que entren al
+  HTML.
+- **`nutriCondicion` — "Prefiero no decir"** ya no convive con el resto
+  de checkboxes del grupo (antes se podía tildar "Prefiero no decir" y
+  "Diabetes" a la vez): listener de `change` en
+  `js/nutricion-wizard.js` que destilda la rama contraria.
+- **Fuera de alcance de esta pasada** (a propósito, ver el plan): el
+  formulario de contacto (mismo tipo de problema, no tocado); y
+  coherencia cruzada peso/talla → IMC imposible (cada campo por
+  separado queda dentro de rango, pero la combinación podría dar un IMC
+  inviable) — no se bloquea, para no generar falsos positivos con casos
+  reales atípicos.
+- Tests nuevos en `tests/nutricion-planes.test.js` (16 casos) para
+  `nutriValidarRango`, `nutriValidarNombre`, `nutriEscaparHTML` y el
+  escapado dentro de `nutriConstruirAjustes`. Suite completa: 46/46 ok.
+
 ## Pendientes conocidos
 
 **Auto-scroll del wizard al mensaje final (sesión 2026-09-16) — falta
