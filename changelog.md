@@ -8,6 +8,73 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veintiunava tanda) — Método (lam-03): interruptor "Mi progreso"/"Mi IMC" al lado del botón de acción, y botón "Actualizar" sin texto largo
+
+A pedido del usuario: "el interruptor lo podemos poner alado del boton de
+actualizar mi estado otra vez?" + "el boton solo ponle actualizar". El
+interruptor (`.gauges-switch`, tabs "Mi progreso"/"Mi IMC") vivía arriba de
+todo en `.method-gauges`, como una fila propia antes del contenido de cada
+pestaña. Se movió a un footer nuevo al final de la tarjeta, en la misma
+fila que el botón de acción de la pestaña activa:
+
+- **`index.html`**: dentro de `<aside id="methodGauges">`, el orden pasa a
+  ser: `#methodGaugesProgreso`, `#methodGaugesImc` (los 2 paneles, igual
+  que antes) y después un `<div class="gauges-footer">` nuevo que agrupa
+  `#gaugesSwitch` (mismo markup de siempre, solo que ahora al final) más 2
+  `<span class="gauges-footer-cta">` vacíos: `#gaugesFooterCtaProgreso` y
+  `#gaugesFooterCtaImc` (este último arranca con `.hidden`, igual que su
+  panel).
+- **`css/styles.css`**: `.gauges-switch` pierde el `margin-bottom:18px`
+  que tenía para separarse del contenido de abajo (ya no le hace falta,
+  ahora es el último elemento de la tarjeta salvo el CTA). Regla nueva
+  `.gauges-footer{display:flex;align-items:center;flex-wrap:wrap;
+  gap:10px;margin-top:18px}` y `.gauges-footer-cta{display:contents}` —
+  el `display:contents` hace que el `<button>` que cada slot recibe por
+  `innerHTML` se comporte como un ítem flex más del footer (no como un
+  hijo de un contenedor aparte), así queda realmente al lado del
+  interruptor y no en una fila propia. `.hidden{display:none!important}`
+  (regla global ya existente) alcanza para ocultar el slot que no
+  corresponde a la pestaña activa, sin regla adicional.
+- **`js/script.js`**:
+  - `renderMethodGauges()`: el botón ("Generar mi diagnóstico" en el
+    estado sin diagnóstico, o el de reevaluación en el estado con datos)
+    deja de ir dentro del `innerHTML` de `#methodGaugesProgreso` y pasa a
+    `document.getElementById('gaugesFooterCtaProgreso').innerHTML`. El
+    texto del botón de reevaluación (`id="btnReevaluar"`) se simplificó:
+    antes alternaba entre "Actualizar mi estado" (primera vez) y
+    "Actualizar mi estado otra vez" (si ya había una reevaluación previa
+    guardada); ahora dice siempre **"Actualizar"** en los dos casos, a
+    pedido del usuario.
+  - `renderMethodImc()`: mismo patrón — el botón "Registrar datos
+    antropométricos" (estado sin datos de peso/talla) pasa a
+    `#gaugesFooterCtaImc`; en el estado con datos no hay botón, así que
+    ese slot queda vacío (`ctaImcEl.innerHTML = ''`).
+  - `setGaugesView(view)`: además de togglear `.hidden` en los 2 paneles
+    y `.is-active`/`aria-selected` en los 2 tabs (sin cambios ahí), ahora
+    también togglea `.hidden` en `#gaugesFooterCtaProgreso`/
+    `#gaugesFooterCtaImc` en el mismo `if`, para que el slot de CTA se
+    esconda/muestre junto con su panel.
+  - Los 3 listeners de click sobre botones generados dinámicamente
+    (`#btnGaugeDiagnostico`, `#btnReevaluar`, `#btnGaugeAntro`) vivían
+    repartidos en 2 delegaciones distintas: una sobre `#methodGauges`
+    (los primeros 2) y otra sobre `#methodGaugesImc` (el tercero, porque
+    antes vivía dentro de ese panel). Como los 3 botones ahora salen de
+    los mismos 2 contenedores fijos del footer (que son hijos de
+    `#methodGauges`), la delegación se unificó en una sola, sobre
+    `#methodGauges` — se borró el listener separado sobre
+    `#methodGaugesImc`.
+
+Verificado con Playwright (mock de `localStorage`, sin backend real): los
+4 cruces de estado — sin datos/con datos × pestaña Mi progreso/Mi IMC — en
+desktop 1440px y mobile 390px. En los 3 casos donde hay botón (sin
+diagnóstico, con diagnóstico+reevaluación, sin datos antropométricos)
+queda al lado del interruptor en la misma fila (en mobile 390px no entran
+juntos y el `flex-wrap` los pasa a 2 líneas, sin romper nada). En el único
+caso sin botón (Mi IMC con datos ya cargados) el interruptor queda solo,
+sin hueco vacío al lado. No se tocó `mi-plan.html` ni ninguna otra
+sección: `.gauges-switch`/`.gauges-footer`/`#methodGauges` son exclusivos
+de `#lam-03` en `index.html`.
+
 ## 2026-09-15 (veinteava tanda) — Método (lam-03): pestaña "Mi IMC" con la misma jerarquía que "Mi progreso"
 
 A pedido del usuario: "esta parte de imc se ve como simple, no resalta,

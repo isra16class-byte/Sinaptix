@@ -897,6 +897,25 @@ próximos pasos).
   `index.html`: `.miplan-card`/`.miplan-card-cta` son clases exclusivas
   de `mi-plan.html`.
 
+- **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
+  al lado del botón de acción** (sesión 2026-09-15, continuación): antes
+  `.gauges-switch` vivía arriba de todo en `.method-gauges`, suelto. Ahora
+  vive en un footer nuevo (`.gauges-footer`, al final del `<aside
+  id="methodGauges">`) junto al botón de la pestaña activa (`id`
+  `gaugesFooterCtaProgreso`/`gaugesFooterCtaImc`, spans `display:contents`
+  para que el botón que insertan sea un ítem flex más del footer). Los
+  botones "Generar mi diagnóstico", "Actualizar" (antes "Actualizar mi
+  estado"/"Actualizar mi estado otra vez" — se simplificó el texto, ahora
+  es siempre "Actualizar") y "Registrar datos antropométricos" se
+  renderizan ahí en vez de adentro de cada panel (`js/script.js`,
+  `renderMethodGauges()`/`renderMethodImc()`). `setGaugesView()` togglea
+  `.hidden` en el slot de CTA correspondiente junto con su panel. Los 3
+  listeners de click (antes repartidos entre `#methodGauges` y
+  `#methodGaugesImc`) quedaron unificados por delegación sobre
+  `#methodGauges`. Verificado con Playwright: sin datos/con datos, ambas
+  pestañas, desktop 1440px y mobile 390px (el footer envuelve en 2 líneas
+  si no entran en una fila).
+
 ## Pendientes conocidos
 
 **Login/registro propios — IMPLEMENTADO** (sesión 2026-09-15, tercera

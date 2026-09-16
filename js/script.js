@@ -398,9 +398,12 @@
     const header = '<span class="eyebrow">Tu progreso</span>'+
       '<h3 class="method-gauges-title">Foco, memoria, energía y calma</h3>';
 
+    const ctaProgresoEl = document.getElementById('gaugesFooterCtaProgreso');
+
     if(!antesObjetivo){
       el.innerHTML = header+
-        '<p class="method-gauges-text">Generá tu diagnóstico de nutrición especializada y vas a ver acá, de un vistazo, cómo está hoy tu foco, tu memoria, tu energía y tu calma.</p>'+
+        '<p class="method-gauges-text">Generá tu diagnóstico de nutrición especializada y vas a ver acá, de un vistazo, cómo está hoy tu foco, tu memoria, tu energía y tu calma.</p>';
+      if(ctaProgresoEl) ctaProgresoEl.innerHTML =
         '<button type="button" class="btn btn-ghost" id="btnGaugeDiagnostico">Generar mi diagnóstico</button>';
       return;
     }
@@ -452,10 +455,15 @@
     }
     legend += '</p>';
 
-    const cta = '<button type="button" class="btn btn-ghost" id="btnReevaluar">'+
-      (despues ? 'Actualizar mi estado otra vez' : 'Actualizar mi estado')+'</button>';
-
-    el.innerHTML = header+insight+featuredHtml+'<div class="gauge-grid">'+grid+'</div>'+scale+legend+cta;
+    el.innerHTML = header+insight+featuredHtml+'<div class="gauge-grid">'+grid+'</div>'+scale+legend;
+    // Botón de reevaluación: vive al lado del interruptor Mi progreso/Mi
+    // IMC en el footer de la tarjeta (#gaugesFooterCtaProgreso), no acá
+    // adentro (ver memoria.md, "Método: interruptor junto al CTA"). Texto
+    // fijo "Actualizar" en los dos estados (antes decía "Actualizar mi
+    // estado"/"Actualizar mi estado otra vez"; se simplificó a pedido del
+    // usuario).
+    if(ctaProgresoEl) ctaProgresoEl.innerHTML =
+      '<button type="button" class="btn btn-ghost" id="btnReevaluar">Actualizar</button>';
   }
 
   // ===================== Interruptor "Mi progreso" / "Mi IMC" (Método) =====================
@@ -500,12 +508,17 @@
       if(raw) antro = JSON.parse(raw);
     }catch(err){ /* dato corrupto: se ignora */ }
 
+    const ctaImcEl = document.getElementById('gaugesFooterCtaImc');
+
     if(!antro || typeof imcGaugeAngulo !== 'function' || typeof imcCategoria !== 'function'){
       el.innerHTML = header+
-        '<p class="method-gauges-text">Registrá tu peso y talla para ver acá tu IMC y a qué rango corresponde.</p>'+
+        '<p class="method-gauges-text">Registrá tu peso y talla para ver acá tu IMC y a qué rango corresponde.</p>';
+      if(ctaImcEl) ctaImcEl.innerHTML =
         '<button type="button" class="btn btn-ghost" id="btnGaugeAntro">Registrar datos antropométricos</button>';
       return;
     }
+
+    if(ctaImcEl) ctaImcEl.innerHTML = '';
 
     const deg = 90 - imcGaugeAngulo(antro.imc);
     const info = imcCategoria(antro.imc);
@@ -558,11 +571,18 @@
     const imcEl = document.getElementById('methodGaugesImc');
     const btnProgreso = document.getElementById('btnVerProgreso');
     const btnImc = document.getElementById('btnVerImc');
+    // Los botones de acción de cada pestaña (Generar mi diagnóstico /
+    // Actualizar / Registrar datos antropométricos) viven en el footer,
+    // al lado del interruptor, y se muestran/ocultan junto con su panel.
+    const ctaProgresoEl = document.getElementById('gaugesFooterCtaProgreso');
+    const ctaImcEl = document.getElementById('gaugesFooterCtaImc');
     if(!progresoEl || !imcEl || !btnProgreso || !btnImc) return;
 
     const showImc = view === 'imc';
     progresoEl.classList.toggle('hidden', showImc);
     imcEl.classList.toggle('hidden', !showImc);
+    if(ctaProgresoEl) ctaProgresoEl.classList.toggle('hidden', showImc);
+    if(ctaImcEl) ctaImcEl.classList.toggle('hidden', !showImc);
     btnProgreso.classList.toggle('is-active', !showImc);
     btnImc.classList.toggle('is-active', showImc);
     btnProgreso.setAttribute('aria-selected', String(!showImc));
@@ -574,17 +594,6 @@
   if(btnVerProgreso) btnVerProgreso.addEventListener('click', function(){ setGaugesView('progreso'); });
   if(btnVerImc) btnVerImc.addEventListener('click', function(){ setGaugesView('imc'); });
 
-  // El botón "Registrar datos antropométricos" del estado vacío de "Mi IMC"
-  // vive dentro de contenido generado por innerHTML (igual que
-  // #btnGaugeDiagnostico/#btnReevaluar más abajo), así que se delega el
-  // click sobre el contenedor fijo en vez de buscar el botón recién creado.
-  const methodGaugesImcEl = document.getElementById('methodGaugesImc');
-  if(methodGaugesImcEl){
-    methodGaugesImcEl.addEventListener('click', function(e){
-      if(e.target.closest('#btnGaugeAntro')) openModal('modalAntropometria');
-    });
-  }
-
   function resetReevalForm(){
     const form = document.getElementById('formReevaluacion');
     if(form) form.reset();
@@ -592,6 +601,12 @@
     if(res){ res.style.display='none'; res.textContent=''; }
   }
 
+  // Los 3 botones de acción de la tarjeta (#btnGaugeDiagnostico,
+  // #btnReevaluar, #btnGaugeAntro) viven en el footer compartido
+  // (#gaugesFooterCtaProgreso / #gaugesFooterCtaImc), generados por
+  // innerHTML, así que se delega el click sobre #methodGauges (contenedor
+  // fijo que envuelve paneles y footer) en vez de buscarlos recién
+  // creados.
   const methodGaugesEl = document.getElementById('methodGauges');
   if(methodGaugesEl){
     methodGaugesEl.addEventListener('click', function(e){
@@ -601,6 +616,8 @@
       } else if(e.target.closest('#btnReevaluar')){
         resetReevalForm();
         openModal('modalReevaluacion');
+      } else if(e.target.closest('#btnGaugeAntro')){
+        openModal('modalAntropometria');
       }
     });
   }

@@ -909,10 +909,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    Vuelve a usar --panel de fondo (como el diseño original): ahora que la
    tarjeta usa --gauge-card en vez de --panel, ambos colores vuelven a
    ser distintos entre sí y el track del switch se ve bien de nuevo. */
-.gauges-switch{display:flex;gap:6px;background:var(--panel);border-radius:var(--radius-pill);padding:4px;margin-bottom:18px;width:fit-content;max-width:100%}
+.gauges-switch{display:flex;gap:6px;background:var(--panel);border-radius:var(--radius-pill);padding:4px;width:fit-content;max-width:100%}
 .gauges-switch-btn{font-family:var(--font-m);font-size:12.5px;font-weight:700;letter-spacing:.01em;color:var(--ink-soft);background:transparent;border:none;border-radius:var(--radius-pill);padding:9px 16px;cursor:pointer;transition:background .18s ease,color .18s ease}
 .gauges-switch-btn:hover{color:var(--ink)}
 .gauges-switch-btn.is-active{background:var(--gauge-card, var(--paper));color:var(--purple);box-shadow:var(--shadow)}
+
+/* Fila inferior de .method-gauges: el interruptor Mi progreso/Mi IMC
+   quedó al lado del botón de acción de la pestaña activa (antes el
+   interruptor iba arriba de todo, suelto) — ver memoria.md, "Método:
+   interruptor junto al CTA". Un solo `.gauges-footer-cta` visible a la
+   vez (el otro con `.hidden`), sincronizados con las pestañas en
+   setGaugesView(). Envuelve si no entran en una fila (mobile/panel
+   angosto). */
+.gauges-footer{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:18px}
+.gauges-footer-cta{display:contents}
 .method-gauges-title{font-family:var(--font-d);font-size:19px;font-weight:800;color:var(--ink);margin:10px 0 12px;max-width:none}
 .method-gauges-text{color:var(--ink-soft);font-size:14px;margin-bottom:18px}
 /* Frase de resumen arriba de la grilla (methodInsightHtml en script.js):
