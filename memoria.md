@@ -231,6 +231,19 @@ próximos pasos).
   solo en `#lam-03` — Pilares (`#lam-04`) sigue con el naranja original
   del asset compartido `deco-scribble.svg`. Detalle completo en
   `changelog.md`, diecisieteava tanda.
+- **Método (`#lam-03`) — tarjeta "Tu progreso" con jerarquía**: la tarjeta
+  de anillos (`.method-gauges`, generada en `js/script.js`) ya no muestra
+  4 anillos idénticos. Ahora: una frase de insight arriba (mayor avance /
+  área con más margen de mejora), el área que peor está destacada aparte
+  (más grande, con borde e ícono + badge de nivel), las otras 3 en grilla
+  de 3 columnas, delta como badge con flecha (verde arriba / rojo abajo),
+  e ícono lineal por área. Paleta propia de esta tarjeta (morado oscuro →
+  dorado → verde salvia, `METHOD_GAUGE_LOW/MID/HIGH` en `js/script.js`) —
+  el semáforo genérico (`GAUGE_LOW/MID/HIGH` de `js/nutricion-planes.js`)
+  sigue intacto para el gráfico de barras de "Mi plan", que no se tocó.
+  Detalle completo, incluyendo el bug de especificidad CSS que se
+  encontró y corrigió (`.gauge-item svg` → `.gauge-ring svg`), en
+  `changelog.md`, dieciochoava tanda.
 - **Método (`#lam-03`) — neuronas decorativas laterales reemplazadas**
   (sesión 2026-09-15): los 2 `<img class="deco deco-fruit">` sueltos a
   los costados del título (`neurona-izquierda.webp` a la izquierda,

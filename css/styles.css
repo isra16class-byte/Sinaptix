@@ -886,9 +886,39 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .gauges-switch-btn.is-active{background:var(--gauge-card, var(--paper));color:var(--purple);box-shadow:var(--shadow)}
 .method-gauges-title{font-family:var(--font-d);font-size:19px;font-weight:800;color:var(--ink);margin:10px 0 12px;max-width:none}
 .method-gauges-text{color:var(--ink-soft);font-size:14px;margin-bottom:18px}
-.gauge-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:4px 0 16px}
-.gauge-item{display:flex;flex-direction:column;align-items:center;text-align:center}
-.gauge-item svg{display:block;width:100%;max-width:128px;height:auto}
+/* Frase de resumen arriba de la grilla (methodInsightHtml en script.js):
+   convierte los 4 números sueltos en una lectura con sentido antes de
+   mostrar el detalle. */
+.gauge-insight{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border-radius:12px;padding:12px 14px;margin:4px 0 16px}
+.gauge-insight svg{flex:none;width:18px;height:18px;color:var(--gold);margin-top:1px}
+.gauge-insight p{margin:0;font-size:13px;line-height:1.5;color:var(--purple-dark)}
+
+.gauge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 16px}
+.gauge-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.gauge-ring{flex:none}
+.gauge-ring svg{display:block;width:100%;max-width:92px;height:auto}
+
+/* Tarjeta destacada (gaugeBuildItem con featured=true): el área que peor
+   está va aparte, en fila y más grande, con borde propio — es lo que
+   hace que la tarjeta diga "mirá esto primero" en vez de mostrar 4
+   anillos idénticos sin jerarquía. */
+.gauge-item.is-featured{flex-direction:row;align-items:center;text-align:left;gap:16px;border:1.5px solid var(--purple-dark);border-radius:12px;padding:16px;margin-bottom:14px}
+.gauge-item.is-featured .gauge-ring svg{max-width:120px}
+@media(max-width:480px){
+  .gauge-grid{grid-template-columns:repeat(2,1fr)}
+  .gauge-item.is-featured{flex-direction:column;text-align:center}
+}
+
+.gauge-item-meta{display:flex;flex-direction:column;align-items:inherit;gap:4px}
+.gauge-item-label{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-m);font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.01em}
+.gauge-icon{width:15px;height:15px;flex:none;color:var(--purple)}
+.gauge-tier-badge{font-family:var(--font-m);font-size:11px;font-weight:700;color:var(--purple-dark);background:var(--panel);padding:2px 9px;border-radius:20px}
+.gauge-item-antes{font-family:var(--font-m);font-size:11.5px;color:var(--ink-soft)}
+.gauge-delta-badge{display:inline-flex;align-items:center;gap:3px;font-family:var(--font-m);font-size:11px;font-weight:700}
+.gauge-delta-badge svg{width:12px;height:12px}
+.gauge-delta-badge.is-up{color:var(--green)}
+.gauge-delta-badge.is-down{color:#B3261E}
+.gauge-delta-badge.is-flat{color:var(--ink-faint)}
 .gauge-delta{font-family:var(--font-m);font-size:11.5px;color:var(--ink-soft);margin-top:6px}
 .gauge-scale{display:flex;flex-wrap:wrap;gap:12px;font-family:var(--font-m);font-size:11.5px;color:var(--ink-soft);margin-bottom:14px}
 .gauge-scale span{display:inline-flex;align-items:center;gap:5px}

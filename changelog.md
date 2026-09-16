@@ -8,6 +8,52 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (dieciochoava tanda) — Método (lam-03): rediseño de la tarjeta "Tu progreso" con jerarquía
+
+A pedido del usuario, que mostró capturas de la tarjeta real (`.method-
+gauges`, "Foco, memoria, energía y calma") y dijo que "no resalta, no
+convence": los 4 anillos idénticos sin jerarquía se reemplazan por una
+tarjeta con lectura guiada. Cambios en `js/script.js` (todo dentro de la
+sección "Anillos de progreso (Método)", no toca `nutricion-planes.js` ni
+el gráfico de barras de "Mi plan", que siguen usando `gaugeColorForPercent`
+/`GAUGE_LOW`/`MID`/`HIGH`/`gaugeDeltaHtml` sin cambios):
+
+- **Frase de insight arriba** (`methodInsightHtml`): con reevaluación,
+  celebra el área de mayor avance ("Tu mayor avance: memoria pasó de 60%
+  a 100% (+40 pts)") y señala la que sigue floja; sin reevaluación
+  (primera visita), señala directamente el área con más margen de mejora.
+- **Área destacada** (`gaugeBuildItem(area, featured=true)`): la de peor
+  valor actual (`despuesPct` si existe, si no `antesPct`) se muestra
+  aparte, en fila, anillo más grande, con borde propio (`.is-featured`,
+  `border:1.5px solid var(--purple-dark)`) y un badge de nivel
+  (`methodTierLabel`: "Necesita atención" / "En progreso" / "Sólido").
+  Las otras 3 quedan en una grilla de 3 columnas (antes eran 4 en 2x2).
+- **Ícono lineal por área** (`methodGaugeIcon`: diana=Foco, pulso=Memoria,
+  rayo=Energía, luna=Calma) — mismo estilo que el resto del sitio
+  (`viewBox 24`, `stroke currentColor` 1.5, sin relleno).
+- **Delta como badge con flecha** (`methodDeltaBadge`) en vez del texto
+  gris 11px de antes: flecha arriba/verde si mejoró, abajo/rojo si
+  empeoró, "sin cambios" en gris si igual.
+- **Paleta propia de esta tarjeta** (`methodGaugeColorForPercent`,
+  `METHOD_GAUGE_LOW/MID/HIGH` = morado oscuro `#4B2E45` → dorado
+  `#C1703B` → verde salvia apagado `#6B8F71`) en vez del semáforo rojo/
+  dorado/verde genérico (`GAUGE_LOW/MID/HIGH` de `nutricion-planes.js`,
+  que se dejó intacto porque lo sigue usando "Mi plan").
+- CSS nuevo en `css/styles.css`: `.gauge-insight`, `.gauge-item.is-
+  featured`, `.gauge-item-meta`, `.gauge-item-label`, `.gauge-icon`,
+  `.gauge-tier-badge`, `.gauge-item-antes`, `.gauge-delta-badge` (+
+  variantes `.is-up`/`.is-down`/`.is-flat`), `.gauge-grid` pasó de
+  `repeat(2,1fr)` a `repeat(3,1fr)` (2 columnas debajo de 480px).
+- Bug encontrado y corregido durante la verificación: `.gauge-item svg`
+  (regla vieja, pensada solo para el anillo) le ganaba por especificidad
+  a `.gauge-icon` y estiraba los íconos nuevos a ~90px. Se renombró a
+  `.gauge-ring svg`, scopeado al wrapper del anillo únicamente.
+- Verificado con Playwright inyectando `sinaptix_objetivo`/
+  `sinaptix_reevaluacion` en `localStorage`: estado con reevaluación,
+  estado sin reevaluación (primera visita, sin deltas), mobile 390px
+  (cae a grilla de 2 columnas y la destacada se apila en columna), y que
+  la pestaña "Mi IMC" sigue intacta (no se tocó `renderMethodImc`).
+
 ## 2026-09-15 (diecisieteava tanda) — Método (lam-03): frutas pequeñas + rayas del título en dorado
 
 A pedido del usuario: (1) se agregaron 3 `<img class="deco deco-fruit">`

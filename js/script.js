@@ -261,23 +261,120 @@
       'stroke-dasharray="'+len.toFixed(1)+' '+circumference.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
   }
 
+  // Paleta propia de esta tarjeta (Método): morado oscuro → dorado →
+  // verde salvia apagado, en vez del rojo/dorado/verde semáforo genérico
+  // de gaugeColorForPercent/GAUGE_LOW/MID/HIGH (js/nutricion-planes.js).
+  // Esas constantes compartidas NO se tocan porque las sigue usando el
+  // gráfico de barras de "Mi plan" (nutriBuildBarChartHTML) — este cambio
+  // queda scopeado a la tarjeta de Método, a pedido del usuario.
+  const METHOD_GAUGE_LOW = '#4B2E45';
+  const METHOD_GAUGE_MID = '#C1703B';
+  const METHOD_GAUGE_HIGH = '#6B8F71';
+  function methodGaugeColorForPercent(pct){
+    const p = Math.max(0, Math.min(100, pct));
+    const low = gaugeHexToRgb(METHOD_GAUGE_LOW), mid = gaugeHexToRgb(METHOD_GAUGE_MID), high = gaugeHexToRgb(METHOD_GAUGE_HIGH);
+    if(p <= 50){
+      const t = p/50;
+      return gaugeRgbToHex({r:gaugeLerp(low.r,mid.r,t), g:gaugeLerp(low.g,mid.g,t), b:gaugeLerp(low.b,mid.b,t)});
+    }
+    const t = (p-50)/50;
+    return gaugeRgbToHex({r:gaugeLerp(mid.r,high.r,t), g:gaugeLerp(mid.g,high.g,t), b:gaugeLerp(mid.b,high.b,t)});
+  }
+  function methodTierLabel(pct){
+    if(pct <= 40) return 'Necesita atención';
+    if(pct <= 75) return 'En progreso';
+    return 'Sólido';
+  }
+
+  // Ícono lineal por área (mismo estilo que el resto del sitio: viewBox
+  // 24, stroke currentColor 1.5) para poder escanear la tarjeta sin leer
+  // cada palabra.
+  function methodGaugeIcon(key){
+    const icons = {
+      foco:'<circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
+      memoria:'<path d="M3 12h4l2-6 3 12 2-9 2 3h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+      energia:'<path d="M13 3 4 14h6l-1 7 9-11h-6l1-7Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+      calma:'<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
+    };
+    return '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class="gauge-icon">'+(icons[key]||'')+'</svg>';
+  }
+
+  // Delta "Antes: X% (+/- N pts)" pintado como badge con flecha en vez
+  // del texto gris chico de antes (gaugeDeltaHtml, que sigue viviendo tal
+  // cual en nutricion-planes.js y se sigue usando en "Mi plan" sin
+  // cambios). Acá se lee de un vistazo en vez de tener que leer el número.
+  function methodDeltaBadge(antesPct, despuesPct){
+    if(despuesPct == null) return '';
+    const delta = despuesPct - antesPct;
+    if(delta > 0){
+      return '<span class="gauge-delta-badge is-up"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 17 17 7M9 7h8v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>+'+delta+' pts</span>';
+    }
+    if(delta < 0){
+      return '<span class="gauge-delta-badge is-down"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M7 7 17 17M17 9v8H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'+delta+' pts</span>';
+    }
+    return '<span class="gauge-delta-badge is-flat">sin cambios</span>';
+  }
+
+  // Frase que resume el estado en palabras en vez de solo 4 números
+  // sueltos: sin esto la tarjeta era un dashboard sin interpretación.
+  // Con reevaluación, celebra el mayor avance y señala qué área sigue
+  // floja; sin reevaluación (primera visita), señala directamente dónde
+  // hay más margen de mejora.
+  function methodInsightHtml(areas, hasReeval){
+    const pctDe = function(a){ return a.despuesPct==null ? a.antesPct : a.despuesPct; };
+    const worst = areas.reduce(function(a,b){ return pctDe(b) < pctDe(a) ? b : a; });
+    const worstPct = pctDe(worst);
+    let texto;
+    if(hasReeval){
+      const best = areas.reduce(function(a,b){
+        const da = a.despuesPct - a.antesPct, db = b.despuesPct - b.antesPct;
+        return db > da ? b : a;
+      });
+      const bestDelta = best.despuesPct - best.antesPct;
+      const logro = bestDelta > 0
+        ? 'Tu mayor avance: <strong>'+best.label.toLowerCase()+'</strong> pasó de '+best.antesPct+'% a '+best.despuesPct+'% (+'+bestDelta+' pts). '
+        : '';
+      texto = logro+worst.label+' sigue en '+worstPct+'% — va a ser el foco de la próxima fase.';
+    } else {
+      texto = 'Tu área con más margen de mejora hoy es <strong>'+worst.label.toLowerCase()+'</strong> ('+worstPct+'%) — probá enfocar ahí las próximas dos semanas.';
+    }
+    return '<div class="gauge-insight">'+
+      '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+      '<p>'+texto+'</p>'+
+    '</div>';
+  }
+
   // Un anillo tipo "Apple Watch" por área, coloreado según su propio
-  // porcentaje. Si hay reevaluación, se agrega debajo una línea de texto
-  // con el valor inicial y la diferencia — en vez de un segundo anillo
-  // concéntrico pegado al primero, que en el tamaño real de la tarjeta
-  // quedaba demasiado apretado contra el anillo externo y se leía como un
-  // glitch en vez de una comparación clara (ver memoria.md).
-  function gaugeBuildItem(label, antesPct, despuesPct){
-    const cx=60, cy=60;
-    const current = (despuesPct==null) ? antesPct : despuesPct;
-    const color = gaugeColorForPercent(current);
-    let svg = '<svg viewBox="0 0 120 120" role="img" aria-label="'+label+': '+current+'%'+
-      (despuesPct!=null ? ' (antes '+antesPct+'%)' : '')+'">';
-    svg += gaugeArc(cx, cy, 46, 12, current, color);
-    svg += '<text x="60" y="57" text-anchor="middle" style="font-family:var(--font-d);font-size:24px;font-weight:800;fill:var(--ink)">'+current+'%</text>';
-    svg += '<text x="60" y="75" text-anchor="middle" style="font-family:var(--font-m);font-size:10px;font-weight:700;fill:var(--ink-faint);letter-spacing:.02em">'+label+'</text>';
+  // porcentaje. `featured` agranda el anillo y agrega el ícono + badge de
+  // nivel (ver renderMethodGauges: es el área que peor está, para que la
+  // tarjeta diga "mirá esto primero" en vez de mostrar 4 anillos
+  // idénticos sin jerarquía). El delta ("Antes: X%") usa methodDeltaBadge
+  // en vez de un segundo anillo concéntrico pegado al primero, que en el
+  // tamaño real de la tarjeta quedaba demasiado apretado contra el
+  // anillo externo y se leía como un glitch en vez de una comparación
+  // clara (ver memoria.md).
+  function gaugeBuildItem(area, featured){
+    const current = area.despuesPct==null ? area.antesPct : area.despuesPct;
+    const color = methodGaugeColorForPercent(current);
+    const size = featured ? {r:46, sw:12, box:120, font:26} : {r:34, sw:9, box:92, font:19};
+    const c = size.box/2;
+    let svg = '<svg viewBox="0 0 '+size.box+' '+size.box+'" role="img" aria-label="'+area.label+': '+current+'%'+
+      (area.despuesPct!=null ? ' (antes '+area.antesPct+'%)' : '')+'">';
+    svg += gaugeArc(c, c, size.r, size.sw, current, color);
+    svg += '<text x="'+c+'" y="'+(c+size.font*0.34)+'" text-anchor="middle" style="font-family:var(--font-d);font-size:'+size.font+'px;font-weight:800;fill:var(--ink)">'+current+'%</text>';
     svg += '</svg>';
-    return '<div class="gauge-item">'+svg+gaugeDeltaHtml(antesPct, despuesPct)+'</div>';
+
+    const badge = featured ? '<span class="gauge-tier-badge">'+methodTierLabel(current)+'</span>' : '';
+    const antesLine = area.despuesPct==null ? '' :
+      '<span class="gauge-item-antes">Antes: '+area.antesPct+'%</span> '+methodDeltaBadge(area.antesPct, area.despuesPct);
+
+    return '<div class="gauge-item'+(featured?' is-featured':'')+'">'+
+      '<div class="gauge-ring">'+svg+'</div>'+
+      '<div class="gauge-item-meta">'+
+        '<span class="gauge-item-label">'+methodGaugeIcon(area.key)+area.label+badge+'</span>'+
+        antesLine+
+      '</div>'+
+    '</div>';
   }
 
   function renderMethodGauges(){
@@ -316,17 +413,34 @@
       {key:'memoria', label:'Memoria'},
       {key:'energia', label:'Energía'},
       {key:'calma', label:'Calma'}
-    ];
-    const grid = areas.map(function(a){
-      const antesPct = Math.round((antes[a.key]/5)*100);
-      const despuesPct = despues ? Math.round((despues[a.key]/5)*100) : null;
-      return gaugeBuildItem(a.label, antesPct, despuesPct);
-    }).join('');
+    ].map(function(a){
+      return {
+        key:a.key,
+        label:a.label,
+        antesPct: Math.round((antes[a.key]/5)*100),
+        despuesPct: despues ? Math.round((despues[a.key]/5)*100) : null
+      };
+    });
+
+    // El área que peor está (según el valor más reciente) se destaca en
+    // grande arriba de la grilla, en vez de mostrar los 4 anillos
+    // idénticos sin decir cuál mirar primero (ver memoria.md, "Método:
+    // tarjeta de progreso con jerarquía").
+    const featured = areas.reduce(function(a,b){
+      const pa = a.despuesPct==null?a.antesPct:a.despuesPct;
+      const pb = b.despuesPct==null?b.antesPct:b.despuesPct;
+      return pb < pa ? b : a;
+    });
+
+    const insight = methodInsightHtml(areas, !!despues);
+    const featuredHtml = gaugeBuildItem(featured, true);
+    const grid = areas.filter(function(a){ return a.key!==featured.key; })
+      .map(function(a){ return gaugeBuildItem(a, false); }).join('');
 
     const scale = '<div class="gauge-scale">'+
-      '<span><i style="background:'+GAUGE_LOW+'"></i>Necesita atención</span>'+
-      '<span><i style="background:'+GAUGE_MID+'"></i>En progreso</span>'+
-      '<span><i style="background:'+GAUGE_HIGH+'"></i>Sólido</span>'+
+      '<span><i style="background:'+METHOD_GAUGE_LOW+'"></i>Necesita atención</span>'+
+      '<span><i style="background:'+METHOD_GAUGE_MID+'"></i>En progreso</span>'+
+      '<span><i style="background:'+METHOD_GAUGE_HIGH+'"></i>Sólido</span>'+
       '</div>';
 
     let legend = '<p class="gauge-dates">';
@@ -341,7 +455,7 @@
     const cta = '<button type="button" class="btn btn-ghost" id="btnReevaluar">'+
       (despues ? 'Actualizar mi estado otra vez' : 'Actualizar mi estado')+'</button>';
 
-    el.innerHTML = header+'<div class="gauge-grid">'+grid+'</div>'+scale+legend+cta;
+    el.innerHTML = header+insight+featuredHtml+'<div class="gauge-grid">'+grid+'</div>'+scale+legend+cta;
   }
 
   // ===================== Interruptor "Mi progreso" / "Mi IMC" (Método) =====================
