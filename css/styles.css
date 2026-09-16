@@ -1086,6 +1086,17 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
   font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--green);
   display:none;padding-top:4px;
 }
+/* Botón "Iniciar sesión" del último paso del wizard de nutrición
+   (#nutriLoginBtn, index.html): sin este align-self, hereda el
+   align-items:stretch por default de `.modal-form` (flex-column) y
+   ocupa todo el ancho del modal — se ve pesado y compite con "Guardar
+   mi plan" (reportado por el usuario con captura). `align-self:flex-start`
+   lo vuelve a su ancho natural de contenido, `btn-ghost` (en vez de
+   btn-solid) lo baja de jerarquía visual frente al solid morado de
+   "Guardar mi plan" (esa ya fue la acción principal), y el padding/
+   font-size más chicos lo acercan al tono de nota que tiene el mensaje
+   de arriba en vez de un CTA grande nuevo. */
+.nutri-login-btn{align-self:flex-start;margin-top:10px;padding:11px 24px;font-size:13.5px}
 
 /* ---------- ENCUESTA DE NUTRICIÓN ESPECIALIZADA (wizard) ---------- */
 .modal-card-wide{max-width:560px}

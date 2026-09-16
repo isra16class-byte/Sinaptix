@@ -996,7 +996,7 @@ Prioridad 2.
   login/registro en `mi-plan.html` (`#btnLogin`/`#btnAcceder` del header
   ya apuntan ahí, no al widget). En el deploy real tampoco se veía ningún
   botón en ese paso. Fix: `index.html` agrega
-  `<a href="mi-plan.html" class="btn btn-solid hidden"
+  `<a href="mi-plan.html" class="btn btn-ghost nutri-login-btn hidden"
   id="nutriLoginBtn">Iniciar sesión</a>` justo debajo de
   `#nutriResultado`; `js/script.js` (handler de submit del wizard) sacó
   el `setTimeout`/`netlifyIdentity.open('login')` y en su lugar hace
@@ -1006,10 +1006,24 @@ Prioridad 2.
   el botón (`classList.add('hidden')`) al reabrir el wizard, igual que ya
   hacía con `#nutriResultado`, para que no quede visible de una sesión
   anterior del wizard. El caso con sesión iniciada no cambió (sigue
-  redirigiendo directo a "Mi plan" a los 900ms). Verificado con
-  Playwright (mock del DOM en vez del widget real, no alcanzable desde
-  este entorno): botón visible y con el estilo `.btn-solid` esperado en
-  desktop 1440px y mobile 390px.
+  redirigiendo directo a "Mi plan" a los 900ms).
+  **Tamaño y estilo del botón** (misma sesión, ajuste siguiente — el
+  usuario mandó captura mostrando el botón `btn-solid` estirado a todo
+  el ancho del modal, "feo"/pesado al lado de "Guardar mi plan"). Causa:
+  `.modal-form` es `display:flex;flex-direction:column` sin
+  `align-items` propio → default `stretch`, y a diferencia de
+  "Atrás"/"Guardar mi plan" (que viven adentro de `.nutri-nav`, una fila
+  flex aparte con `.btn{flex:none}`), `#nutriLoginBtn` cuelga directo del
+  `.modal-form`, así que heredaba ese stretch y ocupaba el 100% del
+  ancho. Fix: nueva clase `.nutri-login-btn{align-self:flex-start;
+  margin-top:10px;padding:11px 24px;font-size:13.5px}` (`css/styles.css`)
+  le da tamaño natural de contenido y lo alinea a la izquierda; además
+  pasó de `btn-solid` a `btn-ghost` (outline, no relleno) para bajarle
+  jerarquía visual frente al solid morado de "Guardar mi plan", que ya
+  fue la acción principal de este paso.
+  Verificado con Playwright (mock del DOM en vez del widget real, no
+  alcanzable desde este entorno): botón chico, alineado a la izquierda,
+  estilo `.btn-ghost`, desktop 1440px y mobile 390px.
 
 - **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
   al lado del botón de acción** (sesión 2026-09-15, continuación): antes

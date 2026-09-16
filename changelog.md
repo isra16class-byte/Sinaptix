@@ -8,6 +8,33 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veintiseisava tanda) — Botón "Iniciar sesión" del wizard: de btn-solid estirado a btn-ghost de tamaño natural
+
+A pedido del usuario, con captura mostrando el botón agregado en la
+tanda anterior estirado a todo el ancho del modal, en el mismo morado
+sólido que "Guardar mi plan" — "se ve feo".
+
+- **Causa**: `#nutriLoginBtn` cuelga directo de `.modal-form`
+  (`display:flex;flex-direction:column`, sin `align-items` propio →
+  default `stretch`). "Atrás"/"Guardar mi plan" no sufren esto porque
+  viven dentro de `.nutri-nav` (fila flex aparte, con
+  `.btn{flex:none}`); `#nutriLoginBtn` es hijo directo del form y
+  heredaba el stretch del eje cruzado (ancho).
+- **`css/styles.css`**: nueva clase `.nutri-login-btn{align-self:flex-start;
+  margin-top:10px;padding:11px 24px;font-size:13.5px}`, agregada junto a
+  `.modal-result`.
+- **`index.html`**: `#nutriLoginBtn` pasa de `btn btn-solid` a `btn
+  btn-ghost nutri-login-btn` (se saca también el `style="margin-top:10px"`
+  inline, ahora lo da la clase).
+- Sin cambios en `js/script.js` ni `js/nutricion-wizard.js` — el
+  toggle de `hidden` sigue igual, solo cambió el estilo.
+- Verificado con Playwright: botón de tamaño natural, alineado a la
+  izquierda, estilo outline (ghost), desktop 1440px y mobile 390px.
+- **Actualiza `memoria.md`**: se reescribió la entrada del botón de login
+  del wizard (agregada en la tanda anterior) para reflejar el diseño
+  final — no se agregó una entrada nueva separada porque es el mismo
+  punto de "estado actual", solo corregido antes de llegar a producción.
+
 ## 2026-09-15 (veinticincoava tanda) — Wizard de nutrición: botón real de "Iniciar sesión" en vez del widget nativo automático
 
 A pedido del usuario, con captura del deploy real (`index.html`, último
