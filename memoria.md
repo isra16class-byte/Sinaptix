@@ -166,7 +166,8 @@ próximos pasos).
 ## Tests
 
 Sesión 2026-09-15: se armó `plan-tests-sinaptix.md` (entregado al
-usuario, no vive en el repo) y se implementó su Prioridad 1.
+usuario, no vive en el repo) y se implementaron su Prioridad 1 y
+Prioridad 2.
 
 - **Qué cubre**: `tests/nutricion-planes.test.js` — 30 tests con
   `node --test` (nativo de Node, sin dependencias nuevas) sobre las
@@ -193,16 +194,40 @@ usuario, no vive en el repo) y se implementó su Prioridad 1.
   define un mock in-memory (`crearLocalStorageMock()`) y lo asigna a
   `global.localStorage` **antes** de requerir el módulo, para que esa
   referencia libre la encuentre.
-- **No se testea (a propósito, ver `plan-tests-sinaptix.md`)**:
-  `netlify/functions/plan.mjs` (depende de Netlify Identity/Database,
-  no mockeables sin tocar el archivo — queda como Prioridad 2, todavía
-  no implementada) ni el diseño/layout del sitio (cambia cada sesión, se
-  sigue verificando con Playwright ad hoc en cada patch de UI, no en una
-  suite fija).
+- **Prioridad 2 — `esTipoValido` de `netlify/functions/plan.mjs`**:
+  `plan.mjs` valida el campo `tipo` del POST contra
+  `TIPOS_VALIDOS.includes(tipo)`; esa constante y la validación se
+  extrajeron a un módulo nuevo, **`netlify/functions/plan-validacion.mjs`**
+  (`export const TIPOS_VALIDOS`, `export function esTipoValido(tipo)`),
+  sin ningún import de `@netlify/identity` ni `@netlify/database`.
+  `plan.mjs` ahora importa `{ TIPOS_VALIDOS, esTipoValido }` de ese
+  archivo en vez de declarar la constante y usa `esTipoValido(tipo)` en
+  el POST; el resto del handler (GET/POST, auth, SQL) no cambió. Se
+  separó en un módulo aparte (y no se agregó `export` directo en
+  `plan.mjs`) porque `plan.mjs` importa `@netlify/identity` y
+  `@netlify/database` a nivel de módulo — esos paquetes solo están
+  declarados en `package.json` para que Netlify los instale en el
+  deploy, no viven en `node_modules` en este entorno de trabajo, así que
+  importar `plan.mjs` directo desde un test rompería con
+  `ERR_MODULE_NOT_FOUND` aunque lo único que se quisiera testear sea la
+  validación.
+  Test: `tests/plan-validacion.test.mjs` (5 tests, ESM — `.mjs` porque
+  `plan-validacion.mjs` usa `export`/`import`, a diferencia de
+  `nutricion-planes.test.js` que es CommonJS): los 3 tipos válidos dan
+  `true`; inválido, vacío, `undefined` y `null` dan `false`. No requiere
+  ningún mock.
+  El resto de `plan.mjs` (auth real vía `getUser()`, SQL real vía
+  `getDatabase()`) sigue **sin testear**, a propósito: solo se puede
+  verificar contra un deploy real de Netlify (ver "Pendientes
+  conocidos"), no es alcanzable desde este entorno.
+- **No se testea (a propósito, ver `plan-tests-sinaptix.md`)**: el
+  diseño/layout del sitio (cambia cada sesión, se sigue verificando con
+  Playwright ad hoc en cada patch de UI, no en una suite fija).
 - **CI**: no hay pipeline configurado — `netlify.toml` tiene
   `command = ""`, así que Netlify no corre `npm test` en el deploy. Correr
   los tests es manual (`npm test`) antes de generar cada patch que toque
-  `js/nutricion-planes.js`.
+  `js/nutricion-planes.js` o `netlify/functions/plan.mjs`/
+  `plan-validacion.mjs`.
 
 ## Estado actual del diseño (resumen)
 

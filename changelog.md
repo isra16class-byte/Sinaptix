@@ -8,6 +8,48 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veintitresava tanda) — Tests unitarios para netlify/functions/plan.mjs (Prioridad 2 de plan-tests-sinaptix.md)
+
+A pedido del usuario ("continuemos con la prioridad 2"): segunda tanda
+de tests, siguiendo `plan-tests-sinaptix.md` (Prioridad 2, opcional).
+`plan.mjs` no se testea completo (depende de `getUser()`/`getDatabase()`,
+solo verificables contra un deploy real), pero la validación del campo
+`tipo` era una función pura aislable.
+
+- **`netlify/functions/plan-validacion.mjs`** (archivo nuevo): se movió
+  acá `TIPOS_VALIDOS` (antes declarada inline en `plan.mjs`) y se agregó
+  `esTipoValido(tipo)` (`TIPOS_VALIDOS.includes(tipo)` envuelto en
+  función, ambos exportados). Sin ningún import de `@netlify/identity` ni
+  `@netlify/database` a propósito: esos paquetes están en
+  `package.json` para que Netlify los instale en el deploy, pero no hay
+  `node_modules` en este entorno de trabajo, así que si el test
+  importara `plan.mjs` directo (que sí los importa a nivel de módulo)
+  fallaría con `ERR_MODULE_NOT_FOUND` aunque lo único que quisiera
+  testear fuera la validación — separarla en su propio módulo sin esas
+  dependencias evita el problema.
+- **`netlify/functions/plan.mjs`**: reemplaza la declaración inline de
+  `TIPOS_VALIDOS` por `import { TIPOS_VALIDOS, esTipoValido } from
+  './plan-validacion.mjs'`, y el check del POST pasa de
+  `TIPOS_VALIDOS.includes(tipo)` a `esTipoValido(tipo)`. Sin cambios de
+  comportamiento: mismo mensaje de error, mismo status 400, GET/POST y
+  el resto del handler intactos.
+- **`tests/plan-validacion.test.mjs`** (archivo nuevo): 5 tests con
+  `node --test`, en formato ESM (`.mjs`, con `import`/`export` —
+  a diferencia de `tests/nutricion-planes.test.js` que es CommonJS,
+  porque `plan-validacion.mjs` sí usa `export`). Cubre: los 3 valores de
+  `TIPOS_VALIDOS` dan `true`; un string inválido (incluida una variante
+  con mayúscula, para confirmar que no matchea case-insensitive), vacío,
+  `undefined` y `null` dan `false`. No requiere ningún mock. Se corrió
+  junto con la suite completa (`npm test`) para confirmar que los 30
+  tests de la tanda anterior siguen pasando: **35/35 OK**.
+- **Actualiza `memoria.md`**: sección "Tests" — se agregó el bloque
+  "Prioridad 2" (qué se extrajo, por qué en un módulo aparte, qué cubre
+  el test) y se sacó la nota de "Prioridad 2 todavía no implementada".
+  No se archivó nada (la sección sigue corta).
+- No se generó Patch para `plan-tests-sinaptix.md` en sí — es un
+  documento de planificación entregado aparte, no vive en el repo (así
+  lo pide el propio plan, sección "Cómo se entrega").
+
 ## 2026-09-15 (veintidosava tanda) — Tests unitarios para js/nutricion-planes.js (Prioridad 1 de plan-tests-sinaptix.md)
 
 A pedido del usuario ("oye para este tipo de web se necesita test?" →

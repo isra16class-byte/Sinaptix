@@ -39,8 +39,7 @@
 // corre DDL).
 import { getUser } from '@netlify/identity';
 import { getDatabase } from '@netlify/database';
-
-const TIPOS_VALIDOS = ['antropometria', 'objetivo', 'reevaluacion'];
+import { TIPOS_VALIDOS, esTipoValido } from './plan-validacion.mjs';
 
 export default async (req, context) => {
   const user = await getUser();
@@ -81,7 +80,7 @@ export default async (req, context) => {
 
     const tipo = body.tipo;
     const datos = body.datos;
-    if(!TIPOS_VALIDOS.includes(tipo)){
+    if(!esTipoValido(tipo)){
       return Response.json({error: 'tipo inválido. Debe ser uno de: '+TIPOS_VALIDOS.join(', ')}, {status: 400});
     }
 
