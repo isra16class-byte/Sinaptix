@@ -228,13 +228,20 @@
         }, 900);
       } else {
         // Sin sesión: queda guardado en este navegador, pero para verlo
-        // completo y no perderlo, invitamos a iniciar sesión (o crear cuenta).
+        // completo y no perderlo, invitamos a iniciar sesión (o crear
+        // cuenta) en "Mi plan" — mismo destino que #btnLogin/#btnAcceder
+        // del header, que ya usan las pantallas propias de login/registro
+        // (.miplan-locked-card en mi-plan.html) en vez del widget nativo
+        // de Netlify Identity. Antes acá se abría ese widget directo con
+        // netlifyIdentity.open('login'), pero quedó inconsistente con el
+        // resto del sitio y, en el deploy real, no siempre se veía (el
+        // usuario reportó no encontrar ningún botón en este paso) — se
+        // reemplaza por un botón visible y explícito.
         res.textContent = 'Guardamos tu propuesta en este navegador. Iniciá sesión para verla completa, guardada y lista cada vez que entres. ✓';
         renderMethodGauges();
         renderMethodImc();
-        if(window.netlifyIdentity){
-          setTimeout(function(){ netlifyIdentity.open('login'); }, 900);
-        }
+        const loginBtn = document.getElementById('nutriLoginBtn');
+        if(loginBtn) loginBtn.classList.remove('hidden');
       }
     });
   }

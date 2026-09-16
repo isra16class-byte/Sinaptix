@@ -43,6 +43,8 @@ function resetNutriWizard(){
   nutriForm.reset();
   const resultadoEl = document.getElementById('nutriResultado');
   if(resultadoEl) resultadoEl.style.display='none';
+  const loginBtnEl = document.getElementById('nutriLoginBtn');
+  if(loginBtnEl) loginBtnEl.classList.add('hidden');
 
   // Prellenar edad/sexo/peso/talla si ya existen en "Mis datos"
   // (antropometría). Peso y talla, en particular, ya no se muestran como

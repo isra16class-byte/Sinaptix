@@ -8,6 +8,41 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-15 (veinticincoava tanda) — Wizard de nutrición: botón real de "Iniciar sesión" en vez del widget nativo automático
+
+A pedido del usuario, con captura del deploy real (`index.html`, último
+paso del wizard "Creamos tu plan de neuroalimentación"): sin sesión
+iniciada, el mensaje final invitaba a iniciar sesión pero no había
+ningún botón visible para hacerlo.
+
+- **Causa**: el handler de submit del wizard (`js/script.js`) confiaba
+  en `setTimeout(() => netlifyIdentity.open('login'), 900)` — abre el
+  **widget nativo** de Netlify Identity automáticamente. Esto quedó
+  desactualizado frente al resto del sitio, que ya reemplazó ese widget
+  por pantallas propias de login/registro (`mi-plan.html`,
+  `.miplan-locked-card`) — el header (`#btnLogin`/`#btnAcceder`) ya
+  apunta ahí, no al widget. En el deploy real tampoco se veía ningún
+  botón en este paso.
+- **`index.html`**: se agregó `<a href="mi-plan.html" class="btn
+  btn-solid hidden" id="nutriLoginBtn">Iniciar sesión</a>` debajo de
+  `#nutriResultado` (mismo destino que el resto de los accesos de login
+  del sitio).
+- **`js/script.js`**: en la rama "sin sesión" del submit del wizard, se
+  sacó el `setTimeout`/`netlifyIdentity.open('login')` y se reemplazó por
+  `nutriLoginBtn.classList.remove('hidden')` — el botón queda visible en
+  vez de depender de un popup automático. La rama "con sesión" no
+  cambió.
+- **`js/nutricion-wizard.js`** (`resetNutriWizard()`): se agregó
+  `nutriLoginBtn.classList.add('hidden')`, junto al reseteo existente de
+  `#nutriResultado`, para que el botón no quede visible de una vuelta
+  anterior del wizard al volver a abrirlo.
+- Verificado con Playwright (mock del DOM del último paso, sin depender
+  del widget real de Netlify Identity — no alcanzable desde este
+  entorno): botón visible con el estilo `.btn-solid` esperado, desktop
+  1440px y mobile 390px.
+- **Actualiza `memoria.md`**: entrada agregada a continuación del punto
+  del placeholder de Antropometría en "Estado actual del diseño".
+
 ## 2026-09-15 (veinticuatroava tanda) — Antropometría: "—" placeholder igualado al de Objetivo cognitivo
 
 A pedido del usuario, con captura del dashboard "Mi plan" en estado sin

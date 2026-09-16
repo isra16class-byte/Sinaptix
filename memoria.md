@@ -985,6 +985,31 @@ Prioridad 2.
   tamaño y altura, desktop 1440px y mobile 390px, botones siguen
   parejos) y estado con IMC cargado (vuelve a 36px, sin afectar
   Objetivo cognitivo).
+- **Wizard de nutrición (`#modalNutricion`) — botón "Iniciar sesión" real
+  en el último paso, en vez de depender del widget nativo automático**
+  (sesión 2026-09-15, continuación — el usuario mandó captura del deploy
+  real mostrando el mensaje final sin ningún botón visible). Antes, sin
+  sesión, al guardar el plan se llamaba a `setTimeout(() =>
+  netlifyIdentity.open('login'), 900)`: abría el widget **nativo** de
+  Netlify Identity automáticamente — inconsistente con el resto del
+  sitio, que ya reemplazó ese widget por pantallas propias de
+  login/registro en `mi-plan.html` (`#btnLogin`/`#btnAcceder` del header
+  ya apuntan ahí, no al widget). En el deploy real tampoco se veía ningún
+  botón en ese paso. Fix: `index.html` agrega
+  `<a href="mi-plan.html" class="btn btn-solid hidden"
+  id="nutriLoginBtn">Iniciar sesión</a>` justo debajo de
+  `#nutriResultado`; `js/script.js` (handler de submit del wizard) sacó
+  el `setTimeout`/`netlifyIdentity.open('login')` y en su lugar hace
+  `loginBtn.classList.remove('hidden')` cuando no hay sesión — mismo
+  destino (`mi-plan.html`) que el resto de los accesos de login del
+  sitio. `js/nutricion-wizard.js` (`resetNutriWizard()`) vuelve a ocultar
+  el botón (`classList.add('hidden')`) al reabrir el wizard, igual que ya
+  hacía con `#nutriResultado`, para que no quede visible de una sesión
+  anterior del wizard. El caso con sesión iniciada no cambió (sigue
+  redirigiendo directo a "Mi plan" a los 900ms). Verificado con
+  Playwright (mock del DOM en vez del widget real, no alcanzable desde
+  este entorno): botón visible y con el estilo `.btn-solid` esperado en
+  desktop 1440px y mobile 390px.
 
 - **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
   al lado del botón de acción** (sesión 2026-09-15, continuación): antes
