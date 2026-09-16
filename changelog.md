@@ -8,6 +8,50 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimooctava tanda) — Tarjetas de `#lam-02` menos verticales, texto con más contraste, ícono "1:1" más grande
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario mandó una captura del sitio y una referencia (mockup generado
+con Gemini) pidiendo tres cosas sobre el `stat-grid` de 4 tarjetas de
+Visión (`#lam-02`): que las tarjetas no se vean "tan verticales", que el
+texto del label (casi no se leía) se resuelva (sugería negrita), y que
+el ícono de la tarjeta "1:1" (`icon-conversacion.svg`, dos personas
+hablando) se vea más grande.
+
+- **Tarjetas más bajas/horizontales**: `#lam-02 .stat-box` — padding de
+  `28px 26px` (heredado del `.stat-box` base) a `20px 22px 18px`; `.num`
+  de `36px` a `32px`. La causa real de la altura era que el
+  `padding-right:74px` reservado para el ícono se aplicaba tanto a
+  `.num` como a `.lab` (línea completa), así que el label perdía ancho
+  en **todas** sus líneas aunque el ícono solo ocupa la esquina
+  superior — eso hacía que el label envolviera en 4-5 líneas cortas. Se
+  saca el `padding-right` de `.lab` (queda solo en `.num`, bajado a
+  `66px`) y en su lugar `.lab` usa `margin-top:16px` (antes `8px`) para
+  arrancar ya despejado por debajo del ícono: menos líneas, tarjetas más
+  bajas. El ícono base también bajó de `60×60px` a `56×56px` para
+  acompañar el padding más chico.
+- **Contraste del texto**: `.lab` de esta sección pasó de
+  `opacity:.85` + peso normal a `opacity:1` + `font-weight:600`; el
+  fondo translúcido de la tarjeta subió de `rgba(255,255,255,.55)` a
+  `.72` (mismo cambio, para que el label se lea bien contra el arte de
+  fondo). No se puso negrita real en el sentido de otra familia
+  tipográfica, se usó `font-weight:600` de la misma fuente — se ve
+  como negrita sin romper el resto de la jerarquía tipográfica.
+- **Ícono "1:1" más grande**: a pesar del fix de `viewBox` de la tanda
+  anterior (16ª/17ª), a este tamaño de tarjeta más compacto el ícono de
+  conversación se seguía viendo chico frente a los otros 3 una vez
+  reducidos a 56px — se decidió agrandar *solo ese*, en vez de tocar el
+  tamaño base de los 4: `#lam-02 .stat-box:nth-child(4) .stat-icon` a
+  `78×78px` (`top`/`right` `10px`, antes `18px`), con `.num` y `.lab` de
+  esa misma tarjeta ajustando `padding-right`/`margin-top` (`88px`/`20px`)
+  para que no se pisen con el ícono más grande.
+- Verificado con Playwright headless (desktop 1440px y mobile 390px):
+  las 4 tarjetas quedan claramente más bajas que antes, el texto del
+  label se lee con buen contraste, el ícono "1:1" se ve notoriamente más
+  grande que los otros 3, y no hay overlap entre ícono/número/label en
+  ninguno de los dos anchos probados.
+
 ## 2026-09-16 (décimoséptima tanda) — Iconos de `#lam-02` más grandes + fix de recorte en `icon-conversacion.svg`
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

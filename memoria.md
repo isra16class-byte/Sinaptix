@@ -163,9 +163,12 @@ próximos pasos).
   `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
   conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
   sin `stroke`, color `--ink`), usados como `.stat-icon` en las 4
-  tarjetas de `#lam-02` (Visión) a 60×60px (`#lam-02 .stat-icon`, ver
-  `changelog.md` para el porqué de `icon-conversacion.svg` tener un
-  `viewBox` recortado distinto a los otros 3). Antes usaban los `.webp`
+  tarjetas de `#lam-02` (Visión) a 56×56px (`#lam-02 .stat-icon`; el de
+  `icon-conversacion.svg`, tarjeta "1:1", va más grande —78×78px— porque
+  a igual tamaño se veía más chico que los otros 3, ver "Estado actual
+  del diseño" → "Visión" para el detalle). Ver `changelog.md` para el
+  porqué de `icon-conversacion.svg` tener un `viewBox` recortado distinto
+  a los otros 3. Antes usaban los `.webp`
   ilustrados de `img/Iconos/` (`icon-energia-cerebral`, `icon-neuronas`,
   `icon-semanas`, `icon-acompanamiento`); esos archivos siguen en el
   repo por si se necesitan en otro lado, pero ya no están referenciados
@@ -730,19 +733,41 @@ Prioridad 2.
   repartir el arte a lo largo de todo el hueco vertical que deja la
   columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
   incluida la destacada `.is-featured`) son translúcidas, **todas en el
-  mismo tono blanco** (`rgba(255,255,255,.55)`, destacada `.7`) con blur
+  mismo tono blanco** (`rgba(255,255,255,.72)`, destacada `.7`) con blur
   suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en
-  `var(--purple-dark)` (`.lab` con `opacity:.85` para diferenciarse un
-  poco del `.num`; antes ambos en `var(--purple)` a secas, mismo `.lab`
-  con `opacity:.82` — se oscureció a pedido del usuario en sesión
-  2026-09-16, el morado claro contra el fondo translúcido casi no se
-  distinguía); sin `text-shadow` (ya no hace falta, el fondo es claro). El
-  borde de las 4 tarjetas (`border`, antes `rgba(255,255,255,.7)` casi
-  invisible sobre fondo claro) es `1px solid var(--purple)` (sesión
-  2026-09-15, a pedido del usuario, para que las tarjetas se distingan
-  del fondo blanco de la sección aunque no tengan la ilustración detrás).
-  El texto de `.lab` pasó de `13px` a `15px` (mismo pedido) para que se
-  lea con más facilidad; no se tocó `.num` (`36px`). Antes
+  `var(--purple-dark)` (`.lab` en `font-weight:600` y `opacity:1` — antes
+  `.85`/normal, se subió el contraste a pedido del usuario en sesión
+  2026-09-16 porque el label casi no se leía contra el fondo translúcido
+  con el arte de fondo detrás; el fondo de la tarjeta también subió de
+  `.55` a `.72` como parte del mismo ajuste); sin `text-shadow` (ya no
+  hace falta, el fondo es claro). El borde de las 4 tarjetas (`border`,
+  antes `rgba(255,255,255,.7)` casi invisible sobre fondo claro) es `1px
+  solid var(--purple)` (sesión 2026-09-15, a pedido del usuario, para que
+  las tarjetas se distingan del fondo blanco de la sección aunque no
+  tengan la ilustración detrás). El texto de `.lab` pasó de `13px` a
+  `15px` (sesión 2026-09-15, mismo pedido) para que se lea con más
+  facilidad.
+  **Tarjetas más bajas/horizontales (sesión 2026-09-16):** a pedido del
+  usuario (se veían "muy verticales"), `#lam-02 .stat-box` bajó el
+  padding de `28px 26px` (heredado de `.stat-box` base) a
+  `20px 22px 18px`, y `.num` bajó de `36px` a `32px`. El padding-right
+  que reservaba el hueco del ícono (antes aplicado también a `.lab`) se
+  saca de `.lab` y queda solo en `.num` (`66px`, antes `74px` en ambos);
+  `.lab` en cambio usa `margin-top:16px` (antes `8px`) para arrancar ya
+  despejado por debajo del ícono, así que ocupa el ancho completo de la
+  tarjeta — menos líneas de wrap, tarjetas más bajas. El ícono
+  (`#lam-02 .stat-icon`) bajó de `60×60px` a `56×56px` (`top`/`right`
+  `20px`→`18px`) para acompañar el padding más chico.
+  **Ícono de la tarjeta "1:1" (`icon-conversacion.svg`) agrandado**
+  (mismo pedido): a igual tamaño de caja que los otros 3, este ícono se
+  veía visiblemente más chico (su dibujo — dos personas hablando + iconos
+  sueltos alrededor — deja mucho aire dentro del `viewBox`, ver línea de
+  `svg/` en "Estructura de archivos"). Se targetea solo esa tarjeta con
+  `#lam-02 .stat-box:nth-child(4)` (es la 4ª/última del `stat-grid`):
+  ícono a `78×78px` (`top`/`right` `10px`), `.num` con `padding-right:88px`
+  y `.lab` con `margin-top:20px` (en vez de los valores base de arriba)
+  para que el número y el label sigan sin pisarse con el ícono más
+  grande. Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se
