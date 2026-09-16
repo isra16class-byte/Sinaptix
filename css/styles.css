@@ -329,6 +329,31 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   font-size:clamp(40px,6vw,68px);
 }
 
+/* "SINAPTIX" en el título de "Mi plan" ("Tu progreso con SINAPTIX"): a
+   pedido del usuario, encerrado con un círculo dibujado a mano (mismo
+   lenguaje visual que el resto de decos del sitio, un solo <path> con
+   stroke) en color turquesa (tomado de una referencia que trajo el
+   usuario, no es un color de marca existente — por eso vive como color
+   fijo en el SVG, `svg/deco-circle-brand.svg`, y no como variable de
+   :root) y en el morado de marca (`--purple-dark`, el mismo que usa
+   "SINAPTIX" en el logo de la nav, `.nav .mark`) en vez del color de
+   texto normal del título. El círculo es un `::after` con
+   background-image (mismo mecanismo que `.title-mark` más arriba) en vez
+   de una `<img>` aparte, para que se recorte solo a esta palabra sin
+   tocar el resto del `<h2>`; `preserveAspectRatio="none"` en el SVG (a
+   diferencia de los otros decos) porque acá el círculo tiene que
+   estirarse para calzar con el ancho real de la palabra en vez de
+   mantener su proporción original. */
+.miplan-brand-circled{
+  display:inline-block;position:relative;color:var(--purple-dark);
+}
+.miplan-brand-circled::after{
+  content:'';position:absolute;pointer-events:none;
+  left:-7%;right:-15%;top:-24%;bottom:-30%;
+  background-image:url(../svg/deco-circle-brand.svg);
+  background-repeat:no-repeat;background-size:100% 100%;
+}
+
 
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}

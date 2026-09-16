@@ -1006,6 +1006,17 @@ Prioridad 2.
   Verificado con Playwright (mock de `netlifyIdentity`, sin red real):
   desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
   `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
+- **Título "Tu progreso con SINAPTIX" — palabra "SINAPTIX" encerrada**
+  (sesión 2026-09-16, décimocuarta tanda): solo esa palabra vive en
+  `<span class="miplan-brand-circled">`, con texto en `--purple-dark` y
+  un círculo dibujado a mano (`svg/deco-circle-brand.svg`, color fijo
+  `#0FD8C4` turquesa — **no** es una variable de `:root`, es un color de
+  esta referencia puntual del usuario, no de la paleta de marca) como
+  `::after` con `background-image`. Si algún día cambia el texto de este
+  título o su tamaño de fuente, revisar los offsets de
+  `.miplan-brand-circled::after` (`left/right/top/bottom`, en `%`
+  relativos al propio `<span>`) — están ajustados a ojo para "SINAPTIX"
+  en `Caveat` 700, no son un cálculo genérico.
 - Para el detalle completo de esta sesión (íconos SVG exactos, capturas
   de verificación) ver la entrada 2026-09-15 en `changelog.md`.
 - Para el detalle completo del resto de estos puntos (por qué se

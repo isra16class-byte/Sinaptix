@@ -8,6 +8,44 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimocuarta tanda) — "SINAPTIX" encerrado en el título de "Mi plan"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario trajo una referencia visual (una palabra manuscrita rodeada
+por un círculo dibujado a mano en turquesa, tipo resaltador) y pidió
+aplicar ese tratamiento solo a la palabra "SINAPTIX" dentro del título
+"Tu progreso con SINAPTIX" (`mi-plan.html`), en el morado de marca que
+ya se usa en el resto del sitio.
+
+- `mi-plan.html`: "SINAPTIX" queda envuelto en
+  `<span class="miplan-brand-circled">` dentro del `<h2 class="lam-title
+  title-hand">` — el resto del título ("Tu progreso con") no cambia.
+- `svg/deco-circle-brand.svg` (nuevo): un círculo/óvalo dibujado a mano
+  (un solo `<path>` con stroke, mismo lenguaje visual que los demás decos
+  del sitio) en turquesa `#0FD8C4` — color tomado de la referencia del
+  usuario, no es un color de marca existente, por eso vive fijo en el SVG
+  y no como variable de `:root`. Tiene `preserveAspectRatio="none"` (a
+  diferencia de los otros decos) para poder estirarse libremente y
+  calzar con el ancho real de la palabra.
+- `css/styles.css`: `.miplan-brand-circled` pone el texto en
+  `var(--purple-dark)` (el mismo morado que usa "SINAPTIX" en el logo de
+  la nav, `.nav .mark`) y agrega el círculo como `::after` con
+  `background-image` (mismo mecanismo que ya usa `.title-mark` en otras
+  secciones), recortado solo a esta palabra.
+- Offsets del círculo (`left:-7%;right:-15%;top:-24%;bottom:-30%`,
+  relativos al propio `<span>`) ajustados a ojo probando con la tipografía
+  real (`Caveat` 700) para que no pise la palabra "con" de al lado ni
+  quede desproporcionado — no son valores redondos "de manual", si el
+  texto de esta palabra cambiara algún día conviene volver a mirarlos.
+- Verificado con Playwright, desktop (1600px) y mobile (390px), sin
+  overflow horizontal. Para esta verificación se instaló temporalmente
+  el paquete npm `typeface-caveat` (fuente real, self-hosted solo para la
+  captura) porque `fonts.googleapis.com` no es alcanzable desde este
+  entorno — el archivo de fuente y el paquete se borraron al terminar, no
+  quedaron en el repo. 54/54 tests ok (sin relación con este cambio, solo
+  CSS/HTML/SVG).
+
 ## 2026-09-16 (décimotercera tanda) — Fix: texto largo sin espacios rompía la grilla de "Mi plan"
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
