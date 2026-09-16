@@ -160,7 +160,13 @@ próximos pasos).
   con migraciones nuevas, nunca editando ni recreando en runtime.
 - `svg/`, `img/` — assets (decoraciones SVG tipo `deco-*`, frutas
   `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
-  `img/generadas*`).
+  `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
+  conversacion, bateria-rayo): set de 4 iconos de línea genéricos
+  (calendario con check, red de nodos, dos personas conversando, batería
+  cargando), entregados sueltos en esta tanda — **todavía no están
+  referenciados en ningún HTML/CSS**, quedan disponibles en el repo para
+  cuando se decida dónde usarlos. Ver `changelog.md` (entrada de esta
+  fecha) para cómo se generaron.
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests

@@ -8,6 +8,52 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimoquinta tanda) — 4 iconos de línea (`svg/icon-*.svg`)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario trajo 4 imágenes de referencia (JPG generados con IA: un
+calendario con check, una red de nodos, dos personas conversando, una
+batería cargando — todas en trazo simple de un solo color sobre fondo
+liso) y pidió reproducirlas como iconos del sitio.
+
+- Primer intento: redibujar los 4 a mano como paths SVG nuevos
+  (aproximando las curvas a ojo). Quedaron parecidos pero no idénticos —
+  el usuario lo notó comparando contra el original, en particular en el
+  icono de las dos personas conversando (proporciones de la cabeza,
+  cruce de las caras).
+- Método que sí funcionó (el que se usó para los 4 archivos finales):
+  binarizar cada imagen original a blanco/negro puro (`PIL`,
+  `point(lambda p: 0 if p<umbral else 255)`), recortar al bounding box
+  del contenido, convertir a `.pbm` y vectorizar con `potrace`
+  (`potrace archivo.pbm -s -o salida.svg --flat -O 0.2`) — esto traza el
+  contorno exacto de la mancha negra en vez de aproximarlo a mano. El
+  `<path>` resultante se re-colorea a mano cambiando `fill="#000000"` por
+  `fill="#26161F"` (`--ink` de la paleta) en un `<g>` wrapper.
+  **Limitación importante de este método, documentada para no repetir el
+  intento**: solo sirve con arte de un solo color plano sobre fondo liso
+  (blanco/negro puro tras binarizar). Se probó con una 5ta imagen (una
+  esfera 3D con degradado verde→amarillo, brillo y sombra suave,
+  `img/Iconos/Gemini_Generated_Image_9svf9m9svf9m9svf.jpg`) y el
+  resultado fue inutilizable: al no haber un único umbral que separe
+  "icono" de "fondo/sombra" en una imagen con degradado continuo, la
+  mancha binarizada pierde la forma real (ver capturas de esa sesión, no
+  se guardó el intento fallido en el repo). Para ese tipo de arte 3D/con
+  brillo, las alternativas son: redibujar a mano como ilustración plana
+  con gradiente CSS/SVG propio, dejarlo rasterizado (PNG/webp) sin
+  vectorizar, o —si el usuario provee una versión ya plana del mismo
+  símbolo (un solo color, sin esfera/brillo)— recién ahí aplicar el mismo
+  método de binarizar+potrace.
+- Archivos nuevos: `svg/icon-calendario-check.svg`,
+  `svg/icon-red-nodos.svg`, `svg/icon-conversacion.svg`,
+  `svg/icon-bateria-rayo.svg`. Cada uno es un único `<path>` con `fill`
+  (no `stroke`) — el grosor de línea quedó fijo tal cual el trazo
+  original, no es editable vía `stroke-width`.
+- **No se tocó ningún HTML/CSS en esta tanda**: los 4 SVG quedan sueltos
+  en `svg/`, sin usarse todavía en ninguna sección del sitio. Falta que
+  el usuario indique dónde van (qué sección, qué tamaño, si necesitan
+  variante de color) para integrarlos.
+
 ## 2026-09-16 (décimocuarta tanda) — "SINAPTIX" encerrado en el título de "Mi plan"
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
