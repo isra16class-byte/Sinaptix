@@ -767,7 +767,18 @@ Prioridad 2.
   ícono a `78×78px` (`top`/`right` `10px`), `.num` con `padding-right:88px`
   y `.lab` con `margin-top:20px` (en vez de los valores base de arriba)
   para que el número y el label sigan sin pisarse con el ícono más
-  grande. Antes
+  grande.
+  **Posición vertical de la columna de tarjetas (sesión 2026-09-16,
+  continuación):** con las tarjetas más bajas de arriba, la columna
+  quedaba muy arriba respecto del párrafo de la columna de texto — a
+  pedido del usuario se bajó, casi a la altura de ese párrafo. El
+  `margin-top:90px` que tenía **inline** en `index.html` (en el
+  `<div class="reveal d2">` que envuelve el `.stat-grid`) se sacó y pasó
+  a CSS con una clase (`vision-stats-col`): `margin-top:300px` en
+  desktop, pero se mantiene el valor original `90px` en mobile
+  (`max-width:900px`, mismo breakpoint que `.split`) para no dejar un
+  hueco enorme cuando las columnas se apilan — ahí las tarjetas van
+  justo debajo de los bullets, no tienen por qué bajar tanto. Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se

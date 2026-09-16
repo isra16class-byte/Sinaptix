@@ -355,6 +355,17 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 
 
+/* Columna de tarjetas de Visión (#lam-02): antes tenía margin-top:90px
+   inline en index.html. Con las tarjetas más bajas de la sesión anterior
+   (2026-09-16) quedaba muy arriba respecto del párrafo de la columna de
+   texto — el usuario pidió bajarla, casi a la altura de ese párrafo. Se
+   pasa a CSS (en vez de inline) para poder mantener el valor angosto
+   original en mobile, donde las columnas se apilan (`.split` a 1
+   columna, ver media query) y un margin-top tan grande dejaría un hueco
+   enorme entre los bullets y las tarjetas. */
+.vision-stats-col{margin-top:300px}
+@media(max-width:900px){.vision-stats-col{margin-top:90px}}
+
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}
 .stat-icon{width:40px;height:40px;display:block;margin-bottom:14px;object-fit:contain}

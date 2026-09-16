@@ -8,6 +8,28 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décimonovena tanda) — Columna de tarjetas de `#lam-02` bajada, a la altura del párrafo
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Con las tarjetas más bajas de la tanda anterior (mismo día), el usuario
+mandó una captura señalando que la columna de tarjetas quedaba "muy
+arriba" respecto de la columna de texto, y pidió bajarla casi a la
+altura del párrafo (`.lam-text`).
+
+- `index.html`: el `<div class="reveal d2">` que envuelve el
+  `.stat-grid` tenía `style="margin-top:90px"` inline; se saca y se le
+  agrega la clase `vision-stats-col`.
+- `css/styles.css`: `.vision-stats-col{margin-top:300px}` en desktop,
+  con `@media(max-width:900px){.vision-stats-col{margin-top:90px}}` para
+  mantener el valor original en mobile — ahí `.split` pasa a 1 columna
+  (las tarjetas quedan debajo de los bullets, no al lado del párrafo) y
+  un margin-top de 300px hubiera dejado un hueco enorme sin sentido.
+- Verificado con Playwright (bounding boxes): en desktop 1440px, el
+  párrafo (`.lam-text`) y el `.stat-grid` arrancan casi en la misma
+  coordenada Y (419px vs 421px, antes 214px). En mobile 390px, screenshot
+  idéntico al de antes de este cambio (sin diferencias).
+
 ## 2026-09-16 (décimooctava tanda) — Tarjetas de `#lam-02` menos verticales, texto con más contraste, ícono "1:1" más grande
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
