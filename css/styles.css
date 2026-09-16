@@ -390,6 +390,27 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .vision-stats-col{max-width:400px;margin-left:auto;margin-right:auto}
 }
 
+/* Tarjetas de Visión más grandes (a pedido del usuario, sesión
+   2026-09-16, quinta tanda): sube el ancho máximo de la columna (400px
+   -> 480px, hay aire de sobra a la derecha contra el arte de fondo) y,
+   dentro de cada tarjeta, padding/ícono/número/label más grandes. Solo
+   en desktop (min-width:901px) y solo `#lam-02`: en mobile las tarjetas
+   ya se estiran a todo el ancho de columna (no hay "más grande" posible
+   sin romper el layout de 1 columna) y `.stat-box`/`.stat-grid` son
+   clases compartidas con "Mi plan" (#miPlan), que no debe verse
+   afectado. */
+@media(min-width:901px){
+  #lam-02 .vision-stats-col{max-width:480px}
+  #lam-02 .stat-grid{gap:20px}
+  #lam-02 .stat-box{padding:30px 28px 26px}
+  #lam-02 .stat-box .num{font-size:40px}
+  #lam-02 .stat-box .lab{font-size:16px}
+  #lam-02 .stat-icon{width:64px;height:64px;top:22px;right:22px}
+  #lam-02 .stat-box .num{padding-right:76px}
+  #lam-02 .stat-box:nth-child(4) .stat-icon{width:88px;height:88px;top:12px;right:12px}
+  #lam-02 .stat-box:nth-child(4) .num{padding-right:98px}
+}
+
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .stat-box{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px 26px;transition:box-shadow .2s ease,transform .2s ease}
 .stat-icon{width:40px;height:40px;display:block;margin-bottom:14px;object-fit:contain}

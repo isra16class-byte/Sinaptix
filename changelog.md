@@ -8,6 +8,32 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigesimotercera tanda) — Tarjetas de `#lam-02` (Visión) más grandes
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió agrandar las 4 tarjetas de la sección Visión (venían de
+achicarse dos tandas atrás, "muy verticales").
+
+- `css/styles.css`, todo scopeado a `#lam-02` dentro de
+  `@media(min-width:901px)` (mobile sin cambios):
+  - `.vision-stats-col{max-width:480px}` (antes `400px`).
+  - `.stat-grid{gap:20px}` (antes heredaba `16px` de `.stat-grid` base).
+  - `.stat-box{padding:30px 28px 26px}` (antes `20px 22px 18px`).
+  - `.num{font-size:40px}` (antes `32px`); `.lab{font-size:16px}` (antes
+    `15px`).
+  - `.stat-icon{width/height:64px;top/right:22px}` (antes `56px`/`18px`);
+    `.num{padding-right:76px}` (antes `66px`) para el hueco del ícono.
+  - 4ª tarjeta ("1:1"): ícono `88×88px` (antes `78px`),
+    `top/right:12px` (antes `10px`), `.num{padding-right:98px}` (antes
+    `88px`) — mantiene el mismo criterio de "más grande que las otras 3"
+    de la tanda que lo introdujo.
+- Actualiza `memoria.md`.
+
+Verificado con Playwright en 1920px (desktop, tarjetas notoriamente más
+grandes, sin overflow ni textos pisados) y 390px (mobile, sin cambios —
+scopeado a `min-width:901px`).
+
 ## 2026-09-16 (vigesimosegunda tanda) — Columna de tarjetas de `#lam-02` corrida a la derecha y centrada en su espacio
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

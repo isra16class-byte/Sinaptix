@@ -799,7 +799,27 @@ Prioridad 2.
   no hay "columna de al lado" de la que alejarse, sigue a ancho
   completo). Efecto combinado: las tarjetas quedan notoriamente más
   lejos del texto y con aire de los dos lados en vez de pegadas al borde
-  izquierdo de su columna. Antes
+  izquierdo de su columna.
+  **Tarjetas más grandes (sesión 2026-09-16, quinta tanda):** a pedido
+  del usuario. Todo scopeado a `#lam-02` y dentro de
+  `@media(min-width:901px)` (mobile sin cambios: ahí las tarjetas ya
+  ocupan todo el ancho de columna y `.stat-box`/`.stat-grid` son clases
+  compartidas con `#miPlan`, que no debe verse afectado). Valores
+  actuales, todos sobreescriben los de la tanda anterior (arriba en este
+  mismo párrafo): `#lam-02 .vision-stats-col{max-width:480px}` (antes
+  `400px`), `#lam-02 .stat-grid{gap:20px}` (antes heredaba `16px` de
+  `.stat-grid` base), `#lam-02 .stat-box{padding:30px 28px 26px}` (antes
+  `20px 22px 18px`), `.num{font-size:40px}` (antes `32px`),
+  `.lab{font-size:16px}` (antes `15px`), `#lam-02 .stat-icon{width/
+  height:64px;top/right:22px}` (antes `56px`/`18px`), `.num{padding-
+  right:76px}` (antes `66px`, hueco para el ícono más grande). La 4ª
+  tarjeta ("1:1", `icon-conversacion.svg`) sigue con su propio ícono más
+  grande que las otras 3 (mismo criterio de siempre, ver tanda anterior):
+  `88×88px` (antes `78px`), `top/right:12px` (antes `10px`),
+  `.num{padding-right:98px}` (antes `88px`). No se tocó `.lab{margin-top}`
+  de la 4ª tarjeta (`20px`) ni el resto de valores no listados acá.
+  Verificado con Playwright en 1920px (desktop) y 390px (mobile, sin
+  cambios). Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se
