@@ -8,6 +8,56 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (décima tanda) — Anillos de Método: animación de llenado + marcador de "antes"
+
+El usuario pidió mejorar los anillos de progreso de la tarjeta "Método"
+(`#methodGauges`, `.gauge-grid`): hasta ahora cada anillo aparecía
+directo en su posición final sin animación, y el "antes" solo se veía
+como badge de texto. Se combinaron dos mejoras, sin tocar el criterio ya
+vigente de "un solo anillo, no doble concéntrico" (ver
+`historico/memoria-2026-09-14.md`, esa opción quedó descartada por
+verse como un glitch a este tamaño de tarjeta):
+
+1. **Animación de llenado** (`gaugeArc`/`gaugeAnimateArcs`,
+   `js/script.js`): cada anillo se llena desde 0% hasta su porcentaje
+   real con `stroke-dashoffset` animado por CSS (`.gauge-arc-value`,
+   `css/styles.css`), ~0.7s ease-out. Se cambió la técnica de dibujo:
+   `stroke-dasharray` ahora es fijo a la circunferencia completa (antes
+   era `"largo circunferencia"`, que dibujaba el arco ya resuelto y no
+   se podía animar sin recalcularlo cada frame) y lo que varía es el
+   offset. El destacado arranca en 0ms, los 3 chicos ~90ms después
+   (con 30ms extra de diferencia entre ellos) para que no se sientan
+   como 4 anillos disparando a la vez. `prefers-reduced-motion: reduce`
+   lo desactiva del todo (arranca directo en el valor final, sin
+   transición ni JS de más — doble red: `gaugeArc` no pone `transition`
+   inline en ese caso, y hay una regla CSS de refuerzo). Confirmado por
+   código que `renderMethodGauges` solo se llama al cargar la página y
+   tras guardar diagnóstico/reevaluación (no hay listener de scroll que
+   la dispare), así que no se reinicia sola al hacer scroll.
+2. **Marcador de "antes" sobre el propio anillo** (`gaugeArcMarker`,
+   `js/script.js`; `.gauge-arc-marker`, `css/styles.css`): un punto
+   chico blanco con contorno gris (no un segundo anillo) en el ángulo
+   correspondiente a `area.antesPct`, solo cuando hay reevaluación
+   guardada (`area.despuesPct != null`, mismo criterio que ya usaba el
+   badge de delta). Color deliberadamente neutro para no confundirse
+   con el extremo actual del arco, que usa la paleta
+   `METHOD_GAUGE_LOW/MID/HIGH`. El badge de texto (`methodDeltaBadge`)
+   y la línea "Antes: X%" no se tocaron.
+
+Sin dependencias nuevas (SVG + CSS + JS vanilla, sin build step). Los
+`aria-label` de cada anillo siguen reflejando el valor final real, no
+un valor intermedio de la animación. No se tocaron
+`gaugeColorForPercent`/`GAUGE_LOW/MID/HIGH` de `js/nutricion-planes.js`
+(compartidas con el gráfico de barras de "Mi plan") ni la lógica de los
+3 estados de la tarjeta ni el interruptor "Mi progreso"/"Mi IMC".
+
+Suite de tests sin cambios (46/46 ok — este patch no toca lógica de
+cálculo, solo SVG/CSS/animación). No se pudo verificar con Playwright
+en esta sesión: la descarga del browser (`cdn.playwright.dev`) no está
+en la allowlist de red de este entorno, mismo problema documentado en
+sesiones anteriores. Queda pendiente en `memoria.md` → "Pendientes
+conocidos".
+
 ## 2026-09-16 (novena tanda) — Ícono de las tarjetas de Visión a la esquina superior derecha
 
 El usuario pidió que el ícono de las 4 tarjetas de estadísticas

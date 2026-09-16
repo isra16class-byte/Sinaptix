@@ -1173,6 +1173,78 @@ Prioridad 2.
   pestañas, desktop 1440px y mobile 390px (el footer envuelve en 2 líneas
   si no entran en una fila).
 
+**Anillos de progreso de Método — animación de llenado + marcador de
+"antes" (sesión 2026-09-16).** Sobre la base descrita en
+`historico/memoria-2026-09-14.md` ("Anillos de progreso en Método": un
+solo anillo por área, sin doble anillo concéntrico — esa opción quedó
+descartada, no se reintrodujo):
+- **Animación de llenado** (`gaugeArc`/`gaugeAnimateArcs`,
+  `js/script.js`): cada anillo arranca "vacío" y se llena hasta su
+  porcentaje real con `stroke-dashoffset` animado por CSS
+  (`.gauge-arc-value{transition:stroke-dashoffset .7s
+  cubic-bezier(.16,.84,.44,1)}` en `css/styles.css`), ~0.7s ease-out.
+  Técnica: `stroke-dasharray` fijo a la circunferencia completa
+  (`"C C"`) y el offset va de `C` (anillo vacío) a `C - largoDelArco`
+  (valor final) — reemplaza el `dasharray="largo circunferencia"` de
+  antes, que dibujaba el arco ya resuelto y no se podía animar sin
+  recalcularlo en cada frame. `gaugeAnimateArcs(el)` se llama justo
+  después de pintar el `innerHTML` en `renderMethodGauges` y usa un
+  doble `requestAnimationFrame` para forzar que el navegador pinte el
+  estado "vacío" antes de disparar la transición al valor final (si se
+  cambia en el mismo frame que el `innerHTML`, varios navegadores saltan
+  directo al valor final sin barrido).
+  - **Escalonado**: el anillo destacado arranca en 0ms; los 3 chicos
+    ~90ms después (delay pedido por el usuario para que no se sientan
+    como 4 anillos disparando a la vez), con 30ms de diferencia extra
+    entre ellos. El delay es inline (`transition-delay`, en el propio
+    `<circle>`) porque cada anillo necesita un valor distinto — la
+    duración/easing viven en CSS.
+  - **`prefers-reduced-motion: reduce`**: `gaugeArc` arranca esos
+    anillos directo en su valor final (sin barrido, sin `transition`
+    inline) y `gaugeAnimateArcs` no hace nada; además hay una regla CSS
+    `@media(prefers-reduced-motion:reduce){.gauge-arc-value{transition:none}}`
+    como red adicional. La lectura de la preferencia
+    (`gaugePrefersReducedMotion`, `matchMedia`) es una sola vez al cargar
+    el script, no reactiva a cambios en caliente de la config del SO
+    (recargar la página sí la vuelve a leer).
+  - **No se reinicia sola con el scroll**: `renderMethodGauges` solo se
+    llama al cargar la página y después de guardar un diagnóstico o una
+    reevaluación (ver los `renderMethodGauges()` en `js/script.js`) — no
+    hay ningún listener de scroll/`IntersectionObserver` que la
+    dispare, así que la animación no se re-ejecuta al pasar la sección
+    por el viewport más de una vez.
+  - Los `aria-label` de cada `<svg>` (`gaugeBuildItem`) siguen
+    reflejando siempre el valor final real, nunca un valor intermedio
+    de la animación — no dependen del estado visual del arco.
+- **Marcador de "antes" sobre el propio anillo** (`gaugeArcMarker`,
+  `js/script.js`; estilo `.gauge-arc-marker`, `css/styles.css`): un
+  punto chico (círculo blanco `var(--paper)` con contorno gris
+  `var(--ink-soft)`), no un segundo anillo, ubicado sobre el mismo radio
+  del arco en el ángulo correspondiente a `area.antesPct`. Se dibuja
+  solo cuando `area.despuesPct != null` (mismo criterio que ya usaba el
+  badge de texto `methodDeltaBadge`/la línea "Antes: X%"). El color
+  blanco+gris es deliberado para no confundirse con el extremo actual
+  del arco (que usa la paleta `METHOD_GAUGE_LOW/MID/HIGH`) mientras
+  anima. `size.marker` (5px en el destacado `r:46`, 3.5px en los chicos
+  `r:34`) mantiene el punto legible sin pisar el ícono/porcentaje del
+  centro en ningún tamaño. El badge de texto (`methodDeltaBadge`) y la
+  línea "Antes: X%" **no se tocaron** — el marcador es un refuerzo
+  visual adicional, el dato accesible en texto sigue igual.
+- **Sin dependencias nuevas**: sigue siendo SVG + CSS + JS vanilla, sin
+  build step, igual que el resto de la tarjeta.
+- **Pendiente de verificación visual real**: no se pudo correr
+  Playwright en esta sesión (mismo problema de siempre en este
+  entorno — sin acceso de red al dominio de descarga del browser,
+  `cdn.playwright.dev` no está en la allowlist). Revisado a mano y por
+  sintaxis únicamente (incluye chequeo de sintaxis con `node --check` y
+  la suite de `node --test`, 46/46 ok — no cambia lógica de cálculo,
+  así que no hacía falta un test nuevo). Falta confirmar en un navegador
+  real: el barrido de llenado se ve fluido y escalonado como se espera
+  (desktop y mobile ≤900px, donde `.method-body` se apila), el marcador
+  de "antes" se lee claramente distinto del extremo del arco en el
+  anillo destacado y en al menos un anillo chico, y que
+  `prefers-reduced-motion: reduce` efectivamente salta la animación.
+
 ## Validación de respuestas irracionales en la encuesta (sesión 2026-09-16)
 
 A pedido del usuario, se agregó validación de rango/formato a los **7
@@ -1252,6 +1324,17 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Animación de llenado + marcador de "antes" en los anillos de Método
+(sesión 2026-09-16) — falta verificación visual.** Implementado (ver
+"Estado actual del diseño" → "Anillos de progreso de Método") pero no
+se pudo correr Playwright en esta sesión (sin acceso de red al dominio
+de descarga del browser desde este entorno). Revisado a mano y por
+sintaxis únicamente. Falta confirmar en un navegador real, en desktop y
+mobile ≤900px: que el barrido se vea fluido y escalonado (destacado vs.
+los 3 chicos), que el marcador de "antes" se lea claramente distinto
+del extremo del arco en el estado "con reevaluación", y que
+`prefers-reduced-motion: reduce` salte la animación correctamente.
 
 **Auto-scroll del wizard al mensaje final (sesión 2026-09-16) — falta
 verificación visual.** Se implementó (ver "Estado actual del diseño" →

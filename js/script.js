@@ -285,12 +285,77 @@
   // sesión también muestra la comparación antes/después) — ese script se
   // carga antes que este.
 
-  function gaugeArc(cx, cy, r, strokeWidth, pct, color){
+  // Preferencia de "menos movimiento" del navegador, leída una sola vez
+  // (no cambia durante la sesión salvo que el usuario edite la config del
+  // SO y recargue) — usada para saltear la animación de llenado del
+  // anillo (ver gaugeArc/gaugeAnimateArcs más abajo).
+  const gaugePrefersReducedMotion = !!(window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  // Un punto chico (no un segundo anillo) en el ángulo correspondiente al
+  // valor `antesPct`, sobre el mismo radio que el arco. A propósito NO
+  // reusa el color del arco (para no confundirse con el extremo actual
+  // del trazo animado) ni es un anillo concéntrico completo — esa versión
+  // se probó y se descartó por verse como un glitch a este tamaño de
+  // tarjeta (ver historico/memoria-2026-09-14.md, "Anillos de progreso").
+  // El ángulo usa la misma referencia que el arco (0% = arriba, sentido
+  // horario) sin necesidad del transform="rotate(-90)" del arco: se
+  // calcula el punto ya en su posición final directamente.
+  function gaugeArcMarker(cx, cy, r, antesPct, size){
+    const p = Math.max(0, Math.min(100, antesPct));
+    const angleRad = (p/100*360 - 90) * (Math.PI/180);
+    const mx = cx + r*Math.cos(angleRad);
+    const my = cy + r*Math.sin(angleRad);
+    return '<circle class="gauge-arc-marker" cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="'+size+'" aria-hidden="true"/>';
+  }
+
+  function gaugeArc(cx, cy, r, strokeWidth, pct, color, opts){
+    opts = opts || {};
     const circumference = 2*Math.PI*r;
     const len = (Math.max(0, Math.min(100, pct))/100)*circumference;
-    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--panel-line)" stroke-width="'+strokeWidth+'"/>'+
-      '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" '+
-      'stroke-dasharray="'+len.toFixed(1)+' '+circumference.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    const finalOffset = circumference - len;
+    // Animación de llenado: dasharray fijo a la circunferencia completa
+    // (dash=gap=circumference, técnica estándar de "progress ring") y lo
+    // que se anima es stroke-dashoffset, de "circumference" (anillo
+    // vacío) a "finalOffset" (el pct real) — reemplaza el truco anterior
+    // de dasharray="len circumference", que dibujaba el arco ya resuelto
+    // y no se podía animar en CSS sin recalcular el dasharray en cada
+    // frame. Si el usuario prefiere menos movimiento, arranca directo en
+    // finalOffset y sin transición (ver gaugePrefersReducedMotion).
+    const startOffset = gaugePrefersReducedMotion ? finalOffset : circumference;
+    const delay = opts.delayMs || 0;
+    const style = gaugePrefersReducedMotion ? '' : ' style="transition-delay:'+delay+'ms"';
+    let svg = '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="var(--panel-line)" stroke-width="'+strokeWidth+'"/>'+
+      '<circle class="gauge-arc-value" cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+strokeWidth+'" stroke-linecap="round" '+
+      'stroke-dasharray="'+circumference.toFixed(1)+' '+circumference.toFixed(1)+'" stroke-dashoffset="'+startOffset.toFixed(1)+'" '+
+      'data-final-offset="'+finalOffset.toFixed(1)+'"'+style+' '+
+      'transform="rotate(-90 '+cx+' '+cy+')"/>';
+    if(opts.antesPct != null){
+      svg += gaugeArcMarker(cx, cy, r, opts.antesPct, opts.markerSize || 4);
+    }
+    return svg;
+  }
+
+  // Dispara la animación de llenado de todos los anillos recién insertados
+  // en `container` (llamar justo después de asignar el innerHTML). Doble
+  // requestAnimationFrame: el primero deja que el navegador pinte el
+  // estado inicial (anillo "vacío", stroke-dashoffset = circunferencia
+  // completa); recién en el segundo frame se cambia al valor final — si
+  // se hiciera en el mismo frame que el innerHTML, varios navegadores no
+  // llegan a pintar el estado inicial y el anillo aparece directo en su
+  // valor final, sin barrido. No hace nada si prefers-reduced-motion está
+  // activo (gaugeArc ya arrancó esos anillos en su valor final).
+  function gaugeAnimateArcs(container){
+    if(gaugePrefersReducedMotion) return;
+    const arcs = container.querySelectorAll('.gauge-arc-value');
+    if(!arcs.length) return;
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        arcs.forEach(function(arc){
+          arc.style.strokeDashoffset = arc.getAttribute('data-final-offset');
+        });
+      });
+    });
   }
 
   // Paleta propia de esta tarjeta (Método): morado oscuro → dorado →
@@ -385,14 +450,26 @@
   // tamaño real de la tarjeta quedaba demasiado apretado contra el
   // anillo externo y se leía como un glitch en vez de una comparación
   // clara (ver memoria.md).
-  function gaugeBuildItem(area, featured){
+  function gaugeBuildItem(area, featured, index){
     const current = area.despuesPct==null ? area.antesPct : area.despuesPct;
     const color = methodGaugeColorForPercent(current);
-    const size = featured ? {r:46, sw:12, box:120, font:26} : {r:34, sw:9, box:92, font:19};
+    const size = featured ? {r:46, sw:12, box:120, font:26, marker:5} : {r:34, sw:9, box:92, font:19, marker:3.5};
     const c = size.box/2;
+    // Escalonado de la animación: el destacado arranca en 0ms; los 3
+    // chicos arrancan ~90ms después (diferencia pedida por el usuario
+    // para que no se sientan como 4 anillos disparando a la vez) y entre
+    // ellos hay un desfase menor (30ms) para que tampoco salten los tres
+    // exactamente juntos.
+    const delayMs = featured ? 0 : 90 + ((index||0)*30);
     let svg = '<svg viewBox="0 0 '+size.box+' '+size.box+'" role="img" aria-label="'+area.label+': '+current+'%'+
       (area.despuesPct!=null ? ' (antes '+area.antesPct+'%)' : '')+'">';
-    svg += gaugeArc(c, c, size.r, size.sw, current, color);
+    svg += gaugeArc(c, c, size.r, size.sw, current, color, {
+      delayMs: delayMs,
+      // El marcador de "antes" usa el mismo criterio que el badge de
+      // delta debajo: solo si hay reevaluación guardada.
+      antesPct: area.despuesPct!=null ? area.antesPct : null,
+      markerSize: size.marker
+    });
     svg += '<text x="'+c+'" y="'+(c+size.font*0.34)+'" text-anchor="middle" style="font-family:var(--font-d);font-size:'+size.font+'px;font-weight:800;fill:var(--ink)">'+current+'%</text>';
     svg += '</svg>';
 
@@ -470,7 +547,7 @@
     const insight = methodInsightHtml(areas, !!despues);
     const featuredHtml = gaugeBuildItem(featured, true);
     const grid = areas.filter(function(a){ return a.key!==featured.key; })
-      .map(function(a){ return gaugeBuildItem(a, false); }).join('');
+      .map(function(a, idx){ return gaugeBuildItem(a, false, idx); }).join('');
 
     const scale = '<div class="gauge-scale">'+
       '<span><i style="background:'+METHOD_GAUGE_LOW+'"></i>Necesita atención</span>'+
@@ -488,6 +565,11 @@
     legend += '</p>';
 
     el.innerHTML = header+insight+featuredHtml+'<div class="gauge-grid">'+grid+'</div>'+scale+legend;
+    // Dispara la animación de llenado de los 4 anillos recién insertados
+    // (no hace nada si prefers-reduced-motion está activo). Se llama acá
+    // y no dentro de gaugeBuildItem porque necesita el contenedor ya en
+    // el DOM (querySelectorAll sobre `el`, no sobre el string armado).
+    gaugeAnimateArcs(el);
     // Botón de reevaluación: vive al lado del interruptor Mi progreso/Mi
     // IMC en el footer de la tarjeta (#gaugesFooterCtaProgreso), no acá
     // adentro (ver memoria.md, "Método: interruptor junto al CTA"). Texto

@@ -965,6 +965,28 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .gauge-ring{flex:none}
 .gauge-ring svg{display:block;width:100%;max-width:92px;height:auto}
 
+/* Animación de llenado de los anillos (gaugeArc/gaugeAnimateArcs,
+   js/script.js): el navegador solo anima el cambio de stroke-dashoffset
+   que dispara el JS en el segundo frame; la duración/easing vive acá y
+   el delay (escalonado destacado vs. chicos) se inyecta inline por
+   anillo porque cada uno necesita un valor propio. prefers-reduced-motion
+   apaga la transición como red adicional — gaugeArc ya arranca esos
+   anillos directo en su valor final en ese caso (ver memoria.md), esto
+   es un refuerzo por si algún navegador la disparara igual. */
+.gauge-arc-value{transition:stroke-dashoffset .7s cubic-bezier(.16,.84,.44,1)}
+@media(prefers-reduced-motion:reduce){.gauge-arc-value{transition:none}}
+
+/* Marcador de "antes" sobre el propio anillo (gaugeArcMarker,
+   js/script.js): un punto chico en el ángulo del valor previo, solo
+   cuando hay reevaluación guardada (mismo criterio que el badge de
+   delta). A propósito NO reusa el color del arco (para no confundirse
+   con el extremo actual del trazo, sobre todo mientras anima) ni es un
+   segundo anillo concéntrico completo — esa versión se probó y se
+   descartó por verse como un glitch a este tamaño de tarjeta (ver
+   historico/memoria-2026-09-14.md, "Anillos de progreso"). Blanco +
+   contorno gris para que se lea como una marca de referencia neutra. */
+.gauge-arc-marker{fill:var(--paper);stroke:var(--ink-soft);stroke-width:1.5}
+
 /* Tarjeta destacada (gaugeBuildItem con featured=true): el área que peor
    está va aparte, en fila y más grande, con borde propio — es lo que
    hace que la tarjeta diga "mirá esto primero" en vez de mostrar 4
