@@ -262,7 +262,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .sec-head-center .lam-title,.sec-head-center .lam-text{margin-left:auto;margin-right:auto}
 
 .title-mark{
-  background-image:url(../svg/deco-scribble.svg);
+  background-image:url(../svg/deco-scribble-purple.svg);
   background-repeat:no-repeat;
   background-position:left bottom 2px;
   background-size:100% 32%;
@@ -290,13 +290,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background-size:100% 26%;
 }
 
-/* ---------- lam-03 (Método): las 2 rayas naranjas del título (subrayado
-   de "genérica" vía .title-mark y la línea curva .title-scribble debajo
-   del <h2>) pasan de la marca genérica #EDA23A a --gold (#C1703B) para
-   que combinen con el resto de la paleta morado/dorado del sitio. Cambio
-   scopeado solo a #lam-03 — no toca #lam-04 (Pilares) ni ninguna otra
-   sección que reutiliza el mismo asset deco-scribble.svg. */
-#lam-03 .title-mark{background-image:url(../svg/deco-scribble-gold.svg)}
+/* ---------- lam-03 (Método): las 2 rayas del título (subrayado de
+   "genérica" vía .title-mark y la línea curva .title-scribble debajo del
+   <h2>) eran naranja/dorado (#EDA23A / #C1703B) y pasaron a --purple
+   (#714B67, deco-scribble-purple.svg) para combinar con el color de la
+   propia palabra resaltada (.title-mark ya usaba color:var(--purple)
+   para el texto) — mismo cambio aplicado también en el resto de
+   secciones (lam-02, lam-04, lam-05, lam-06) que usan .title-mark /
+   .title-scribble, así que ya no hace falta un override acá: el default
+   de .title-mark cubre esta sección igual que a las demás. */
 
 /* ---------- lam-05 / lam-06: títulos que antes no tenían ningún acento
    (a diferencia de lam-02 con su icono, lam-03/04 con mark+scribble

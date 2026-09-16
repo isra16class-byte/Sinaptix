@@ -253,6 +253,28 @@ Prioridad 2.
   "alimenta" en `index.html` para que las 6 secciones compartan el mismo
   lenguaje. No aplica a `mi-plan.html`: sus `<h2 class="lam-title">` no
   usan `.title-mark`, siguen 100% `--ink`.
+- **Títulos de sección — trazos "marcador" (subrayado + curva) en morado
+  en todo el sitio** (sesión 2026-09-16): las 2 rayas que acompañan cada
+  título (el subrayado detrás de la palabra remarcada vía `.title-mark`
+  y la línea curva `.title-scribble` debajo del `<h2>`) eran naranja/
+  dorado (`#EDA23A` genérico, o `#C1703B`/`--gold` en `#lam-03`) y pasaron
+  a `--purple` (`#714B67`) para que combinen con el color de la propia
+  palabra resaltada (`.title-mark` ya usaba `color:var(--purple)` para el
+  texto). Nuevo asset único `svg/deco-scribble-purple.svg` (mismo path
+  `M8,17 Q200,9 392,13`, solo cambia el `stroke`) reemplaza tanto
+  `deco-scribble.svg` como `deco-scribble-gold.svg` en las 5 secciones que
+  usan este lenguaje: `#lam-03` (subrayado "genérica" + curva), `#lam-04`
+  (subrayado "trabajo" + curva + el `<img class="deco deco-scribble">`
+  suelto de `.lam-title-frame`, ver entrada de abajo),
+  `#lam-05` ("carga alta") y `#lam-06` ("asesoría"). `#lam-02` no tenía
+  curva propia y sigue sin ella (el subrayado de "alimenta" ya estaba
+  desactivado a propósito, `background-image:none`, sin cambios). El
+  default de `.title-mark` en CSS ahora apunta directo al asset morado,
+  así que se sacó el override específico de `#lam-03` que antes lo hacía
+  dorado (ya no hace falta, coincide con el default). Los `deco-espiga.svg`
+  (motivo de espigas sueltas, no relacionado) no se tocaron. Solo CSS +
+  `index.html` (5 atributos `src`), nada de JS. Verificado con Playwright,
+  desktop 1440px, las 5 secciones.
 - **Pilares (`#lam-04`) — trazos "marcador" del título**: dentro de
   `.lam-title-frame` quedó **un solo** `<img class="deco deco-scribble">`
   suelto (`style="right:110px;bottom:14px;width:320px..."`), más los 2
@@ -289,15 +311,13 @@ Prioridad 2.
   Verificado con Playwright, desktop 1440px y mobile 390px — no rompe el
   layout de las columnas (`.ben-grid`, `.contact-wrap`) ni el ancho del
   `<h2>` (`max-width:14ch` sin cambios).
-- **Método (`#lam-03`) — frutas pequeñas + rayas del título en dorado**:
-  la sección tiene 3 `deco-fruit` chicas de fruta real (fresa, arándanos,
-  cereza, de `img/imagenes-frutas/`) scatterizadas detrás del contenido, y
-  las 2 rayas naranjas del título (subrayado `.title-mark` de "genérica" +
-  `.title-scribble` curva bajo el `<h2>`) pasaron de `#EDA23A` a `--gold`
-  (`#C1703B`) vía un asset nuevo `svg/deco-scribble-gold.svg` referenciado
-  solo en `#lam-03` — Pilares (`#lam-04`) sigue con el naranja original
-  del asset compartido `deco-scribble.svg`. Detalle completo en
-  `changelog.md`, diecisieteava tanda.
+- **Método (`#lam-03`) — frutas pequeñas**: la sección tiene 3
+  `deco-fruit` chicas de fruta real (fresa, arándanos, cereza, de
+  `img/imagenes-frutas/`) scatterizadas detrás del contenido. (Las 2
+  rayas del título de esta sección pasaron de naranja a dorado en su
+  momento — `changelog.md`, diecisieteava tanda — y luego, junto con el
+  resto del sitio, de dorado a `--purple`; ver la entrada de "Títulos de
+  sección" más arriba para el estado actual.)
 - **Método (`#lam-03`) — tarjeta "Tu progreso" con jerarquía**: la tarjeta
   de anillos (`.method-gauges`, generada en `js/script.js`) ya no muestra
   4 anillos idénticos. Ahora: una frase de insight arriba (mayor avance /

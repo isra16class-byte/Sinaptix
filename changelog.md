@@ -8,6 +8,27 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (sexta tanda) — Rayas bajo los títulos de naranja/dorado a morado en todo el sitio
+
+El usuario pidió que las rayas naranjas que acompañan los títulos de
+cada sección (el subrayado detrás de la palabra remarcada y la línea
+curva debajo del `<h2>`) fueran del mismo morado que la propia palabra.
+
+Nuevo asset `svg/deco-scribble-purple.svg` (mismo trazo, `stroke`
+morado `#714B67`) reemplaza a `deco-scribble.svg` (naranja `#EDA23A`) y
+`deco-scribble-gold.svg` (dorado `#C1703B`, usado solo en Método) en
+las 5 secciones que usan este lenguaje visual: Método (`#lam-03`),
+Pilares (`#lam-04`, incluye también el trazo suelto extra de
+`.lam-title-frame`), Beneficios (`#lam-05`) y Contacto (`#lam-06`). El
+default de `.title-mark` en `css/styles.css` ahora usa el asset morado
+directamente, así que se sacó el override que hacía dorado el de
+Método. Visión (`#lam-02`) no tenía esta raya y sigue sin ella. Los
+`deco-espiga.svg` (motivo de espigas, sin relación) no se tocaron.
+
+Cambio en `css/styles.css` (2 reglas) + `index.html` (5 atributos
+`src`) + el nuevo `svg/deco-scribble-purple.svg`. Sin cambios en JS.
+Verificado con Playwright, desktop 1440px, las 5 secciones.
+
 ## 2026-09-16 (quinta tanda) — Rediseño estético de los círculos numerados del timeline de Método
 
 El usuario pidió mejorar estéticamente los números 1-2-3-4 del lado
