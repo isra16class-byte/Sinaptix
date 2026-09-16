@@ -242,6 +242,22 @@
         renderMethodImc();
         const loginBtn = document.getElementById('nutriLoginBtn');
         if(loginBtn) loginBtn.classList.remove('hidden');
+        // El modal (`.modal-card`) es el propio contenedor con scroll
+        // (max-height:88vh;overflow:auto en css/styles.css), y con todos
+        // los avisos nutricionales del último paso, el mensaje de éxito +
+        // el botón "Iniciar sesión" quedan por debajo del fold: la persona
+        // tiene que scrollear el modal para encontrarlos (se perdía en el
+        // deploy real). Apenas se muestran, bajamos el scroll del modal
+        // hasta el final para que queden a la vista sin que nadie tenga
+        // que buscarlos. rAF espera que el navegador ya haya pintado el
+        // botón (recién visible, ya no display:none) antes de medir
+        // scrollHeight.
+        const modalCard = document.querySelector('#modalNutricion .modal-card');
+        if(modalCard){
+          requestAnimationFrame(function(){
+            modalCard.scrollTo({ top: modalCard.scrollHeight, behavior: 'smooth' });
+          });
+        }
       }
     });
   }

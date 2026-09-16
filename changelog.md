@@ -8,6 +8,34 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 — Wizard de nutrición: auto-scroll al mensaje final + botón "Iniciar sesión"
+
+A pedido del usuario: ya con el patch del botón real de "Iniciar sesión"
+aplicado y verificado que el botón funciona, seguía sin verlo al usar el
+sitio — el modal quedaba scrolleado y el mensaje + el botón quedaban por
+debajo de lo visible, sin ninguna pista de que había que bajar.
+
+- **Causa**: `.modal-card` es su propio contenedor con scroll
+  (`max-height:88vh;overflow:auto` en `css/styles.css`); con todos los
+  avisos nutricionales del último paso del wizard, `#nutriResultado` +
+  `#nutriLoginBtn` quedan fuera del viewport inicial del modal.
+- **`js/script.js`** (handler de submit, rama sin sesión iniciada):
+  después de mostrar el botón (`loginBtn.classList.remove('hidden')`),
+  se agrega `modalCard.scrollTo({top: modalCard.scrollHeight, behavior:
+  'smooth'})` dentro de un `requestAnimationFrame`, sobre
+  `document.querySelector('#modalNutricion .modal-card')`. El
+  `requestAnimationFrame` espera a que el botón ya esté pintado como
+  visible antes de medir `scrollHeight`, para que el scroll llegue
+  hasta el fondo real (con el botón ya contando en la altura).
+- No se tocó la rama con sesión iniciada (redirige sola a "Mi plan" a
+  los 900ms, no hace falta scrollear).
+- Sin cambios en `index.html` ni `css/styles.css`.
+- **No verificado con Playwright en esta sesión**: no hay acceso de red
+  a los dominios de descarga del browser de Playwright desde este
+  entorno de trabajo. Se revisó a mano (lectura de la lógica) y con
+  `node --check js/script.js` (sintaxis). Falta confirmación visual del
+  scroll real — anotado en "Pendientes conocidos" de `memoria.md`.
+
 ## 2026-09-15 (veintiseisava tanda) — Botón "Iniciar sesión" del wizard: de btn-solid estirado a btn-ghost de tamaño natural
 
 A pedido del usuario, con captura mostrando el botón agregado en la

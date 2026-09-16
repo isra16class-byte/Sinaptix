@@ -1024,6 +1024,24 @@ Prioridad 2.
   Verificado con Playwright (mock del DOM en vez del widget real, no
   alcanzable desde este entorno): botón chico, alineado a la izquierda,
   estilo `.btn-ghost`, desktop 1440px y mobile 390px.
+  **Auto-scroll a mensaje + botón al guardar (sesión 2026-09-16)**: el
+  usuario reportó, ya con el patch anterior aplicado, no ver el botón
+  aunque funcionaba — el modal (`.modal-card`, `max-height:88vh;
+  overflow:auto` en `css/styles.css`) es su propio contenedor con scroll,
+  y con todos los avisos nutricionales del último paso, el mensaje de
+  éxito (`#nutriResultado`) + `#nutriLoginBtn` quedan por debajo del
+  fold sin que se note que hay más para scrollear. Fix en `js/script.js`
+  (handler de submit, rama sin sesión): al mostrar el botón se hace
+  `modalCard.scrollTo({top: modalCard.scrollHeight, behavior:'smooth'})`
+  dentro de un `requestAnimationFrame` (para que el botón ya esté
+  visible — no `display:none` — antes de medir `scrollHeight`). Solo se
+  aplica a la rama sin sesión (el caso con sesión ya redirige solo a los
+  900ms, no hace falta). **No se pudo verificar con Playwright en esta
+  sesión** (no hay acceso de red a los dominios de descarga del browser
+  de Playwright desde este entorno); la lógica se revisó a mano y por
+  sintaxis (`node --check`), pero falta confirmación visual — si en el
+  deploy real el scroll no llega justo al fondo o se ve brusco, revisar
+  acá primero.
 
 - **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
   al lado del botón de acción** (sesión 2026-09-15, continuación): antes
@@ -1045,6 +1063,15 @@ Prioridad 2.
   si no entran en una fila).
 
 ## Pendientes conocidos
+
+**Auto-scroll del wizard al mensaje final (sesión 2026-09-16) — falta
+verificación visual.** Se implementó (ver "Estado actual del diseño" →
+entrada del botón "Iniciar sesión" del wizard) pero no se pudo correr
+Playwright en esta sesión (sin acceso de red a los dominios de descarga
+del browser desde este entorno). Revisado a mano y por sintaxis
+únicamente. Falta confirmar en un navegador real: que el scroll llegue
+justo al fondo del modal (mensaje + botón completamente visibles, no
+cortados) y que no se vea brusco, en desktop y mobile.
 
 **Login/registro propios — IMPLEMENTADO** (sesión 2026-09-15, tercera
 tanda). El plan que vivía acá como "a futuro" (reemplazar el widget
