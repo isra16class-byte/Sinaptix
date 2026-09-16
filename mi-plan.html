@@ -256,7 +256,7 @@
               <option value="No estoy seguro">No estoy seguro / varios objetivos</option>
             </select>
           </div>
-          <div class="modal-row">
+          <div class="modal-row" id="nutriContactoInputs">
             <div class="nutri-group">
               <label class="nutri-field-label" for="nutriNombre">Nombre <span class="req" aria-hidden="true">*</span></label>
               <input class="modal-input" type="text" id="nutriNombre" placeholder="Nombre" minlength="2" maxlength="60" pattern=".*[A-Za-zÀ-ÿ].*" title="Ingresá tu nombre (al menos 2 caracteres, con alguna letra)." required>
@@ -265,6 +265,10 @@
               <label class="nutri-field-label" for="nutriEmail">Correo electrónico <span class="req" aria-hidden="true">*</span></label>
               <input class="modal-input" type="email" id="nutriEmail" placeholder="Correo electrónico" required>
             </div>
+          </div>
+          <div class="nutri-antro-resumen hidden" id="nutriContactoResumen">
+            <p class="nutri-antro-texto" id="nutriContactoResumenTexto"></p>
+            <button type="button" class="btn btn-ghost" id="btnNutriContactoEditar">Usar otro nombre o correo</button>
           </div>
         </fieldset>
 

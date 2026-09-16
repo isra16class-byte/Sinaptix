@@ -8,6 +8,50 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (tercera tanda) — Nombre/correo del wizard: ocultar/prellenar con sesión + precargar login
+
+A partir de una consulta del usuario por chat sobre para qué se usan
+`nutriNombre`/`nutriEmail` (paso 1 del wizard) si no alimentan nada del
+plan — se confirmó que hoy no se usan aguas abajo, más allá de quedar
+guardados en `sinaptix_objetivo`. El usuario pidió: (1) dejarlos pero
+ocultos/prellenados si ya hay sesión iniciada, y (2) usar esos dos datos
+para precargar la pantalla de login/registro de "Mi plan" cuando alguien
+guarda sin sesión, para que solo tenga que escribir la contraseña.
+
+- **`index.html` / `mi-plan.html`**: el `.modal-row` de nombre/correo
+  (paso 1 del wizard) ahora tiene `id="nutriContactoInputs"`; se agrega
+  debajo un bloque `#nutriContactoResumen` (reutiliza las clases
+  `.nutri-antro-resumen`/`.nutri-antro-texto` ya usadas por peso/talla,
+  sin CSS nuevo) con `#nutriContactoResumenTexto` y el botón
+  `#btnNutriContactoEditar` ("Usar otro nombre o correo").
+- **`js/nutricion-wizard.js`** (`resetNutriWizard()`): si
+  `netlifyIdentity.currentUser()` devuelve un usuario con `email` y
+  `user_metadata.full_name`, prellena `nutriNombre`/`nutriEmail` y
+  oculta `#nutriContactoInputs` mostrando el resumen ("Vas a guardar el
+  plan con los datos de tu cuenta — Nombre (email)."); si solo hay
+  `email` (cuentas viejas sin `full_name`), prellena pero deja los
+  inputs visibles, para no ocultar un campo `required` vacío. Nuevo
+  listener en `#btnNutriContactoEditar` (mismo patrón que
+  `btnNutriAntroEditar`) para volver a mostrar los inputs sin perder el
+  valor ya cargado.
+- **`js/mi-plan.js`**: nueva `prefillAuthDesdeEncuesta()`, llamada desde
+  la rama sin sesión de `netlifyIdentity.on('init', …)` (no en el flujo
+  de recuperación de contraseña). Lee `sinaptix_objetivo` de
+  localStorage (ya traía `email` y `encuesta.nombre` desde antes de este
+  patch) y completa `#loginEmailMiPlan`/`#registroEmailMiPlan` con el
+  email y `#registroNombreMiPlan` con el nombre, sin pisar nada que la
+  persona ya haya escrito. Si completó el email, pone el foco en
+  `#loginPassMiPlan` (asume cuenta existente, pestaña de login activa
+  por defecto).
+- Verificado con Playwright (mock de `netlifyIdentity`; el script real
+  de `identity.netlify.com` no es alcanzable desde este entorno, mismo
+  criterio que otras sesiones): los 3 casos del paso 1 (sin sesión, con
+  sesión completa, con sesión solo-email) y el prellenado de "Mi plan"
+  con y sin `sinaptix_objetivo` guardado, más el caso de no pisar un
+  valor ya tipeado. Ver detalle en `memoria.md`.
+- Suite de unit tests sin cambios (46/46 ok) — este patch no toca
+  `js/nutricion-planes.js`.
+
 ## 2026-09-16 (segunda tanda) — Validación de respuestas irracionales en la encuesta de nutrición
 
 A pedido del usuario ("que no se puedan poder respuestas irracionales"),

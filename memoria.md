@@ -1042,6 +1042,52 @@ Prioridad 2.
   sintaxis (`node --check`), pero falta confirmación visual — si en el
   deploy real el scroll no llega justo al fondo o se ve brusco, revisar
   acá primero.
+  **Nombre/correo del paso 1 — ocultos/prellenados si ya hay sesión, y
+  usados para precargar login/registro (sesión 2026-09-16, continuación)**:
+  a raíz de una pregunta del usuario ("¿para qué pido nombre/correo si no
+  se usan?"), se confirmó que `nutriNombre`/`nutriEmail` (paso 1) hoy no
+  alimentan nada aguas abajo (`nutriBuildResumenHTML` no los toca) — solo
+  quedan guardados en `sinaptix_objetivo`. Se decidió dejarlos (no
+  quitarlos) pero con dos mejoras:
+  1. **Ocultar/prellenar si hay sesión** (`js/nutricion-wizard.js`,
+     `resetNutriWizard()`): mismo patrón visual que peso/talla
+     (`#nutriAntroInputs`/`#nutriAntroResumen`) — nuevos
+     `#nutriContactoInputs` (envuelve el `.modal-row` de nombre/correo,
+     agregado en `index.html` y `mi-plan.html`) y
+     `#nutriContactoResumen`/`#nutriContactoResumenTexto` +
+     `#btnNutriContactoEditar` ("Usar otro nombre o correo", mismo
+     listener que `btnNutriAntroEditar` para volver a mostrar los
+     inputs). Con `netlifyIdentity.currentUser()` disponible: si hay
+     `email` **y** `user_metadata.full_name`, se prellenan ambos inputs
+     (por debajo, ocultos) y se muestra el resumen; si solo hay `email`
+     (cuentas viejas sin `full_name`, previas a que el registro propio lo
+     pidiera obligatorio), se dejan los inputs **visibles pero
+     prellenados** — no se oculta con el campo `required` de nombre
+     vacío. Sin sesión, comportamiento sin cambios (inputs vacíos,
+     visibles).
+  2. **Precargar login/registro en "Mi plan" con esos datos** (sin
+     sesión): cuando el wizard guarda sin sesión, `sinaptix_objetivo` ya
+     tenía `email` y `encuesta.nombre` (paso 1). `js/mi-plan.js` agrega
+     `prefillAuthDesdeEncuesta()`, llamada solo en la rama sin sesión de
+     `netlifyIdentity.on('init', …)` (no en el flujo de recuperación de
+     contraseña, que muestra otro panel) — lee `sinaptix_objetivo` de
+     localStorage y, si hay `email`, completa `#loginEmailMiPlan` y
+     `#registroEmailMiPlan`; si hay `encuesta.nombre`, completa
+     `#registroNombreMiPlan`; nunca pisa un campo que la persona ya haya
+     escrito a mano (`if(!el.value)`). Si se completó el email, además
+     pone el foco en `#loginPassMiPlan` (pestaña de login, activa por
+     defecto) — asume que quien llega así ya tiene cuenta y solo le falta
+     escribir la contraseña; si en realidad quiere registrarse, el nombre
+     también quedó cargado en esa otra pestaña.
+  Verificado con Playwright (mock de `netlifyIdentity`, igual que el
+  resto de esta memoria — el script real no es alcanzable desde este
+  entorno): paso 1 sin sesión (inputs visibles y vacíos), con sesión
+  full_name+email (ocultos + resumen con el texto correcto + botón
+  "editar" los vuelve a mostrar sin perder el valor), con sesión solo
+  email (visibles y prellenados, no ocultos); y en `mi-plan.html` sin
+  sesión, con `sinaptix_objetivo` guardado (login/registro precargados,
+  foco en contraseña) y sin ese dato guardado (no rompe nada, campos
+  vacíos como antes) y sin pisar un valor ya tipeado por el usuario.
 
 - **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
   al lado del botón de acción** (sesión 2026-09-15, continuación): antes

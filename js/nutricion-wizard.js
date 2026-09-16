@@ -83,6 +83,40 @@ function resetNutriWizard(){
     if(antroInputsEl) antroInputsEl.classList.remove('hidden');
     if(antroResumenEl) antroResumenEl.classList.add('hidden');
   }
+
+  // Prellenar/ocultar nombre y correo (paso 1) si ya hay sesión iniciada:
+  // hoy esos dos campos no se usan para nada aguas abajo (ver memoria.md),
+  // pero pedirle a alguien logueado que los vuelva a tipear no tiene
+  // sentido. Mismo patrón visual que peso/talla arriba: si tenemos ambos
+  // datos de la cuenta, se ocultan los inputs y se muestra un resumen con
+  // botón para volver a editarlos (por si quiere guardar el plan con otro
+  // nombre/correo). Si solo tenemos el email (cuentas viejas sin
+  // full_name en user_metadata), se dejan los inputs visibles pero
+  // prellenados, para no bloquear con un campo requerido vacío que el
+  // usuario no ve.
+  const currentUser = window.netlifyIdentity && netlifyIdentity.currentUser();
+  const contactoInputsEl = document.getElementById('nutriContactoInputs');
+  const contactoResumenEl = document.getElementById('nutriContactoResumen');
+  const contactoResumenTextoEl = document.getElementById('nutriContactoResumenTexto');
+  const nutriNombreEl = document.getElementById('nutriNombre');
+  const nutriEmailEl = document.getElementById('nutriEmail');
+  const nombreSesion = currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name;
+  const emailSesion = currentUser && currentUser.email;
+  if(currentUser && emailSesion){
+    if(nutriNombreEl) nutriNombreEl.value = nombreSesion || '';
+    if(nutriEmailEl) nutriEmailEl.value = emailSesion;
+  }
+  if(currentUser && emailSesion && nombreSesion){
+    if(contactoResumenTextoEl){
+      contactoResumenTextoEl.textContent = 'Vas a guardar el plan con los datos de tu cuenta — '+nombreSesion+' ('+emailSesion+').';
+    }
+    if(contactoInputsEl) contactoInputsEl.classList.add('hidden');
+    if(contactoResumenEl) contactoResumenEl.classList.remove('hidden');
+  } else {
+    if(contactoInputsEl) contactoInputsEl.classList.remove('hidden');
+    if(contactoResumenEl) contactoResumenEl.classList.add('hidden');
+  }
+
   nutriShowStep(1);
 }
 
@@ -93,6 +127,16 @@ if(btnNutriAntroEditar){
     const antroResumenEl = document.getElementById('nutriAntroResumen');
     if(antroInputsEl) antroInputsEl.classList.remove('hidden');
     if(antroResumenEl) antroResumenEl.classList.add('hidden');
+  });
+}
+
+const btnNutriContactoEditar = document.getElementById('btnNutriContactoEditar');
+if(btnNutriContactoEditar){
+  btnNutriContactoEditar.addEventListener('click', function(){
+    const contactoInputsEl = document.getElementById('nutriContactoInputs');
+    const contactoResumenEl = document.getElementById('nutriContactoResumen');
+    if(contactoInputsEl) contactoInputsEl.classList.remove('hidden');
+    if(contactoResumenEl) contactoResumenEl.classList.add('hidden');
   });
 }
 

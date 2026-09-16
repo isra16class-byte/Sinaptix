@@ -143,6 +143,38 @@ if(window.netlifyIdentity){
     if(btnLogoutNav) btnLogoutNav.classList.add('hidden');
   }
 
+  // Si la persona llegó acá desde el botón "Iniciar sesión" del wizard de
+  // nutrición (paso 8, sin sesión) después de cargar nombre/correo en el
+  // paso 1, reusamos esos dos datos para no pedírselos de nuevo: quedan
+  // guardados en `sinaptix_objetivo` (ver js/script.js, evento submit del
+  // wizard). Solo prellena, nunca pisa algo que la persona ya haya
+  // escrito a mano en el formulario. El foco en la contraseña asume el
+  // caso más probable (ya tiene cuenta, pestaña de login activa por
+  // defecto) — si en realidad quiere registrarse, el nombre también quedó
+  // prellenado en esa pestaña al cambiar.
+  function prefillAuthDesdeEncuesta(){
+    let obj = null;
+    try{
+      const raw = localStorage.getItem('sinaptix_objetivo');
+      if(raw) obj = JSON.parse(raw);
+    }catch(err){ obj = null; }
+    const email = obj && obj.email;
+    const nombre = obj && obj.encuesta && obj.encuesta.nombre;
+    if(!email && !nombre) return;
+    const loginEmailEl = document.getElementById('loginEmailMiPlan');
+    const registroEmailEl = document.getElementById('registroEmailMiPlan');
+    const registroNombreEl = document.getElementById('registroNombreMiPlan');
+    if(email){
+      if(loginEmailEl && !loginEmailEl.value) loginEmailEl.value = email;
+      if(registroEmailEl && !registroEmailEl.value) registroEmailEl.value = email;
+    }
+    if(nombre && registroNombreEl && !registroNombreEl.value) registroNombreEl.value = nombre;
+    if(email){
+      const loginPassEl = document.getElementById('loginPassMiPlan');
+      if(loginPassEl) loginPassEl.focus();
+    }
+  }
+
   // ---------------------------------------------------------------------
   // Login / registro propios (reemplazan al widget nativo de Identity)
   // ---------------------------------------------------------------------
@@ -539,7 +571,12 @@ if(window.netlifyIdentity){
       window.SINAPTIX_RECOVERY_TOKEN = null; // un token se canjea una sola vez
       return;
     }
-    if(user) mostrarEstadoConSesion(user); else mostrarEstadoSinSesion();
+    if(user){
+      mostrarEstadoConSesion(user);
+    } else {
+      mostrarEstadoSinSesion();
+      prefillAuthDesdeEncuesta();
+    }
   });
   netlifyIdentity.on('login', function(user){
     netlifyIdentity.close();
