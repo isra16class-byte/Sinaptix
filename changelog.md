@@ -8,6 +8,50 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima quinta tanda) — Composición final del nuevo fondo de Visión (2 variantes) armada por código
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Continuación de la tanda anterior (assets sueltos). En esta sesión se
+armó la composición completa por código, sin usar más generación por IA
+para esta parte — solo Python (Pillow + scipy para las curvas):
+
+1. A cada uno de los 5 elementos (`img/decoraciones-neurona/vision-elementos/
+   elemento-*.webp`) se le quitó el fondo blanco (umbral sobre la
+   luminosidad del pixel, con degradado suave entre 225-248 para no
+   perder los bordes con resplandor/glow de las ilustraciones) y se
+   recortó ajustado al contenido real (autocrop con margen de 15px).
+2. Se armó un lienzo nuevo de 1700×1040 con los 4 elementos elegidos en
+   grid 2×2 (cerebro arriba-izq., red neuronal arriba-der., reloj de
+   arena abajo-izq., cintas azules abajo-der.), con ~180px de margen
+   contra los bordes laterales y sin overlap entre elementos — esto es
+   justamente lo que el fondo anterior no tenía y por eso las anotaciones
+   no apuntaban a nada real.
+3. Los listones/cintas de fondo (mismo lenguaje visual que
+   `fondo-vision-red.webp`) se generaron por código: varias curvas suaves
+   (`scipy.interpolate.CubicSpline` sobre puntos de control a mano) con
+   pequeños haces de 6-7 líneas por curva (jitter de offset/amplitud/fase
+   aleatorio por línea para que no se vean perfectamente paralelas),
+   color mauve `rgb(130,95,115)` con alpha bajo (~50, variable por
+   línea), dibujadas a 2x resolución y reescaladas para antialiasing
+   (Pillow no antialiasea líneas nativamente).
+
+Como seguía sin decidirse cuál de las 2 versiones de la red neuronal usar
+(ver tanda anterior), se generaron **los 2 lienzos completos**, idénticos
+salvo por ese elemento:
+- `img/decoraciones-neurona/vision-elementos/fondo-vision-nuevo-redonda.webp`
+- `img/decoraciones-neurona/vision-elementos/fondo-vision-nuevo-corazon.webp`
+
+Se muestran ambos al usuario dentro del chat para que elija; la elección
+y la integración en `index.html`/`css/styles.css` (reemplazo de
+`fondo-vision-red.webp` + reposicionamiento de los 4 `.stat-annot`) quedan
+para la próxima sesión (ver `memoria.md` → "Pendientes conocidos" para el
+detalle actualizado).
+
+No se tocó `index.html`, `css/styles.css` ni ningún `.js` en esta tanda.
+No se corrió Playwright (nada integrado en el sitio todavía). Tests sin
+cambios (no aplica).
+
 ## 2026-09-17 (trigésima cuarta tanda) — Assets: 5 elementos ilustrados generados por separado para el nuevo fondo de Visión (sin integrar todavía)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

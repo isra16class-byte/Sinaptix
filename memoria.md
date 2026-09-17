@@ -1579,22 +1579,41 @@ patch a `img/decoraciones-neurona/vision-elementos/` (formato `.webp`,
   más iteraciones costó (ver `changelog.md` de esta tanda para el detalle
   completo de los 3 intentos descartados y por qué).
 
+**Composición ya armada (sesión 2026-09-17, cuarta tanda) — por código,
+no por IA.** Se les quitó el fondo blanco a los 5 elementos (transparencia
+real vía umbral de luminosidad + recorte ajustado al contenido) y se
+armaron **2 lienzos candidatos completos** en
+`img/decoraciones-neurona/vision-elementos/` (1700×1040, `.webp`), uno
+por cada variante de red neuronal:
+- `fondo-vision-nuevo-redonda.webp` (con `elemento-red-neuronal.webp`)
+- `fondo-vision-nuevo-corazon.webp` (con `elemento-red-neuronal-alt-corazon.webp`)
+
+En ambos, mismo layout en cuadrícula 2×2 con márgenes generosos (~180px
+contra los bordes laterales, sin overlap entre elementos): cerebro
+arriba-izquierda, red neuronal arriba-derecha, reloj de arena
+abajo-izquierda, cintas azules abajo-derecha. Los listones conectores de
+fondo (curvas suaves tipo `CubicSpline`, varias líneas finas por haz con
+jitter aleatorio, color mauve `rgb(130,95,115)` con alpha bajo,
+supersampleado 2x para antialiasing) se generaron por código para poder
+controlar el espaciado, en vez de pedírselos a la IA.
+
 **Lo que falta (para la próxima sesión — ver prompt de arranque que el
 usuario ya tiene aparte, fuera de este repo):**
-1. Confirmar con el usuario cuál versión de la red neuronal usar (la
-   redonda o la de corazón) antes de tocar código.
-2. Componer los 4 elementos elegidos en un lienzo nuevo por código (no
-   por IA), con margen generoso entre ellos y contra los bordes, y dibujar
-   por código los listones finos ondulados que los conectan (mismo
-   lenguaje visual que el `fondo-vision-red.webp` actual).
-3. Reemplazar `fondo-vision-red.webp` por el nuevo compuesto (mantener el
+1. Confirmar con el usuario cuál de los 2 lienzos usar (`-redonda` o
+   `-corazon`) antes de tocar código — es la única decisión de diseño que
+   sigue abierta, todo el resto (composición, márgenes, listones) ya está
+   resuelto.
+2. Reemplazar `fondo-vision-red.webp` por el lienzo elegido (mantener el
    nombre de archivo o actualizar la referencia en `css/styles.css` si
-   cambia).
-4. Reposicionar las 4 `.stat-annot` (coordenadas `left`/`top` dentro de
+   cambia; el nuevo lienzo es más ancho/alto que el original — puede
+   requerir ajustar el `clamp()`/bleed que usa `#lam-02`).
+3. Reposicionar las 4 `.stat-annot` (coordenadas `left`/`top` dentro de
    `@media(min-width:901px)` en `#lam-02 .stat-annotations`) para que cada
    punto+línea apunte de verdad al elemento correspondiente en la imagen
-   nueva.
-5. Verificar con Playwright en 1440px y **mostrar captura al usuario y
+   nueva (las posiciones aproximadas de cada elemento en el lienzo de
+   1700×1040 están en el detalle de arriba, pero conviene remedir contra
+   el render final una vez insertada la imagen).
+4. Verificar con Playwright en 1440px y **mostrar captura al usuario y
    esperar confirmación explícita antes de cerrar la sesión** (mismo
    criterio que la sesión 1 de este plan y que la nota de más abajo) —
    recién ahí generar el patch final. Sesión 2 (mobile, ver bullet de
