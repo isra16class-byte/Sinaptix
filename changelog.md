@@ -8,6 +8,74 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima cuarta tanda) — Assets: 5 elementos ilustrados generados por separado para el nuevo fondo de Visión (sin integrar todavía)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Sesión dedicada solo a **generar y sumar assets de imagen**, sin tocar
+HTML/CSS/JS — la integración queda para una sesión aparte (ver
+`memoria.md` → "Pendientes conocidos" para el detalle completo del plan y
+el prompt de arranque de la siguiente sesión).
+
+Contexto: se detectó que `fondo-vision-red.webp` (el fondo ilustrado
+actual de `#lam-02`, generado por IA como una sola imagen compuesta) no
+tiene puntos de anclaje reales para las 4 anotaciones (`.stat-annot`,
+sesión anterior) — el punto+línea de cada dato cae en coordenadas libres
+sobre el arte, sin relación con ningún elemento puntual de la ilustración.
+Se decidió reemplazar ese fondo por una composición armada a partir de
+elementos generados por separado (uno por dato), en vez de pedirle a la
+IA un fondo compuesto de una sola vez, por dos motivos observados en esta
+misma sesión: (a) Gemini no itera bien sobre una imagen ya generada —
+ante un pedido de agregar más margen a los costados sobre la composición
+completa, devolvió exactamente la misma imagen sin cambios; (b) Gemini
+pierde consistencia de estilo cuando tiene que resolver varios elementos
+distintos dentro de un mismo prompt.
+
+Elementos generados con Gemini (prompts armados a mano, iterando por
+elemento) y aprobados por el usuario:
+
+- **Energía cerebral (dorado `#C1703B`, dato 20%)** — cerebro humano
+  semi-realista con arco de progreso terracota alrededor. Aprobado a la
+  primera.
+- **Red neuronal (morado `#714B67`, dato 86B)** — cúmulo denso de
+  neuronas conectadas y luminosas. Aprobado a la primera, con dos
+  variantes: la original (cúmulo redondo) y una alternativa con silueta
+  de corazón que el usuario generó después sin pedir explícitamente
+  reemplazar la primera — **queda pendiente decidir cuál de las dos usar**
+  antes de integrar. Ambas se guardaron.
+- **Acompañamiento 1 a 1 (azul `#3B6EA5`, dato 1:1)** — dos cintas de luz
+  azules entrelazadas en forma de nudo/infinito. Aprobado a la primera.
+- **Semanas para notar el cambio (verde `#2E7D5B`, dato 4–6)** — el que
+  más costó, 4 intentos:
+  1. Calendario + regla de progreso: salió como ícono 3D "glossy" tipo
+     app, con relleno sólido de color, texto y números — se había pedido
+     evitar ambas cosas. Descartado.
+  2. Mismo concepto con prompt más estricto (prohibiendo explícitamente
+     texto/números/relleno sólido/glossy): salió como boceto técnico de
+     solo contorno en perspectiva isométrica (objeto acostado en
+     diagonal, estilo manual de instrucciones), sin volumen ni sombreado
+     — rompía con la técnica pictórica semi-realista de los otros 3
+     elementos. Descartado.
+  3. Cambio de objeto a reloj de arena (más fácil de pintar con volumen
+     realista que un calendario/regla): estilo correcto (volumen, luces y
+     sombras), pero con marco de bronce envejecido y pátina — look
+     "vintage/victoriano" que no combina con el resto (todos limpios y
+     modernos). Descartado.
+  4. Mismo reloj de arena, prompt con prohibición explícita de cualquier
+     elemento antiguo/vintage y pedido de material moderno/minimalista
+     (vidrio limpio, soporte mínimo o inexistente): **aprobado**.
+
+Assets agregados en este patch a
+`img/decoraciones-neurona/vision-elementos/` (`.webp`, 1024×1024, fondo
+blanco, sin integrar en el sitio):
+`elemento-energia-cerebral.webp`, `elemento-red-neuronal.webp`,
+`elemento-red-neuronal-alt-corazon.webp`,
+`elemento-acompanamiento-1a1.webp`, `elemento-semanas-progreso.webp`.
+
+No se tocó `index.html`, `css/styles.css` ni ningún `.js` en esta tanda.
+No se corrió Playwright (no hay nada visual que verificar todavía, son
+solo assets sueltos). Tests sin cambios (no aplica, no se tocó código).
+
 ## 2026-09-17 (trigésima tercera tanda) — Plan de anotaciones en Visión, Sesión 1 de 2: reemplazo de las 4 tarjetas por anotaciones sueltas en desktop
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

@@ -1532,6 +1532,74 @@ ajuste, se dividió en 2 sesiones en vez de intentarlo todo de una:
   sobre la parte más cargada de `vision-brain-bg` y se lee algo peor que
   20%/4–6 (que caen sobre espacio en blanco), y el punto+línea de esos
   mismos dos casi no contrasta contra el arte de fondo.
+**Plan: reemplazar `fondo-vision-red.webp` (fondo único generado por IA)
+por una composición armada a partir de elementos generados por separado
+(sesión 2026-09-17, tercera tanda) — decidido, assets ya generados y
+agregados al repo, integración en HTML/CSS todavía PENDIENTE.**
+
+Motivo del cambio: `fondo-vision-red.webp` (el fondo actual, ver arriba)
+no tiene puntos de anclaje reales para las 4 `.stat-annot` — el punto+
+línea de cada dato cae en coordenadas libres sin relación con ningún
+elemento del arte de fondo, que es justo la causa de la observación ya
+documentada arriba (86B y 1:1 sobre zonas cargadas, poco contraste). En
+vez de pedirle a la IA un fondo compuesto de una sola vez (con 4
+elementos + listones conectores en un solo prompt), se optó por generar
+**cada elemento suelto por separado** y armar la composición final por
+código (no por IA), porque:
+- Gemini no itera bien sobre una composición ya generada: ante un pedido
+  de "más margen a los costados" sobre la imagen completa, devolvió
+  exactamente la misma imagen sin cambios.
+- Gemini pierde consistencia de estilo cuando tiene que resolver varios
+  elementos distintos dentro de un mismo prompt/imagen — se vio claro con
+  el elemento de "semanas": la primera vuelta salió como ícono 3D
+  glossy con texto y números (se había pedido evitar ambos), la segunda
+  como boceto técnico en perspectiva isométrica, y recién la tercera
+  (reloj de arena, pero con marco de bronce "vintage") y cuarta (mismo
+  reloj de arena en versión moderna/minimalista) lograron igualar la
+  técnica pictórica semi-realista de los otros elementos.
+- Generando el listón/cinta conectora por código (no por IA) se controla
+  el espaciado exacto entre elementos, que es el requisito central de
+  todo este cambio (poder anclar cada anotación a un punto real).
+
+Elementos ya generados, aprobados por el usuario y agregados en este
+patch a `img/decoraciones-neurona/vision-elementos/` (formato `.webp`,
+1024×1024, fondo blanco, sin integrar todavía en el HTML/CSS):
+- `elemento-energia-cerebral.webp` — cerebro con arco de progreso
+  terracota (para el dato 20%, dorado `#C1703B`).
+- `elemento-red-neuronal.webp` — cúmulo de neuronas moradas (para el dato
+  86B, morado `#714B67`).
+- `elemento-red-neuronal-alt-corazon.webp` — variante del mismo cúmulo de
+  neuronas con silueta de corazón, generada como alternativa. **No está
+  decidido cuál de las dos usar** — falta confirmar con el usuario antes
+  de integrar cualquiera de las dos.
+- `elemento-acompanamiento-1a1.webp` — dos cintas de luz azules
+  entrelazadas en forma de infinito (para el dato 1:1, azul `#3B6EA5`).
+- `elemento-semanas-progreso.webp` — reloj de arena verde de diseño
+  moderno, sin marco antiguo (para el dato 4–6, verde `#2E7D5B`); el que
+  más iteraciones costó (ver `changelog.md` de esta tanda para el detalle
+  completo de los 3 intentos descartados y por qué).
+
+**Lo que falta (para la próxima sesión — ver prompt de arranque que el
+usuario ya tiene aparte, fuera de este repo):**
+1. Confirmar con el usuario cuál versión de la red neuronal usar (la
+   redonda o la de corazón) antes de tocar código.
+2. Componer los 4 elementos elegidos en un lienzo nuevo por código (no
+   por IA), con margen generoso entre ellos y contra los bordes, y dibujar
+   por código los listones finos ondulados que los conectan (mismo
+   lenguaje visual que el `fondo-vision-red.webp` actual).
+3. Reemplazar `fondo-vision-red.webp` por el nuevo compuesto (mantener el
+   nombre de archivo o actualizar la referencia en `css/styles.css` si
+   cambia).
+4. Reposicionar las 4 `.stat-annot` (coordenadas `left`/`top` dentro de
+   `@media(min-width:901px)` en `#lam-02 .stat-annotations`) para que cada
+   punto+línea apunte de verdad al elemento correspondiente en la imagen
+   nueva.
+5. Verificar con Playwright en 1440px y **mostrar captura al usuario y
+   esperar confirmación explícita antes de cerrar la sesión** (mismo
+   criterio que la sesión 1 de este plan y que la nota de más abajo) —
+   recién ahí generar el patch final. Sesión 2 (mobile, ver bullet de
+   abajo) sigue pendiente aparte.
+
 - **Sesión 2 (siguiente)** — mobile (≤900px) + limpieza. El posicionamiento libre de
   la sesión 1 probablemente no sirve en pantallas angostas — definir en
   esa sesión si conviene una versión apilada (punto + número + etiqueta
