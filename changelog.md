@@ -8,6 +8,35 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigesimocuarta tanda) — Tarjetas de `#lam-02` (Visión) "un poco más grandes"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Ajuste fino sobre la tanda anterior: el usuario pidió agrandar un poco
+más las mismas 4 tarjetas.
+
+- `css/styles.css`, todo scopeado a `#lam-02` dentro de
+  `@media(min-width:901px)` (mobile sin cambios), sobre los valores de
+  la tanda anterior:
+  - `.vision-stats-col{max-width:520px}` (antes `480px`).
+  - `.stat-grid{gap:24px}` (antes `20px`).
+  - `.stat-box{padding:34px 32px 30px}` (antes `30px 28px 26px`).
+  - `.num{font-size:44px}` (antes `40px`); `.lab{font-size:17px}` (antes
+    `16px`).
+  - `.stat-icon{width/height:70px;top/right:20px}` (antes `64px`/`22px`);
+    `.num{padding-right:82px}` (antes `76px`).
+  - 4ª tarjeta ("1:1"): ícono `96×96px` (antes `88px`), `top/right:10px`
+    (antes `12px`), `.num{padding-right:106px}` (antes `98px`).
+- Actualiza `memoria.md` (se reescribe el párrafo de la tanda anterior
+  con los valores finales, no se acumulan los dos juegos de números).
+
+Verificado con Playwright en 1920px (desktop) y 390px (mobile, sin
+cambios). Nota de proceso: la primera captura de verificación salió con
+las tarjetas "invisibles" — falso positivo del propio script de prueba
+(el `.reveal` tiene `transition:opacity .7s`, y el timeout usado antes
+de capturar era más corto que eso); con más tiempo de espera las
+tarjetas aparecen normalmente, no es un bug del sitio.
+
 ## 2026-09-16 (vigesimotercera tanda) — Tarjetas de `#lam-02` (Visión) más grandes
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
