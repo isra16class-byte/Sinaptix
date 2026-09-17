@@ -8,6 +8,33 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (cuadragésima tercera tanda) — revertir a los íconos originales, tal cual se generaron la primera vez
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+La tanda anterior (cuadragésima segunda) había recortado los 4 íconos
+de nuevo desde `fondo-vision-red.webp` (la versión agrandada) para
+igualar proporciones — pero eso reintrodujo el corte contra el borde del
+lienzo en 3 de los 4 íconos, y el usuario pidió explícitamente **usar
+los archivos tal cual se generaron la primera vez** (recortados del
+archivo que subió en el chat, sin el agrandado de sesiones previas, sin
+cortes contra ningún borde).
+
+- Se reemplazan los 4 WEBP en `img/decoraciones-neurona/vision-iconos/`
+  por esa primera versión (cerebro 456×424, red neuronal 489×480, reloj
+  de arena 309×566, cintas azules 441×432).
+- **Importante para quien retome esto**: estas proporciones NO son las
+  mismas que las que tenía el ícono agrandado con el que se calibraron
+  `.vision-icon--dorado/--morado/--verde/--azul` en `css/styles.css`
+  (`width` fijo en %, `height:auto`). Al ser más "cuadrados" que los
+  anteriores, es esperable que se rendericen más altos de lo que se
+  veían antes a la misma anchura — falta confirmar en el navegador si
+  eso tapa el texto de abajo (`4–6`/`1:1`) como ya había pasado una vez
+  con el agrandado; si tapa, el ajuste sería en los `width`/`top` de
+  `.vision-icon--*`, no en las imágenes.
+- No se tocó `index.html` ni `css/styles.css`.
+- Actualizados `memoria.md` y este archivo.
+
 ## 2026-09-17 (cuadragésima segunda tanda) — íconos de Visión recortados de nuevo, sin artefactos de fondo
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

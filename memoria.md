@@ -1622,6 +1622,19 @@ tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
 
+**Íconos de Visión — revertidos a la versión original (sesión
+2026-09-17, cuadragésima tercera tanda).** El recorte de la tanda
+anterior (desde `fondo-vision-red.webp` agrandado) reintrodujo el corte
+contra el borde del lienzo en 3 de los 4 íconos; el usuario pidió volver
+a los archivos tal cual se generaron la primera vez (sin ese agrandado,
+sin cortes). Ver `changelog.md`, cuadragésima tercera tanda, para el
+detalle. **Ojo**: estos íconos tienen proporciones distintas a las que
+calibraron `.vision-icon--*` en `css/styles.css` (más cuadrados/altos) —
+**falta confirmar en el navegador real si eso tapa el texto de abajo**
+(mismo riesgo que ya se había dado antes con el agrandado). Si tapa,
+ajustar `.vision-icon--*` (width/top), no volver a recortar las
+imágenes sin que el usuario lo pida.
+
 **Íconos de Visión recortados de nuevo sin artefactos de IA (sesión
 2026-09-17, cuadragésima segunda tanda).** Los 4 WEBP de
 `img/decoraciones-neurona/vision-iconos/` (que la tanda anterior había
