@@ -1603,6 +1603,59 @@ tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
 
+**Plan: reemplazar las tarjetas de Visión por anotaciones a mano (2
+sesiones) — sesión 2026-09-17, sin implementar aún.** El usuario mostró
+capturas de las 4 tarjetas (`.stat-box` dentro de `#lam-02`, ver "Estado
+actual del diseño" → Visión) y no se sentía conforme; se descartó que
+fuera un tema de íconos o de tipografía del número (`.stat-box .num` ya
+usa `--font-d`/Fraunces, la misma familia que `h1-h3` y el logo — es
+consistente con el resto del sitio). El diagnóstico al que se llegó: el
+problema es el *formato de contenedor* — una caja redondeada con ícono
+arriba a la izquierda y grid 2×2 parejo es el patrón visual de un "stat
+card" de dashboard/SaaS, y choca de género con la identidad
+manuscrita/editorial del resto de la sección (título `.lam-title` en
+Caveat cursiva, frutas `.brain-fruit` flotando, el garabato punteado
+`.lam-title-deco` junto a "alimenta"). Dirección elegida (ver mockups
+mostrados en el chat de esa sesión, no forman parte del repo): sacar las
+4 tarjetas de caja y reemplazarlas por 4 anotaciones sueltas — un punto
+de color + línea punteada (mismo lenguaje que `.lam-title-deco`) +
+número en Fraunces (se mantiene el tratamiento actual de `.stat-box
+.num`) + etiqueta corta en Inter — flotando sobre `vision-brain-bg` en
+vez de encajonadas. Colores por dato: se mantienen los mismos 4 que ya
+tienen los íconos SVG actuales (dorado `#C1703B` 20%, morado `#714B67`
+86B, verde `#2E7D5B` 4–6, azul `#3B6EA5` 1:1).
+
+Por ser un cambio de estructura (HTML + CSS, no solo color) y no solo un
+ajuste, se dividió en 2 sesiones en vez de intentarlo todo de una:
+
+- **Sesión 1 (siguiente)** — versión desktop (≥901px) únicamente.
+  Reemplazar `.stat-grid`/`.stat-box` dentro de `#lam-02
+  .vision-stats-col` por el nuevo componente de anotaciones, con
+  posicionamiento libre (no grid parejo) sobre el área que hoy ocupa la
+  grilla, cuidando no tapar el texto de la izquierda ni salirse del
+  `vision-brain-bg`. No tocar mobile en esta sesión. Verificar con
+  Playwright en 1440px si el entorno lo permite (si no, dejarlo anotado
+  como pendiente de verificación visual, igual que otras sesiones).
+  Actualizar esta entrada marcando la sesión 1 como hecha, más
+  `changelog.md`, y generar el patch.
+- **Sesión 2** — mobile (≤900px) + limpieza. El posicionamiento libre de
+  la sesión 1 probablemente no sirve en pantallas angostas — definir en
+  esa sesión si conviene una versión apilada (punto + número + etiqueta
+  en línea) u otra solución; no está decidido de antemano. Revisar que
+  las anotaciones no choquen con `.brain-fruit`/`.deco-blob-berries`/
+  `.deco-scribble` en ningún breakpoint. Decidir si se limpian las
+  variables/reglas que quedan sin uso (`--vision-card-*`, los `#lam-02
+  .stat-box:nth-child(n)` de color, etc.) o se dejan comentadas.
+  Verificar con Playwright en 1440 y 390px, actualizar memoria/changelog,
+  generar el patch final.
+
+Importante para quien retome esto: **antes de dar por buena la sesión 1
+o la 2, mostrar una captura al usuario y esperar confirmación explícita
+antes de seguir** — el cambio de colores de íconos y de fondo pastel de
+esta misma sección se había implementado en sesiones anteriores sin
+poder verse en un navegador real, y terminó siendo justamente lo que no
+convenció al usuario ahora. No repetir ese patrón acá.
+
 **Fondo pastel por tarjeta en Visión (sesión 2026-09-17, novena tanda) —
 verificado con Playwright en este entorno (desktop 1440px y mobile
 390px), falta confirmar en un navegador real/deploy que los 4 pasteles

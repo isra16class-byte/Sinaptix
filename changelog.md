@@ -8,6 +8,29 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima segunda tanda) — Plan (sin implementar) para reemplazar las tarjetas de Visión por anotaciones a mano, dividido en 2 sesiones
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Sesión de diagnóstico, no de código: el usuario compartió una captura de
+las 4 tarjetas de estadísticas de Visión (`.stat-box` dentro de
+`#lam-02`) y expresó que "no encajan" con el sitio, sin poder explicar
+bien por qué. Se revisó el código y los íconos (colores ya coherentes
+por dato, número en la misma Fraunces que el resto del sitio) y se
+llegó a que el problema real es el formato de tarjeta tipo dashboard/
+SaaS (caja + ícono en la esquina + grid parejo), que choca con la
+identidad manuscrita/editorial de la sección (título en Caveat, frutas
+flotantes, garabato punteado `.lam-title-deco`). Se armaron mockups de
+3 alternativas en el chat (no en el repo): tarjeta blanca con color solo
+en el ícono, un único lila de marca para las 4, y una versión sin caja
+con anotaciones sueltas (punto + línea punteada + número) flotando sobre
+el fondo. El usuario se inclinó por la tercera. Por ser un cambio de
+estructura, se armó un plan dividido en 2 sesiones (ver "Pendientes
+conocidos" en `memoria.md` para el detalle de qué hace cada una) en vez
+de intentar todo en esta misma sesión. Ningún archivo de
+`index.html`/`css/styles.css` se tocó todavía — este patch solo
+documenta el plan en `memoria.md` y esta entrada.
+
 ## 2026-09-17 (trigésimoprimera tanda) — Título de "Mi plan": corrección de tamaño (el recorte anterior se pasó de chico)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
