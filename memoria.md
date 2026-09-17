@@ -804,26 +804,36 @@ Prioridad 2.
   completo). Efecto combinado: las tarjetas quedan notoriamente más
   lejos del texto y con aire de los dos lados en vez de pegadas al borde
   izquierdo de su columna.
-  **Tarjetas más grandes (sesión 2026-09-16, quinta y sexta tanda):** a
-  pedido del usuario, en dos pasadas (la segunda "un poco más grandes"
-  sobre la primera). Todo scopeado a `#lam-02` y dentro de
-  `@media(min-width:901px)` (mobile sin cambios: ahí las tarjetas ya
-  ocupan todo el ancho de columna y `.stat-box`/`.stat-grid` son clases
-  compartidas con `#miPlan`, que no debe verse afectado). Valores
-  **actuales** (ya con las dos pasadas aplicadas; no quedan valores
-  intermedios en ningún lado): `#lam-02 .vision-stats-col{max-width:
-  520px}` (venía de `400px`), `#lam-02 .stat-grid{gap:24px}` (venía de
-  heredar `16px` de `.stat-grid` base), `#lam-02 .stat-box{padding:34px
-  32px 30px}` (venía de `20px 22px 18px`), `.num{font-size:44px}` (venía
-  de `32px`), `.lab{font-size:17px}` (venía de `15px`), `#lam-02
-  .stat-icon{width/height:70px;top/right:20px}` (venía de `56px`/`18px`),
-  `.num{padding-right:82px}` (venía de `66px`, hueco para el ícono más
-  grande). La 4ª tarjeta ("1:1", `icon-conversacion.svg`) sigue con su
-  propio ícono más grande que las otras 3 (mismo criterio de siempre):
-  `96×96px` (venía de `78px`), `top/right:10px` (venía de `12px` en la
-  primera pasada), `.num{padding-right:106px}` (venía de `88px`). No se tocó
-  `.lab{margin-top}` de la 4ª tarjeta (`20px`) ni el resto de valores no
-  listados acá. **Color de los 4 íconos:** pasaron de `--ink` (casi
+  **Tarjetas más grandes (sesión 2026-09-16, quinta/sexta tanda; bug de
+  cascada corregido y tamaño subido de nuevo en sesión 2026-09-17,
+  séptima tanda):** a pedido del usuario. Las pasadas quinta y sexta
+  (2026-09-16) habían quedado documentadas acá con valores que **nunca
+  se vieron en pantalla**: se escribieron como un
+  `@media(min-width:901px){ #lam-02 .stat-box{...} ... }` ubicado *antes*
+  (más arriba en `css/styles.css`) que las reglas base sin media query
+  `#lam-02 .stat-box`/`#lam-02 .stat-icon`/`.num`/`.lab` (las de fondo
+  translúcido, ícono en esquina, etc., documentadas en los párrafos de
+  arriba). Como esas reglas base tienen la misma especificidad (id +
+  clase) y venían **después** en el archivo, ganaban la cascada sin
+  importar el `@media` — el CSS "grande" existía pero quedaba anulado, y
+  las tarjetas seguían viéndose con los valores chicos. El usuario lo
+  notó al pedir "más grande" de nuevo sobre lo que creía ya aplicado.
+  Fix: se movió el bloque `@media(min-width:901px)` de agrandado a
+  **después** de esas reglas base (mismo selector, ahora sí gana) y se
+  subió el tamaño más que en el intento anterior. Valores **actuales**
+  (los únicos que quedan, no hay valores intermedios en ningún lado):
+  `#lam-02 .vision-stats-col{max-width:560px}` (venía de `400px`),
+  `#lam-02 .stat-grid{gap:28px}` (venía de heredar `16px` de `.stat-grid`
+  base), `#lam-02 .stat-box{padding:32px 30px 28px}` (venía de `20px 22px
+  18px`), `.num{font-size:42px}` (venía de `32px`), `.lab{font-size:17px}`
+  (venía de `15px`), `#lam-02 .stat-icon{width/height:68px;top/right:
+  20px}` (venía de `56px`/`18px`), `.num{padding-right:82px}` (venía de
+  `66px`, hueco para el ícono más grande). La 4ª tarjeta ("1:1",
+  `icon-conversacion.svg`) sigue con su propio ícono más grande que las
+  otras 3 (mismo criterio de siempre): `92×92px` (venía de `78px`),
+  `top/right:8px` (venía de `10px`), `.num{padding-right:106px}` (venía
+  de `88px`), `.lab{margin-top:22px}` (venía de `20px`). **Color de los 4
+  íconos:** pasaron de `--ink` (casi
   negro) al morado de marca (`--purple`, `#714B67`) a pedido del
   usuario — hardcodeado dentro de cada `.svg` (no vía CSS: son `<img>`,
   no inline, no leen variables de `:root`), ver "Estructura de archivos"
@@ -1515,6 +1525,20 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Tarjetas de Visión más grandes + fix de cascada (sesión 2026-09-17) —
+falta verificación visual.** Ver `changelog.md` para el detalle del bug
+(un `@media` de agrandado quedaba anulado por reglas base con la misma
+especificidad más abajo en el archivo) y "Estado actual del diseño" →
+Visión para los valores finales. No se pudo correr Playwright en esta
+sesión (sin acceso de red al dominio de descarga del browser desde este
+entorno). Revisado a mano confirmando el orden de las reglas en
+`css/styles.css`, pero falta confirmar en un navegador real, desktop
+≥901px: que las 4 tarjetas se vean notoriamente más grandes que antes,
+que el número/label no se solapen con el ícono en ninguna (en particular
+la 4ª, "1:1", con ícono más grande), y que la columna con
+`max-width:560px` no se salga del hueco disponible contra el arte de
+fondo (`vision-brain-bg`).
 
 **Animación de llenado + marcador de "antes" en los anillos de Método
 (sesión 2026-09-16) — falta verificación visual.** Implementado (ver

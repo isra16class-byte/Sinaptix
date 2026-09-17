@@ -8,6 +8,43 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (vigesimosexta tanda) — Tarjetas de Visión más grandes (y fix de un bug de cascada que las dejaba sin efecto)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió agrandar las 4 tarjetas de estadísticas de la sección
+Visión (`#lam-02`, "20%"/"86B"/"4–6"/"1:1"), mostrando una captura donde
+se veían con un tamaño moderado pese a que `memoria.md` documentaba un
+agrandado ya aplicado en sesiones anteriores (quinta/sexta tanda,
+2026-09-16).
+
+- **Causa raíz:** el `@media(min-width:901px)` que agrandaba
+  `#lam-02 .stat-box`/`.stat-icon`/`.num`/`.lab` estaba ubicado en
+  `css/styles.css` **antes** que las reglas base (sin media query) con
+  el mismo selector — mismo id + clase, misma especificidad. Con
+  especificidad empatada, gana la regla que aparece **después** en el
+  archivo, sin importar el `@media`; como las reglas base venían
+  después, pisaban silenciosamente los valores "grandes". El agrandado
+  de sesiones previas nunca se vio en pantalla.
+- **Fix:** se movió el bloque de agrandado a después de las reglas base
+  (mismo selector, ahora sí gana la cascada) y se subieron los valores
+  más que en el intento anterior. Todo sigue scopeado a `#lam-02` y a
+  `@media(min-width:901px)` (mobile sin cambios, `.stat-box`/`.stat-grid`
+  son clases compartidas con `#miPlan`).
+- Valores nuevos (ver detalle completo en `memoria.md` →
+  "Estado actual del diseño" → Visión): `.vision-stats-col{max-width:
+  560px}` (antes 520px, efectivamente sin aplicar), `.stat-grid{gap:
+  28px}` (antes 24px), `.stat-box{padding:32px 30px 28px}` (antes 34px
+  32px 30px sin aplicar → 20px 22px 18px real), `.num{font-size:42px}`
+  (antes 32px real), `.lab{font-size:17px}` (antes 15px real),
+  `.stat-icon{68×68px}` (antes 56×56px real), 4ª tarjeta ("1:1") con
+  ícono `92×92px` (antes 78×78px real).
+- No se tocó HTML ni JS, solo `css/styles.css`. No se pudo correr
+  Playwright en esta sesión (sin acceso de red al dominio de descarga
+  del browser desde este entorno) — revisado a mano confirmando el orden
+  final de las reglas en el archivo. **Falta verificación visual en un
+  navegador real.**
+
 ## 2026-09-16 (vigesimoquinta tanda) — Íconos de las tarjetas de Visión en morado de marca
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
