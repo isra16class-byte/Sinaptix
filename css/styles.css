@@ -449,6 +449,31 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #lam-02 .vision-brain-bg{display:block;width:100%;height:auto;opacity:.92}
 @media(max-width:900px){#lam-02 .vision-brain-bg{display:none}}
 
+/* Íconos de Visión separados en 4 archivos individuales (sesión
+   2026-09-17, a pedido del usuario) — antes venían quemados dentro de
+   un único `fondo-vision-red.webp`. Ese archivo se reemplazó por
+   `fondo-vision-red-sin-iconos.webp` (mismos listones conectores, sin
+   los 4 íconos) y cada ícono ahora es un `<img>` propio
+   (`img/decoraciones-neurona/vision-iconos/icon-*.webp`, recortados con
+   `scripts/separar-iconos-vision.py` directo del canal alfa del archivo
+   viejo, así que son un recorte exacto — mismo tamaño/posición que se
+   veía antes). `.vision-icons` comparte la misma caja que
+   `.vision-brain-bg`/`.stat-annotations` dentro de `.vision-art`, y cada
+   `.vision-icon` se posiciona en porcentajes de esa caja (mismo criterio
+   que `.stat-annot`) para escalar junto con el fondo a cualquier ancho.
+   Oculto en mobile por ahora (`<900px`, mismo breakpoint que
+   `.vision-brain-bg`) — el posicionamiento en ese rango todavía no está
+   decidido, ver memoria.md → "Pendientes conocidos". */
+.vision-icons{display:none}
+@media(min-width:901px){
+  .vision-icons{position:absolute;inset:0;pointer-events:none}
+  .vision-icon{position:absolute;display:block;height:auto}
+  .vision-icon--dorado{left:8.94%;top:0;width:29.18%}
+  .vision-icon--morado{left:61.53%;top:0;width:35.18%}
+  .vision-icon--verde{left:13.82%;top:60.87%;width:19.41%}
+  .vision-icon--azul{left:62.29%;top:64.52%;width:29.82%}
+}
+
 #lam-02 .stat-box{
   background:rgba(255,255,255,.72);
   border:1px solid var(--purple);

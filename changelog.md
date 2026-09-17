@@ -8,6 +8,66 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (cuadragésima tanda) — Íconos de Visión separados en 4 archivos individuales
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+A pedido del usuario, que subió una captura del sitio en producción y
+pidió que los 4 íconos de `#lam-02` (Visión) dejaran de estar "unidos"
+(quemados dentro de un único archivo) y pasaran a ser individuales.
+Explícitamente pidió **no verificar ni mandar capturas** en esta
+tanda — "luego te diré qué vamos a hacer" — así que este patch es solo
+la separación técnica, sin decisiones nuevas de diseño/posición.
+
+- **Diagnóstico rápido**: a diferencia del caso de
+  `elemento-*.webp` (en `vision-elementos/`, generados por IA sobre
+  fondo blanco, necesitan que se les quite el blanco a mano), el
+  archivo en uso, `fondo-vision-red.webp`, **ya es RGBA con canal alfa
+  real** (confirmado con Pillow: esquina del lienzo con alfa `0`, zona
+  de un ícono con alfa `255`) — el recorte pudo hacerse directo por
+  transparencia, sin reprocesar blancos.
+- **Script nuevo y versionado**: `scripts/separar-iconos-vision.py`
+  (Pillow + numpy). Por cada uno de los 4 íconos: busca su bounding box
+  real (píxeles con alfa > 150) dentro de una ventana de búsqueda
+  generosa por ícono (evita mezclarse con el vecino o con los listones
+  de fondo, que tienen alfa bajo ~48), lo recorta con 20px de margen y
+  lo guarda como archivo individual; además arma una copia del fondo
+  original con esas 4 zonas (bounding box + 35px de margen extra)
+  vueltas transparentes, dejando solo los listones conectores. No toca
+  el archivo original (`fondo-vision-red.webp` queda intacto en el
+  repo, sin referenciarse desde ningún HTML/CSS a partir de este
+  patch, por si hace falta volver atrás).
+  Bounding boxes detectados (en % del lienzo 1700×1040, calzan con los
+  ya documentados en memoria.md de la tanda anterior): cerebro
+  8.9–36.9%×0–28.7%, red neuronal 61.5–96.5%×0–31.5%, reloj de arena
+  13.8–33.2%×60.9–100%, cintas azules 62.3–92.1%×64.5–100%.
+- **Archivos nuevos**:
+  `img/decoraciones-neurona/vision-iconos/icon-cerebro.webp` (496×318),
+  `icon-red-neuronal.webp` (598×348), `icon-reloj-arena.webp`
+  (330×407), `icon-cintas-azules.webp` (507×369); y
+  `img/decoraciones-neurona/fondo-vision-red-sin-iconos.webp`
+  (1700×1040, mismos listones, sin los 4 íconos).
+- **`index.html`**: `.vision-brain-bg` pasa a apuntar a
+  `fondo-vision-red-sin-iconos.webp`; se agrega `<div class="vision-icons">`
+  con los 4 `<img class="vision-icon vision-icon--{dorado,morado,verde,azul}">`
+  nuevos, como hermano de `.stat-annotations` dentro de `.vision-art`.
+- **`css/styles.css`**: `.vision-icons` comparte la misma caja que
+  `.vision-brain-bg`/`.stat-annotations` (`position:absolute;inset:0`
+  dentro de `.vision-art`) y cada `.vision-icon` se posiciona en
+  `left`/`top`/`width` porcentuales calculados a partir del mismo
+  bounding box detectado arriba, así que **visualmente no debería
+  cambiar nada** respecto a como se veía el fondo compuesto — es un
+  recorte exacto del mismo píxel. Oculto en mobile (`<900px`, mismo
+  breakpoint que `.vision-brain-bg`, que también se oculta ahí): el
+  posicionamiento en ese rango sigue sin definir (ver "Pendientes
+  conocidos" en `memoria.md`, plan de 2 sesiones aún no continuado).
+- **No verificado visualmente** (a pedido explícito del usuario, ver
+  arriba). Sí se corrió `npm test`: 54/54 ok (este cambio no toca JS de
+  lógica, solo assets + HTML/CSS).
+- Queda abierto, a definir en la próxima instrucción del usuario: qué
+  hacer con los 4 íconos ya separados (reposicionarlos, agrandarlos
+  individualmente, animarlos, etc.).
+
 ## 2026-09-17 (trigésima novena tanda) — Íconos de Visión más grandes + texto reacomodado
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

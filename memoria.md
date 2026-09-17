@@ -160,7 +160,14 @@ próximos pasos).
   con migraciones nuevas, nunca editando ni recreando en runtime.
 - `svg/`, `img/` — assets (decoraciones SVG tipo `deco-*`, frutas
   `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
-  `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
+  `img/generadas*`). `img/decoraciones-neurona/fondo-vision-red-sin-iconos.webp`
+  (fondo de Visión sin los 4 íconos, solo listones conectores) +
+  `img/decoraciones-neurona/vision-iconos/icon-{cerebro,red-neuronal,
+  reloj-arena,cintas-azules}.webp` (los 4 íconos, ahora archivos
+  individuales con transparencia real) — ver "Estado actual del diseño"
+  → Visión → "Íconos separados en archivos individuales" para el
+  detalle de cómo se armaron (`scripts/separar-iconos-vision.py`) y
+  cómo se posicionan. `svg/icon-*.svg` (calendario-check, red-nodos,
   conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
   sin `stroke`, hardcodeado en el propio archivo `.svg` como
   `#714B67` — mismo tono que `--purple`; no puede ser la variable CSS
@@ -851,6 +858,46 @@ Prioridad 2.
   de tarjetas **quedan en el archivo sin usarse** en esta sección (no se
   borraron en la sesión 1, ver comentario en `css/styles.css` junto a
   esas reglas) — decidir limpieza en la sesión 2 del plan.
+- **Visión (`#lam-02`) — íconos separados en 4 archivos individuales**
+  (sesión 2026-09-17, cuadragésima tanda, a pedido del usuario). Hasta
+  este patch, los 4 íconos (cerebro, red neuronal, reloj de arena,
+  cintas azules) vivían quemados dentro de un único archivo,
+  `fondo-vision-red.webp`. Ahora ese archivo dejó de referenciarse (sigue
+  en el repo intacto, sin uso, por si hace falta volver atrás) y
+  `.vision-brain-bg` apunta a
+  `img/decoraciones-neurona/fondo-vision-red-sin-iconos.webp` (mismo
+  lienzo 1700×1040, mismos listones conectores, con las 4 zonas de los
+  íconos borradas/transparentes). Los 4 íconos ahora son archivos
+  propios en `img/decoraciones-neurona/vision-iconos/`
+  (`icon-cerebro.webp` 496×318, `icon-red-neuronal.webp` 598×348,
+  `icon-reloj-arena.webp` 330×407, `icon-cintas-azules.webp` 507×369),
+  recortados directo del canal alfa del `fondo-vision-red.webp` viejo
+  (ya era RGBA con transparencia real, no hubo que quitar fondo blanco
+  como con los `elemento-*.webp` de `vision-elementos/`). Nuevo HTML:
+  `<div class="vision-icons">` con los 4 `<img class="vision-icon
+  vision-icon--{dorado,morado,verde,azul}">`, hermano de
+  `.stat-annotations` dentro de `.vision-art` (mismo contenedor que
+  `.vision-brain-bg`). CSS: cada `.vision-icon` usa `left`/`top`/`width`
+  en porcentaje del mismo sistema de coordenadas que ya usan las 4
+  `.stat-annot` (`position:absolute` dentro de `.vision-icons`, que
+  comparte caja con `.vision-art`), calculados para reproducir
+  exactamente la posición/tamaño que tenía cada ícono dentro del fondo
+  viejo — es un recorte 1:1, no un reposicionamiento. Oculto en mobile
+  (`<900px`, mismo breakpoint que `.vision-brain-bg`) — el
+  posicionamiento en ese rango sigue sin decidir (ver "Pendientes
+  conocidos"). **Reproducible**: `scripts/separar-iconos-vision.py`
+  (Pillow + numpy, comentado, no versionado hasta este patch) rehace los
+  4 recortes + el fondo sin íconos a partir de `fondo-vision-red.webp`
+  si hace falta volver a generarlos (por ejemplo si se cambia el margen
+  de recorte). **Sin verificación visual** — el usuario pidió
+  explícitamente no tomar capturas en esta tanda, así que **antes de dar
+  esto por definitivo hay que confirmar en un navegador real** que los 4
+  íconos calzan en el mismo lugar que antes (debería ser así porque es
+  un recorte exacto del mismo píxel, pero no se comprobó). Qué hacer con
+  los 4 íconos ya separados (moverlos, agrandarlos individualmente,
+  animarlos, rediseñar su posición) queda para la próxima instrucción
+  del usuario — no estaba decidido de antemano, solo se pidió la
+  separación técnica.
 - **Visión (`#lam-02`) — subtítulos de los 3 bullets en morado** (sesión
   2026-09-16): `.vision-bullets strong` ("Atención individualizada.",
   "No más dietas genéricas.", "Rendimiento cognitivo.") pasó de
@@ -1553,6 +1600,26 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Íconos de Visión separados en 4 archivos individuales (sesión
+2026-09-17, cuadragésima tanda) — sin verificación visual, a pedido
+explícito del usuario ("no quiero que hagas verificaciones ni que me
+envíes capturas").** Ver "Estado actual del diseño" → Visión → "íconos
+separados en 4 archivos individuales" para el detalle completo. Falta
+para quien retome esto:
+- Confirmar en un navegador real (desktop ≥901px) que los 4
+  `.vision-icon` calzan exactamente donde estaba cada ícono antes del
+  cambio — debería ser así por construcción (son un recorte 1:1 del
+  mismo `fondo-vision-red.webp` viejo, con los mismos porcentajes que
+  ya usaban las `.stat-annot`), pero no se corrió Playwright ni se tomó
+  ninguna captura en esta tanda.
+- El usuario todavía no dijo qué quiere hacer con los íconos ya
+  separados (moverlos, agrandarlos individualmente, animarlos,
+  rediseñar la composición) — esperar esa instrucción antes de tocar
+  `.vision-icon*` de nuevo.
+- `fondo-vision-red.webp` (el archivo viejo, con los íconos quemados
+  adentro) queda en el repo sin usarse, por si hace falta volver atrás
+  rápido; no se borró.
 
 **Íconos de Visión agrandados dentro de la imagen + reacomodo de texto
 (sesión 2026-09-17) — sin verificación visual, el usuario pidió no
