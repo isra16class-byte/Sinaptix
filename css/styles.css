@@ -636,6 +636,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    no hay ningún `.lam-text` bajo `.sec-head-center` en mi-plan.html. */
 #miPlanConSesion .sec-head-center .lam-title{margin-top:14px;margin-bottom:6px}
 #miPlanConSesion .sec-head-center .lam-text{margin-top:0;margin-bottom:0}
+/* El título de "Mi plan" hereda el tamaño de hero (clamp 40-68px) de
+   `.lam-title` pensado para las secciones grandes de index.html — acá al
+   lado de "Datos clave" (`.miplan-subhead`, 19px Inter) y el resto de la
+   tipografía chica del dashboard, se sentía "fuera de contexto" (reportado
+   por el usuario con captura, ya centrado y con el círculo). Se lo achica
+   solo en esta pantalla (no se toca `.lam-title` global, que siguen
+   usando todos los títulos grandes de las secciones de index.html) y se
+   baja un poco el peso (700→600, el otro corte que ya trae la fuente
+   Caveat importada) para que lea como encabezado de panel y no como
+   titular de landing — sigue bastante más grande que `.miplan-subhead`
+   para no perder la jerarquía visual sobre "Datos clave". */
+#miPlanConSesion .sec-head-center .lam-title{
+  font-size:clamp(26px,3.4vw,34px);font-weight:600;
+}
 #miPlan .miplan-subhead{margin-bottom:12px}
 #miPlan .stat-box,
 #miPlan .bar-chart-card,

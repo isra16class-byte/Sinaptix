@@ -1149,7 +1149,7 @@ Prioridad 2.
   desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
   `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
 - **Título "Tu progreso con SINAPTIX" — palabra "SINAPTIX" encerrada**
-  (sesión 2026-09-16/17, décimocuarta a vigesimonovena tanda): solo esa
+  (sesión 2026-09-16/17, décimocuarta a trigésima tanda): solo esa
   palabra vive en `<span class="miplan-brand-circled">`, con texto en
   `--purple-dark` y un círculo como `::after` con `background-image`.
   **El círculo es una foto real** (recorte de `img/ilustraciones-mi-plan/
@@ -1170,9 +1170,19 @@ Prioridad 2.
   algún día cambia el texto de este título o su tamaño de fuente, revisar
   los offsets de `.miplan-brand-circled::after` (`left/right/top/
   bottom`, en `%` relativos al propio `<span>`) — están ajustados a ojo
-  para "SINAPTIX" en `Caveat` 700 contra esta imagen puntual (su recorte/
+  para "SINAPTIX" en `Caveat` contra esta imagen puntual (su recorte/
   proporción no cambió al recolorearla, así que los offsets siguen
   valiendo), no son un cálculo genérico.
+  **Tamaño del título (tanda trigésima)**: `#miPlanConSesion .sec-head-
+  center .lam-title{font-size:clamp(26px,3.4vw,34px);font-weight:600}` —
+  el usuario pidió "que no se sienta fuera de contexto" al lado de
+  `.miplan-subhead` (19px) y las tarjetas del dashboard; se achicó y se
+  bajó el peso (700→600) **solo acá**, sin tocar `.lam-title` global
+  (`clamp(40px,6vw,68px)`, la escala de hero que siguen usando todos los
+  títulos de sección de `index.html`). Si algún día se agranda esta
+  pantalla o se agrega más contenido al lado del título, este es el punto
+  a revisar — no es un tamaño "final", es el que se sintió bien contra el
+  dashboard actual.
   **Ojo con `margin` shorthand en `#miPlanConSesion .sec-head-center
   .lam-title`**: en la décimocuarta tanda quedó con `margin:14px 0 6px`,
   que sin querer pisaba el `margin-left/right:auto` que centra el título

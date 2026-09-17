@@ -8,6 +8,43 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima tanda) — Título de "Mi plan" achicado: dejó de sentirse "de landing"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario preguntó qué más se podía hacer para que el título "Tu
+progreso con SINAPTIX" no se sintiera fuera de contexto en el dashboard
+de "Mi plan" (ya centrado y con el círculo dorado de las tandas
+anteriores). Diagnóstico: `.lam-title` (la clase base de TODOS los
+títulos de sección del sitio, no solo este) trae `font-size:clamp(40px,
+6vw,68px)` — una escala pensada para titulares de landing en
+`index.html`, donde conviven bien con secciones espaciosas. En "Mi plan"
+esa misma escala quedaba al lado de `.miplan-subhead` ("Datos clave",
+19px Inter) y tarjetas densas con tipografía chica — el contraste de
+escala entre "titular gigante" y "dashboard funcional" era la fuente
+real del problema, no el color ni el centrado (que ya se habían
+resuelto).
+
+Se le ofrecieron 3 direcciones al usuario (achicar el título completo /
+cursiva solo en SINAPTIX y el resto en la tipografía del dashboard /
+alinear a la izquierda) y eligió la primera.
+
+- `css/styles.css`: nuevo override
+  `#miPlanConSesion .sec-head-center .lam-title{font-size:clamp(26px,
+  3.4vw,34px);font-weight:600}` — **no se tocó `.lam-title` global**
+  (seguiría afectando todos los títulos de `index.html` si se tocara
+  ahí). El peso baja de 700 a 600 (el otro corte que ya trae la fuente
+  `Caveat` importada, no hubo que sumar un nuevo `@font-face`). El
+  círculo dorado (`::after` con offsets en `%`) escala solo porque los
+  offsets son relativos al propio `<span>` — no hizo falta tocarlo.
+- Sigue bastante más grande que `.miplan-subhead` (26-34px vs 19px) para
+  no perder jerarquía visual sobre "Datos clave".
+
+Verificado con Playwright (tipografía real vía `typeface-caveat`, no
+queda en el repo): desktop y mobile, el círculo se sigue viendo nítido y
+bien proporcionado al texto más chico. 54/54 tests ok (cambio puramente
+de CSS).
+
 ## 2026-09-17 (vigesimonovena tanda) — Círculo de "SINAPTIX" recoloreado a dorado
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
