@@ -642,13 +642,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    tipografía chica del dashboard, se sentía "fuera de contexto" (reportado
    por el usuario con captura, ya centrado y con el círculo). Se lo achica
    solo en esta pantalla (no se toca `.lam-title` global, que siguen
-   usando todos los títulos grandes de las secciones de index.html) y se
-   baja un poco el peso (700→600, el otro corte que ya trae la fuente
-   Caveat importada) para que lea como encabezado de panel y no como
-   titular de landing — sigue bastante más grande que `.miplan-subhead`
-   para no perder la jerarquía visual sobre "Datos clave". */
+   usando todos los títulos grandes de las secciones de index.html) para
+   que lea como encabezado de panel y no como titular de landing — sigue
+   bastante más grande que `.miplan-subhead` para no perder la jerarquía
+   visual sobre "Datos clave". El primer recorte (26-34px, peso 600) fue
+   demasiado lejos ("te pasaste un poco", reportado con captura) — se
+   subió a un punto medio (30-42px) y se le devolvió el peso 700 original
+   (a este tamaño más chico, el corte 600 de `Caveat` se leía débil/poco
+   definido; 700 sostiene mejor los trazos finos del script). */
 #miPlanConSesion .sec-head-center .lam-title{
-  font-size:clamp(26px,3.4vw,34px);font-weight:600;
+  font-size:clamp(30px,3.9vw,42px);font-weight:700;
 }
 #miPlan .miplan-subhead{margin-bottom:12px}
 #miPlan .stat-box,

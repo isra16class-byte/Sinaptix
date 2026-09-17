@@ -8,6 +8,33 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésimoprimera tanda) — Título de "Mi plan": corrección de tamaño (el recorte anterior se pasó de chico)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario probó el achique de la tanda anterior (clamp 26-34px, peso
+600) y avisó que "se pasó un poco" — quedó demasiado chico para el peso
+que el título debería tener en la jerarquía de la página. Se subió a un
+punto medio: `clamp(30px,3.9vw,42px)`, y se le devolvió el peso 700
+original (a este tamaño más chico, el corte 600 de `Caveat` se leía
+débil/poco definido — 700 sostiene mejor los trazos finos del script).
+
+De paso, el usuario preguntó si convenía variar o cambiarle el color a
+todo el título (hoy "Tu progreso con" queda en el color de texto normal
+de los títulos del sitio y solo "SINAPTIX" tiene su propio color +
+círculo). Respuesta que se le dio (no se tocó código por esto, es una
+recomendación de diseño, no un pedido): no conviene — el contraste entre
+un texto neutro y una sola palabra destacada en el color/círculo de
+marca es lo que hace que el ojo vaya directo a "SINAPTIX"; si todo el
+título compartiera un color (o si cada palabra tuviera uno distinto) se
+perdería esa jerarquía y sumaría ruido visual en una pantalla que ya
+tiene bastante color (tarjetas verde/dorado/lila). Si en algún momento
+se pide explícitamente igual, tenerlo en cuenta al implementarlo.
+
+Verificado con Playwright (tipografía real vía `typeface-caveat`, no
+queda en el repo): desktop y mobile. 54/54 tests ok (cambio puramente de
+CSS, un solo valor de `font-size`/`font-weight`).
+
 ## 2026-09-17 (trigésima tanda) — Título de "Mi plan" achicado: dejó de sentirse "de landing"
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

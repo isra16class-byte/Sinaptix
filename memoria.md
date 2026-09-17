@@ -1173,16 +1173,25 @@ Prioridad 2.
   para "SINAPTIX" en `Caveat` contra esta imagen puntual (su recorte/
   proporción no cambió al recolorearla, así que los offsets siguen
   valiendo), no son un cálculo genérico.
-  **Tamaño del título (tanda trigésima)**: `#miPlanConSesion .sec-head-
-  center .lam-title{font-size:clamp(26px,3.4vw,34px);font-weight:600}` —
-  el usuario pidió "que no se sienta fuera de contexto" al lado de
-  `.miplan-subhead` (19px) y las tarjetas del dashboard; se achicó y se
-  bajó el peso (700→600) **solo acá**, sin tocar `.lam-title` global
+  **Tamaño del título (tanda trigésima, corregido en la trigésimoprimera)**:
+  `#miPlanConSesion .sec-head-center .lam-title{font-size:clamp(30px,
+  3.9vw,42px);font-weight:700}` — el usuario pidió "que no se sienta
+  fuera de contexto" al lado de `.miplan-subhead` (19px) y las tarjetas
+  del dashboard; el primer recorte (26-34px, peso 600, tanda trigésima)
+  se pasó de chico ("te pasaste un poco", con captura), se subió a este
+  punto medio y se volvió al peso 700 original (600 se leía débil a este
+  tamaño). Todo esto **solo acá**, sin tocar `.lam-title` global
   (`clamp(40px,6vw,68px)`, la escala de hero que siguen usando todos los
-  títulos de sección de `index.html`). Si algún día se agranda esta
-  pantalla o se agrega más contenido al lado del título, este es el punto
-  a revisar — no es un tamaño "final", es el que se sintió bien contra el
-  dashboard actual.
+  títulos de sección de `index.html`). No es un tamaño "final" — quedó
+  en lo que se sintió bien contra el dashboard actual, si la pantalla
+  cambia (más contenido al lado, otro layout) conviene revisar de nuevo.
+  El usuario también preguntó si convenía recolorear todo el título (no
+  solo "SINAPTIX") — se le recomendó que no: el contraste entre el texto
+  neutro y la única palabra destacada es lo que dirige la mirada a
+  "SINAPTIX", un título entero de un color (o multicolor) perdería esa
+  jerarquía y sumaría ruido en una pantalla ya cargada de color (tarjetas
+  verde/dorado/lila). No se tocó código por esto — si en algún momento
+  se pide explícitamente, tenerlo en cuenta al implementarlo.
   **Ojo con `margin` shorthand en `#miPlanConSesion .sec-head-center
   .lam-title`**: en la décimocuarta tanda quedó con `margin:14px 0 6px`,
   que sin querer pisaba el `margin-left/right:auto` que centra el título
