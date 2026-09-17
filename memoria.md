@@ -854,7 +854,31 @@ Prioridad 2.
   (`--gold` en los íconos de los bullets de esta sección, `--green` en
   Beneficios), así que combinan con la paleta general. Mismo mecanismo
   de siempre: color hardcodeado en el `fill` del `<g>` que envuelve el
-  dibujo dentro de cada `.svg`. El título de esta sección (`El cerebro también se
+  dibujo dentro de cada `.svg`.
+  **Fondo de cada tarjeta con tinte pastel a juego con su ícono
+  (sesión 2026-09-17, novena tanda):** a pedido del usuario ("colorear
+  las tarjetas con colores suaves"), las 4 dejan de compartir el mismo
+  blanco translúcido (`rgba(255,255,255,.72)`) + borde morado uniforme
+  y pasan a un pastel propio ligado al color que ya tenía cada ícono:
+  1ª ("20%", `is-featured`) durazno, 2ª ("86B") lavanda, 3ª ("4–6")
+  menta, 4ª ("1:1") celeste. Variables nuevas en `:root`
+  (`--vision-card-dorado/-morado/-verde/-azul` + sufijo `-line` para el
+  borde de cada una): los fondos son `rgba` a `alpha .72` (mismo nivel
+  de translucidez que el blanco que reemplazan, para seguir dejando ver
+  `vision-brain-bg` detrás con el mismo `blur(2px)` de siempre) y los
+  bordes son el color de cada familia (`--gold`/`--purple`/`--green`/
+  `--navy-bright`) a `alpha .45` (antes: `var(--purple)` sólido en las
+  4). Reglas nuevas `#lam-02 .stat-box:nth-child(1..4)` puestas
+  **después** de la regla `.is-featured` en `css/styles.css` (misma
+  especificidad id+2-clases-o-pseudoclase; en ese empate gana la que
+  está más abajo en el archivo) para que también sobreescriban el fondo
+  blanco que traía `.is-featured` en la 1ª tarjeta. No se tocó color de
+  texto (`.num`/`.lab` siguen en `--purple-dark`, se probó legible
+  contra los 4 pasteles), ni tamaño/padding/íconos (eso quedó igual que
+  la tanda anterior). Verificado con Playwright, desktop 1440px y
+  mobile 390px: los 4 colores se leen bien diferenciados entre sí y
+  contra el arte de fondo, sin perder contraste de texto.
+  El título de esta sección (`El cerebro también se
   alimenta`) es un `<h2 class="lam-title">` normal, **sin** `display:flex`
   inline (se sacó en la misma tanda: causaba que el texto se envolviera
   letra por letra en vez de fluir normal — ver `changelog.md` para el
@@ -1538,6 +1562,14 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Fondo pastel por tarjeta en Visión (sesión 2026-09-17, novena tanda) —
+verificado con Playwright en este entorno (desktop 1440px y mobile
+390px), falta confirmar en un navegador real/deploy que los 4 pasteles
+se lean bien también contra el arte de fondo real en producción (acá se
+sirvió el sitio con `python -m http.server`, no hubo red para
+`identity.netlify.com` ni assets remotos, pero `vision-brain-bg` es un
+asset local así que cargó igual).**
 
 **Íconos de las tarjetas de Visión con color propio (sesión 2026-09-17)
 — falta verificación visual.** Ver `changelog.md` y "Estado actual del

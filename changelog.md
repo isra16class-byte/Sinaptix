@@ -8,6 +8,34 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (vigesimoctava tanda) — Fondo pastel por tarjeta de Visión, a juego con el color de cada ícono
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió "colorear las tarjetas con colores suaves" — hasta
+ahora las 4 tarjetas de Visión (`#lam-02 .stat-box`) compartían el mismo
+fondo blanco translúcido (`rgba(255,255,255,.72)`) y borde morado
+uniforme, aunque cada ícono ya tenía su propio color (tanda anterior).
+
+- Nuevas variables en `:root` (`css/styles.css`): 4 fondos
+  `--vision-card-dorado/-morado/-verde/-azul` (`rgba` a alpha `.72`,
+  mismo nivel de translucidez que el blanco que reemplazan) y 4 bordes
+  `--vision-card-*-line` (color de cada familia a alpha `.45`, antes
+  `var(--purple)` sólido en las 4).
+- `#lam-02 .stat-box:nth-child(1..4)`: cada tarjeta toma el pastel de su
+  propio ícono — 1ª ("20%") durazno, 2ª ("86B") lavanda, 3ª ("4–6")
+  menta, 4ª ("1:1") celeste. Reglas puestas después de `.is-featured`
+  para que ganen también en la 1ª tarjeta (empate de especificidad,
+  gana la que está más abajo en el archivo).
+- No se tocó color de texto, tamaño, padding ni íconos.
+- Verificado con Playwright en este entorno (servidor local
+  `python -m http.server`, no hay red a `netlify.app`/`identity.netlify.com`
+  desde acá): capturas desktop 1440px y mobile 390px, los 4 pasteles se
+  distinguen bien entre sí y contra `vision-brain-bg`, sin perder
+  contraste del texto (`--purple-dark`).
+- `memoria.md`: actualizada la sub-sección de Visión → tarjetas, y
+  agregado el pendiente de confirmar en un deploy real.
+
 ## 2026-09-17 (vigesimoséptima tanda) — Cada ícono de las tarjetas de Visión con su propio color
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

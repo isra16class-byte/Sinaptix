@@ -36,6 +36,21 @@
   --miplan-card-verde:#DFEEE4;
   --miplan-card-dorado:#F6E7D6;
   --miplan-card-lila:#EFE1EC;
+  /* Tinte pastel translúcido de las 4 tarjetas de Visión (#lam-02),
+     una por color de ícono (dorado/morado/verde/azul) — a diferencia de
+     los --miplan-card-* de arriba (sólidos, opacos), estos son rgba con
+     alpha .72 para mantener el mismo nivel de translucidez que tenía el
+     blanco uniforme que reemplazan, dejando ver el arte de fondo
+     (vision-brain-bg) detrás. El borde usa el mismo color de familia a
+     alpha .45 (antes: var(--purple) sólido en las 4). */
+  --vision-card-dorado:rgba(250,224,196,.72);
+  --vision-card-dorado-line:rgba(193,112,59,.45);
+  --vision-card-morado:rgba(233,219,230,.72);
+  --vision-card-morado-line:rgba(113,75,103,.45);
+  --vision-card-verde:rgba(214,235,224,.72);
+  --vision-card-verde-line:rgba(46,125,91,.45);
+  --vision-card-azul:rgba(214,226,240,.72);
+  --vision-card-azul-line:rgba(59,110,165,.45);
   --red:#B3261E;
   --line:rgba(38,22,31,.12);
   --radius:16px;
@@ -429,6 +444,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #lam-02 .stat-box .num{color:var(--purple-dark);text-shadow:none;font-size:32px}
 #lam-02 .stat-box .lab{color:var(--purple-dark);opacity:1;font-size:15px;font-weight:600;margin-top:16px}
 #lam-02 .stat-box.is-featured{background:rgba(255,255,255,.7);border-color:var(--purple)}
+
+/* Cada tarjeta con su propio tinte pastel (sesión 2026-09-17, a pedido
+   del usuario), a juego con el color que ya tenía su ícono (ver más
+   abajo "Color de los 4 íconos"): reemplaza el blanco uniforme +
+   borde morado de las reglas de arriba. Van después de `.is-featured`
+   (misma especificidad, así ganan también en la 1ª tarjeta, que tiene
+   esa clase). Orden de las tarjetas en el markup: 1) batería/20%
+   dorado, 2) red-nodos/86B morado, 3) calendario/4–6 verde,
+   4) conversación/1:1 azul. */
+#lam-02 .stat-box:nth-child(1){background:var(--vision-card-dorado);border-color:var(--vision-card-dorado-line)}
+#lam-02 .stat-box:nth-child(2){background:var(--vision-card-morado);border-color:var(--vision-card-morado-line)}
+#lam-02 .stat-box:nth-child(3){background:var(--vision-card-verde);border-color:var(--vision-card-verde-line)}
+#lam-02 .stat-box:nth-child(4){background:var(--vision-card-azul);border-color:var(--vision-card-azul-line)}
 
 /* Ícono de las 4 tarjetas de Visión: pasa de estar arriba a la izquierda
    (en flujo normal, empujando num/lab hacia abajo) a quedar fijo en la
