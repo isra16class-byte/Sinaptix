@@ -749,6 +749,17 @@ Prioridad 2.
   de control de los listones, estilo). Si hace falta mover o agrandar
   algún elemento, conviene tocar las constantes del script y volver a
   correrlo en vez de editar los `.webp` a mano.
+  **⚠️ Desvío de este criterio (sesión 2026-09-17, "íconos más
+  grandes"): el agrandado de los 4 íconos de esta tanda se hizo editando
+  el `.webp` final directamente (recorte+escala+repegado por alfa, ver
+  "Pendientes conocidos"), no tocando las constantes de
+  `generar-fondo-vision.py` y corriéndolo de nuevo — no se llegó a
+  revisar si el script tiene una constante de tamaño por elemento fácil
+  de ajustar. Si se vuelve a correr `generar-fondo-vision.py` tal como
+  está, pisa `fondo-vision-red.webp` y se pierde el agrandado de esta
+  sesión.** Próxima vez que se toque el tamaño de estos íconos, evaluar
+  primero si conviene migrar este ajuste al script (más prolijo y
+  reproducible) en vez de seguir apilando ediciones directas del `.webp`.
   **El `width` en `vw`/`clamp()` y el bleed en `right`/`top` que tuvo
   esta imagen en las tandas anteriores ya no existen** — sesión
   2026-09-17 (trigésima séptima tanda) la pasó a vivir dentro de
@@ -798,8 +809,12 @@ Prioridad 2.
   de su cuadrante sin tapar el elemento que señala) — `#lam-02
   .stat-annot{width:38%}`, dorado `left:1%;top:1%` (cerebro, arriba-izq.),
   morado `left:41%;top:2%` (red neuronal, arriba-der.), verde
-  `left:1%;top:64%` (reloj de arena, abajo-izq.), azul `left:41%;top:64%`
-  (cintas azules, abajo-der.). El número (`.stat-annot-num`) y la
+  `left:1%;top:40%` (reloj de arena, abajo-izq.), azul `left:41%;top:40%`
+  (cintas azules, abajo-der.) — **el `top` de verde/azul subió de `64%`
+  a `40%` en la sesión 2026-09-17 ("íconos más grandes", ver "Pendientes
+  conocidos"): al agrandar los íconos de esa fila dentro de la imagen,
+  el `top:64%` que tenían antes quedaba dentro del área del ícono ya
+  agrandado y el texto se veía tapado.** El número (`.stat-annot-num`) y la
   etiqueta (`.stat-annot-lab`) usan `font-size:clamp(...)` (26–36px y
   12–14px respectivamente, ver `css/styles.css`) en vez de tamaño fijo:
   a anchos angostos dentro del rango desktop (~901–1100px) el texto
@@ -1538,6 +1553,65 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Íconos de Visión agrandados dentro de la imagen + reacomodo de texto
+(sesión 2026-09-17) — sin verificación visual, el usuario pidió no
+seguir haciendo capturas en esta sesión.** El usuario pidió agrandar los
+4 íconos de `#lam-02` (cerebro, red neuronal, reloj de arena, nudo/
+cintas azules) y "acomodar" el texto que quedó tapado. Los 4 íconos
+**no son SVGs sueltos**: viven quemados dentro de un único archivo,
+`img/decoraciones-neurona/fondo-vision-red.webp` (1700×1040px, RGBA con
+canal alfa real — el "blanco" de fondo es transparente, no pintado).
+Se agrandaron con un script Python/PIL (no versionado en el repo, corrió
+en `/home/claude/work` de esta sesión): por cada ícono, recorta un
+parche alrededor de su bounding box (umbral de canal alfa >150) con
+margen generoso (2.5x), lo escala ~1.35x con Lanczos, **borra el parche
+viejo dejándolo transparente** y pega el parche agrandado encima usando
+su propio canal alfa como máscara — este orden importa: pegar el ícono
+grande directamente sobre el chico sin borrar antes deja un "fantasma"
+semitransparente doble (se probó primero así y se descartó por eso).
+`img/decoraciones-neurona/fondo-vision-red.webp` quedó reemplazado en el
+repo con la versión agrandada.
+
+Nuevas coordenadas del contenido de cada ícono (mismo script de medición
+de siempre, umbral alfa >150, sobre la imagen ya agrandada): cerebro
+≈10–37%×0–29%, red neuronal ≈63–96%×0–32%, reloj de arena
+≈15–32%×63–100%, cintas azules ≈64–91%×66–100%. Los dos de abajo crecieron
+lo suficiente para tapar el texto de esa fila (`.stat-annot--verde`/
+`--azul`, que tenían `top:64%`, ahora dentro del rango del ícono
+agrandado) — se subió su `top` a `40%` en `css/styles.css` (queda en el
+hueco libre entre el borde inferior de la fila de arriba, ≈29–32%, y el
+inicio del ícono de abajo, ≈63–66%). La fila de arriba (dorado/morado,
+`top:1%/2%`) no se tocó: no hubo reporte ni indicio de que se tape con
+el cerebro/red ya agrandados, pero **tampoco se reverificó con
+Playwright después del agrandado** (sí se había verificado, sin
+problema, antes de agrandar los íconos de abajo).
+
+**Falta para quien retome esto:**
+- Verificar con Playwright (desktop ≥901px, donde aplica el
+  posicionamiento absoluto) que "4–6"/"1:1" ya no queden tapados por el
+  reloj/nudo agrandados, y que el `top:40%` no los deje demasiado
+  pegados a la fila de arriba ni con el label de 2 líneas cortado.
+- Confirmar que dorado/morado (fila de arriba) siguen sin tocarse con el
+  cerebro/red ya agrandados — no debería haber cambiado nada ahí (el
+  `top` no se movió) pero no se re-tomó captura para confirmarlo en esta
+  tanda.
+- Revisar en mobile (≤900px): en ese breakpoint las `.stat-annot` no
+  usan posicionamiento absoluto (ver la regla base más simple, columna
+  apilada) así que el agrandado del ícono de fondo no debería afectar el
+  texto ahí, pero no se verificó.
+- El script de agrandado no quedó guardado en el repo (vivió en
+  `/home/claude/work` de la sesión de trabajo, no en `Sinaptix/`). Si se
+  necesita volver a tocar el tamaño de algún ícono, hay que rehacerlo
+  desde cero con el mismo método (recorte por alfa + Lanczos + borrar-
+  antes-de-pegar) en vez de editar el `.webp` a mano.
+- Queda un backup de la imagen **anterior** al agrandado (íconos
+  originales, antes de esta sesión) en `/home/claude/work/
+  fondo-vision-red-ORIGINAL-backup.webp` de esta sesión de trabajo — no
+  está en el repo ni en el patch; si hace falta revertir el tamaño de
+  los íconos y ese entorno de trabajo ya no existe, hay que recrearlo
+  desde el historial de git (el commit anterior a este todavía tiene el
+  `.webp` viejo).
 
 **Plan: reemplazar las tarjetas de Visión por anotaciones a mano (2
 sesiones) — sesión 1 hecha (2026-09-17), sesión 2 (mobile + limpieza)

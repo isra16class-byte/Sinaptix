@@ -8,6 +8,62 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima novena tanda) — Íconos de Visión más grandes + texto reacomodado
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+A pedido del usuario ("hazlos iconos mas grandes y le falta apenitas
+acomodarle los textos"), sobre una captura del sitio ya desplegado en
+Netlify mostrando la sección Visión con las 4 anotaciones (cerebro,
+red neuronal, reloj de arena, cintas azules/nudo).
+
+- **Diagnóstico**: los 4 íconos no son SVGs sueltos, están quemados
+  dentro de un único archivo `img/decoraciones-neurona/fondo-vision-red.webp`
+  (1700×1040px, RGBA con transparencia real). Agrandarlos requiere
+  editar la imagen, no un simple ajuste de CSS.
+- **Edición de imagen**: script Python/PIL (no versionado en el repo,
+  corrió en el entorno de trabajo de esta sesión) que, por cada ícono:
+  mide su bounding box por canal alfa (umbral >150), recorta un parche
+  con margen generoso (2.5x el tamaño del ícono), lo escala 1.35x con
+  Lanczos, **borra el parche viejo dejándolo transparente** y pega el
+  parche agrandado encima usando su propio canal alfa como máscara. Se
+  probaron antes dos variantes que se descartaron: (a) pegar el parche
+  agrandado directo sobre el viejo sin borrar antes → dejaba un
+  "fantasma" semitransparente del ícono chico debajo (los íconos tienen
+  zonas translúcidas — vidrio del reloj, halo/glow del nudo y la red
+  neuronal — que no tapan del todo lo de abajo); (b) mezclar con un
+  feather rectangular difuminado en los bordes del parche → mezclaba dos
+  renders del mismo objeto a distinta escala y se veía doble/fantasma
+  igual, peor que (a). La solución final evita ambos problemas porque
+  no hay una versión vieja debajo para filtrar: se borra primero.
+- **Texto tapado**: al agrandar los íconos de la fila de abajo (reloj de
+  arena y nudo), su nueva extensión vertical (medida después de
+  agrandar, umbral alfa >150: reloj ≈15–32%×63–100%, nudo/cintas azules
+  ≈64–91%×66–100%) empezó a superponerse con `top:64%`, la posición fija
+  en la que estaba el texto de esa fila (`.stat-annot--verde`/`--azul`
+  en `css/styles.css`) — "4–6" y "1:1" con su etiqueta quedaban tapados
+  por el ícono. Se subió ese `top` a `40%`, que cae en el hueco libre
+  entre el borde inferior de la fila de arriba (cerebro/red neuronal,
+  ≈29–32%) y el nuevo borde superior del ícono de abajo (≈63–66%). La
+  fila de arriba (dorado/morado, `top:1%/2%`) no se tocó — no hay indicio
+  de que el cerebro/red neuronal ya agrandados tapen su texto, pero no
+  se reverificó visualmente en esta tanda (ver "Pendientes conocidos").
+- **Sin verificación visual con Playwright en esta tanda**: a pedido
+  explícito del usuario, que pidió no seguir generando capturas de
+  pantalla y pasar directo al patch. Se había verificado con Playwright
+  el estado *previo* al agrandado de íconos (reproducción fiel de la
+  captura del usuario) y el agrandado de imagen en sí (recortes por
+  cuadrante, sin fantasmas ni cortes), pero **no** el resultado final
+  combinado (imagen agrandada + `top:40%` nuevo) en un navegador.
+- **Archivos tocados**: `img/decoraciones-neurona/fondo-vision-red.webp`
+  (reemplazado, contenido binario) y `css/styles.css` (2 valores de
+  `top`, sección `#lam-02 .stat-annot--verde/--azul` dentro del
+  `@media(min-width:901px)`).
+- Ver "Estado actual del diseño" → Visión y "Pendientes conocidos" en
+  `memoria.md` para el detalle completo, incluida la nota sobre el
+  desvío del criterio de `scripts/generar-fondo-vision.py` (esta tanda
+  editó el `.webp` final directo en vez de tocar constantes del script).
+
 ## 2026-09-17 (trigésima octava tanda) — Script `scripts/generar-fondo-vision.py`: la composición del fondo de Visión queda reproducible por código
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

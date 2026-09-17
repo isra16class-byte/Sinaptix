@@ -570,13 +570,26 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    de `.vision-art`, que mide lo que mide la imagen vía `width:100%`).
    Con esto ambas cosas escalan juntas a cualquier ancho por
    construcción, ya no hace falta remedir a mano cada vez que cambia el
-   ancho de ventana o el lienzo de fondo. Coordenadas actuales medidas
-   con un script Python/PIL sobre `fondo-vision-red.webp` (1700×1040px,
-   umbral de canal alfa >180): cerebro ≈12–35%×12–46%, red neuronal
-   ≈64–89%×9–48%, reloj de arena ≈16–31%×51–99%, cintas azules
-   ≈66–87%×58–92% — cada anotación va en el hueco libre más cercano a su
-   elemento (pasillo central o margen superior) sin taparlo. Ver
-   memoria.md → Visión y el changelog de esta tanda para el detalle. */
+   ancho de ventana o el lienzo de fondo. Ver memoria.md → Visión y el
+   changelog de esta tanda para el detalle.
+
+   Sesión 2026-09-17 (tanda "íconos más grandes"): se agrandaron los 4
+   íconos dentro de `fondo-vision-red.webp` (edición de imagen, ~1.35x,
+   pegados con su propio canal alfa para no dejar fantasma del ícono
+   viejo). Coordenadas nuevas medidas con el mismo script Python/PIL
+   (umbral de canal alfa >150) sobre la imagen ya agrandada: cerebro
+   ≈10–37%×0–29%, red neuronal ≈63–96%×0–32%, reloj de arena
+   ≈15–32%×63–100%, cintas azules ≈64–91%×66–100%. Los íconos de abajo
+   (reloj/cintas) crecieron lo suficiente como para invadir el `top:64%`
+   que tenía el texto de esa fila (se veía "4–6"/"1:1" tapados por el
+   ícono) — se sube el `top` de esas dos anotaciones a 40% para que el
+   texto quede en el hueco libre entre la fila de arriba (que termina
+   ≈29–32%) y donde ahora empieza el ícono de abajo (≈63–66%), con
+   margen de sobra para el dot+número+label de dos líneas. La fila de
+   arriba (dorado/morado) no se tocó: sus íconos tocan el borde superior
+   (y empieza en 0%) pero el texto (top:1%/2%) no se solapaba en la
+   verificación visual hecha antes de agrandar los íconos de abajo — se
+   deja así, sin re-verificar de nuevo (ver "Pendientes conocidos"). */
 @media(min-width:901px){
   /* `width:100%` es necesario acá: `.vision-stats-col` no está en un
      contexto de grid/flex que lo estire (tiene `margin:auto` para
@@ -588,8 +601,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .stat-annot{position:absolute;width:38%}
   #lam-02 .stat-annot--dorado{left:1%;top:1%}
   #lam-02 .stat-annot--morado{left:41%;top:2%}
-  #lam-02 .stat-annot--verde{left:1%;top:64%}
-  #lam-02 .stat-annot--azul{left:41%;top:64%}
+  #lam-02 .stat-annot--verde{left:1%;top:40%}
+  #lam-02 .stat-annot--azul{left:41%;top:40%}
 }
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
