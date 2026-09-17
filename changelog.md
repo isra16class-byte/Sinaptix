@@ -8,6 +8,30 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-16 (vigesimoquinta tanda) — Íconos de las tarjetas de Visión en morado de marca
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió que los 4 íconos de las tarjetas (`svg/icon-bateria-
+rayo.svg`, `icon-red-nodos.svg`, `icon-calendario-check.svg`,
+`icon-conversacion.svg`) usen el morado que ya se usa en el resto del
+sitio, en vez de su color original casi negro.
+
+- Los 4 archivos `.svg`: `fill="#26161F"` (`--ink`) -> `fill="#714B67"`
+  (mismo tono que `--purple`). Se edita el color **dentro del propio
+  archivo SVG**, no en `css/styles.css`: se cargan como `<img
+  src="...">` (no inline en el HTML), así que no pueden leer variables
+  CSS del documento (`var(--purple)` no funcionaría ahí) — por eso el
+  hex va hardcodeado en cada archivo en vez de depender de `:root`.
+  Estos 4 SVG solo se usan en estas 4 tarjetas (`#lam-02`), confirmado
+  con grep antes de tocarlos, así que el cambio no afecta nada más del
+  sitio.
+- Actualiza `memoria.md`.
+
+Verificado con Playwright en 1920px y 390px: los íconos se ven en
+morado, contra el fondo translúcido y el borde `var(--purple)` de la
+tarjeta, sin perder contraste/legibilidad.
+
 ## 2026-09-16 (vigesimocuarta tanda) — Tarjetas de `#lam-02` (Visión) "un poco más grandes"
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

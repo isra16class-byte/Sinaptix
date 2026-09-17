@@ -162,9 +162,13 @@ próximos pasos).
   `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
   `img/generadas*`). `svg/icon-*.svg` (calendario-check, red-nodos,
   conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
-  sin `stroke`, color `--ink`), usados como `.stat-icon` en las 4
-  tarjetas de `#lam-02` (Visión) a 56×56px (`#lam-02 .stat-icon`; el de
-  `icon-conversacion.svg`, tarjeta "1:1", va más grande —78×78px— porque
+  sin `stroke`, hardcodeado en el propio archivo `.svg` como
+  `#714B67` — mismo tono que `--purple`; no puede ser la variable CSS
+  porque se cargan como `<img src="...">`, no inline, así que no leen
+  `:root` — antes `#26161F`/`--ink`, cambiado a pedido del usuario, ver
+  `changelog.md`), usados como `.stat-icon` en las 4 tarjetas de
+  `#lam-02` (Visión) a 70×70px (`#lam-02 .stat-icon`; el de
+  `icon-conversacion.svg`, tarjeta "1:1", va más grande —96×96px— porque
   a igual tamaño se veía más chico que los otros 3, ver "Estado actual
   del diseño" → "Visión" para el detalle). Ver `changelog.md` para el
   porqué de `icon-conversacion.svg` tener un `viewBox` recortado distinto
@@ -819,8 +823,12 @@ Prioridad 2.
   `96×96px` (venía de `78px`), `top/right:10px` (venía de `12px` en la
   primera pasada), `.num{padding-right:106px}` (venía de `88px`). No se tocó
   `.lab{margin-top}` de la 4ª tarjeta (`20px`) ni el resto de valores no
-  listados acá. Verificado con Playwright en 1920px (desktop) y 390px
-  (mobile, sin cambios). Antes
+  listados acá. **Color de los 4 íconos:** pasaron de `--ink` (casi
+  negro) al morado de marca (`--purple`, `#714B67`) a pedido del
+  usuario — hardcodeado dentro de cada `.svg` (no vía CSS: son `<img>`,
+  no inline, no leen variables de `:root`), ver "Estructura de archivos"
+  más arriba para el detalle de por qué y dónde. Verificado con
+  Playwright en 1920px (desktop) y 390px (mobile, sin cambios). Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
   `changelog.md`). El título de esta sección (`El cerebro también se
