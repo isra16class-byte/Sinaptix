@@ -437,7 +437,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    número/label. Es un ajuste **solo acá** (selector con #lam-02): en
    "Mi plan" (#miPlan) y el resto del sitio .stat-box sigue con su fondo
    sólido de siempre. */
-#lam-02 .vision-brain-bg{opacity:.92}
+/* .vision-art (sesión 2026-09-17, trigésima séptima tanda): contenedor
+   que agrupa vision-brain-bg + .stat-annotations en la misma caja, para
+   que ambos compartan un único sistema de coordenadas y escalen juntos a
+   cualquier ancho — antes vision-brain-bg vivía suelta fuera de .wrap con
+   posición en vw/clamp() mientras las anotaciones tenían px fijos
+   calculados solo para 1440px, así que por encima de ese ancho (visto en
+   una captura real a ~1920px) se desalineaban. Ver memoria.md → Visión y
+   changelog.md de esta tanda para el detalle completo. */
+.vision-art{position:relative}
+#lam-02 .vision-brain-bg{display:block;width:100%;height:auto;opacity:.92}
 @media(max-width:900px){#lam-02 .vision-brain-bg{display:none}}
 
 #lam-02 .stat-box{
@@ -540,8 +549,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-annotations{display:flex;flex-direction:column;gap:30px}
 .stat-annot{display:flex;flex-direction:column}
 .stat-annot-deco{width:70px;height:36px;display:block;margin-bottom:6px}
-.stat-annot-num{font-family:var(--font-d);font-weight:800;font-size:36px;letter-spacing:-.02em;color:var(--purple-dark)}
-.stat-annot-lab{font-family:var(--font-m);font-size:14px;font-weight:500;color:var(--ink-soft);letter-spacing:0;margin-top:4px;max-width:30ch}
+.stat-annot-num{font-family:var(--font-d);font-weight:800;font-size:clamp(26px,2.2vw,36px);letter-spacing:-.02em;color:var(--purple-dark)}
+.stat-annot-lab{font-family:var(--font-m);font-size:clamp(12px,1vw,14px);font-weight:500;color:var(--ink-soft);letter-spacing:0;margin-top:4px;max-width:30ch}
 
 /* Color por dato: mismos 4 colores que ya tenían los íconos SVG de las
    tarjetas (dorado 20%, morado 86B, verde 4–6, azul 1:1). El color se
@@ -553,39 +562,34 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-annot--verde{color:var(--green)}
 .stat-annot--azul{color:var(--navy-bright)}
 
-/* Posicionamiento libre solo en desktop (sesión 1 del plan). Se ubican
-   dentro del área de 560px (`#lam-02 .vision-stats-col{max-width:560px}`
-   de arriba) que antes ocupaba el `.stat-grid` 2×2, pero sin alinear en
-   grilla pareja — valores de posición elegidos a mano para que se vean
-   como anotaciones sueltas "flotando", cuidando: 1) no exceder el ancho
-   de 560px de la columna (para no salirse de `vision-brain-bg`, que
-   tiene ese mismo criterio de bleed), 2) no quedar tan pegadas al borde
-   izquierdo de la columna que choquen con el texto de al lado (hay
-   130px de gap entre columnas, `#lam-02 .split{gap:130px}` arriba).
-   Alto fijo del contenedor (340px) calculado para las 4 posiciones de
-   abajo con aire de sobra; revisar si constituye demasiado o muy poco
-   espacio en blanco al verificar con Playwright. */
+/* Posicionamiento libre solo en desktop. Sesión 2026-09-17 (trigésima
+   séptima tanda): las 4 `.stat-annot` dejaron de tener `left/top` en
+   píxeles fijos (calculados una sola vez contra 1440px) y pasaron a
+   porcentajes de `.stat-annotations`, que ahora ocupa exactamente la
+   misma caja que `vision-brain-bg` (`position:absolute;inset:0` dentro
+   de `.vision-art`, que mide lo que mide la imagen vía `width:100%`).
+   Con esto ambas cosas escalan juntas a cualquier ancho por
+   construcción, ya no hace falta remedir a mano cada vez que cambia el
+   ancho de ventana o el lienzo de fondo. Coordenadas actuales medidas
+   con un script Python/PIL sobre `fondo-vision-red.webp` (1700×1040px,
+   umbral de canal alfa >180): cerebro ≈12–35%×12–46%, red neuronal
+   ≈64–89%×9–48%, reloj de arena ≈16–31%×51–99%, cintas azules
+   ≈66–87%×58–92% — cada anotación va en el hueco libre más cercano a su
+   elemento (pasillo central o margen superior) sin taparlo. Ver
+   memoria.md → Visión y el changelog de esta tanda para el detalle. */
 @media(min-width:901px){
-  /* `width:100%` es necesario acá: al pasar los `.stat-annot` a
-     `position:absolute` dejan de aportarle tamaño al contenedor (los
-     elementos con posición absoluta no cuentan para el shrink-to-fit del
-     padre), y `.vision-stats-col` no está en un contexto de grid/flex
-     que lo estire (tiene `margin:auto` para centrarse dentro del hueco,
-     ver regla de arriba) — sin esto, `.stat-annotations` colapsaba a
-     0px de ancho y las anotaciones no se veían aunque el CSS de
-     posición estuviera bien. */
+  /* `width:100%` es necesario acá: `.vision-stats-col` no está en un
+     contexto de grid/flex que lo estire (tiene `margin:auto` para
+     centrarse dentro del hueco, ver regla de arriba) — sin esto,
+     `.vision-art` colapsaba al ancho de su contenido en vez de ocupar
+     toda la columna disponible. */
   #lam-02 .vision-stats-col{width:100%}
-  #lam-02 .stat-annotations{position:relative;display:block;width:100%;height:380px}
-  #lam-02 .stat-annot{position:absolute;width:230px}
-  /* Posiciones remedidas contra el lienzo compuesto nuevo (2026-09-17,
-     décima tanda — ver memoria.md, plan de reemplazo de fondo-vision-red):
-     cada punto+línea ahora cae sobre/junto al elemento real que le
-     corresponde en la imagen (cerebro, red neuronal, reloj de arena,
-     cintas), no en coordenadas libres. */
-  #lam-02 .stat-annot--dorado{left:24px;top:18px}
-  #lam-02 .stat-annot--morado{left:300px;top:18px}
-  #lam-02 .stat-annot--verde{left:36px;top:242px}
-  #lam-02 .stat-annot--azul{left:175px;top:262px}
+  #lam-02 .stat-annotations{position:absolute;inset:0;display:block}
+  #lam-02 .stat-annot{position:absolute;width:38%}
+  #lam-02 .stat-annot--dorado{left:1%;top:1%}
+  #lam-02 .stat-annot--morado{left:41%;top:2%}
+  #lam-02 .stat-annot--verde{left:1%;top:64%}
+  #lam-02 .stat-annot--azul{left:41%;top:64%}
 }
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */

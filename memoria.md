@@ -740,13 +740,13 @@ Prioridad 2.
   real (no fondo blanco), grilla 2×2 con márgenes generosos: cerebro
   (arriba-izq.), red neuronal (arriba-der.), reloj de arena
   (abajo-izq.), cintas azules (abajo-der.), listones conectores
-  dibujados por código (curvas `CubicSpline`, mauve translúcido). Al ser
-  más angosto/alto que el original (720×1478 vs 1040×1700), el `width`
-  inline de `.vision-brain-bg` en `index.html` bajó de
-  `clamp(880px,84vw,1480px)` a `clamp(760px,71vw,1150px)` (mismo
-  `top:230px`; bleed derecho ajustado de `-160px` a `-140px`) para que
-  la imagen no se saliera del alto de la sección con la nueva
-  proporción.
+  dibujados por código (curvas `CubicSpline`, mauve translúcido).
+  **El `width` en `vw`/`clamp()` y el bleed en `right`/`top` que tuvo
+  esta imagen en las tandas anteriores ya no existen** — sesión
+  2026-09-17 (trigésima séptima tanda) la pasó a vivir dentro de
+  `.vision-art`/`.vision-stats-col` con `width:100%;height:auto`, ver el
+  párrafo "Posicionamiento" más abajo para el detalle completo y el
+  porqué.
   **Los 4 datos ya no son tarjetas de caja** (`.stat-box`/`.stat-grid` —
   historial completo de esa etapa, con todos sus ajustes pixel a pixel,
   en `changelog.md` y `historico/`): a partir de la sesión 1 del plan de
@@ -769,50 +769,60 @@ Prioridad 2.
   de los labels largos que tenían las tarjetas, tomada de la captura de
   referencia que mostró el usuario.
   **Posicionamiento — solo desktop (`min-width:901px`), sesión 1 de 2
-  (mobile queda pendiente, ver "Pendientes conocidos"):**
-  `#lam-02 .stat-annotations{position:relative;width:100%;height:380px}`,
-  cada `.stat-annot{position:absolute;width:230px}` con `left`/`top` a
-  mano (no grid parejo): dorado `0,0`; morado `300px,14px`; verde
-  `16px,230px`; azul `300px,246px`. Ojo con el bug que costó
-  diagnosticar en esta sesión: al pasar los `.stat-annot` a
-  `position:absolute` dejan de aportarle tamaño a `.stat-annotations`
-  (elementos absolutos no cuentan para el shrink-to-fit del padre) y
-  `#lam-02 .vision-stats-col` no está en un contexto que lo estire
-  (tiene `margin:auto` para centrarse dentro del hueco de la grilla de
-  `.split`) — sin `width:100%` explícito en ambos (`.vision-stats-col` y
-  `.stat-annotations`) el contenedor colapsaba a `0px` y no se veía
-  nada, aunque el resto del CSS estuviera bien. Fuera de ese `@media`,
-  `.stat-annotations{display:flex;flex-direction:column;gap:30px}` es
-  el fallback base (aplica hoy a cualquier ancho sin el `@media`, o sea
-  mobile): apilado simple sin más ajuste, a propósito — la versión mobile
-  "de verdad" se define en la sesión 2.
-  Confirmado con el usuario en captura a 1440px (sesión 2026-09-17):
-  quedan sin resolver dos puntos que el usuario podría querer ajustar
-  más adelante (no bloquean, se mostró y se pidió seguir tal cual) — 86B
-  y 1:1 caen sobre la parte más "cargada" de la ilustración (cerebro y
-  nodos) y se leen algo peor que 20%/4–6, que caen sobre espacio en
-  blanco; el punto+línea de esos mismos dos casi no contrasta contra el
-  arte de fondo. **Resuelto en la sesión 2026-09-17 (décima tanda, ver
-  "Plan: reemplazar `fondo-vision-red.webp`..." más abajo):** con el
-  fondo nuevo (composición por elementos + márgenes reales) las 4
-  `.stat-annot` se remidieron contra los elementos reales de la imagen y
-  ya no caen sobre zonas cargadas. Valores finales, dentro de
-  `@media(min-width:901px)`: dorado `24px,18px` (punto sobre el borde
-  del arco del cerebro); morado `300px,18px` (punto a la izquierda del
-  cúmulo de neuronas, en el hueco entre cerebro y red — quedó casi igual
-  al valor anterior, ya caía bien); verde `36px,242px` (punto sobre el
-  borde superior del reloj de arena); azul `175px,262px` (punto+label en
-  el hueco entre el reloj y las cintas — tuvo que correrse más a la
-  izquierda que morado porque con `300px` el label "acompañamiento
-  personal" quedaba pisando visualmente las cintas azules, bajo
-  contraste; sin ese ajuste se repetía el mismo problema que este
-  cambio buscaba resolver). No se tocó el SVG `.stat-annot-deco`
-  (punto+línea corta decorativa) ni su geometría, solo las coordenadas
-  `left`/`top` del contenedor.
+  (mobile queda pendiente, ver "Pendientes conocidos"). Reescrito por
+  completo en la sesión 2026-09-17 (trigésima séptima tanda) — ver esa
+  entrada en `changelog.md` para el diagnóstico y la verificación
+  completa, acá solo el estado final:**
+  `vision-brain-bg` dejó de ser un `<img class="deco">` suelto fuera de
+  `.wrap` con posición en `vw`/`clamp()`, y pasó a vivir dentro de
+  `.vision-stats-col`, envuelta junto con `.stat-annotations` en un
+  contenedor nuevo, `.vision-art{position:relative}` (`index.html`). La
+  imagen mide `width:100%;height:auto` de esa caja (ya no usa
+  `vw`/`clamp()`/`--vw100`) y `#lam-02 .stat-annotations{position:
+  absolute;inset:0}` ocupa exactamente esa misma caja — con esto, cada
+  `.stat-annot` se posiciona con `left`/`top` en **porcentajes** de la
+  imagen en vez de píxeles fijos, así que quedan alineadas al arte a
+  cualquier ancho de pantalla por construcción (ya no hace falta
+  remedir a mano cada vez que cambia el ancho de ventana o el lienzo de
+  fondo — antes, por encima de ~1440px, la imagen seguía creciendo
+  mientras las anotaciones quedaban clavadas en su lugar).
+  Layout: grilla 2×2 (una anotación por cuadrante, cada una en el margen
+  de su cuadrante sin tapar el elemento que señala) — `#lam-02
+  .stat-annot{width:38%}`, dorado `left:1%;top:1%` (cerebro, arriba-izq.),
+  morado `left:41%;top:2%` (red neuronal, arriba-der.), verde
+  `left:1%;top:64%` (reloj de arena, abajo-izq.), azul `left:41%;top:64%`
+  (cintas azules, abajo-der.). El número (`.stat-annot-num`) y la
+  etiqueta (`.stat-annot-lab`) usan `font-size:clamp(...)` (26–36px y
+  12–14px respectivamente, ver `css/styles.css`) en vez de tamaño fijo:
+  a anchos angostos dentro del rango desktop (~901–1100px) el texto
+  ocupa menos alto y envuelve a menos líneas, necesario para que la
+  fila de abajo (verde/azul) no quede pisando el reloj de arena/cintas
+  — sin este achique, con los 4 textos a tamaño completo una sola fila
+  ya ocupaba ~80% del alto de la imagen a esos anchos angostos.
+  `#lam-02 .vision-stats-col{width:100%}` (dentro del mismo `@media`) es
+  necesario porque `.vision-stats-col` no está en un contexto de
+  grid/flex que lo estire (tiene `margin:auto` para centrarse dentro del
+  hueco de `.split`) — sin esto, `.vision-art` colapsaba al ancho de su
+  contenido en vez de ocupar toda la columna disponible.
+  **Verificado con Playwright real** (esta sesión sí pudo levantar
+  Chromium — a diferencia de la sesión anterior que solo pudo probar con
+  `wkhtmltoimage`, que ni siquiera soporta `display:grid`) en 390, 899,
+  901, 1024, 1440 y 1920px: las 4 anotaciones no se superponen entre sí
+  en ninguno de esos anchos, la imagen queda contenida dentro de `.wrap`
+  (no crece sin límite como antes) y el estado mobile (`<900px`, imagen
+  oculta, `.stat-annotations` en columna simple) sigue intacto. Sí queda
+  un solape menor **intencional** (mismo criterio que ya tenían "20%"
+  sobre el cerebro desde la sesión anterior): el número/etiqueta de cada
+  anotación roza el borde del elemento que señala en vez de dejar aire
+  completo — es el mismo lenguaje visual de "anotación con puntero", no
+  un bug.
   `#lam-02 .vision-stats-col{max-width:560px;width:100%;margin-left:
   auto;margin-right:auto}` en desktop (en mobile, ancho completo, sin
   `margin-top` propio salvo `90px` de `.vision-stats-col` base en
-  `<900px` para no pegarse a los bullets al apilarse).
+  `<900px` para no pegarse a los bullets al apilarse) — sin cambios,
+  sigue siendo el límite de ancho real de la columna (la imagen no llega
+  a tocar los 560px salvo en viewports muy anchos, contenida antes por
+  el ancho de la columna del grid).
   Variables `--vision-card-dorado/-morado/-verde/-azul` (+ `-line`) y
   las reglas `#lam-02 .stat-box`/`.stat-icon`/`.num`/`.lab` de la etapa
   de tarjetas **quedan en el archivo sin usarse** en esta sección (no se
@@ -1651,6 +1661,26 @@ controlar el espaciado, en vez de pedírselos a la IA.
    son solo 4 números `left`/`top` en `css/styles.css` (sección de
    arriba) los que hay que tocar. Sesión 2 (mobile, ver bullet de abajo)
    sigue pendiente aparte, no se tocó nada de `<900px` en esta sesión.
+
+- **Sesión 2026-09-17 (trigésima séptima tanda) — fix de escala/
+  alineación en anchos grandes — HECHO y verificado con Playwright
+  real.** El usuario reportó con una captura a ~1920px que las 4
+  anotaciones ya no caían sobre su elemento (`vision-brain-bg` crecía
+  con `vw`/`clamp()` mientras las anotaciones tenían `left`/`top` en
+  píxeles fijos calculados solo para 1440px). Se rehizo el
+  posicionamiento a porcentajes de una caja compartida (`.vision-art`) —
+  ver "Estado actual del diseño" → Visión, párrafo "Posicionamiento",
+  para el detalle completo. A diferencia del intento anterior (que no
+  pudo verificarse porque `wkhtmltoimage`/Xvfb no soporta `display:grid`
+  y Playwright no podía descargar Chromium), esta vez **sí se pudo
+  levantar Chromium real en el entorno** y se verificó con capturas +
+  medición de `bounding_box()` en 390, 899, 901, 1024, 1440 y 1920px. De
+  paso se encontró y corrigió un bug propio de este arreglo antes de
+  entregarlo (no reportado por el usuario, detectado en la propia
+  verificación): con las coordenadas iniciales, "4–6" y "1:1" quedaban
+  apiladas en la misma columna y se superponían entre sí — se resolvió
+  pasando a una grilla 2×2 (una anotación por cuadrante) en vez de 2
+  columnas de 2 filas cada una.
 
 - **Sesión 2 (siguiente)** — mobile (≤900px) + limpieza. El posicionamiento libre de
   la sesión 1 probablemente no sirve en pantallas angostas — definir en

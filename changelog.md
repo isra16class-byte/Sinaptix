@@ -8,6 +8,117 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima séptima tanda) — Fix de escala/alineación de las anotaciones de Visión en pantallas anchas
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario mandó una captura tomada en una ventana ancha (~1920px) donde
+el fondo ilustrado de Visión (`vision-brain-bg`) se veía grande y los 4
+datos (20%, 86B, 4–6, 1:1) ya no caían bien sobre su elemento — pidió
+arreglarlo, dejando en manos de la sesión si convenía achicar las
+imágenes u otra solución.
+
+**Nota sobre esta entrada**: la sesión que diagnosticó e implementó este
+fix se cortó por límite justo antes de generar el patch (sin llegar a
+commitear nada), así que el trabajo se rehizo desde cero en una sesión
+nueva. El diagnóstico y el enfoque general fueron los mismos; lo que
+cambia respecto a lo que se había dejado escrito es que **esta vez sí
+se pudo verificar con un navegador real** (ver más abajo), y esa
+verificación encontró un bug adicional que se corrigió antes de
+entregar el patch.
+
+**Diagnóstico.** No era percepción: `vision-brain-bg` vivía como
+`.deco` suelto fuera de `.wrap` (sección `#lam-02`), con
+`width:clamp(760px,71vw,1150px)` y posición vía `right:calc(50% -
+(var(--vw100,100vw)/2) - 140px)` — crece y se mueve en función del
+viewport. Las 4 `.stat-annot`, en cambio, vivían dentro de
+`.vision-stats-col` (dentro de `.wrap`, con `max-width:1180px`), con
+`left`/`top` en píxeles fijos, calculados a mano contra cómo se veía
+todo a 1440px (única resolución verificada hasta ahora, ver tandas
+anteriores). Dos cajas con sistemas de coordenadas independientes que
+solo coincidían en ese ancho puntual: por encima de 1440px la imagen
+sigue agrandándose (hasta tocar su tope de 1150px recién a partir de
+~1620px de viewport) mientras las anotaciones quedaban clavadas en su
+lugar — a 1920px (la captura del usuario) ya había un desfasaje real
+de tamaño entre ambas.
+
+**Fix — unificar el sistema de coordenadas (HTML + CSS).**
+
+- `index.html`: `vision-brain-bg` deja de ser un `<img class="deco">`
+  suelto y pasa a vivir dentro de `.vision-stats-col`, envuelto junto
+  con `.stat-annotations` en un `<div class="vision-art">` nuevo.
+- `css/styles.css`: `.vision-art{position:relative}`; la imagen mide
+  `width:100%;height:auto` de ese contenedor (ya no usa
+  `vw`/`clamp()`/`--vw100`). `#lam-02 .stat-annotations{position:
+  absolute;inset:0}` dentro de `.vision-art` — al ocupar exactamente la
+  misma caja que la imagen, cada `.stat-annot` pasa de `left`/`top` en
+  píxeles a porcentajes de esa caja compartida, así que quedan
+  alineados con el arte a cualquier ancho de pantalla por construcción,
+  no solo al que se pruebe una vez.
+- Efecto secundario esperado (y buscado, según lo que dejó abierto el
+  usuario): la imagen queda contenida dentro de `.wrap` (ya no se sale
+  del `max-width:1180px` del sitio) y bastante más chica que antes —
+  limitada en la práctica por el ancho de la columna del grid de
+  `.split` (la cota `#lam-02 .vision-stats-col{max-width:560px}` de una
+  sesión anterior casi no llega a activarse, la columna es más angosta
+  que eso salvo en viewports muy anchos).
+- Posiciones nuevas de las 4 anotaciones: se midieron con un script
+  Python (PIL, umbral de canal alfa >180 para no confundir el dibujo
+  con las líneas de fondo semitransparentes) las coordenadas reales de
+  cada elemento dentro de `fondo-vision-red.webp` (1700×1040px) —
+  cerebro ≈12–35%×12–46%, red neuronal ≈64–89%×9–48%, reloj de arena
+  ≈16–31%×51–99%, cintas azules ≈66–87%×58–92% — en vez de calcular a
+  ojo. Layout final: grilla 2×2, una anotación en el margen de cada
+  cuadrante (`#lam-02 .stat-annot{width:38%}`): dorado
+  `left:1%;top:1%`, morado `left:41%;top:2%`, verde `left:1%;top:64%`,
+  azul `left:41%;top:64%`.
+- `.stat-annot-num`/`.stat-annot-lab` pasaron de `font-size` fijo
+  (36px/14px) a `clamp(26px,2.2vw,36px)`/`clamp(12px,1vw,14px)`: a
+  anchos angostos dentro del rango desktop (~901–1100px) el texto más
+  largo ("de la energía diaria la consume el cerebro") envolvía a 3
+  líneas y la fila de abajo (verde/azul) terminaba pisando el reloj de
+  arena — con el texto más chico a esos anchos, envuelve a menos líneas
+  y la fila de abajo tiene lugar de sobra.
+
+**Verificación — con navegador real, a diferencia del intento
+anterior.** La sesión anterior había quedado bloqueada: Playwright no
+podía descargar Chromium (sin red al dominio de descarga) y la
+alternativa que se probó, `wkhtmltoimage`+Xvfb, resultó no soportar CSS
+Grid (`#lam-02 .split` usa `display:grid`), así que cualquier captura
+con esa herramienta salía con el layout roto por el motor, no por el
+código. En esta sesión, **Chromium ya estaba descargado en el caché de
+Playwright del entorno** (`playwright install chromium` lo detectó
+"already downloaded" en vez de intentar bajarlo), así que se pudo
+levantar un servidor local (`python -m http.server`) y correr
+Playwright de verdad:
+
+- Capturas + medición de `bounding_box()` de la imagen, la columna y
+  las 4 `.stat-annot` en 390, 899, 901, 1024, 1440 y 1920px.
+- Esa verificación encontró un bug propio de esta implementación antes
+  de entregarla (no reportado por el usuario): con las coordenadas
+  iniciales (2 columnas de 2 filas, verde y azul apiladas en la misma
+  columna) "4–6" y "1:1" se superponían visualmente entre sí. Se
+  corrigió pasando al layout 2×2 descrito arriba (una anotación por
+  cuadrante, columnas separadas también en la fila de abajo).
+- Con el layout 2×2 + los `clamp()` de fuente, no quedó ninguna
+  superposición entre anotaciones en ninguno de los 6 anchos probados.
+  Sí queda un solape menor **intencional** entre cada anotación y el
+  elemento que señala (p. ej. "20%" roza el borde del arco del
+  cerebro) — es el mismo criterio que ya tenía esta sección desde la
+  tanda anterior (el punto+línea apunta al elemento, no lo evita del
+  todo), no un bug nuevo.
+- Se confirmó también que el estado mobile (`<900px`, imagen oculta vía
+  `#lam-02 .vision-brain-bg{display:none}`, `.stat-annotations` en
+  columna simple) sigue intacto — no se tocó ese `@media`.
+- No se corrió el resto de la suite manual de Playwright de otras
+  secciones del sitio (fuera de alcance de este patch), solo `#lam-02`.
+
+memoria.md actualizado: sección "Estado actual del diseño" → Visión
+(párrafo "Posicionamiento" reescrito con el nuevo sistema de
+coordenadas) y "Pendientes conocidos" → Visión (nueva entrada marcando
+esta tanda como hecha y verificada; la Sesión 2 del plan, mobile +
+limpieza de CSS sin usar, sigue pendiente igual que antes).
+
 ## 2026-09-17 (trigésima sexta tanda) — Integración del nuevo fondo de Visión elegido + reposicionamiento de las 4 anotaciones
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
