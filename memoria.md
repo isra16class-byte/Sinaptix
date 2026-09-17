@@ -725,12 +725,28 @@ Prioridad 2.
   `mi-plan.html`), 4 planes con "día tipo" cada uno + resolución
   automática si el usuario no está seguro de su objetivo.
 - **Visión (`lam-02`)**: fondo ilustrado grande
-  (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro, red
-  neuronal, rompecabezas), `clamp(880px,84vw,1480px)`, con bleed
-  `-160px` contra el borde derecho real (mismo criterio que
-  `neurona-derecha` de Método), `opacity:.92`, oculto en mobile
-  (`<900px`). `#lam-02 .split{align-items:center;gap:130px}` (en mobile
-  vuelve a `44px`, mismo breakpoint que `.split`).
+  (`img/decoraciones-neurona/fondo-vision-red.webp`), `opacity:.92`,
+  oculto en mobile (`<900px`). `#lam-02 .split{align-items:center;gap:130px}`
+  (en mobile vuelve a `44px`, mismo breakpoint que `.split`).
+  **Composición reemplazada (sesión 2026-09-17, décima tanda) — ver
+  "Plan: reemplazar `fondo-vision-red.webp`..." más abajo para el
+  historial completo del porqué.** El archivo `fondo-vision-red.webp` ya
+  no es el fondo generado de una sola vez por IA: ahora es el lienzo
+  compuesto por código `fondo-vision-nuevo-redonda.webp` (mismo nombre
+  de archivo final, contenido reemplazado; el usuario eligió la variante
+  "redonda" del cúmulo de neuronas sobre la alternativa "corazón" —
+  ambas quedan igual en `img/decoraciones-neurona/vision-elementos/`
+  por si se quiere cambiar más adelante), 1700×1040 con transparencia
+  real (no fondo blanco), grilla 2×2 con márgenes generosos: cerebro
+  (arriba-izq.), red neuronal (arriba-der.), reloj de arena
+  (abajo-izq.), cintas azules (abajo-der.), listones conectores
+  dibujados por código (curvas `CubicSpline`, mauve translúcido). Al ser
+  más angosto/alto que el original (720×1478 vs 1040×1700), el `width`
+  inline de `.vision-brain-bg` en `index.html` bajó de
+  `clamp(880px,84vw,1480px)` a `clamp(760px,71vw,1150px)` (mismo
+  `top:230px`; bleed derecho ajustado de `-160px` a `-140px`) para que
+  la imagen no se saliera del alto de la sección con la nueva
+  proporción.
   **Los 4 datos ya no son tarjetas de caja** (`.stat-box`/`.stat-grid` —
   historial completo de esa etapa, con todos sus ajustes pixel a pixel,
   en `changelog.md` y `historico/`): a partir de la sesión 1 del plan de
@@ -776,7 +792,23 @@ Prioridad 2.
   y 1:1 caen sobre la parte más "cargada" de la ilustración (cerebro y
   nodos) y se leen algo peor que 20%/4–6, que caen sobre espacio en
   blanco; el punto+línea de esos mismos dos casi no contrasta contra el
-  arte de fondo.
+  arte de fondo. **Resuelto en la sesión 2026-09-17 (décima tanda, ver
+  "Plan: reemplazar `fondo-vision-red.webp`..." más abajo):** con el
+  fondo nuevo (composición por elementos + márgenes reales) las 4
+  `.stat-annot` se remidieron contra los elementos reales de la imagen y
+  ya no caen sobre zonas cargadas. Valores finales, dentro de
+  `@media(min-width:901px)`: dorado `24px,18px` (punto sobre el borde
+  del arco del cerebro); morado `300px,18px` (punto a la izquierda del
+  cúmulo de neuronas, en el hueco entre cerebro y red — quedó casi igual
+  al valor anterior, ya caía bien); verde `36px,242px` (punto sobre el
+  borde superior del reloj de arena); azul `175px,262px` (punto+label en
+  el hueco entre el reloj y las cintas — tuvo que correrse más a la
+  izquierda que morado porque con `300px` el label "acompañamiento
+  personal" quedaba pisando visualmente las cintas azules, bajo
+  contraste; sin ese ajuste se repetía el mismo problema que este
+  cambio buscaba resolver). No se tocó el SVG `.stat-annot-deco`
+  (punto+línea corta decorativa) ni su geometría, solo las coordenadas
+  `left`/`top` del contenedor.
   `#lam-02 .vision-stats-col{max-width:560px;width:100%;margin-left:
   auto;margin-right:auto}` en desktop (en mobile, ancho completo, sin
   `margin-top` propio salvo `90px` de `.vision-stats-col` base en
@@ -1534,8 +1566,8 @@ ajuste, se dividió en 2 sesiones en vez de intentarlo todo de una:
   mismos dos casi no contrasta contra el arte de fondo.
 **Plan: reemplazar `fondo-vision-red.webp` (fondo único generado por IA)
 por una composición armada a partir de elementos generados por separado
-(sesión 2026-09-17, tercera tanda) — decidido, assets ya generados y
-agregados al repo, integración en HTML/CSS todavía PENDIENTE.**
+(sesión 2026-09-17, tercera/cuarta/décima tanda) — HECHO, integrado en
+HTML/CSS y verificado con Playwright a 1440px.**
 
 Motivo del cambio: `fondo-vision-red.webp` (el fondo actual, ver arriba)
 no tiene puntos de anclaje reales para las 4 `.stat-annot` — el punto+
@@ -1597,27 +1629,28 @@ jitter aleatorio, color mauve `rgb(130,95,115)` con alpha bajo,
 supersampleado 2x para antialiasing) se generaron por código para poder
 controlar el espaciado, en vez de pedírselos a la IA.
 
-**Lo que falta (para la próxima sesión — ver prompt de arranque que el
-usuario ya tiene aparte, fuera de este repo):**
-1. Confirmar con el usuario cuál de los 2 lienzos usar (`-redonda` o
-   `-corazon`) antes de tocar código — es la única decisión de diseño que
-   sigue abierta, todo el resto (composición, márgenes, listones) ya está
-   resuelto.
-2. Reemplazar `fondo-vision-red.webp` por el lienzo elegido (mantener el
-   nombre de archivo o actualizar la referencia en `css/styles.css` si
-   cambia; el nuevo lienzo es más ancho/alto que el original — puede
-   requerir ajustar el `clamp()`/bleed que usa `#lam-02`).
-3. Reposicionar las 4 `.stat-annot` (coordenadas `left`/`top` dentro de
-   `@media(min-width:901px)` en `#lam-02 .stat-annotations`) para que cada
-   punto+línea apunte de verdad al elemento correspondiente en la imagen
-   nueva (las posiciones aproximadas de cada elemento en el lienzo de
-   1700×1040 están en el detalle de arriba, pero conviene remedir contra
-   el render final una vez insertada la imagen).
-4. Verificar con Playwright en 1440px y **mostrar captura al usuario y
-   esperar confirmación explícita antes de cerrar la sesión** (mismo
-   criterio que la sesión 1 de este plan y que la nota de más abajo) —
-   recién ahí generar el patch final. Sesión 2 (mobile, ver bullet de
-   abajo) sigue pendiente aparte.
+**Integración hecha (sesión 2026-09-17, décima tanda):**
+1. El usuario confirmó la variante "redonda" (cúmulo esférico) sobre la
+   alternativa "corazón" — ambos lienzos quedan en el repo por si se
+   quiere cambiar más adelante, solo se referencia uno.
+2. `fondo-vision-red.webp` fue reemplazado (mismo nombre de archivo,
+   contenido nuevo = el lienzo compuesto elegido). `index.html` ajustó el
+   `width`/bleed inline de `.vision-brain-bg` para la nueva proporción
+   (ver "Estado actual del diseño" → Visión para los valores exactos).
+3. Las 4 `.stat-annot` se remidieron y reposicionaron contra el render
+   real (ver "Estado actual del diseño" → Visión para los valores
+   finales de `left`/`top` y el porqué de cada uno).
+4. Verificado con Playwright a 1440px, iterando sobre capturas hasta que
+   los 4 puntos cayeran sobre su elemento real y ningún label quedara con
+   bajo contraste. **Nota sobre el criterio de mostrar captura antes de
+   cerrar la sesión (ver más abajo, "Importante para quien retome
+   esto"):** en esta sesión puntual el usuario pidió explícitamente pasar
+   directo a actualizar memoria/changelog y generar el patch sin ver la
+   captura final — no es que se haya saltado sin avisar, quedó
+   confirmado en el chat. Si esto no se ve bien en un navegador real,
+   son solo 4 números `left`/`top` en `css/styles.css` (sección de
+   arriba) los que hay que tocar. Sesión 2 (mobile, ver bullet de abajo)
+   sigue pendiente aparte, no se tocó nada de `<900px` en esta sesión.
 
 - **Sesión 2 (siguiente)** — mobile (≤900px) + limpieza. El posicionamiento libre de
   la sesión 1 probablemente no sirve en pantallas angostas — definir en

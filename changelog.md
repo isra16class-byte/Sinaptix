@@ -8,6 +8,65 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima sexta tanda) — Integración del nuevo fondo de Visión elegido + reposicionamiento de las 4 anotaciones
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Cierre del plan de reemplazo de `fondo-vision-red.webp` (ver tandas
+anteriores: assets sueltos generados con Gemini, luego los 2 lienzos
+candidatos armados por código). En esta sesión:
+
+1. Se le preguntó al usuario cuál de las 2 variantes de red neuronal
+   usar (cúmulo redondo vs. silueta de corazón) **antes de tocar
+   código**, como pedía el plan — eligió la redonda
+   (`elemento-red-neuronal.webp` / `fondo-vision-nuevo-redonda.webp`).
+2. `img/decoraciones-neurona/fondo-vision-red.webp` se reemplazó con el
+   contenido de `fondo-vision-nuevo-redonda.webp` (mismo nombre de
+   archivo final — el lienzo `-corazon` queda igual en
+   `vision-elementos/` sin usarse, por si se quiere cambiar más
+   adelante).
+3. Como el lienzo nuevo tiene otra proporción (1700×1040, más alto en
+   relación al ancho que el 1478×720 original), se ajustó el `width`
+   inline de `.vision-brain-bg` en `index.html`: de
+   `clamp(880px,84vw,1480px)` a `clamp(760px,71vw,1150px)`, y el bleed
+   derecho de `-160px` a `-140px` (mismo `top:230px`). Sin este ajuste
+   la imagen se salía por abajo del alto de la sección (`#lam-02`,
+   padding `130px 0 110px`) y pisaba la siguiente sección.
+4. Se remidieron y reposicionaron las 4 `.stat-annot` dentro de
+   `@media(min-width:901px)` en `css/styles.css`, con Playwright
+   sirviendo el sitio local (`python -m http.server`) e iterando sobre
+   capturas a 1440px hasta que cada punto+línea cayera sobre/junto al
+   elemento real que le corresponde:
+   - dorado (20%): `left:0,top:0` → `left:24px,top:18px` (punto sobre el
+     borde del arco de progreso del cerebro).
+   - morado (86B): `left:300px,top:14px` → `left:300px,top:18px` (ya
+     caía bien — el valor original casi no necesitó ajuste porque el
+     layout 2×2 del lienzo nuevo coincide con la intención original de
+     las coordenadas).
+   - verde (4–6): `left:16px,top:230px` → `left:36px,top:242px` (punto
+     sobre el borde superior del reloj de arena).
+   - azul (1:1): `left:300px,top:246px` → `left:175px,top:262px`. Este
+     fue el único que necesitó un ajuste grande: con `left:300px` (el
+     valor "simétrico" con morado) el label "acompañamiento personal"
+     quedaba superpuesto visualmente sobre las cintas azules del propio
+     elemento que se supone que señala, con bajo contraste — el mismo
+     tipo de problema que motivó todo este cambio. Se corrió más a la
+     izquierda, al hueco libre entre el reloj de arena y las cintas, con
+     el punto+línea señalando hacia las cintas sin que el texto quede
+     encima.
+5. Verificado con Playwright a 1440px (capturas + recortes de zoom sobre
+   cada anotación para revisar contraste). **En esta sesión puntual el
+   usuario pidió explícitamente saltar el paso de mostrar la captura
+   final y pasar directo a documentar/commitear** — quedó pedido y
+   confirmado en el chat, no es un salto no avisado. Sesión 2 (mobile,
+   ≤900px) del plan original de anotaciones sigue pendiente aparte, no
+   se tocó nada de ese breakpoint acá.
+
+Archivos tocados: `img/decoraciones-neurona/fondo-vision-red.webp`
+(contenido reemplazado), `index.html` (1 línea, tamaño/bleed de
+`.vision-brain-bg`), `css/styles.css` (bloque de `#lam-02 .stat-annot--*`
+dentro de `@media(min-width:901px)`).
+
 ## 2026-09-17 (trigésima quinta tanda) — Composición final del nuevo fondo de Visión (2 variantes) armada por código
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

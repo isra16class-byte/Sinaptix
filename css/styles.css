@@ -577,10 +577,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .vision-stats-col{width:100%}
   #lam-02 .stat-annotations{position:relative;display:block;width:100%;height:380px}
   #lam-02 .stat-annot{position:absolute;width:230px}
-  #lam-02 .stat-annot--dorado{left:0;top:0}
-  #lam-02 .stat-annot--morado{left:300px;top:14px}
-  #lam-02 .stat-annot--verde{left:16px;top:230px}
-  #lam-02 .stat-annot--azul{left:300px;top:246px}
+  /* Posiciones remedidas contra el lienzo compuesto nuevo (2026-09-17,
+     décima tanda — ver memoria.md, plan de reemplazo de fondo-vision-red):
+     cada punto+línea ahora cae sobre/junto al elemento real que le
+     corresponde en la imagen (cerebro, red neuronal, reloj de arena,
+     cintas), no en coordenadas libres. */
+  #lam-02 .stat-annot--dorado{left:24px;top:18px}
+  #lam-02 .stat-annot--morado{left:300px;top:18px}
+  #lam-02 .stat-annot--verde{left:36px;top:242px}
+  #lam-02 .stat-annot--azul{left:175px;top:262px}
 }
 
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
