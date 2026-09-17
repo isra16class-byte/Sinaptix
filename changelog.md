@@ -8,6 +8,62 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima tercera tanda) — Plan de anotaciones en Visión, Sesión 1 de 2: reemplazo de las 4 tarjetas por anotaciones sueltas en desktop
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Primera sesión de implementación del plan documentado en la tanda
+anterior (ver debajo). Alcance: solo desktop (`min-width:901px`), tal
+como definía el plan; mobile queda para la sesión 2.
+
+En `index.html` (`#lam-02 .vision-stats-col`), las 4 `.stat-box` (con
+ícono SVG + número + label largo, dentro de `.stat-grid`) se
+reemplazaron por 4 `.stat-annot` dentro de `.stat-annotations`: un punto
+de color + línea punteada en SVG (mismo lenguaje que `.lam-title-deco`,
+el garabato de "alimenta"), número en Fraunces y una etiqueta corta en
+Inter — sin ícono. Los textos de las etiquetas se acortaron según la
+captura de referencia que compartió el usuario: "de la energía diaria la
+consume el cerebro" (20%), "neuronas conectándose en cada decisión"
+(86B), "semanas para notar el cambio" (4–6), "acompañamiento personal"
+(1:1).
+
+En `css/styles.css` se agregaron los estilos base de `.stat-annotations`/
+`.stat-annot` (fallback simple en columna, sin diseño fino — eso es
+tarea de la sesión 2, así que hoy aplica también en mobile aunque no es
+su versión final) y, dentro de `@media(min-width:901px)`, el
+posicionamiento libre (no grid parejo): 4 posiciones absolutas a mano
+sobre el área que antes ocupaba `.stat-grid`, con color por dato vía
+`currentColor` (mismos 4 colores que ya tenían los íconos: dorado,
+morado, verde, azul).
+
+Bug encontrado y corregido en el camino: al pasar los `.stat-annot` a
+`position:absolute`, `.stat-annotations` colapsaba a `0px` de ancho (los
+hijos absolutos no le dan tamaño al padre en shrink-to-fit, y
+`#lam-02 .vision-stats-col` no está en un contexto grid/flex que lo
+estire — tiene `margin:auto` para centrarse). Se agregó `width:100%`
+explícito a `.vision-stats-col` y a `.stat-annotations` dentro de ese
+mismo `@media`. Sin este fix las anotaciones no se veían en absoluto
+pese a que el resto del CSS estaba bien.
+
+Las variables `--vision-card-*` y las reglas `#lam-02 .stat-box`/
+`.stat-icon`/`.num`/`.lab` de la etapa de tarjetas no se borraron (quedan
+comentadas/anotadas en el CSS como sin uso); decidir si se limpian en la
+sesión 2, junto con el resto de la limpieza de esa sesión.
+
+Verificado con Playwright en este entorno (`python -m http.server`,
+1440px; sin red para assets remotos pero `vision-brain-bg` es local).
+**Capturas mostradas al usuario y confirmadas explícitamente** antes de
+cerrar la sesión, como exige la nota de "Pendientes conocidos" en
+`memoria.md` (evitar repetir el patrón de sesiones anteriores donde un
+cambio de esta sección se dio por bueno sin verse en navegador real y
+terminó sin convencer). Quedan anotadas dos observaciones que el usuario
+vio y aceptó dejar así por ahora: la pareja 86B/1:1 cae sobre la parte
+más cargada de la ilustración de fondo y se lee algo peor que 20%/4–6, y
+el punto+línea de esos dos casi no contrasta contra ese mismo fondo. No
+se corrió la suite de Playwright de regresión completa (46/46 tests son
+sobre otras secciones/flujos, no tocados); no se corrió por no ser un
+cambio de lógica, solo de esta sección visual.
+
 ## 2026-09-17 (trigésima segunda tanda) — Plan (sin implementar) para reemplazar las tarjetas de Visión por anotaciones a mano, dividido en 2 sesiones
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

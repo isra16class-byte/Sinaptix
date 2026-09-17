@@ -513,6 +513,76 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .stat-box:nth-child(4) .lab{margin-top:22px}
 }
 
+/* NOTA (sesión 2026-09-17, plan de anotaciones — sesión 1 de 2, ver
+   memoria.md "Pendientes conocidos"): el `.stat-grid`/`.stat-box` de
+   arriba deja de usarse dentro de `#lam-02` (el HTML de esta sección ya
+   no tiene esos elementos, reemplazados por `.stat-annotations` /
+   `.stat-annot` de abajo). Las reglas `#lam-02 .stat-box...` de este
+   archivo (más arriba) quedan sin efecto para esta sección — se dejan
+   sin tocar por ahora (no se borran) porque comparten selector con
+   posibles ajustes futuros y la limpieza definitiva se decide recién en
+   la sesión 2, junto con las variables `--vision-card-*` que tampoco se
+   usan ya acá. `.stat-box`/`.stat-grid` siguen en uso normal en
+   `#miPlan`, no se tocó nada de eso. */
+
+/* Anotaciones sueltas de Visión (reemplazo de las 4 tarjetas de caja,
+   sesión 1 del plan — ver memoria.md). Un punto de color + línea
+   punteada (mismo lenguaje que `.lam-title-deco`, el garabato junto a
+   "alimenta") + número en Fraunces (mismo tratamiento que tenía
+   `.stat-box .num`) + etiqueta corta en Inter, flotando sobre
+   `vision-brain-bg` en vez de encajonadas en una caja.
+   Estilos base = fallback simple en columna (mobile y cualquier ancho
+   sin el @media de abajo): esto es intencional, la versión mobile
+   "de verdad" (apilada u otra solución) se define en la sesión 2 — acá
+   solo evita que se vea roto mientras tanto. El posicionamiento libre
+   (no grid parejo) es exclusivo de desktop, ver @media(min-width:901px)
+   más abajo. */
+.stat-annotations{display:flex;flex-direction:column;gap:30px}
+.stat-annot{display:flex;flex-direction:column}
+.stat-annot-deco{width:70px;height:36px;display:block;margin-bottom:6px}
+.stat-annot-num{font-family:var(--font-d);font-weight:800;font-size:36px;letter-spacing:-.02em;color:var(--purple-dark)}
+.stat-annot-lab{font-family:var(--font-m);font-size:14px;font-weight:500;color:var(--ink-soft);letter-spacing:0;margin-top:4px;max-width:30ch}
+
+/* Color por dato: mismos 4 colores que ya tenían los íconos SVG de las
+   tarjetas (dorado 20%, morado 86B, verde 4–6, azul 1:1). El color se
+   aplica al punto+línea (`currentColor` en el SVG) vía `color` en el
+   contenedor; el número/etiqueta se mantienen en `--purple-dark`/
+   `--ink-soft` para legibilidad, igual que antes. */
+.stat-annot--dorado{color:var(--gold)}
+.stat-annot--morado{color:var(--purple)}
+.stat-annot--verde{color:var(--green)}
+.stat-annot--azul{color:var(--navy-bright)}
+
+/* Posicionamiento libre solo en desktop (sesión 1 del plan). Se ubican
+   dentro del área de 560px (`#lam-02 .vision-stats-col{max-width:560px}`
+   de arriba) que antes ocupaba el `.stat-grid` 2×2, pero sin alinear en
+   grilla pareja — valores de posición elegidos a mano para que se vean
+   como anotaciones sueltas "flotando", cuidando: 1) no exceder el ancho
+   de 560px de la columna (para no salirse de `vision-brain-bg`, que
+   tiene ese mismo criterio de bleed), 2) no quedar tan pegadas al borde
+   izquierdo de la columna que choquen con el texto de al lado (hay
+   130px de gap entre columnas, `#lam-02 .split{gap:130px}` arriba).
+   Alto fijo del contenedor (340px) calculado para las 4 posiciones de
+   abajo con aire de sobra; revisar si constituye demasiado o muy poco
+   espacio en blanco al verificar con Playwright. */
+@media(min-width:901px){
+  /* `width:100%` es necesario acá: al pasar los `.stat-annot` a
+     `position:absolute` dejan de aportarle tamaño al contenedor (los
+     elementos con posición absoluta no cuentan para el shrink-to-fit del
+     padre), y `.vision-stats-col` no está en un contexto de grid/flex
+     que lo estire (tiene `margin:auto` para centrarse dentro del hueco,
+     ver regla de arriba) — sin esto, `.stat-annotations` colapsaba a
+     0px de ancho y las anotaciones no se veían aunque el CSS de
+     posición estuviera bien. */
+  #lam-02 .vision-stats-col{width:100%}
+  #lam-02 .stat-annotations{position:relative;display:block;width:100%;height:380px}
+  #lam-02 .stat-annot{position:absolute;width:230px}
+  #lam-02 .stat-annot--dorado{left:0;top:0}
+  #lam-02 .stat-annot--morado{left:300px;top:14px}
+  #lam-02 .stat-annot--verde{left:16px;top:230px}
+  #lam-02 .stat-annot--azul{left:300px;top:246px}
+}
+
 /* Bullets de la visión (lam-02): iconos de línea delgada en dorado. */
 .vision-bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:22px}
 .vision-bullets li{display:flex;gap:16px;align-items:flex-start}

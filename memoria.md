@@ -724,173 +724,68 @@ Prioridad 2.
   (compartido entre modal de `index.html` y sección inline de
   `mi-plan.html`), 4 planes con "día tipo" cada uno + resolución
   automática si el usuario no está seguro de su objetivo.
-- **Visión (`lam-02`)**: el `stat-grid` de 4 tarjetas tiene ahora un fondo
-  ilustrado (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro,
-  red neuronal, rompecabezas) grande (`clamp(880px,84vw,1480px)`) y
-  pegado/recortado contra el borde derecho real de la pantalla (bleed
-  `-160px`, para que parezca que "sale" del costado), igual criterio que
-  las neuronas de Método. El fondo va nítido y sin filtros
-  (`opacity:.92`, sin blur/brightness/saturate ni transform) con bleed
-  `-160px` (mismo criterio que `neurona-derecha` de Método) para que
-  parezca que sale del borde derecho real. La columna de tarjetas (`.reveal.d2` de esta
-  sección) baja `margin-top:90px` y el fondo arranca en `top:230px` para
-  repartir el arte a lo largo de todo el hueco vertical que deja la
-  columna de texto, más alta. Las 4 tarjetas (`#lam-02 .stat-box`,
-  incluida la destacada `.is-featured`) son translúcidas, **todas en el
-  mismo tono blanco** (`rgba(255,255,255,.72)`, destacada `.7`) con blur
-  suave para dejar ver el arte detrás y texto (`.num`/`.lab`) en
-  `var(--purple-dark)` (`.lab` en `font-weight:600` y `opacity:1` — antes
-  `.85`/normal, se subió el contraste a pedido del usuario en sesión
-  2026-09-16 porque el label casi no se leía contra el fondo translúcido
-  con el arte de fondo detrás; el fondo de la tarjeta también subió de
-  `.55` a `.72` como parte del mismo ajuste); sin `text-shadow` (ya no
-  hace falta, el fondo es claro). El borde de las 4 tarjetas (`border`,
-  antes `rgba(255,255,255,.7)` casi invisible sobre fondo claro) es `1px
-  solid var(--purple)` (sesión 2026-09-15, a pedido del usuario, para que
-  las tarjetas se distingan del fondo blanco de la sección aunque no
-  tengan la ilustración detrás). El texto de `.lab` pasó de `13px` a
-  `15px` (sesión 2026-09-15, mismo pedido) para que se lea con más
-  facilidad.
-  **Tarjetas más bajas/horizontales (sesión 2026-09-16):** a pedido del
-  usuario (se veían "muy verticales"), `#lam-02 .stat-box` bajó el
-  padding de `28px 26px` (heredado de `.stat-box` base) a
-  `20px 22px 18px`, y `.num` bajó de `36px` a `32px`. El padding-right
-  que reservaba el hueco del ícono (antes aplicado también a `.lab`) se
-  saca de `.lab` y queda solo en `.num` (`66px`, antes `74px` en ambos);
-  `.lab` en cambio usa `margin-top:16px` (antes `8px`) para arrancar ya
-  despejado por debajo del ícono, así que ocupa el ancho completo de la
-  tarjeta — menos líneas de wrap, tarjetas más bajas. El ícono
-  (`#lam-02 .stat-icon`) bajó de `60×60px` a `56×56px` (`top`/`right`
-  `20px`→`18px`) para acompañar el padding más chico.
-  **Ícono de la tarjeta "1:1" (`icon-conversacion.svg`) agrandado**
-  (mismo pedido): a igual tamaño de caja que los otros 3, este ícono se
-  veía visiblemente más chico (su dibujo — dos personas hablando + iconos
-  sueltos alrededor — deja mucho aire dentro del `viewBox`, ver línea de
-  `svg/` en "Estructura de archivos"). Se targetea solo esa tarjeta con
-  `#lam-02 .stat-box:nth-child(4)` (es la 4ª/última del `stat-grid`):
-  ícono a `78×78px` (`top`/`right` `10px`), `.num` con `padding-right:88px`
-  y `.lab` con `margin-top:20px` (en vez de los valores base de arriba)
-  para que el número y el label sigan sin pisarse con el ícono más
-  grande.
-  **Posición vertical de la columna de tarjetas (sesión 2026-09-16,
-  continuación):** con las tarjetas más bajas de arriba, la columna
-  quedaba muy arriba respecto del párrafo de la columna de texto — a
-  pedido del usuario se bajó, casi a la altura de ese párrafo. El
-  `margin-top:90px` que tenía **inline** en `index.html` (en el
-  `<div class="reveal d2">` que envuelve el `.stat-grid`) se sacó y pasó
-  a CSS con una clase (`vision-stats-col`): se probó primero `300px`
-  (quedaba pegada al párrafo) y después `250px` (ajuste fino a pedido
-  del usuario), pero en vez de seguir afinando un valor fijo a ojo, el
-  usuario pidió centrarla de verdad respecto a la columna de texto. La
-  solución final es `#lam-02 .split{align-items:center}` (el grid de
-  `.split` usa `align-items:start` en el resto del sitio, acá se
-  sobreescribe solo para esta sección) — `vision-stats-col` quedó en
-  `margin-top:0` en desktop (el centrado ya lo resuelve el grid), pero se mantiene el valor original `90px` en mobile
-  (`max-width:900px`, mismo breakpoint que `.split`) para no dejar un
-  hueco enorme cuando las columnas se apilan — ahí las tarjetas van
-  justo debajo de los bullets, no tienen por qué bajar tanto.
-  **Corrida a la derecha y centrada en su espacio (misma sesión,
-  continuación):** el usuario sintió la columna de tarjetas "muy cerca"
-  del texto y pidió correrla más a la derecha y centrarla. El `gap` de
-  `#lam-02 .split` sube de `70px` (heredado de `.split` base) a `130px`
-  en desktop (en mobile, dentro de `max-width:900px`, se fija de nuevo
-  en `44px`, el valor original de `.split` en esa media query, para que
-  `#lam-02 .split` no herede el `130px` de desktop). Además
-  `#lam-02 .vision-stats-col` deja de estirarse a todo el ancho de su
-  columna del grid: `max-width:400px` (antes ~515px, todo el ancho de la
-  columna) con `margin-left:auto;margin-right:auto` para centrarla
-  dentro de esa columna — solo en desktop (`min-width:901px`; en mobile
-  no hay "columna de al lado" de la que alejarse, sigue a ancho
-  completo). Efecto combinado: las tarjetas quedan notoriamente más
-  lejos del texto y con aire de los dos lados en vez de pegadas al borde
-  izquierdo de su columna.
-  **Tarjetas más grandes (sesión 2026-09-16, quinta/sexta tanda; bug de
-  cascada corregido y tamaño subido de nuevo en sesión 2026-09-17,
-  séptima tanda):** a pedido del usuario. Las pasadas quinta y sexta
-  (2026-09-16) habían quedado documentadas acá con valores que **nunca
-  se vieron en pantalla**: se escribieron como un
-  `@media(min-width:901px){ #lam-02 .stat-box{...} ... }` ubicado *antes*
-  (más arriba en `css/styles.css`) que las reglas base sin media query
-  `#lam-02 .stat-box`/`#lam-02 .stat-icon`/`.num`/`.lab` (las de fondo
-  translúcido, ícono en esquina, etc., documentadas en los párrafos de
-  arriba). Como esas reglas base tienen la misma especificidad (id +
-  clase) y venían **después** en el archivo, ganaban la cascada sin
-  importar el `@media` — el CSS "grande" existía pero quedaba anulado, y
-  las tarjetas seguían viéndose con los valores chicos. El usuario lo
-  notó al pedir "más grande" de nuevo sobre lo que creía ya aplicado.
-  Fix: se movió el bloque `@media(min-width:901px)` de agrandado a
-  **después** de esas reglas base (mismo selector, ahora sí gana) y se
-  subió el tamaño más que en el intento anterior. Valores **actuales**
-  (los únicos que quedan, no hay valores intermedios en ningún lado):
-  `#lam-02 .vision-stats-col{max-width:560px}` (venía de `400px`),
-  `#lam-02 .stat-grid{gap:28px}` (venía de heredar `16px` de `.stat-grid`
-  base), `#lam-02 .stat-box{padding:32px 30px 28px}` (venía de `20px 22px
-  18px`), `.num{font-size:42px}` (venía de `32px`), `.lab{font-size:17px}`
-  (venía de `15px`), `#lam-02 .stat-icon{width/height:68px;top/right:
-  20px}` (venía de `56px`/`18px`), `.num{padding-right:82px}` (venía de
-  `66px`, hueco para el ícono más grande). La 4ª tarjeta ("1:1",
-  `icon-conversacion.svg`) sigue con su propio ícono más grande que las
-  otras 3 (mismo criterio de siempre): `92×92px` (venía de `78px`),
-  `top/right:8px` (venía de `10px`), `.num{padding-right:106px}` (venía
-  de `88px`), `.lab{margin-top:22px}` (venía de `20px`). **Color de los 4
-  íconos — historial:** primero pasaron de `--ink` (casi
-  negro) al morado de marca (`--purple`, `#714B67`) a pedido del
-  usuario — hardcodeado dentro de cada `.svg` (no vía CSS: son `<img>`,
-  no inline, no leen variables de `:root`), ver "Estructura de archivos"
-  más arriba para el detalle de por qué y dónde. Verificado con
-  Playwright en 1920px (desktop) y 390px (mobile, sin cambios). Antes
-  el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
-  glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
-  `changelog.md`). **Sesión 2026-09-17 (octava tanda): cada tarjeta pasó
-  a tener su propio color** (en vez de las 4 en el mismo morado), a
-  pedido del usuario, para que se distingan entre sí y llamen más la
-  atención: `icon-bateria-rayo.svg` ("20%") a dorado (`--gold`,
-  `#C1703B`), `icon-calendario-check.svg` ("4–6") a verde (`--green`,
-  `#2E7D5B`), `icon-conversacion.svg` ("1:1") a azul (`--navy-bright`,
-  `#3B6EA5`); `icon-red-nodos.svg` ("86B") se dejó en el morado de marca
-  (mismo valor `#714B67` que ya tenía) por ser el color que más asocia
-  el sitio con "red neuronal/cerebro". Los 4 colores ya existían en
-  `:root` (ninguno nuevo) y son los mismos que usa el resto del sitio
-  (`--gold` en los íconos de los bullets de esta sección, `--green` en
-  Beneficios), así que combinan con la paleta general. Mismo mecanismo
-  de siempre: color hardcodeado en el `fill` del `<g>` que envuelve el
-  dibujo dentro de cada `.svg`.
-  **Fondo de cada tarjeta con tinte pastel a juego con su ícono
-  (sesión 2026-09-17, novena tanda):** a pedido del usuario ("colorear
-  las tarjetas con colores suaves"), las 4 dejan de compartir el mismo
-  blanco translúcido (`rgba(255,255,255,.72)`) + borde morado uniforme
-  y pasan a un pastel propio ligado al color que ya tenía cada ícono:
-  1ª ("20%", `is-featured`) durazno, 2ª ("86B") lavanda, 3ª ("4–6")
-  menta, 4ª ("1:1") celeste. Variables nuevas en `:root`
-  (`--vision-card-dorado/-morado/-verde/-azul` + sufijo `-line` para el
-  borde de cada una): los fondos son `rgba` a `alpha .72` (mismo nivel
-  de translucidez que el blanco que reemplazan, para seguir dejando ver
-  `vision-brain-bg` detrás con el mismo `blur(2px)` de siempre) y los
-  bordes son el color de cada familia (`--gold`/`--purple`/`--green`/
-  `--navy-bright`) a `alpha .45` (antes: `var(--purple)` sólido en las
-  4). Reglas nuevas `#lam-02 .stat-box:nth-child(1..4)` puestas
-  **después** de la regla `.is-featured` en `css/styles.css` (misma
-  especificidad id+2-clases-o-pseudoclase; en ese empate gana la que
-  está más abajo en el archivo) para que también sobreescriban el fondo
-  blanco que traía `.is-featured` en la 1ª tarjeta. No se tocó color de
-  texto (`.num`/`.lab` siguen en `--purple-dark`, se probó legible
-  contra los 4 pasteles), ni tamaño/padding/íconos (eso quedó igual que
-  la tanda anterior). Verificado con Playwright, desktop 1440px y
-  mobile 390px: los 4 colores se leen bien diferenciados entre sí y
-  contra el arte de fondo, sin perder contraste de texto.
-  El título de esta sección (`El cerebro también se
-  alimenta`) es un `<h2 class="lam-title">` normal, **sin** `display:flex`
-  inline (se sacó en la misma tanda: causaba que el texto se envolviera
-  letra por letra en vez de fluir normal — ver `changelog.md` para el
-  detalle del bug); el ícono svg de puntitos decorativo va con la clase
-  `.lam-title-deco` (`inline-block`, no flex-item) para seguir pegado a
-  "alimenta". El `<span class="title-mark">` de "alimenta" tampoco tiene
-  ya la raya naranja tipo marcador (`#lam-02 .title-mark{background-image:
-  none}`, scopeado solo acá — `lam-03` a `lam-06` siguen con su trazo),
-  solo queda el color `var(--purple)` de la palabra. Se sacaron las
-  decoraciones viejas de esa esquina (círculos, huevo, aceite de oliva)
-  que competían con el arte nuevo. Ancho responsive con `clamp()`, oculto
-  en mobile (`<900px`, mismo criterio que el resto de `.deco-fruit`).
+- **Visión (`lam-02`)**: fondo ilustrado grande
+  (`img/decoraciones-neurona/fondo-vision-red.webp` — cerebro, red
+  neuronal, rompecabezas), `clamp(880px,84vw,1480px)`, con bleed
+  `-160px` contra el borde derecho real (mismo criterio que
+  `neurona-derecha` de Método), `opacity:.92`, oculto en mobile
+  (`<900px`). `#lam-02 .split{align-items:center;gap:130px}` (en mobile
+  vuelve a `44px`, mismo breakpoint que `.split`).
+  **Los 4 datos ya no son tarjetas de caja** (`.stat-box`/`.stat-grid` —
+  historial completo de esa etapa, con todos sus ajustes pixel a pixel,
+  en `changelog.md` y `historico/`): a partir de la sesión 1 del plan de
+  anotaciones (2026-09-17, ver "Pendientes conocidos" más abajo) son 4
+  `.stat-annot` (`.stat-annotations` adentro de `.vision-stats-col`) —
+  un punto de color (`.stat-annot-deco`, SVG con `circle`+`line`
+  punteada, mismo lenguaje que `.lam-title-deco`) + número en Fraunces
+  (`.stat-annot-num`, `var(--font-d)`, `var(--purple-dark)`) + etiqueta
+  corta en Inter (`.stat-annot-lab`, `var(--ink-soft)`), sin ícono SVG
+  (los `svg/icon-*.svg` que antes usaban como `.stat-icon` quedan sin
+  uso en esta sección, se mantienen intactos por si se reusan en otro
+  lado). Color por dato vía `currentColor` en el SVG, controlado con una
+  clase modificadora en el contenedor: `.stat-annot--dorado{color:
+  var(--gold)}` (20%), `--morado{var(--purple)}` (86B),
+  `--verde{var(--green)}` (4–6), `--azul{var(--navy-bright)}` (1:1) —
+  mismos 4 colores que ya tenían los íconos de las tarjetas viejas.
+  Textos actuales: "de la energía diaria la consume el cerebro" (20%),
+  "neuronas conectándose en cada decisión" (86B), "semanas para notar
+  el cambio" (4–6), "acompañamiento personal" (1:1) — versión abreviada
+  de los labels largos que tenían las tarjetas, tomada de la captura de
+  referencia que mostró el usuario.
+  **Posicionamiento — solo desktop (`min-width:901px`), sesión 1 de 2
+  (mobile queda pendiente, ver "Pendientes conocidos"):**
+  `#lam-02 .stat-annotations{position:relative;width:100%;height:380px}`,
+  cada `.stat-annot{position:absolute;width:230px}` con `left`/`top` a
+  mano (no grid parejo): dorado `0,0`; morado `300px,14px`; verde
+  `16px,230px`; azul `300px,246px`. Ojo con el bug que costó
+  diagnosticar en esta sesión: al pasar los `.stat-annot` a
+  `position:absolute` dejan de aportarle tamaño a `.stat-annotations`
+  (elementos absolutos no cuentan para el shrink-to-fit del padre) y
+  `#lam-02 .vision-stats-col` no está en un contexto que lo estire
+  (tiene `margin:auto` para centrarse dentro del hueco de la grilla de
+  `.split`) — sin `width:100%` explícito en ambos (`.vision-stats-col` y
+  `.stat-annotations`) el contenedor colapsaba a `0px` y no se veía
+  nada, aunque el resto del CSS estuviera bien. Fuera de ese `@media`,
+  `.stat-annotations{display:flex;flex-direction:column;gap:30px}` es
+  el fallback base (aplica hoy a cualquier ancho sin el `@media`, o sea
+  mobile): apilado simple sin más ajuste, a propósito — la versión mobile
+  "de verdad" se define en la sesión 2.
+  Confirmado con el usuario en captura a 1440px (sesión 2026-09-17):
+  quedan sin resolver dos puntos que el usuario podría querer ajustar
+  más adelante (no bloquean, se mostró y se pidió seguir tal cual) — 86B
+  y 1:1 caen sobre la parte más "cargada" de la ilustración (cerebro y
+  nodos) y se leen algo peor que 20%/4–6, que caen sobre espacio en
+  blanco; el punto+línea de esos mismos dos casi no contrasta contra el
+  arte de fondo.
+  `#lam-02 .vision-stats-col{max-width:560px;width:100%;margin-left:
+  auto;margin-right:auto}` en desktop (en mobile, ancho completo, sin
+  `margin-top` propio salvo `90px` de `.vision-stats-col` base en
+  `<900px` para no pegarse a los bullets al apilarse).
+  Variables `--vision-card-dorado/-morado/-verde/-azul` (+ `-line`) y
+  las reglas `#lam-02 .stat-box`/`.stat-icon`/`.num`/`.lab` de la etapa
+  de tarjetas **quedan en el archivo sin usarse** en esta sección (no se
+  borraron en la sesión 1, ver comentario en `css/styles.css` junto a
+  esas reglas) — decidir limpieza en la sesión 2 del plan.
 - **Visión (`#lam-02`) — subtítulos de los 3 bullets en morado** (sesión
   2026-09-16): `.vision-bullets strong` ("Atención individualizada.",
   "No más dietas genéricas.", "Rendimiento cognitivo.") pasó de
@@ -899,21 +794,12 @@ Prioridad 2.
   a pedido del usuario, para que combinen. El resto del texto de cada
   bullet (`.vision-bullets span`, sin `<strong>`) sigue en `var(--ink-soft)`
   sin cambios; los íconos de línea siguen en `var(--gold)`.
-- **Visión (`#lam-02`) — ícono de las 4 tarjetas movido a la esquina
-  superior derecha** (sesión 2026-09-16): `.stat-icon` (el `<img>` de
-  40x40, antes arriba a la izquierda en flujo normal, empujando `.num`/
-  `.lab` hacia abajo con `margin-bottom:14px`) pasa a
-  `position:absolute;top:22px;right:22px` dentro de `#lam-02 .stat-box`
-  (que ahora necesita `position:relative`, agregado a la regla que ya
-  existía para fondo/borde/blur de esta sección). Efecto: el ícono queda
-  fijo como un sello/badge en la esquina, y `.num`/`.lab` arrancan arriba
-  a la izquierda de la tarjeta (ya no hay hueco donde estaba el ícono).
-  Se sumó `padding-right:50px` a `.num`/`.lab` (solo `#lam-02`) para que
-  el texto no quede pegado al ícono si algún número/label fuera más
-  ancho. Cambio scopeado 100% a `#lam-02` — el resto del sitio que
-  reusa `.stat-box`/`.stat-icon` (Método con sus gauges, "Mi plan") no se
-  toca. Verificado con Playwright, desktop 1440px y mobile 390px, sin
-  superposición en ninguna de las 4 tarjetas.
+- **Visión (`#lam-02`) — ícono de las 4 tarjetas en la esquina
+  superior derecha (sesión 2026-09-16): OBSOLETO**, era de la etapa de
+  tarjetas de caja (`.stat-box`/`.stat-icon`), reemplazada por las
+  anotaciones sin ícono descritas arriba (sesión 2026-09-17, ver
+  "Pendientes conocidos"). Detalle completo en `changelog.md`/
+  `historico/` si hace falta para contexto de por qué existía.
 - **"Mi plan" — estado con sesión (`#miPlanConSesion`, dashboard "Tu
   progreso con SINAPTIX")**: rediseño visual sobre los mismos componentes
   de datos de siempre (medidor de IMC tipo velocímetro, tarjeta de
@@ -1604,7 +1490,8 @@ tests sin cambios (46/46 ok, este fix es puro CSS).
 ## Pendientes conocidos
 
 **Plan: reemplazar las tarjetas de Visión por anotaciones a mano (2
-sesiones) — sesión 2026-09-17, sin implementar aún.** El usuario mostró
+sesiones) — sesión 1 hecha (2026-09-17), sesión 2 (mobile + limpieza)
+pendiente.** El usuario mostró
 capturas de las 4 tarjetas (`.stat-box` dentro de `#lam-02`, ver "Estado
 actual del diseño" → Visión) y no se sentía conforme; se descartó que
 fuera un tema de íconos o de tipografía del número (`.stat-box .num` ya
@@ -1628,17 +1515,24 @@ tienen los íconos SVG actuales (dorado `#C1703B` 20%, morado `#714B67`
 Por ser un cambio de estructura (HTML + CSS, no solo color) y no solo un
 ajuste, se dividió en 2 sesiones en vez de intentarlo todo de una:
 
-- **Sesión 1 (siguiente)** — versión desktop (≥901px) únicamente.
-  Reemplazar `.stat-grid`/`.stat-box` dentro de `#lam-02
-  .vision-stats-col` por el nuevo componente de anotaciones, con
-  posicionamiento libre (no grid parejo) sobre el área que hoy ocupa la
-  grilla, cuidando no tapar el texto de la izquierda ni salirse del
-  `vision-brain-bg`. No tocar mobile en esta sesión. Verificar con
-  Playwright en 1440px si el entorno lo permite (si no, dejarlo anotado
-  como pendiente de verificación visual, igual que otras sesiones).
-  Actualizar esta entrada marcando la sesión 1 como hecha, más
-  `changelog.md`, y generar el patch.
-- **Sesión 2** — mobile (≤900px) + limpieza. El posicionamiento libre de
+- **Sesión 1 — HECHA (2026-09-17).** Versión desktop (≥901px)
+  únicamente: `.stat-grid`/`.stat-box` dentro de `#lam-02
+  .vision-stats-col` reemplazado por `.stat-annotations`/`.stat-annot`
+  con posicionamiento libre a mano (no grid parejo) — ver "Estado actual
+  del diseño" → Visión para el detalle completo (posiciones exactas,
+  colores, textos, y el bug de contenedor colapsado a 0px que hubo que
+  diagnosticar). No se tocó mobile (queda con un fallback simple en
+  columna, sin diseñar, a propósito). Verificado con Playwright en
+  1440px en este entorno (`python -m http.server`, sin red para assets
+  remotos pero `vision-brain-bg` es local); **capturas mostradas al
+  usuario y confirmadas explícitamente** antes de cerrar la sesión y
+  generar el patch, como pide la nota de abajo. Quedan dos observaciones
+  que el usuario vio y aceptó dejar así por ahora (no son bugs, son
+  posibles ajustes futuros si se retoma el tema): la pareja 86B/1:1 cae
+  sobre la parte más cargada de `vision-brain-bg` y se lee algo peor que
+  20%/4–6 (que caen sobre espacio en blanco), y el punto+línea de esos
+  mismos dos casi no contrasta contra el arte de fondo.
+- **Sesión 2 (siguiente)** — mobile (≤900px) + limpieza. El posicionamiento libre de
   la sesión 1 probablemente no sirve en pantallas angostas — definir en
   esa sesión si conviene una versión apilada (punto + número + etiqueta
   en línea) u otra solución; no está decidido de antemano. Revisar que
