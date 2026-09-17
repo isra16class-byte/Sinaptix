@@ -889,12 +889,33 @@ Prioridad 2.
   (Pillow + numpy, comentado, no versionado hasta este patch) rehace los
   4 recortes + el fondo sin íconos a partir de `fondo-vision-red.webp`
   si hace falta volver a generarlos (por ejemplo si se cambia el margen
-  de recorte). **Sin verificación visual** — el usuario pidió
-  explícitamente no tomar capturas en esta tanda, así que **antes de dar
-  esto por definitivo hay que confirmar en un navegador real** que los 4
-  íconos calzan en el mismo lugar que antes (debería ser así porque es
-  un recorte exacto del mismo píxel, pero no se comprobó). Qué hacer con
-  los 4 íconos ya separados (moverlos, agrandarlos individualmente,
+  de recorte). **Bug corregido (segunda vuelta, misma sesión, a
+  continuación de que el usuario reportara "no se ven")**: la primera
+  versión de este patch dejaba `.vision-icons{display:none}` sin volver
+  a ponerlo visible dentro del `@media(min-width:901px)` que lo
+  reposiciona (solo tenía `position:absolute;inset:0`, faltaba
+  `display:block`) — los 4 íconos existían en el DOM con la posición
+  correcta pero el contenedor entero quedaba oculto, en cualquier ancho
+  de pantalla. Corregido agregando `display:block` a esa regla. Se
+  verificó por separado (reconstrucción píxel a píxel, ver el detalle
+  más abajo en esta misma entrada) que el contenido/posición de los 4
+  recortes es correcto — el problema era solo la visibilidad del
+  contenedor, no la data. **Sigue sin verificación en un navegador
+  real** (Chromium/Playwright no se pudo descargar en este entorno,
+  ver "Pendientes conocidos") — antes de dar esto por definitivo, falta
+  confirmar en un navegador real que ahora los 4 íconos se ven en el
+  mismo lugar que antes de la separación.
+  **Verificación por reconstrucción píxel a píxel (hecha en esta
+  sesión, no reemplaza un navegador real pero confirma que el recorte
+  en sí no tiene errores)**: se volvió a pegar cada ícono sobre el
+  fondo sin íconos, en la posición exacta que calcula
+  `scripts/separar-iconos-vision.py`, y se comparó contra
+  `fondo-vision-red.webp` original — la diferencia quedó acotada al
+  contorno fino de cada ícono (ruido esperable de recompresión WEBP en
+  bordes), sin ningún desplazamiento ni "fantasma" detectable, y los
+  porcentajes `left`/`top`/`width` de `css/styles.css` coinciden
+  exactamente con los recalculados desde cero. Qué hacer con los 4
+  íconos ya separados (moverlos, agrandarlos individualmente,
   animarlos, rediseñar su posición) queda para la próxima instrucción
   del usuario — no estaba decidido de antemano, solo se pidió la
   separación técnica.
@@ -1602,24 +1623,36 @@ tests sin cambios (46/46 ok, este fix es puro CSS).
 ## Pendientes conocidos
 
 **Íconos de Visión separados en 4 archivos individuales (sesión
-2026-09-17, cuadragésima tanda) — sin verificación visual, a pedido
-explícito del usuario ("no quiero que hagas verificaciones ni que me
-envíes capturas").** Ver "Estado actual del diseño" → Visión → "íconos
-separados en 4 archivos individuales" para el detalle completo. Falta
-para quien retome esto:
-- Confirmar en un navegador real (desktop ≥901px) que los 4
-  `.vision-icon` calzan exactamente donde estaba cada ícono antes del
-  cambio — debería ser así por construcción (son un recorte 1:1 del
-  mismo `fondo-vision-red.webp` viejo, con los mismos porcentajes que
-  ya usaban las `.stat-annot`), pero no se corrió Playwright ni se tomó
-  ninguna captura en esta tanda.
-- El usuario todavía no dijo qué quiere hacer con los íconos ya
-  separados (moverlos, agrandarlos individualmente, animarlos,
-  rediseñar la composición) — esperar esa instrucción antes de tocar
-  `.vision-icon*` de nuevo.
-- `fondo-vision-red.webp` (el archivo viejo, con los íconos quemados
-  adentro) queda en el repo sin usarse, por si hace falta volver atrás
-  rápido; no se borró.
+2026-09-17, cuadragésima/cuadragésima primera tanda) — bug encontrado y
+corregido.** La primera vuelta (cuadragésima tanda) se hizo sin
+verificación visual, a pedido explícito del usuario. El usuario aplicó
+ese patch y reportó "no se ven": los 4 íconos no aparecían en absoluto.
+**Causa**: `.vision-icons` tenía `display:none` como base (para
+ocultarlo en mobile, breakpoint `<900px`) pero el
+`@media(min-width:901px)` que lo reposiciona **nunca volvía a poner
+`display` en algo visible** — solo `position:absolute;inset:0`, así que
+seguía en `display:none` en cualquier ancho de pantalla. Se corrigió
+agregando `display:block` a esa regla (mismo patrón que ya usa
+`#lam-02 .stat-annotations`, que sí tenía su `display:block`
+correspondiente — se pasó por alto al copiar el criterio para
+`.vision-icons`).
+Tampoco en esta segunda vuelta hubo Chromium/Playwright disponible
+(sigue sin poder descargarse en este entorno) para confirmarlo con un
+navegador real: se revisó el CSS a mano buscando cualquier otra regla
+que pudiera estar ocultando `.vision-icon*` (no se encontró ninguna
+más) y, por separado, se había verificado con un script de
+reconstrucción píxel a píxel que el contenido/posición de los 4
+recortes en sí es correcto (ver "Estado actual del diseño" → Visión
+para el detalle de esa verificación) — es decir, lo que faltaba no era
+la posición ni el contenido de los íconos, sino que el contenedor
+entero estaba oculto por CSS. **Falta para quien retome esto**:
+confirmar en un navegador real que ahora sí se ven los 4 íconos en su
+lugar, y que el usuario todavía no dijo qué quiere hacer con ellos una
+vez separados (moverlos, agrandarlos individualmente, animarlos,
+rediseñar la composición) — esperar esa instrucción antes de tocar
+`.vision-icon*` de nuevo. `fondo-vision-red.webp` (el archivo viejo, con
+los íconos quemados adentro) sigue en el repo sin usarse, por si hace
+falta volver atrás rápido.
 
 **Íconos de Visión agrandados dentro de la imagen + reacomodo de texto
 (sesión 2026-09-17) — sin verificación visual, el usuario pidió no

@@ -8,6 +8,41 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (cuadragésima primera tanda) — fix: los 4 íconos de Visión no se veían (display:none sin revertir)
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario aplicó el patch de la tanda anterior (separación de los 4
+íconos de Visión en archivos individuales) y reportó "no se ven".
+
+- **Causa**: en `css/styles.css`, `.vision-icons{display:none}` (base,
+  para ocultar el contenedor en mobile) nunca se revertía a un valor
+  visible dentro del `@media(min-width:901px)` que lo reposiciona — esa
+  regla solo agregaba `position:absolute;inset:0;pointer-events:none`,
+  sin `display:block`. Resultado: el contenedor de los 4 íconos quedaba
+  en `display:none` en cualquier ancho de pantalla, no solo en mobile.
+  Mismo patrón que ya usa `#lam-02 .stat-annotations` (que sí tiene su
+  `display:block` correspondiente en el media query) — se pasó por alto
+  al escribir la regla nueva para `.vision-icons`.
+- **Fix**: una línea, `.vision-icons{display:block;position:absolute;
+  inset:0;pointer-events:none}` dentro del `@media(min-width:901px)`.
+- **Verificación**: no hubo Chromium/Playwright disponible en esta
+  sesión tampoco (sigue sin poder descargarse en este entorno). Se
+  revisó a mano el resto de `css/styles.css` buscando otra regla que
+  pudiera estar ocultando `.vision-icon*` (no se encontró ninguna más).
+  Por separado, se corrió un script de reconstrucción píxel a píxel
+  (pegar cada ícono separado sobre el fondo sin íconos, en la posición
+  que calcula `scripts/separar-iconos-vision.py`, y comparar contra
+  `fondo-vision-red.webp` original) para confirmar que el contenido/
+  posición de los 4 recortes en sí es correcto — la diferencia quedó
+  acotada al contorno fino de cada ícono (ruido de recompresión WEBP),
+  sin desplazamientos. Esto confirma que el problema era únicamente la
+  visibilidad del contenedor, no la posición/contenido de los íconos.
+  `npm test`: 54/54 ok (no se tocó JS).
+- **Sigue pendiente**: confirmar en un navegador real que ahora sí se
+  ven los 4 íconos en su lugar — no se pudo hacer desde este entorno.
+- Actualizados `memoria.md` y este archivo.
+
 ## 2026-09-17 (cuadragésima tanda) — Íconos de Visión separados en 4 archivos individuales
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

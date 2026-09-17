@@ -466,7 +466,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    decidido, ver memoria.md → "Pendientes conocidos". */
 .vision-icons{display:none}
 @media(min-width:901px){
-  .vision-icons{position:absolute;inset:0;pointer-events:none}
+  .vision-icons{display:block;position:absolute;inset:0;pointer-events:none}
   .vision-icon{position:absolute;display:block;height:auto}
   .vision-icon--dorado{left:8.94%;top:0;width:29.18%}
   .vision-icon--morado{left:61.53%;top:0;width:35.18%}
