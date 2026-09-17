@@ -422,6 +422,44 @@ liso) y pidió reproducirlas como iconos del sitio.
   en `svg/`, sin usarse todavía en ninguna sección del sitio. Falta que
   el usuario indique dónde van (qué sección, qué tamaño, si necesitan
   variante de color) para integrarlos.
+## 2026-09-16 (décimoquinta tanda) — Círculo real de la referencia + centrar el título de "Mi plan"
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+Dos ajustes sobre la tanda anterior (círculo alrededor de "SINAPTIX"),
+ambos reportados por el usuario con captura:
+
+1. **El título se veía pegado a la izquierda en vez de centrado.** Causa:
+   `#miPlanConSesion .sec-head-center .lam-title{margin:14px 0 6px}`
+   (shorthand `margin`) pisaba el `margin-left:auto;margin-right:auto`
+   que centra el título (`.sec-head-center .lam-title` en la regla base),
+   dejando `margin-left`/`margin-right` en `0`. Fix: la regla pasa a usar
+   `margin-top`/`margin-bottom` en vez del shorthand, así ya no toca los
+   márgenes horizontales. Mismo fix preventivo en la regla hermana de
+   `.lam-text` (hoy no hay ningún `.lam-text` bajo `.sec-head-center` en
+   `mi-plan.html`, pero tenía el mismo problema latente).
+2. **El círculo dibujado a mano por Claude (SVG, tanda anterior) se veía
+   "simple"** — el usuario trajo la foto real de un círculo de
+   crayón/marcador sobre papel (la misma referencia visual que ya había
+   mandado) y pidió usar esa imagen tal cual. Se le sacó el fondo de
+   papel con un umbral de "qué tan lejos está cada píxel de ser gris"
+   (`(G+B)/2 - R`, ya que el papel es gris/blanco y el trazo turquesa
+   tiene G y B mucho más altos que R), se recortó ajustado al trazo y se
+   redujo a 700px de ancho — queda en
+   `img/ilustraciones-mi-plan/circulo-brand-sinaptix.png` (RGBA con
+   transparencia real, mismo formato que las demás ilustraciones de "Mi
+   plan"). `svg/deco-circle-brand.svg` (el círculo dibujado a mano por
+   Claude) se borró, ya no se usa. `.miplan-brand-circled::after` pasa a
+   apuntar a este PNG en vez del SVG; los offsets (`left/right/top/
+   bottom`) se retocaron un poco porque esta imagen viene recortada más
+   ajustada al trazo que el SVG anterior (que tenía más margen interno
+   en su propio viewBox).
+
+Verificado con Playwright (mock de `netlifyIdentity`, tipografía real
+`Caveat` vía `typeface-caveat` de npm, igual que la tanda anterior — no
+queda nada de eso en el repo): desktop (1600px), mobile (390px) y una
+pasada de overflow horizontal en 1600/1024/390px, todas en 0. Título
+centrado en el ancho del `.wrap` en las 3. 54/54 tests ok.
 
 ## 2026-09-16 (décimocuarta tanda) — "SINAPTIX" encerrado en el título de "Mi plan"
 

@@ -345,27 +345,24 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 
 /* "SINAPTIX" en el título de "Mi plan" ("Tu progreso con SINAPTIX"): a
-   pedido del usuario, encerrado con un círculo dibujado a mano (mismo
-   lenguaje visual que el resto de decos del sitio, un solo <path> con
-   stroke) en color turquesa (tomado de una referencia que trajo el
-   usuario, no es un color de marca existente — por eso vive como color
-   fijo en el SVG, `svg/deco-circle-brand.svg`, y no como variable de
-   :root) y en el morado de marca (`--purple-dark`, el mismo que usa
+   pedido del usuario, encerrado con un círculo dibujado a mano en color
+   turquesa, en el morado de marca (`--purple-dark`, el mismo que usa
    "SINAPTIX" en el logo de la nav, `.nav .mark`) en vez del color de
-   texto normal del título. El círculo es un `::after` con
-   background-image (mismo mecanismo que `.title-mark` más arriba) en vez
-   de una `<img>` aparte, para que se recorte solo a esta palabra sin
-   tocar el resto del `<h2>`; `preserveAspectRatio="none"` en el SVG (a
-   diferencia de los otros decos) porque acá el círculo tiene que
-   estirarse para calzar con el ancho real de la palabra en vez de
-   mantener su proporción original. */
+   texto normal del título. El círculo es la foto de referencia real que
+   trajo el usuario (rayado tipo crayón/marcador sobre papel, no un SVG
+   dibujado a mano por Claude como en el primer intento de esta sesión):
+   se le sacó el fondo de papel (quedó transparente) y se recortó
+   ajustado al trazo, ver `img/ilustraciones-mi-plan/circulo-brand-
+   sinaptix.png`. Va como `::after` con background-image (mismo mecanismo
+   que `.title-mark` más arriba) en vez de una `<img>` aparte, para que
+   se recorte solo a esta palabra sin tocar el resto del `<h2>`. */
 .miplan-brand-circled{
   display:inline-block;position:relative;color:var(--purple-dark);
 }
 .miplan-brand-circled::after{
   content:'';position:absolute;pointer-events:none;
-  left:-7%;right:-15%;top:-24%;bottom:-30%;
-  background-image:url(../svg/deco-circle-brand.svg);
+  left:-9%;right:-17%;top:-30%;bottom:-38%;
+  background-image:url(../img/ilustraciones-mi-plan/circulo-brand-sinaptix.png);
   background-repeat:no-repeat;background-size:100% 100%;
 }
 
@@ -620,8 +617,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    `section`/`footer` en general, así que index.html sigue igual). */
 #miPlan{padding:88px 0 40px;min-height:100vh;box-sizing:border-box;overflow:hidden}
 #miPlan footer{margin-top:28px}
-#miPlanConSesion .sec-head-center .lam-title{margin:14px 0 6px}
-#miPlanConSesion .sec-head-center .lam-text{margin:0}
+/* margin-top/bottom en vez de shorthand `margin`: shorthand pisaba
+   margin-left/right a 0, cancelando el `margin:auto` que centra el
+   título (`.sec-head-center .lam-title{margin-left:auto;margin-right:
+   auto}` más arriba) — el título quedaba pegado a la izquierda en vez de
+   centrado en el ancho de "Mi plan" (reportado por el usuario con
+   captura). Mismo motivo en la regla de `.lam-text` de abajo, aunque hoy
+   no hay ningún `.lam-text` bajo `.sec-head-center` en mi-plan.html. */
+#miPlanConSesion .sec-head-center .lam-title{margin-top:14px;margin-bottom:6px}
+#miPlanConSesion .sec-head-center .lam-text{margin-top:0;margin-bottom:0}
 #miPlan .miplan-subhead{margin-bottom:12px}
 #miPlan .stat-box,
 #miPlan .bar-chart-card,
