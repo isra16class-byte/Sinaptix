@@ -8,6 +8,40 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (vigesimonovena tanda) — Círculo de "SINAPTIX" recoloreado a dorado
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario preguntó si se le podía cambiar el color al círculo de la
+tanda anterior (la foto real, turquesa) y dejó la elección del color en
+manos de Claude ("sorpréndeme"). Se eligió `--gold` (`#C1703B`): es el
+mismo dorado que ya usan la tarjeta "Objetivo cognitivo" y "Ajustado a
+tu caso" en esta misma pantalla, así que conecta el círculo con el resto
+de "Mi plan" — el turquesa original no pertenecía a la paleta del sitio.
+No se tocó el color del texto ("SINAPTIX" sigue en `--purple-dark`) ni
+"Tu progreso con".
+
+- El recoloreado se hizo a nivel de píxel sobre la misma foto (no un
+  filtro CSS): se tomó la luminosidad (L de HLS) de cada píxel del
+  turquesa original — ahí vive la textura de crayón (vetas más claras/
+  oscuras) — y se le aplicó el matiz/saturación del dorado de marca,
+  manteniendo esa L. El turquesa de la foto es bastante más oscuro que
+  el dorado de marca (mediana L~0.34 contra L~0.49 del `--gold` real),
+  así que sin ajuste salía marrón apagado; se subió el nivel general
+  +0.13 (tope 0.92) para que saliera dorado vívido.
+  `img/ilustraciones-mi-plan/circulo-brand-sinaptix.png` se reemplaza en
+  el mismo archivo (mismo recorte/tamaño que la tanda anterior, ver ahí
+  el proceso de sacarle el fondo de papel).
+- `css/styles.css`: solo se actualizó el comentario de
+  `.miplan-brand-circled` explicando la elección de color y el método de
+  recoloreado — la regla en sí (offsets del `::after`) no cambió, es la
+  misma imagen con los mismos bordes.
+
+Verificado con Playwright (tipografía real vía `typeface-caveat`, no
+queda en el repo): desktop y mobile, buen contraste contra el morado del
+texto y contra el fondo de la pantalla. 54/54 tests ok (cambio de imagen
++ comentario CSS, sin lógica).
+
 ## 2026-09-17 (vigesimoctava tanda) — Fondo pastel por tarjeta de Visión, a juego con el color de cada ícono
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

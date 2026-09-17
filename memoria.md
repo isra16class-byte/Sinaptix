@@ -1149,23 +1149,30 @@ Prioridad 2.
   desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
   `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
 - **Título "Tu progreso con SINAPTIX" — palabra "SINAPTIX" encerrada**
-  (sesión 2026-09-16, décimocuarta y décimoquinta tanda): solo esa
+  (sesión 2026-09-16/17, décimocuarta a vigesimonovena tanda): solo esa
   palabra vive en `<span class="miplan-brand-circled">`, con texto en
   `--purple-dark` y un círculo como `::after` con `background-image`.
   **El círculo es una foto real** (recorte de `img/ilustraciones-mi-plan/
-  circulo-brand-sinaptix.png`, un trazo de crayón/marcador turquesa sobre
-  papel al que se le sacó el fondo y quedó con transparencia real —
-  **no** un SVG dibujado a mano por Claude; hubo un intento SVG en la
-  décimocuarta tanda, `svg/deco-circle-brand.svg`, que el usuario pidió
-  reemplazar por esta foto en la décimoquinta porque "se veía simple", y
-  ese SVG ya no existe). El color turquesa es el de la foto, no una
-  variable de `:root` — es una referencia puntual del usuario, no de la
-  paleta de marca. Si algún día cambia el texto de este título o su
-  tamaño de fuente, revisar los offsets de `.miplan-brand-circled::after`
-  (`left/right/top/bottom`, en `%` relativos al propio `<span>`) — están
-  ajustados a ojo para "SINAPTIX" en `Caveat` 700 contra esta imagen
-  puntual, no son un cálculo genérico (si se cambia la imagen por otra
-  con distinto recorte/proporción, hay que volver a ajustarlos).
+  circulo-brand-sinaptix.png`, un trazo de crayón/marcador sobre papel al
+  que se le sacó el fondo y quedó con transparencia real — **no** un SVG
+  dibujado a mano por Claude; hubo un intento SVG en la décimocuarta
+  tanda, `svg/deco-circle-brand.svg`, que el usuario pidió reemplazar por
+  esta foto en la décimoquinta porque "se veía simple", y ese SVG ya no
+  existe). **Color actual: `--gold`** (`#C1703B`, tanda vigesimonovena —
+  el usuario pidió cambiarle el color y dejó la elección a Claude; el
+  original de la foto era turquesa, quedó reemplazado en el mismo
+  archivo). El recoloreado se hace a nivel de píxel conservando la
+  textura real de crayón (luminosidad de cada píxel del color viejo +
+  matiz/saturación del color nuevo, con un ajuste de nivel si el color
+  nuevo es más claro/oscuro que el viejo — ver el script de esa sesión si
+  hay que volver a recolorear esta imagen a otro tono) — el color final
+  **no** es una variable de `:root`, vive fijo en los píxeles del PNG. Si
+  algún día cambia el texto de este título o su tamaño de fuente, revisar
+  los offsets de `.miplan-brand-circled::after` (`left/right/top/
+  bottom`, en `%` relativos al propio `<span>`) — están ajustados a ojo
+  para "SINAPTIX" en `Caveat` 700 contra esta imagen puntual (su recorte/
+  proporción no cambió al recolorearla, así que los offsets siguen
+  valiendo), no son un cálculo genérico.
   **Ojo con `margin` shorthand en `#miPlanConSesion .sec-head-center
   .lam-title`**: en la décimocuarta tanda quedó con `margin:14px 0 6px`,
   que sin querer pisaba el `margin-left/right:auto` que centra el título

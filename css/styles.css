@@ -345,14 +345,24 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 
 /* "SINAPTIX" en el título de "Mi plan" ("Tu progreso con SINAPTIX"): a
-   pedido del usuario, encerrado con un círculo dibujado a mano en color
-   turquesa, en el morado de marca (`--purple-dark`, el mismo que usa
-   "SINAPTIX" en el logo de la nav, `.nav .mark`) en vez del color de
-   texto normal del título. El círculo es la foto de referencia real que
-   trajo el usuario (rayado tipo crayón/marcador sobre papel, no un SVG
-   dibujado a mano por Claude como en el primer intento de esta sesión):
-   se le sacó el fondo de papel (quedó transparente) y se recortó
-   ajustado al trazo, ver `img/ilustraciones-mi-plan/circulo-brand-
+   pedido del usuario, encerrado con un círculo dibujado a mano, en el
+   morado de marca (`--purple-dark`, el mismo que usa "SINAPTIX" en el
+   logo de la nav, `.nav .mark`) en vez del color de texto normal del
+   título. El círculo sale de la foto de referencia real que trajo el
+   usuario (rayado tipo crayón/marcador sobre papel, no un SVG dibujado a
+   mano por Claude como en el primer intento de esta sesión): se le sacó
+   el fondo de papel (quedó transparente), se recortó ajustado al trazo y
+   se recoloreó de turquesa (el color original de la foto) a `--gold`
+   (`#C1703B`) — decisión de diseño de Claude, el usuario pidió elegir el
+   color ("sorpréndeme"): dorado conecta el círculo con el resto de la
+   pantalla (la tarjeta "Objetivo cognitivo" de acá abajo y "Ajustado a
+   tu caso" ya usan ese mismo dorado), cosa que el turquesa —ajeno a la
+   paleta del sitio— no hacía. El recoloreado conserva la textura de
+   crayón real (se tomó la luminosidad de cada píxel del turquesa
+   original y se le aplicó el matiz/saturación del dorado, subiendo el
+   nivel general +0.13 porque el turquesa de la foto es más oscuro que el
+   dorado de marca — sin ese ajuste salía marrón apagado en vez de
+   dorado vivo). Ver `img/ilustraciones-mi-plan/circulo-brand-
    sinaptix.png`. Va como `::after` con background-image (mismo mecanismo
    que `.title-mark` más arriba) en vez de una `<img>` aparte, para que
    se recorte solo a esta palabra sin tocar el resto del `<h2>`. */
