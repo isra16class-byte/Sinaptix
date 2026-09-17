@@ -8,6 +8,68 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (cuadragésima segunda tanda) — íconos de Visión recortados de nuevo, sin artefactos de fondo
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario mandó una captura del sitio corriendo en local (`127.0.0.1:5500`)
+mostrando que los 4 íconos de `#lam-02` (Visión) ya eran visibles (fix de
+la tanda anterior funcionó) pero se veían mal: bordes pixelados/en
+escalera y un halo blanquecino cuadrado alrededor de cada uno, sobre todo
+notorio en cerebro y reloj de arena.
+
+- **Causa**: los 4 archivos en `img/decoraciones-neurona/vision-iconos/`
+  se habían generado en una sesión anterior con un método de
+  segmentación por IA (tipo "remove.bg") sobre el recorte ya compuesto,
+  en vez de aprovechar el canal alfa real que ya trae
+  `fondo-vision-red.webp`. Esa segmentación por IA metía artefactos
+  (bordes con escalera, manchas semitransparentes) que no existían en
+  el archivo fuente.
+- **Fix**: mismo criterio que ya usa `scripts/separar-iconos-vision.py`
+  (recortar directo por transparencia real, sin IA) pero con dos mejoras:
+  1. Antes de buscar el bounding box de cada ícono, se ponen en alfa 0
+     los píxeles con alfa < 60 — descarta los listones/líneas decorativas
+     de fondo (alfa muy bajo, <20 típicamente) para que no se cuelen
+     dentro del recorte de cada ícono ni corran el bounding box.
+  2. El bounding box de cada ícono se calcula por **componentes
+     conectados** (`scipy.ndimage.label`) en vez de una ventana de
+     búsqueda por porcentaje fija — más robusto si el ícono no está
+     exactamente donde se lo esperaba.
+  Recortado con margen chico (6px) de aire alrededor, mismo criterio que
+  `MARGEN_PX` del script existente. Fuente: `fondo-vision-red.webp` (la
+  versión ya agrandada ~1.35x, no el archivo original que subió el
+  usuario en el chat) — importante para que las proporciones de cada
+  ícono sigan coincidiendo con los `width`/`left`/`top` en % que ya
+  calibró `.vision-icon--*` en `css/styles.css`; se comparó el ratio
+  ancho/alto de cada ícono nuevo contra el viejo y quedó prácticamente
+  igual (cerebro 1.56→1.52, red neuronal 1.72→1.69, reloj 0.81→0.76,
+  cintas 1.37→1.34).
+- **No se tocó** `index.html` ni `css/styles.css` — mismos 4 nombres de
+  archivo (`icon-cerebro.webp`, `icon-red-neuronal.webp`,
+  `icon-reloj-arena.webp`, `icon-cintas-azules.webp`), mismo directorio,
+  solo cambió el contenido de los WEBP.
+- **Nota (no regresión, preexistente)**: 3 de los 4 íconos (red neuronal,
+  reloj de arena, cintas azules) ya venían levemente cortados contra el
+  borde del lienzo de 1700×1040 desde el agrandado de una sesión
+  anterior — se confirmó con `git stash` que el archivo commiteado
+  anterior **ya tenía el mismo corte** (p. ej. `icon-red-neuronal.webp`
+  con alfa=255 en la fila 0). Este patch no lo corrige, solo deja de
+  agregar artefactos de IA encima; si se quiere arreglar el corte en sí
+  hace falta volver a agrandar el ícono dentro de un lienzo con más
+  margen, tarea aparte.
+- **Verificación**: de nuevo sin Chromium/Playwright disponible en este
+  entorno (falla por falta de red al dominio de descarga, igual que
+  tandas anteriores). Se revisó a ojo cada WEBP resultante (los 4, ver
+  detalle de proporciones arriba) y se confirmó con `git stash`/`git
+  stash pop` el contenido de los archivos antes de tocarlos. **Falta**
+  confirmar en el navegador real del usuario que ahora se ven limpios
+  (sin el halo/escalera de la captura) y que el tamaño/posición sigue
+  bien (no debería cambiar, mismas proporciones, pero no se verificó
+  con una captura nueva).
+- No se tocó JS, `npm test` no debería verse afectado (solo cambian 4
+  WEBP).
+- Actualizados `memoria.md` y este archivo.
+
 ## 2026-09-17 (cuadragésima primera tanda) — fix: los 4 íconos de Visión no se veían (display:none sin revertir)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

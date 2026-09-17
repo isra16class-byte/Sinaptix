@@ -1622,6 +1622,20 @@ tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
 
+**Íconos de Visión recortados de nuevo sin artefactos de IA (sesión
+2026-09-17, cuadragésima segunda tanda).** Los 4 WEBP de
+`img/decoraciones-neurona/vision-iconos/` (que la tanda anterior había
+generado con segmentación por IA sobre el recorte ya compuesto) se
+volvieron a recortar desde `fondo-vision-red.webp` aprovechando su canal
+alfa real (mismo criterio que `scripts/separar-iconos-vision.py`, sin
+IA), lo que eliminó el halo blanquecino/bordes en escalera que el
+usuario reportó viendo en local. Detalle completo en `changelog.md`,
+cuadragésima segunda tanda. **Falta**: confirmar en el navegador que se
+ven limpios y bien posicionados (no se pudo tomar captura nueva en esta
+sesión). Sigue sin resolverse el corte contra el borde del lienzo en 3
+de los 4 íconos (preexistente, no introducido en esta tanda — ver nota
+en el changelog).
+
 **Íconos de Visión separados en 4 archivos individuales (sesión
 2026-09-17, cuadragésima/cuadragésima primera tanda) — bug encontrado y
 corregido.** La primera vuelta (cuadragésima tanda) se hizo sin
