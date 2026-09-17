@@ -141,13 +141,13 @@ SUPERSAMPLE_SCALE = 2
 # reloj de arena abajo-izq., cintas azules abajo-der. — con ~180px de
 # margen contra los bordes laterales y sin overlap entre elementos
 # (ver memoria.md para el detalle de por qué se eligió este layout).
-ELEMENTO_CEREBRO = ("elemento-energia-cerebral", 400, 300, 420, 380)
-ELEMENTO_RELOJ_ARENA = ("elemento-semanas-progreso", 400, 780, 280, 520)
-ELEMENTO_CINTAS_AZULES = ("elemento-acompanamiento-1a1", 1300, 780, 400, 400)
+ELEMENTO_CEREBRO = ("elemento-energia-cerebral", 400, 200, 400, 340)
+ELEMENTO_RELOJ_ARENA = ("elemento-semanas-progreso", 400, 840, 260, 460)
+ELEMENTO_CINTAS_AZULES = ("elemento-acompanamiento-1a1", 1300, 840, 380, 380)
 # La red neuronal es el único elemento con 2 variantes posibles (ver más
 # abajo, VARIANTES_RED_NEURONAL) — comparte la misma posición/tamaño en
 # ambos lienzos, solo cambia qué imagen se usa.
-RED_NEURONAL_CENTRO = (1300, 300)
+RED_NEURONAL_CENTRO = (1300, 200)
 RED_NEURONAL_MAX = (440, 440)
 
 ELEMENTOS_FIJOS = [ELEMENTO_CEREBRO, ELEMENTO_RELOJ_ARENA, ELEMENTO_CINTAS_AZULES]
