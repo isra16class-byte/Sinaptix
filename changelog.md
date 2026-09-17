@@ -8,6 +8,57 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (trigésima octava tanda) — Script `scripts/generar-fondo-vision.py`: la composición del fondo de Visión queda reproducible por código
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+A pedido del usuario, se sube al repo el script Python usado en una
+sesión anterior para armar `fondo-vision-nuevo-redonda.webp` y
+`fondo-vision-nuevo-corazon.webp`, en vez de dejar esa lógica solo como
+código de una sesión de chat que no queda documentado en ningún lado del
+repo.
+
+Se creó la carpeta `scripts/` (no existía convención previa en el repo
+para este tipo de herramientas — `tests/` es la única carpeta de
+tooling que había hasta ahora). Adentro: `generar-fondo-vision.py`.
+
+El script consolida los 2 pasos que se habían hecho por separado en la
+sesión anterior (recorte de cada elemento + composición del lienzo) en
+un único archivo corrible con `python3 scripts/generar-fondo-vision.py`
+desde la raíz del repo (requiere `pillow numpy scipy`). Todos los
+parámetros quedaron como constantes nombradas y comentadas en el propio
+script, en vez de números sueltos sin explicar:
+
+- Recorte de cada elemento: `UMBRAL_BLANCO_BAJO`/`UMBRAL_BLANCO_ALTO`
+  (degradado de transparencia sobre la luminosidad del pixel) y
+  `AUTOCROP_PADDING`.
+- Posición/tamaño de cada elemento dentro del lienzo 1700×1040:
+  `ELEMENTO_CEREBRO`, `ELEMENTO_RELOJ_ARENA`, `ELEMENTO_CINTAS_AZULES`
+  (tuplas `nombre, centro_x, centro_y, ancho_max, alto_max`) y
+  `RED_NEURONAL_CENTRO`/`RED_NEURONAL_MAX` + `VARIANTES_RED_NEURONAL`
+  (qué archivo de salida usa qué variante de red neuronal).
+- Estilo de los listones conectores: `RIBBON_COLOR`,
+  `RIBBON_LINES_PER_BUNDLE`, `RIBBON_BASE_ALPHA`, `RIBBON_LINE_WIDTH`,
+  `RIBBON_SEED_BASE`, y los 6 haces de puntos de control en
+  `LISTONES_PUNTOS_DE_CONTROL`.
+
+Se verificó que correr el script reproduce **exactamente** (diff de
+píxeles = 0) los 2 `.webp` que ya estaban commiteados de sesiones
+anteriores — no se tocó el resultado visual, solo se documentó y se dejó
+reproducible.
+
+No se tocó `index.html`, `css/styles.css`, ningún `.js`, ni los
+`elemento-*.webp` de origen ni los 2 `fondo-vision-nuevo-*.webp` ya
+commiteados (el script los regenera idénticos si hace falta, pero no se
+re-commitearon en esta tanda). No se corrió Playwright (no aplica, nada
+integrado en el sitio todavía). Tests sin cambios.
+
+**Nota sobre esta tanda:** el patch original de esta sesión se había
+generado sobre una base de `main` desactualizada (no incluía el commit
+de la tanda trigésima séptima, el fix de escala/alineación) y no aplicó
+con `git am`. Se reconstruyó a mano el mismo contenido (script +
+entradas de memoria/changelog) sobre la base correcta.
+
 ## 2026-09-17 (trigésima séptima tanda) — Fix de escala/alineación de las anotaciones de Visión en pantallas anchas
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.

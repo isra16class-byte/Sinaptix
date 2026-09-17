@@ -741,6 +741,14 @@ Prioridad 2.
   (arriba-izq.), red neuronal (arriba-der.), reloj de arena
   (abajo-izq.), cintas azules (abajo-der.), listones conectores
   dibujados por código (curvas `CubicSpline`, mauve translúcido).
+  **Esta composición es reproducible por código**: `scripts/generar-fondo-vision.py`
+  (sesión 2026-09-17, trigésima octava tanda) reconstruye ambos lienzos
+  (`-redonda` y `-corazon`) desde cero a partir de los 5 `elemento-*.webp`
+  — ver "Pendientes conocidos" más abajo, o el propio script, para el
+  detalle de cada constante (posición/tamaño de los 4 elementos, puntos
+  de control de los listones, estilo). Si hace falta mover o agrandar
+  algún elemento, conviene tocar las constantes del script y volver a
+  correrlo en vez de editar los `.webp` a mano.
   **El `width` en `vw`/`clamp()` y el bleed en `right`/`top` que tuvo
   esta imagen en las tandas anteriores ya no existen** — sesión
   2026-09-17 (trigésima séptima tanda) la pasó a vivir dentro de
@@ -1638,6 +1646,27 @@ fondo (curvas suaves tipo `CubicSpline`, varias líneas finas por haz con
 jitter aleatorio, color mauve `rgb(130,95,115)` con alpha bajo,
 supersampleado 2x para antialiasing) se generaron por código para poder
 controlar el espaciado, en vez de pedírselos a la IA.
+
+**El script que arma estos 2 lienzos está en el repo** (sesión
+2026-09-17, trigésima octava tanda): `scripts/generar-fondo-vision.py`.
+Corriéndolo desde la raíz del repo (`python3 scripts/generar-fondo-vision.py`,
+requiere `pillow numpy scipy`) reproduce exactamente
+`fondo-vision-nuevo-redonda.webp` y `fondo-vision-nuevo-corazon.webp` a
+partir de los 5 `elemento-*.webp` — verificado pixel a pixel (diff 0)
+contra los archivos ya commiteados. Todas las constantes relevantes están
+nombradas y comentadas dentro del script (no hardcodeadas sin explicar):
+posición/tamaño de cada elemento dentro del lienzo 1700×1040
+(`ELEMENTO_CEREBRO`, `ELEMENTO_RELOJ_ARENA`, `ELEMENTO_CINTAS_AZULES`,
+`RED_NEURONAL_CENTRO`/`RED_NEURONAL_MAX`), los puntos de control de los 6
+haces de listones (`LISTONES_PUNTOS_DE_CONTROL`), y los parámetros de
+estilo de los listones (`RIBBON_COLOR`, `RIBBON_LINES_PER_BUNDLE`,
+`RIBBON_BASE_ALPHA`, `RIBBON_LINE_WIDTH`, `RIBBON_SEED_BASE`) y del
+recorte de cada elemento (`UMBRAL_BLANCO_BAJO`/`UMBRAL_BLANCO_ALTO`,
+`AUTOCROP_PADDING`). Si en una próxima sesión hace falta mover o agrandar
+algún elemento (por ejemplo para separarlos más y dejar lugar a texto
+entre ellos), conviene tocar las constantes del script y volver a
+correrlo en vez de editar los `.webp` a mano, para que quede
+reproducible.
 
 **Integración hecha (sesión 2026-09-17, décima tanda):**
 1. El usuario confirmó la variante "redonda" (cúmulo esférico) sobre la
