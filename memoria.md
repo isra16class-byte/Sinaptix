@@ -833,7 +833,7 @@ Prioridad 2.
   otras 3 (mismo criterio de siempre): `92×92px` (venía de `78px`),
   `top/right:8px` (venía de `10px`), `.num{padding-right:106px}` (venía
   de `88px`), `.lab{margin-top:22px}` (venía de `20px`). **Color de los 4
-  íconos:** pasaron de `--ink` (casi
+  íconos — historial:** primero pasaron de `--ink` (casi
   negro) al morado de marca (`--purple`, `#714B67`) a pedido del
   usuario — hardcodeado dentro de cada `.svg` (no vía CSS: son `<img>`,
   no inline, no leen variables de `:root`), ver "Estructura de archivos"
@@ -841,7 +841,20 @@ Prioridad 2.
   Playwright en 1920px (desktop) y 390px (mobile, sin cambios). Antes
   el fondo era morado oscuro (`rgba(75,46,69,.6)`) con texto blanco +
   glow — se cambió a pedido del usuario (13ª tanda, 2026-09-15, ver
-  `changelog.md`). El título de esta sección (`El cerebro también se
+  `changelog.md`). **Sesión 2026-09-17 (octava tanda): cada tarjeta pasó
+  a tener su propio color** (en vez de las 4 en el mismo morado), a
+  pedido del usuario, para que se distingan entre sí y llamen más la
+  atención: `icon-bateria-rayo.svg` ("20%") a dorado (`--gold`,
+  `#C1703B`), `icon-calendario-check.svg` ("4–6") a verde (`--green`,
+  `#2E7D5B`), `icon-conversacion.svg` ("1:1") a azul (`--navy-bright`,
+  `#3B6EA5`); `icon-red-nodos.svg` ("86B") se dejó en el morado de marca
+  (mismo valor `#714B67` que ya tenía) por ser el color que más asocia
+  el sitio con "red neuronal/cerebro". Los 4 colores ya existían en
+  `:root` (ninguno nuevo) y son los mismos que usa el resto del sitio
+  (`--gold` en los íconos de los bullets de esta sección, `--green` en
+  Beneficios), así que combinan con la paleta general. Mismo mecanismo
+  de siempre: color hardcodeado en el `fill` del `<g>` que envuelve el
+  dibujo dentro de cada `.svg`. El título de esta sección (`El cerebro también se
   alimenta`) es un `<h2 class="lam-title">` normal, **sin** `display:flex`
   inline (se sacó en la misma tanda: causaba que el texto se envolviera
   letra por letra en vez de fluir normal — ver `changelog.md` para el
@@ -1525,6 +1538,16 @@ dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
 tests sin cambios (46/46 ok, este fix es puro CSS).
 
 ## Pendientes conocidos
+
+**Íconos de las tarjetas de Visión con color propio (sesión 2026-09-17)
+— falta verificación visual.** Ver `changelog.md` y "Estado actual del
+diseño" → Visión → "Color de los 4 íconos" para el detalle (dorado,
+verde, azul y morado en vez de los 4 en morado uniforme). No se pudo
+correr Playwright en esta sesión — revisado a mano abriendo cada
+`.svg`. Falta confirmar en un navegador real que los 4 colores se lean
+bien contra el fondo translúcido de cada tarjeta (incluida la
+destacada, `.is-featured`, con fondo un poco más blanco) y que no
+queden dos colores demasiado parecidos entre sí a simple vista.
 
 **Tarjetas de Visión más grandes + fix de cascada (sesión 2026-09-17) —
 falta verificación visual.** Ver `changelog.md` para el detalle del bug

@@ -8,6 +8,36 @@
 > wizard de nutrición, "Mi plan", backend, ilustraciones, etc.) quedó
 > archivado completo en `historico/changelog-2026-09-14.md`.
 
+## 2026-09-17 (vigesimoséptima tanda) — Cada ícono de las tarjetas de Visión con su propio color
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió colorear los íconos de las 4 tarjetas de Visión
+(`#lam-02`) para que llamaran más la atención — hasta ahora los 4 usaban
+el mismo morado de marca (`#714B67`), lo que los hacía menos
+diferenciables entre sí a simple vista.
+
+- `svg/icon-bateria-rayo.svg` ("20%"): `fill="#714B67"` →
+  `fill="#C1703B"` (`--gold`).
+- `svg/icon-calendario-check.svg` ("4–6"): `fill="#714B67"` →
+  `fill="#2E7D5B"` (`--green`).
+- `svg/icon-conversacion.svg` ("1:1"): `fill="#714B67"` →
+  `fill="#3B6EA5"` (`--navy-bright`).
+- `svg/icon-red-nodos.svg` ("86B"): sin cambios, se mantiene en
+  `#714B67` (`--purple`, color de marca) por asociarse más directamente
+  con "red neuronal".
+- Los 4 colores son variables que ya existían en `:root` — no se agregó
+  ningún color nuevo a la paleta, y son los mismos tonos que ya se usan
+  en otras partes del sitio (`--gold` en los bullets de esta misma
+  sección, `--green` en Beneficios).
+- Cambio quirúrgico: en cada `.svg` es un único `fill` en el `<g>` que
+  envuelve todo el dibujo (confirmado que solo había una ocurrencia por
+  archivo antes de reemplazar). No se tocó HTML/CSS/JS.
+- No se pudo correr Playwright en esta sesión (sin acceso de red al
+  dominio de descarga del browser desde este entorno) — revisado a
+  mano abriendo cada `.svg`. **Falta verificación visual en un
+  navegador real.**
+
 ## 2026-09-17 (vigesimosexta tanda) — Tarjetas de Visión más grandes (y fix de un bug de cascada que las dejaba sin efecto)
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
