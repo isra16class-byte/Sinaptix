@@ -11,6 +11,21 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-17 (quinta tanda) — Beneficios: "Para quién es" vuelve a ser lista + calificación real en testimonios
+
+Dos ajustes a pedido del usuario sobre el rediseño de la tanda anterior:
+
+- **"Para quién es"**: el grid 2x2 (`.ben-audience-grid`) vuelve a ser una
+  lista vertical de 1 columna (ícono a la izquierda + texto a la derecha,
+  en fila), sin perder los 4 íconos de línea nuevos. Mismo HTML, solo
+  cambió el CSS de `.ben-audience-grid`/`.ben-audience-item` (de grid a
+  flex column / flex row).
+- **`.quote-stars`**: ahora reflejan una calificación real en vez de estar
+  todas outline. Se agregó `.quote-stars svg.is-filled{fill:var(--gold)}`
+  y se marcó la clase en el HTML: testimonio de M.R. con 4/5 estrellas,
+  testimonio de J.S. con 5/5.
+- Verificado con Playwright en 1440px y 390px.
+
 ## 2026-09-17 (cuarta tanda) — Beneficios: rediseño de "Para quién es" y de las tarjetas de testimonio
 
 Rediseño visual de `#lam-05` (Beneficios) a pedido del usuario, a partir de
