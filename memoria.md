@@ -246,6 +246,12 @@ próximos pasos).
     (`svg/deco-blob-orange.svg` — este asset ya traía su propio halo/blob
     suave detrás del gajo, es el mismo efecto de "círculo detrás de la
     fruta" que pedía la referencia, no se agregó CSS nuevo para eso).
+    **Recorte de la granada** (ajuste a continuación, mismo pedido): el
+    usuario pidió que la granada se vea "menos de la mitad" en vez de
+    casi completa — se corrió todo el cluster hacia la derecha
+    (`right` más negativo en los 3 elementos, mismo delta de 80px) para
+    que el borde del `<section>` corte la granada bastante antes de su
+    mitad (queda ~39% visible, `right:-110px` sobre `width:180px`).
     No hay asset de hoja rellena tipo perejil en el repo (la única hoja
     disponible es este trazo fino en un solo color) — si el usuario pide
     que se note más, es de las primeras cosas a ajustar (agrandar/subir

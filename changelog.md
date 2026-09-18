@@ -11,6 +11,31 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-17 (tercera tanda) — Pilares: recortar más la granada del cluster junto al título
+
+Commit: ver hash en el archivo `.patch` generado para esta tanda.
+
+El usuario pidió, sobre el cluster agregado en la tanda anterior, correr
+las 3 decoraciones (granada, hoja, naranja) más hacia la derecha para
+que la granada se vea "menos de la mitad" en vez de casi completa.
+
+- Se restó 80px al `right` de los 3 elementos del cluster en `#lam-04`
+  (granada `-30px→-110px`, hoja `150px→70px`, naranja `30px→-50px`),
+  moviendo el grupo entero hacia el borde derecho sin cambiar tamaños,
+  opacidades ni el orden vertical entre ellos.
+- Con `width:180px` y `right:-110px`, la granada queda con ~70px
+  visibles dentro de `.wrap` (≈39%), cumple el pedido de "menos de la
+  mitad".
+- Verificado con Playwright real, desktop 1440px: la granada se ve
+  claramente recortada, la naranja también queda parcialmente cortada
+  por el mismo corrimiento (antes estaba completa) — no reportado como
+  problema, mismo criterio de "bleed" que el resto del sitio, revisar si
+  el usuario lo nota. Mobile no se vuelve a verificar (esta sección se
+  sigue ocultando entera por la regla general de `.deco-fruit` en
+  `<720px`, sin cambios ahí).
+- Sin cambios de CSS/JS, solo los 3 atributos `style` de `index.html`.
+- Actualizados `memoria.md` y este archivo.
+
 ## 2026-09-17 (segunda tanda) — Pilares: frutas/alimentos grandes difuminados de fondo + cluster con naranja junto al título
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
