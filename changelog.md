@@ -11,6 +11,47 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Collage de redes integrado en `#lam-06` "Conócenos", verificado con Playwright
+
+Se retoma la sesión anterior (que había dejado listo el asset recortado
+pero sin integrar) — el usuario pidió avanzar con la integración real en
+el mismo turno.
+
+- `index.html`: `.contact-info` (columna de texto/redes que ya existía) se
+  envolvió junto a una nueva `.conocenos-collage` dentro de un contenedor
+  `.conocenos-grid`, para pasar de 1 a 2 columnas en desktop. La nueva
+  columna es una sola `<img>` apuntando a
+  `img/generadas-cutout/collage-redes-miplan.webp` (el asset ya recortado
+  en la sesión anterior), `alt=""` + `aria-hidden="true"` (decorativa/
+  prueba social, el contacto accesible real sigue en `.social-cards`).
+- `css/styles.css`: `.conocenos-grid{grid-template-columns:1fr .95fr}`,
+  colapsa a 1 columna en `≤900px` (mismo breakpoint que `.hero-grid`/
+  `.ben-grid`). A diferencia de las `.deco-fruit` de esta sección
+  (decoración pura, ocultas en mobile), esta imagen se sigue mostrando en
+  `≤900px`, solo se centra y achica (`max-width:520px`) — tiene valor de
+  contenido, no es decoración de fondo. `.conocenos-collage-img` reusa
+  `@keyframes float` del sitio + `drop-shadow`, respeta
+  `prefers-reduced-motion`.
+- **Novedad de entorno, importante para sesiones futuras**: esta sesión
+  **sí tenía Chromium/Playwright disponible**
+  (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`), a diferencia de lo que
+  asumían sesiones anteriores ("no hay browser en este entorno" aparece
+  varias veces en pendientes viejos). Se pudo abrir `index.html` con
+  `file://` directo (sitio estático) y sacar screenshots reales de
+  `#lam-06` a 1440px y 390px — primera vez que se verifica esta sección
+  visualmente en vez de "a ojo" leyendo el CSS. En ambos anchos: el
+  collage no se superpone de forma problemática con las `deco-fruit` de
+  fondo existentes (granada, kiwi, salmón), no hay overflow horizontal,
+  y en mobile queda centrado debajo de las tarjetas de redes. Se agregó
+  una nota en `memoria.md` → "Pendientes conocidos" pidiendo que
+  cualquier sesión futura con pendientes de verificación visual
+  **pruebe primero si Playwright está disponible** en vez de asumir que
+  no (el entorno se resetea entre sesiones, así que puede o no estarlo).
+- Sigue pendiente (sin tocar en esta sesión): decidir si se saca la
+  tarjeta de Facebook de `.social-cards` — el usuario mencionó que
+  "Facebook pidió que lo eliminemos" pero fue un comentario al pasar, no
+  un pedido explícito.
+
 ## 2026-09-18 — Asset listo para collage de redes en `#lam-06` "Conócenos" (integración pendiente)
 
 Sesión enfocada solo en preparar un asset de imagen, no en tocar código de

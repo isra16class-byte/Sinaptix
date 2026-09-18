@@ -1504,6 +1504,31 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    info quedó sola: .contact-info en vez de grid, ancho limitado para
    que no se estire a todo lo ancho de .wrap en desktop. */
 .contact-info{max-width:640px}
+
+/* Collage de redes (sesión 2026-09-18): vuelve a haber 2 columnas, pero
+   ahora la segunda no es el viejo formulario sino una imagen — un
+   collage tipo "app showcase" (capturas del perfil de SINAPTIX en
+   Instagram/TikTok/Gmail + el dashboard de "Mi plan") generado con
+   Gemini y recortado (fondo transparente) en este entorno con Python/
+   Pillow. Mismo criterio de proporción que `.hero-grid` (columna de
+   imagen un poco más angosta que la de texto) y mismo breakpoint de
+   colapso a 1 columna que `.hero-grid`/`.ben-grid` (900px). A diferencia
+   de los `.deco-fruit` de esta sección (decoración pura, se ocultan en
+   mobile), esta imagen SÍ se muestra en mobile — es contenido con valor
+   propio (prueba social), no decoración de fondo, así que solo se
+   reordena/achica en vez de esconderse. `max-width:640px` de
+   `.contact-info` arriba queda igual: dentro de la grilla nunca llega a
+   pedir tanto ancho, pero no hace daño dejarlo. */
+.conocenos-grid{display:grid;grid-template-columns:1fr .95fr;gap:56px;align-items:center}
+@media(max-width:900px){.conocenos-grid{grid-template-columns:1fr;gap:44px}}
+.conocenos-collage{position:relative;z-index:1}
+@media(max-width:900px){.conocenos-collage{max-width:520px;margin:0 auto}}
+.conocenos-collage-img{
+  display:block;width:100%;height:auto;
+  filter:drop-shadow(0 22px 44px rgba(75,46,69,.22));
+  animation:float 7.5s ease-in-out infinite;
+}
+@media(prefers-reduced-motion:reduce){.conocenos-collage-img{animation:none}}
 .contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
 .contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:600;color:var(--purple)}
 .contact-trust-item svg{width:16px;height:16px;flex:none}

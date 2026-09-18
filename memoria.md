@@ -747,58 +747,71 @@ próximos pasos).
     tiene que llevar al wizard, no a la info de contacto pasivo. El link
     "Contacto" del nav (`#lam-06`) no se tocó: sigue siendo correcto,
     ahí vive el email/redes.
+- **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18)**: nueva
+  columna derecha con una sola imagen decorativa/de prueba social,
+  `img/generadas-cutout/collage-redes-miplan.webp` — un mockup tipo "app
+  showcase" (generado con Gemini en varias iteraciones de prompt y
+  recortado con Python/Pillow en este entorno, sin IA de segmentación:
+  máscara por distancia de color contra el fondo sólido morado que se le
+  pidió a Gemini) que muestra capturas fijas (dibujadas por la IA, no HTML
+  real) del perfil de SINAPTIX en Instagram, TikTok, Gmail y el dashboard
+  de "Mi plan", superpuestas con leve inclinación.
+  - `.contact-info` (columna de texto/redes que ya existía) y la nueva
+    `.conocenos-collage` ahora viven dentro de `.conocenos-grid`
+    (`grid-template-columns:1fr .95fr`, colapsa a 1 columna en `≤900px` —
+    mismo breakpoint que `.hero-grid`/`.ben-grid`). A diferencia de los
+    `.deco-fruit` de esta sección (decoración pura, `display:none` en
+    `≤720px`), esta imagen **sí se muestra en mobile** (tiene valor de
+    contenido, no es solo decoración): en `≤900px` se centra con
+    `max-width:520px` debajo del resto del contenido en vez de
+    ocultarse.
+  - `.conocenos-collage-img` lleva `animation:float` (la misma
+    `@keyframes float` del Hero/Pilares) + `drop-shadow`, respeta
+    `prefers-reduced-motion`. `width="1162" height="705"` fijos en el
+    `<img>` para reservar el espacio y evitar salto de layout mientras
+    carga (`loading="lazy"`, no es LCP — está debajo del fold). `alt=""`
+    + contenedor `aria-hidden="true"`: es decorativa/ilustrativa, el
+    contacto real y accesible ya está en `.social-cards` al lado.
+  - **✅ Verificado visualmente** en este entorno con Playwright/Chromium
+    a 1440px y 390px (ver nota de entorno al inicio de "Pendientes
+    conocidos"): en ambos anchos el collage no queda tapado por ni tapa
+    a las `deco-fruit` de fondo de la sección (granada, kiwi, salmón,
+    etc. quedan lo bastante lejos), no hay overflow horizontal, y en
+    mobile queda bien centrado debajo de las tarjetas de redes sin
+    chocar con el nav fijo. Falta la confirmación de siempre sobre un
+    deploy real (ver "Pendientes conocidos").
 
 ## Pendientes conocidos
 
-- **Integrar collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18,
-  pendiente para la próxima sesión)**: el usuario quiere agregar del lado
-  derecho de esta sección un collage tipo "app showcase" con capturas del
-  perfil de SINAPTIX en Instagram, TikTok, el correo (Gmail) y el dashboard
-  de "Mi plan", superpuestas con leve inclinación (como los collages de
-  landing de SaaS). El asset ya está listo, generado con Gemini a partir de
-  varias iteraciones de prompt (composición + corrección de encuadre + fondo
-  sólido para poder recortarlo) y con el fondo ya recortado (transparente)
-  por este lado con Python/Pillow (máscara por distancia de color al morado
-  sólido `#4B2E45` que se le pidió de fondo a Gemini, sin IA de segmentación
-  — el fondo era plano así que alcanzó con eso, sin halos visibles en los
-  bordes):
-  - **Archivo**: `img/generadas-cutout/collage-redes-miplan.webp` (1162×705,
-    fondo transparente, ~135 KB, webp lossy calidad 88 — mismo criterio que
-    `hero-cerebro-nutricion.webp`).
-  - **Contenido de la imagen** (fijo, dibujado por la IA, no es HTML/CSS
-    real): teléfono con el perfil de Instagram al frente y centrado
-    (`@SINAPTIX`, bio, grilla de posts), tarjeta de TikTok asomando detrás a
-    la izquierda, bandeja de Gmail (`hola@sinaptix.com`) a la derecha,
-    ventana de navegador con el dashboard "Mi plan" (gauge de IMC, tarjeta
-    "Objetivo cognitivo", gráfico de barras) abajo a la derecha. Texto en
-    inglés/con errores menores en la bio de Instagram (limitación de la IA
-    generando texto) — aceptado así a propósito, es un collage decorativo,
-    no contenido funcional que se lea de cerca.
-  - **Cortes conocidos, aceptados a propósito**: el borde izquierdo de la
-    tarjeta de TikTok y el borde derecho de la ventana de "Mi plan" quedan
-    cortados por el límite de la imagen (no por el recorte de fondo — así
-    salió del render de Gemini, no se pudo corregir con más iteraciones,
-    la IA no respetaba la instrucción de encuadre). El usuario los dio por
-    buenos porque van a quedar parcialmente ocultos/superpuestos con otros
-    elementos de la sección de todas formas. Si en la integración se nota
-    mucho el corte, es candidato a pedir un regenerado o a taparlo con una
-    decoración por encima.
-  - **Falta hacer** (no arrancado): decidir cómo se monta en el layout de
-    `#lam-06` (hoy la sección es un solo `.wrap` centrado, sin columna
-    derecha — hay que armar una grilla de 2 columnas o similar), tamaño y
-    posición responsive (mobile probablemente oculto u ocupando el ancho
-    completo debajo del texto, ≤900px — criterio ya usado en otras
-    decoraciones `deco-fruit` del sitio), si lleva animación `float` como
-    el resto de las decoraciones, y si hace falta ajustar el resto de la
-    sección (hoy tiene varias `deco-fruit` de fondo dispersas que podrían
-    quedar recargadas si se suma este collage al lado).
-  - **Relacionado**: la tarjeta de Facebook en `.social-cards` de esta
-    misma sección sigue en el HTML (ver bloque `<div class="social-cards">`
-    en `index.html`) pero el usuario mencionó en esta sesión que "Facebook
-    pidió que lo eliminemos" — no se tocó el código todavía porque no fue
-    un pedido explícito de esta sesión (solo mencionado de pasada), pero
-    si se retoma esta sección conviene preguntar si hay que sacar esa
-    tarjeta ahora que se está tocando `#lam-06` igual.
+> **Nota sobre el entorno de trabajo (2026-09-18)**: varios pendientes de
+> abajo dicen "no hay browser en este entorno" — eso fue cierto en las
+> sesiones que los escribieron, pero en la sesión del collage de redes
+> **sí había Playwright con Chromium ya instalado y cacheado**
+> (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, `node -e "require('playwright')"`
+> resolvía sin error). Como el entorno de trabajo se resetea entre
+> sesiones, **no asumir en ningún sentido** (ni que hay browser ni que no
+> hay) — probar `PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers node -e
+> "require('playwright').chromium.launch().then(b=>b.close())"` al
+> arrancar cualquier sesión que tenga pendientes de verificación visual
+> antes de asumir que hay que saltearla o pedirle al usuario una captura.
+> Si está disponible, se puede abrir `index.html`/`mi-plan.html` con
+> `file://` directo (sitio estático, no hace falta servidor) y sacar
+> screenshots de las secciones en cuestión a distintos anchos.
+
+- **Collage de redes en `#lam-06` "Conócenos" — verificar en un deploy
+  real**: ver "Estado actual del diseño" → bullet "Collage de redes" para
+  el detalle de la implementación. Se verificó visualmente en este mismo
+  entorno (Playwright/Chromium, resultó estar disponible esta sesión —
+  ver nota en "Entorno de trabajo" más abajo) a 1440px y 390px, ambos se
+  ven bien, pero falta el mismo tipo de confirmación que el resto del
+  sitio: cómo se ve en un navegador real sobre el deploy de Netlify.
+  - **Relacionado, sin resolver**: la tarjeta de Facebook en
+    `.social-cards` de esta misma sección sigue en el HTML (bloque
+    `<div class="social-cards">` en `index.html`) pero el usuario
+    mencionó en la sesión anterior que "Facebook pidió que lo
+    eliminemos" — no se tocó todavía porque fue un comentario al pasar,
+    no un pedido explícito. Preguntar si hay que sacarla la próxima vez
+    que se toque esta sección.
 
 - **PDF de "Mi plan" — verificar contra el CDN real y en visores reales**:
   todo se verificó con el bundle de jsPDF servido localmente (cdnjs no es
