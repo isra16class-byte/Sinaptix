@@ -11,6 +11,82 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — PDF de "Mi plan": paleta neutra (fuera el morado) y trazos más finos
+
+El usuario revisó el PDF de la entrega anterior y marcó tres cosas: que se
+veía "como estirado", que los gráficos estaban "muy gruesos", y que el
+morado no funcionaba en ese documento — pidiendo explícitamente acercarse al
+PDF de referencia que había mandado, "más limpio, profesional y ordenado".
+
+### Paleta: se descarta el morado de marca
+
+⚠️ **Decisión a no revertir sin que el usuario lo pida**: el PDF ya no usa
+`--purple`/`--purple-dark`. En papel y en visores de PDF ese morado lee como
+un lila apagado y le da al documento aire de folleto, no de informe. La
+paleta del PDF pasa a ser neutra:
+
+- Azul noche `#1A2542` — títulos de sección, nombre de marca, reglas.
+- Azul acero `#3B6EA5` — rótulos y barras de acento.
+- Grises pizarra (`#1F2937` / `#4B5563` / `#94A3B8` / `#CBD5E1`) — texto,
+  escalas y bordes.
+
+La marca sigue presente por el logo real y por el par tipográfico. **Esto es
+una divergencia deliberada respecto de `css/styles.css`, no un descuido.**
+
+También se estrena una **rampa semántica propia del PDF**
+(`RAMPA` / `pdfColorPorcentaje`): rosa `#BE123C` → ámbar `#D97706` →
+esmeralda `#059669`, para las barras de estado y las zonas del IMC. Antes
+salían de `gaugeColorForPercent` (los terracotas del sitio), que sobre la
+paleta neutra se veían embarrados. Es el mismo criterio —rojo/ámbar/verde
+según el porcentaje— con otros tonos. Los 4 momentos del día tipo usan
+ámbar / esmeralda / azul acero / gris pizarra, 4 tonos que también se
+distinguen impresos en blanco y negro.
+
+### "Muy gruesos": todo el trazo a dieta
+
+- Barras de estado: 3,4 mm → **2,4 mm**; línea de meta de 0,4 → 0,3 mm;
+  marca de "antes" de 0,5 → 0,35 mm.
+- Barra de IMC: 3,6 mm → **2,4 mm**; puntero más chico.
+- Anillo de la dona: grosor de 7,5 mm → **4,5 mm** (radios 16/11,5). Antes
+  leía como un gráfico de torta pesado, no como un dato.
+- Círculos del timeline: r=3,2 → **2,5 mm**; riel de 0,8 → 0,4 mm.
+- Bordes de tarjetas y cajas: 0,3 → **0,25 mm**; radios de 2,5 → 1,5 mm.
+- Las barras de acento de las cajas (objetivo, Priorizar/Moderar, ajustes,
+  avisos) pasan de ser rectángulos redondeados despegados del borde a
+  **filetes de 1 mm a sangre** contra el canto de la caja.
+- La píldora de categoría del IMC pasa de relleno macizo a **contorno**: en
+  un bloque tan chico el bloque de color se comía al número, que es el dato.
+
+### "Estirado": densidad y jerarquía
+
+- **Títulos de sección**: eran serif de 12,5 pt con el número dentro de un
+  círculo relleno; ahora son **versalitas de 9 pt sobre una regla**, con el
+  número como prefijo. Ese tratamiento competía con el encabezado y le daba
+  al documento un aire inflado.
+- Encabezado más compacto: marca de 19 → 16 pt, logo de 13 → 11,5 mm, y se
+  saca el tramo dorado grueso de la regla (quedaba desbalanceado hacia un
+  costado). Queda una sola regla fina en azul noche.
+- Título del objetivo 16 → 13,5 pt; número del IMC 24 → 19 pt; chips con
+  radio de 3,3 → 1 mm (píldoras redondas → etiquetas rectangulares).
+- Interlínea de las barras 9,6 → 8,6 mm y paddings internos más ajustados.
+
+El documento sigue saliendo en 2 páginas con el caso más cargado, con más
+aire real al pie de la página 1.
+
+### Verificación
+
+Se rasterizó el PDF con `pdftoppm` y se revisaron las 2 páginas, además de
+los casos límite (sin antropometría, con reevaluación, objetivo combinado en
+4 planes). `docs/mockup-pdf-mi-plan.html` se actualizó a la paleta y a la
+densidad nuevas para no quedar desincronizado. El test que comparaba el
+color de las barras contra `gaugeColorForPercent` pasa a verificar la rampa
+propia (extremos, punto medio y monotonía). Suite: **80 tests, 80 pass**.
+
+### Archivos tocados
+
+`js/mi-plan-pdf.js`, `docs/mockup-pdf-mi-plan.html`,
+`tests/mi-plan-pdf.test.js`, `memoria.md`, `changelog.md`.
+
 ## 2026-09-18 — "Descargar mi plan en PDF": generación vectorial client-side con jsPDF
 
 Se agrega un botón **"Descargar mi plan en PDF"** (`#btnDescargarPdf`) en la

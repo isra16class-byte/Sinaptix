@@ -107,14 +107,23 @@ test('el área correspondiente al objetivo queda destacada, y solo esa', () => {
   assert.deepStrictEqual(destacadas, ['calma']);
 });
 
-test('el color de cada barra es el de gaugeColorForPercent, en RGB', () => {
+test('el color de cada barra sale de la rampa semántica del PDF', () => {
+  // El PDF NO usa gaugeColorForPercent (los terracotas del sitio se ven
+  // apagados sobre la paleta neutra del documento), pero sí el mismo
+  // criterio: rojo -> ámbar -> verde según el porcentaje.
   const m = modelo(encuestaBase());
   m.barras.forEach(b => {
-    assert.deepStrictEqual(b.color, pdf.pdfHexARgb(planes.gaugeColorForPercent(b.pct)));
+    assert.deepStrictEqual(b.color, pdf.pdfColorPorcentaje(b.pct));
     b.color.forEach(canal => {
       assert.ok(Number.isInteger(canal) && canal >= 0 && canal <= 255);
     });
   });
+  // Extremos y punto medio de la rampa.
+  assert.deepStrictEqual(pdf.pdfColorPorcentaje(0),   [190, 18, 60]);
+  assert.deepStrictEqual(pdf.pdfColorPorcentaje(50),  [217, 119, 6]);
+  assert.deepStrictEqual(pdf.pdfColorPorcentaje(100), [5, 150, 105]);
+  // Monotonía: a más porcentaje, más verde.
+  assert.ok(pdf.pdfColorPorcentaje(100)[1] > pdf.pdfColorPorcentaje(20)[1]);
 });
 
 test('sin datos antropométricos el modelo no trae bloque de IMC', () => {

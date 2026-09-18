@@ -266,6 +266,27 @@ próximos pasos).
     colgados de `window` (a diferencia de las `function`). Buscarlo en
     `window` devolvía `undefined` y el PDF salía vacío. Ver
     `depsPorDefecto()`.
+  - ⚠️ **Paleta propia, NO la del sitio**: el morado de marca
+    (`--purple`/`--purple-dark`) se usó en la primera versión y el usuario
+    lo rechazó ("el morado no queda en ese PDF"). En papel y en visores de
+    PDF lee como un lila apagado y le da al documento aire de folleto, no
+    de informe. El PDF usa una paleta neutra —azul noche `#1A2542` para
+    títulos y marca, azul acero `#3B6EA5` para acentos, grises pizarra
+    para texto y reglas— con acentos semánticos. La marca sigue presente
+    por el logo y la tipografía. **No "arreglar" esto volviendo a la
+    paleta del sitio.**
+  - **Rampa semántica propia** (`RAMPA` / `pdfColorPorcentaje`): las barras
+    y las zonas del IMC van rosa `#BE123C` → ámbar `#D97706` → esmeralda
+    `#059669`, no los colores de `gaugeColorForPercent` (terracotas cálidos
+    del sitio, que sobre esta paleta se ven embarrados). Es el mismo
+    criterio, distintos tonos: si cambia el criterio de color del
+    dashboard, revisar también acá.
+  - **Trazo fino, no grueso**: barras de 2,4 mm (antes 3,4), anillo de la
+    dona de 4,5 mm de grosor (antes 7,5), bordes de 0,25 mm, filetes de
+    color a sangre de 1 mm contra el borde de cada caja, círculos del
+    timeline de r=2,5 mm. Los títulos de sección son versalitas sobre una
+    regla, no serif grande con el número en un círculo relleno: ese
+    tratamiento competía con el encabezado y engordaba el documento.
   - **Tipografía**: Times + Helvetica en vez de Fraunces + Inter. jsPDF
     solo trae las 14 fuentes estándar del formato PDF, y embeber las
     reales como TTF base64 sumaba ~300 KB solo para esta feature. Se

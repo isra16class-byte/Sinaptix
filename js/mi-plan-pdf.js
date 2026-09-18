@@ -33,29 +33,31 @@
   const LOGO_URL = 'img/sinaptix-icon.png';
 
   // ---------- Paleta (misma de css/styles.css, :root) ----------
+  // Paleta del PDF. OJO: NO es la del sitio. El morado de marca
+  // (--purple/--purple-dark) se probó y se descartó: en papel y en visores
+  // de PDF lee como un lila apagado y le da al documento un aire más
+  // "folleto" que "informe". El documento usa una paleta neutra de
+  // azules/grises con acentos semánticos, que es lo que pedía la
+  // referencia. La marca sigue presente por el logo y la tipografía.
   const C = {
-    ink:        [38, 22, 31],     // --ink
-    inkSoft:    [105, 88, 97],    // --ink-soft aplanado sobre blanco
-    inkFaint:   [150, 138, 145],  // --ink-faint aplanado sobre blanco
-    purple:     [113, 75, 103],   // --purple
-    purpleDark: [75, 46, 69],     // --purple-dark
-    green:      [46, 125, 91],    // --green
-    gold:       [193, 112, 59],   // --gold
-    navy:       [59, 110, 165],   // --navy-bright
-    red:        [179, 38, 30],    // --red
-    paper:      [255, 255, 255],  // --paper
-    panel:      [247, 241, 245],  // --panel
-    panel2:     [241, 229, 236],  // --panel-2
-    line:       [229, 220, 227],  // --line aplanado sobre blanco
-    lila:       [239, 225, 236],  // --miplan-card-lila
-    verde:      [223, 238, 228],  // --miplan-card-verde
-    dorado:     [246, 231, 214],  // --miplan-card-dorado
-    rojoSuave:  [251, 236, 235],  // tinte de aviso "alto" (rojo al 8%)
-    rielTimeline:[223, 208, 219]  // --panel-2 un paso más oscuro: sobre papel
-                                  // blanco el riel del timeline en --panel-2
-                                  // puro directamente no se veía
+    ink:        [31, 41, 55],     // texto principal
+    inkSoft:    [75, 85, 99],     // texto secundario
+    inkFaint:   [148, 163, 184],  // rótulos, escalas, pie
+    marca:      [26, 37, 66],     // azul noche: títulos y nombre de marca
+    acento:     [59, 110, 165],   // azul acero: rótulos, barras de acento
+    acentoSuave:[241, 245, 249],  // fondo del panel de objetivo
+    green:      [21, 128, 61],
+    gold:       [180, 83, 9],
+    red:        [159, 19, 57],
+    paper:      [255, 255, 255],
+    panel:      [248, 250, 252],
+    panel2:     [226, 232, 240],
+    line:       [203, 213, 225],
+    verde:      [240, 253, 244],  // tinte de la caja "Priorizar"
+    dorado:     [255, 251, 235],  // tinte de la caja "Moderar"
+    rojoSuave:  [254, 242, 242],  // tinte de aviso "alto"
+    rielTimeline:[203, 213, 225]
   };
-
   // Tipografía: jsPDF solo trae las 14 fuentes estándar del formato PDF.
   // Fraunces e Inter no están ahí y embeberlas como TTF base64 sumaría
   // ~300 KB al bundle solo para el PDF. Se aproxima el par del sitio con
@@ -69,7 +71,7 @@
   const PAGE_W = 210, PAGE_H = 297;
   const M = 15;                       // margen lateral
   const CW = PAGE_W - M * 2;          // ancho útil = 180
-  const Y_INICIO = 34;                // debajo del encabezado de la pág. 1
+  const Y_INICIO = 32;                // debajo del encabezado de la pág. 1
   const Y_INICIO_CONT = 27;           // debajo del encabezado de las siguientes
   const Y_LIMITE = 274;               // último mm usable antes del pie
 
@@ -89,11 +91,13 @@
     'Almuerzo': 35,
     'Cena':     25
   };
+  // 4 tonos bien distinguibles también en escala de grises (impresión B/N):
+  // ámbar, esmeralda, azul acero y gris pizarra.
   const REPARTO_COLOR = {
-    'Desayuno': C.gold,
-    'Snack':    C.green,
-    'Almuerzo': C.purple,
-    'Cena':     C.navy
+    'Desayuno': [217, 119, 6],
+    'Snack':    [5, 150, 105],
+    'Almuerzo': [59, 110, 165],
+    'Cena':     [100, 116, 139]
   };
 
   // Qué área del gráfico de barras corresponde a cada objetivo, para
@@ -132,6 +136,21 @@
       .replace(/[\u2192\u21D2]/g, '>')    // → ⇒
       .replace(/\u2713|\u2714/g, '')      // ✓
       .replace(/\u00A0/g, ' ');
+  }
+
+  // Rampa semántica del PDF (0 = necesita atención, 50 = en progreso,
+  // 100 = sólido). Es la misma IDEA que gaugeColorForPercent() del
+  // dashboard, pero con los tonos de este documento: los del sitio
+  // (#B3261E / #C1703B / #2E7D5B) son terracotas cálidos que sobre el
+  // fondo blanco y la paleta neutra de acá se ven apagados y embarrados.
+  // Si se cambia el criterio de color del dashboard, revisar también esto.
+  const RAMPA = [[190, 18, 60], [217, 119, 6], [5, 150, 105]];
+  function pdfColorPorcentaje(pct){
+    const p = Math.max(0, Math.min(100, pct));
+    const i = p <= 50 ? 0 : 1;
+    const t = p <= 50 ? p / 50 : (p - 50) / 50;
+    const a = RAMPA[i], b = RAMPA[i + 1];
+    return [0, 1, 2].map(function(k){ return Math.round(a[k] + (b[k] - a[k]) * t); });
   }
 
   // gaugeColorForPercent() devuelve un hex ('#2E7D5B') porque su destino
@@ -213,7 +232,7 @@
         label: item.label,
         pct: pct,
         antesPct: antesPct,
-        color: pdfHexARgb(api.gaugeColorForPercent(pct)),
+        color: pdfColorPorcentaje(pct),
         destacada: item.key === destacada
       };
     });
@@ -408,61 +427,59 @@
     if(ctx.logo){
       // 432x397 px en el original: se respeta la proporción para que el
       // logo no salga deformado.
-      doc.addImage(ctx.logo, 'PNG', M, 12, 13, 13 * (397/432));
+      doc.addImage(ctx.logo, 'PNG', M, 12.4, 11.5, 11.5 * (397/432));
     } else {
       // Fallback vectorial si el PNG no se pudo cargar (offline, 404): un
       // nodo con 2 sinapsis, en la misma familia gráfica del sitio.
-      setFill(doc, C.purple);
+      setFill(doc, C.acento);
       doc.circle(M + 6.5, 17.5, 5.5, 'F');
       setFill(doc, C.gold);
       doc.circle(M + 4.2, 15.6, 1.4, 'F');
       doc.circle(M + 8.9, 19.2, 1.4, 'F');
     }
 
-    fuente(doc, F_TITULO, 'bold', 19);
-    setText(doc, C.purpleDark);
-    doc.text('SINAPTIX', M + 16.5, 18.6);
+    fuente(doc, F_TITULO, 'bold', 16);
+    setText(doc, C.marca);
+    doc.text('SINAPTIX', M + 15, 18);
 
-    fuente(doc, F_CUERPO, 'normal', 7.6);
+    fuente(doc, F_CUERPO, 'normal', 7.2);
     setText(doc, C.inkFaint);
-    doc.text('Plan personalizado de neuroalimentación', M + 16.5, 23);
+    doc.text('Plan personalizado de neuroalimentación', M + 15, 22);
 
     // Bloque de identificación, alineado al margen derecho.
     fuente(doc, F_CUERPO, 'normal', 7.2);
     setText(doc, C.inkFaint);
     doc.text('PREPARADO PARA', PAGE_W - M, 14.6, {align:'right'});
-    fuente(doc, F_CUERPO, 'bold', 10.5);
+    fuente(doc, F_CUERPO, 'bold', 10);
     setText(doc, C.ink);
-    doc.text(m.nombre || 'Tu plan', PAGE_W - M, 19.4, {align:'right'});
+    doc.text(m.nombre || 'Tu plan', PAGE_W - M, 19, {align:'right'});
     fuente(doc, F_CUERPO, 'normal', 7.6);
     setText(doc, C.inkSoft);
-    doc.text(pdfFecha(m.fechaReeval || m.fechaPlan), PAGE_W - M, 23.4, {align:'right'});
+    doc.text(pdfFecha(m.fechaReeval || m.fechaPlan), PAGE_W - M, 22.8, {align:'right'});
 
-    // Regla del encabezado: hairline morado a todo el ancho + tramo dorado
-    // corto a la izquierda (mismo recurso de acento que usa el sitio).
-    setDraw(doc, C.line);
-    doc.setLineWidth(0.4);
-    doc.line(M, 27.2, PAGE_W - M, 27.2);
-    setDraw(doc, C.gold);
-    doc.setLineWidth(1);
-    doc.line(M, 27.2, M + 26, 27.2);
+    // Una sola regla fina en azul noche, a todo el ancho. Antes había además
+    // un tramo dorado grueso a la izquierda: con el encabezado ya más
+    // compacto quedaba pesado y desbalanceado hacia un costado.
+    setDraw(doc, C.marca);
+    doc.setLineWidth(0.35);
+    doc.line(M, 25.6, PAGE_W - M, 25.6);
     ctx.y = Y_INICIO;
   }
 
   function dibujarEncabezadoContinuacion(ctx){
     const doc = ctx.doc;
     if(ctx.logo){
-      doc.addImage(ctx.logo, 'PNG', M, 11, 8, 8 * (397/432));
+      doc.addImage(ctx.logo, 'PNG', M, 11.4, 7, 7 * (397/432));
     }
-    fuente(doc, F_TITULO, 'bold', 11);
-    setText(doc, C.purpleDark);
-    doc.text('SINAPTIX', M + (ctx.logo ? 10.5 : 0), 17.2);
-    fuente(doc, F_CUERPO, 'normal', 7.6);
+    fuente(doc, F_TITULO, 'bold', 10);
+    setText(doc, C.marca);
+    doc.text('SINAPTIX', M + (ctx.logo ? 9 : 0), 16.8);
+    fuente(doc, F_CUERPO, 'normal', 7.2);
     setText(doc, C.inkFaint);
-    doc.text('Mi plan de neuroalimentación', PAGE_W - M, 17.2, {align:'right'});
-    setDraw(doc, C.line);
-    doc.setLineWidth(0.4);
-    doc.line(M, 20.4, PAGE_W - M, 20.4);
+    doc.text('Mi plan de neuroalimentación', PAGE_W - M, 16.8, {align:'right'});
+    setDraw(doc, C.marca);
+    doc.setLineWidth(0.3);
+    doc.line(M, 19.6, PAGE_W - M, 19.6);
     ctx.y = Y_INICIO_CONT;
   }
 
@@ -476,54 +493,53 @@
     const doc = ctx.doc;
     ctx.seccion += 1;
     const numero = ctx.seccion;
-    ctx.espacio(11 + Math.min(altoBloque || 14, Y_LIMITE - Y_INICIO_CONT - 11));
+    ctx.espacio(9 + Math.min(altoBloque || 14, Y_LIMITE - Y_INICIO_CONT - 9));
     const y = ctx.y;
-    setFill(doc, C.purple);
-    doc.circle(M + 2.6, y + 1.4, 2.6, 'F');
-    fuente(doc, F_CUERPO, 'bold', 7.5);
-    setText(doc, C.paper);
-    doc.text(String(numero), M + 2.6, y + 2.5, {align:'center'});
+    // Versalitas sobre una regla, en vez del título en serif grande con el
+    // número dentro de un círculo relleno: ese tratamiento competía con el
+    // encabezado y engordaba el documento. Acá el número va como prefijo.
+    fuente(doc, F_CUERPO, 'bold', 9);
+    setText(doc, C.marca);
+    doc.text(numero + '.  ' + texto.toUpperCase(), M, y + 2.6);
 
-    fuente(doc, F_TITULO, 'bold', 12.5);
-    setText(doc, C.purpleDark);
-    doc.text(texto, M + 7.8, y + 3);
-
-    setDraw(doc, C.line);
-    doc.setLineWidth(0.3);
-    doc.line(M, y + 6.4, PAGE_W - M, y + 6.4);
-    ctx.y = y + 11;
+    setDraw(doc, C.marca);
+    doc.setLineWidth(0.45);
+    doc.line(M, y + 4.8, PAGE_W - M, y + 4.8);
+    ctx.y = y + 9;
   }
 
   // Panel destacado del objetivo.
   function dibujarObjetivo(ctx, m){
     const doc = ctx.doc;
-    fuente(doc, F_CUERPO, 'normal', 8.6);
+    fuente(doc, F_CUERPO, 'normal', 8.2);
     const enfoque = m.planes[0].enfoque;
-    const lineas = doc.splitTextToSize(enfoque, CW - 24);
-    const alto = 19.5 + altoTexto(doc, lineas) + 4.5;
+    const lineas = doc.splitTextToSize(enfoque, CW - 16);
+    const alto = 17.5 + altoTexto(doc, lineas) + 4;
 
     ctx.espacio(alto);
     const y = ctx.y;
 
-    setFill(doc, C.lila);
-    doc.roundedRect(M, y, CW, alto, 3, 3, 'F');
-    // Barra de acento a la izquierda, con aire arriba y abajo para no
-    // pelearse con el redondeo del panel.
-    setFill(doc, C.purple);
-    doc.roundedRect(M + 4.5, y + 4.5, 1.6, alto - 9, 0.8, 0.8, 'F');
+    setFill(doc, C.acentoSuave);
+    setDraw(doc, C.panel2);
+    doc.setLineWidth(0.25);
+    doc.roundedRect(M, y, CW, alto, 1.5, 1.5, 'FD');
+    // Barra de acento a la izquierda, a sangre contra el borde del panel:
+    // el radio del panel bajó a 1.5 mm y ya no hace falta despegarla.
+    setFill(doc, C.acento);
+    doc.rect(M, y, 1.2, alto, 'F');
 
-    const x = M + 10.5;
-    fuente(doc, F_CUERPO, 'bold', 7.2);
-    setText(doc, C.purple);
-    doc.text('OBJETIVO COGNITIVO PRINCIPAL', x, y + 8);
+    const x = M + 8;
+    fuente(doc, F_CUERPO, 'bold', 6.8);
+    setText(doc, C.acento);
+    doc.text('OBJETIVO COGNITIVO PRINCIPAL', x, y + 7.2);
 
-    fuente(doc, F_TITULO, 'bold', 16);
-    setText(doc, C.purpleDark);
-    doc.text(m.objetivoTitulo, x, y + 16.4);
+    fuente(doc, F_TITULO, 'bold', 13.5);
+    setText(doc, C.marca);
+    doc.text(m.objetivoTitulo, x, y + 14.4);
 
-    fuente(doc, F_CUERPO, 'normal', 8.6);
+    fuente(doc, F_CUERPO, 'normal', 8.2);
     setText(doc, C.inkSoft);
-    parrafo(doc, enfoque, x, y + 18.6, CW - 24);
+    parrafo(doc, enfoque, x, y + 16.4, CW - 16);
 
     ctx.y = y + alto + 6;
   }
@@ -532,66 +548,66 @@
   function tarjeta(doc, x, y, w, h, titulo){
     setFill(doc, C.paper);
     setDraw(doc, C.line);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(x, y, w, h, 2.5, 2.5, 'FD');
-    fuente(doc, F_CUERPO, 'bold', 7.4);
-    setText(doc, C.purple);
-    doc.text(titulo, x + 6, y + 7);
-    setDraw(doc, C.line);
     doc.setLineWidth(0.25);
-    doc.line(x + 6, y + 9.4, x + w - 6, y + 9.4);
+    doc.roundedRect(x, y, w, h, 1.5, 1.5, 'FD');
+    fuente(doc, F_CUERPO, 'bold', 7);
+    setText(doc, C.marca);
+    doc.text(titulo, x + 5, y + 6.4);
+    setDraw(doc, C.line);
+    doc.setLineWidth(0.2);
+    doc.line(x + 5, y + 8.6, x + w - 5, y + 8.6);
   }
 
   // Barras de estado con marca de meta.
   function dibujarBarras(ctx, m, x, y, w){
     const doc = ctx.doc;
-    const alto = 14 + m.barras.length * 9.6 + 6;
+    const alto = 13 + m.barras.length * 8.6 + 6;
     tarjeta(doc, x, y, w, alto, 'TU ESTADO ACTUAL');
 
-    const xLabel = x + 6;
-    const xTrack = x + 30;
-    const trackW = w - 30 - 6 - 12;
-    let yy = y + 16.5;
+    const xLabel = x + 5;
+    const xTrack = x + 29;
+    const trackW = w - 29 - 5 - 12;
+    let yy = y + 15.5;
 
     m.barras.forEach(function(b){
-      fuente(doc, F_CUERPO, b.destacada ? 'bold' : 'normal', 8.2);
-      setText(doc, b.destacada ? C.purpleDark : C.inkSoft);
-      doc.text(b.label, xLabel, yy + 2.6);
+      fuente(doc, F_CUERPO, b.destacada ? 'bold' : 'normal', 8);
+      setText(doc, b.destacada ? C.marca : C.inkSoft);
+      doc.text(b.label, xLabel + (b.destacada ? 2.4 : 0), yy + 2);
       if(b.destacada){
-        setFill(doc, C.purple);
-        doc.circle(xLabel - 2.2, yy + 1.8, 0.8, 'F');
+        setFill(doc, C.acento);
+        doc.circle(xLabel + 0.7, yy + 1.3, 0.7, 'F');
       }
 
       // Riel
       setFill(doc, C.panel2);
-      doc.roundedRect(xTrack, yy, trackW, 3.4, 1.7, 1.7, 'F');
+      doc.roundedRect(xTrack, yy, trackW, 2.4, 1.2, 1.2, 'F');
       // Relleno
-      const wFill = Math.max(3.4, trackW * b.pct / 100);
+      const wFill = Math.max(2.4, trackW * b.pct / 100);
       setFill(doc, b.color);
-      doc.roundedRect(xTrack, yy, wFill, 3.4, 1.7, 1.7, 'F');
+      doc.roundedRect(xTrack, yy, wFill, 2.4, 1.2, 1.2, 'F');
 
       // Marca de "antes" (solo si hubo reevaluación): tramo oscuro fino
       // sobre el riel, en la posición del valor anterior.
       if(b.antesPct != null){
         const xa = xTrack + trackW * b.antesPct / 100;
-        setDraw(doc, C.purpleDark);
-        doc.setLineWidth(0.5);
-        doc.line(xa, yy - 1, xa, yy + 4.4);
+        setDraw(doc, C.marca);
+        doc.setLineWidth(0.35);
+        doc.line(xa, yy - 0.8, xa, yy + 3.2);
       }
 
       // Marca de meta
       const xm = xTrack + trackW * m.metaPct / 100;
       setDraw(doc, C.inkFaint);
-      doc.setLineWidth(0.4);
-      doc.setLineDashPattern([0.7, 0.7], 0);
-      doc.line(xm, yy - 1.6, xm, yy + 5);
+      doc.setLineWidth(0.3);
+      doc.setLineDashPattern([0.6, 0.6], 0);
+      doc.line(xm, yy - 1.2, xm, yy + 3.6);
       doc.setLineDashPattern([], 0);
 
-      fuente(doc, F_CUERPO, 'bold', 8.2);
+      fuente(doc, F_CUERPO, 'bold', 8);
       setText(doc, C.ink);
-      doc.text(b.pct + '%', x + w - 6, yy + 2.6, {align:'right'});
+      doc.text(b.pct + '%', x + w - 5, yy + 2, {align:'right'});
 
-      yy += 9.6;
+      yy += 8.6;
     });
 
     // Leyenda de la tarjeta
@@ -600,7 +616,7 @@
     const leyenda = m.barras[0].antesPct != null
       ? 'Línea punteada: meta sugerida (' + m.metaPct + '%). Línea llena: valor de la encuesta inicial.'
       : 'Línea punteada: meta sugerida (' + m.metaPct + '%) para cada área.';
-    doc.text(doc.splitTextToSize(leyenda, w - 12), x + 6, yy + 1.5);
+    doc.text(doc.splitTextToSize(leyenda, w - 10), x + 5, yy + 1.2);
 
     return alto;
   }
@@ -613,44 +629,47 @@
     if(!m.imc){
       fuente(doc, F_CUERPO, 'normal', 8);
       setText(doc, C.inkFaint);
-      parrafo(doc, 'Todavía no registraste tus datos antropométricos, así que este plan no incluye el ajuste por IMC.', x + 6, y + 14, w - 12);
+      parrafo(doc, 'Todavía no registraste tus datos antropométricos, así que este plan no incluye el ajuste por IMC.', x + 5, y + 12.5, w - 10);
       return;
     }
 
     const info = m.imc;
     // Número grande + categoría
     const valor = info.imc.toFixed(1);
-    fuente(doc, F_TITULO, 'bold', 24);
+    fuente(doc, F_TITULO, 'bold', 19);
     setText(doc, C.ink);
-    doc.text(valor, x + 6, y + 24);
-    const xUnidad = x + 6 + doc.getTextWidth(valor) + 2.2;
+    doc.text(valor, x + 5, y + 20.5);
+    const xUnidad = x + 5 + doc.getTextWidth(valor) + 1.8;
     // El ² no está garantizado en las fuentes estándar del PDF: se dibuja
     // como un "2" más chico y elevado en vez de confiar en el glifo.
     fuente(doc, F_CUERPO, 'normal', 7);
     setText(doc, C.inkFaint);
-    doc.text('kg/m', xUnidad, y + 24);
+    doc.text('kg/m', xUnidad, y + 20.5);
     const xSup = xUnidad + doc.getTextWidth('kg/m');
     fuente(doc, F_CUERPO, 'normal', 4.6);
-    doc.text('2', xSup, y + 21.8);
+    doc.text('2', xSup, y + 18.6);
 
-    const colorZona = info.zona === 'saludable' ? C.green : (info.zona === 'obesidad' ? C.red : C.gold);
+    const colorZona = info.zona === 'saludable' ? RAMPA[2] : (info.zona === 'obesidad' ? RAMPA[0] : RAMPA[1]);
     const etiqueta = info.cat.charAt(0).toUpperCase() + info.cat.slice(1);
-    fuente(doc, F_CUERPO, 'bold', 7.6);
-    const pillW = doc.getTextWidth(etiqueta) + 7;
-    setFill(doc, colorZona);
-    doc.roundedRect(x + w - 6 - pillW, y + 18.6, pillW, 6.4, 3.2, 3.2, 'F');
-    setText(doc, C.paper);
-    doc.text(etiqueta, x + w - 6 - pillW / 2, y + 22.9, {align:'center'});
+    // Píldora de contorno, no maciza: en un bloque tan chico el relleno
+    // sólido se comía visualmente al número del IMC, que es el dato.
+    fuente(doc, F_CUERPO, 'bold', 7);
+    const pillW = doc.getTextWidth(etiqueta) + 6;
+    setDraw(doc, colorZona);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x + w - 5 - pillW, y + 15.4, pillW, 5.4, 2.7, 2.7, 'D');
+    setText(doc, colorZona);
+    doc.text(etiqueta, x + w - 5 - pillW / 2, y + 19, {align:'center'});
 
     // Barra segmentada 15–40 con los umbrales OMS (18.5 / 25 / 30), los
     // mismos que usa imcCategoria() y el medidor del dashboard.
-    const bx = x + 6, bw = w - 12, by = y + 34, bh = 3.6;
+    const bx = x + 5, bw = w - 10, by = y + 29, bh = 2.4;
     const MIN = 15, MAX = 40;
     const cortes = [
-      {hasta: 18.5, color: C.gold},
-      {hasta: 25,   color: C.green},
-      {hasta: 30,   color: C.gold},
-      {hasta: MAX,  color: C.red}
+      {hasta: 18.5, color: RAMPA[1]},
+      {hasta: 25,   color: RAMPA[2]},
+      {hasta: 30,   color: RAMPA[1]},
+      {hasta: MAX,  color: RAMPA[0]}
     ];
     let desde = MIN;
     cortes.forEach(function(seg, i){
@@ -660,7 +679,7 @@
       // Solo los extremos llevan punta redondeada, igual que el arco del
       // medidor del sitio (los cortes internos van a tope, sin costura).
       if(i === 0 || i === cortes.length - 1){
-        doc.roundedRect(x0, by, x1 - x0, bh, 1.8, 1.8, 'F');
+        doc.roundedRect(x0, by, x1 - x0, bh, 1.2, 1.2, 'F');
         if(i === 0) doc.rect(x0 + (x1 - x0) / 2, by, (x1 - x0) / 2, bh, 'F');
         else doc.rect(x0, by, (x1 - x0) / 2, bh, 'F');
       } else {
@@ -672,27 +691,27 @@
     // Puntero del valor real (recortado al rango visible del gráfico)
     const v = Math.max(MIN, Math.min(MAX, info.imc));
     const px = bx + bw * (v - MIN) / (MAX - MIN);
-    triangulo(doc, px, by - 2.6, 3.4, 2.6, C.purpleDark);
+    triangulo(doc, px, by - 2.2, 2.8, 2.2, C.marca);
 
     fuente(doc, F_CUERPO, 'normal', 6.4);
     setText(doc, C.inkFaint);
-    doc.text('15', bx, by + bh + 5.6);
-    doc.text('18,5', bx + bw * 3.5 / 25, by + bh + 5.6, {align:'center'});
-    doc.text('25', bx + bw * 10 / 25, by + bh + 5.6, {align:'center'});
-    doc.text('30', bx + bw * 15 / 25, by + bh + 5.6, {align:'center'});
-    doc.text('40', bx + bw, by + bh + 5.6, {align:'right'});
+    doc.text('15', bx, by + bh + 3.6);
+    doc.text('18,5', bx + bw * 3.5 / 25, by + bh + 3.6, {align:'center'});
+    doc.text('25', bx + bw * 10 / 25, by + bh + 3.6, {align:'center'});
+    doc.text('30', bx + bw * 15 / 25, by + bh + 3.6, {align:'center'});
+    doc.text('40', bx + bw, by + bh + 3.6, {align:'right'});
 
-    let yy = by + bh + 11;
-    fuente(doc, F_CUERPO, 'normal', 7.4);
+    let yy = by + bh + 9;
+    fuente(doc, F_CUERPO, 'normal', 7.2);
     setText(doc, C.inkSoft);
     if(info.peso && info.tallaCm){
-      doc.text(info.peso + ' kg · ' + info.tallaCm + ' cm', x + 6, yy);
-      yy += 4.4;
+      doc.text(info.peso + ' kg · ' + info.tallaCm + ' cm', x + 5, yy);
+      yy += 4;
     }
     if(info.rango){
       setText(doc, C.inkFaint);
-      fuente(doc, F_CUERPO, 'normal', 7);
-      doc.text('Peso saludable estimado: ' + info.rango.min + '-' + info.rango.max + ' kg', x + 6, yy);
+      fuente(doc, F_CUERPO, 'normal', 6.8);
+      doc.text('Peso saludable estimado: ' + info.rango.min + '-' + info.rango.max + ' kg', x + 5, yy);
     }
   }
 
@@ -700,58 +719,62 @@
   function dibujarNutrientes(ctx, plan){
     const doc = ctx.doc;
     ctx.espacio(20);
-    fuente(doc, F_CUERPO, 'bold', 8);
-    setText(doc, C.purpleDark);
+    fuente(doc, F_CUERPO, 'bold', 7);
+    setText(doc, C.inkFaint);
     doc.text('NUTRIENTES CLAVE', M, ctx.y);
-    let y = ctx.y + 3.4;
+    let y = ctx.y + 2.8;
     let x = M;
 
     fuente(doc, F_CUERPO, 'normal', 8);
     plan.nutrientes.forEach(function(n){
-      const w = doc.getTextWidth(n) + 8;
-      if(x + w > PAGE_W - M){ x = M; y += 8.4; }
-      if(y + 7 > Y_LIMITE){ ctx.y = y; ctx.espacio(999); y = ctx.y; x = M; }
+      const w = doc.getTextWidth(n) + 6.5;
+      if(x + w > PAGE_W - M){ x = M; y += 7.2; }
+      if(y + 6 > Y_LIMITE){ ctx.y = y; ctx.espacio(999); y = ctx.y; x = M; }
       setFill(doc, C.panel);
       setDraw(doc, C.panel2);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(x, y, w, 6.6, 3.3, 3.3, 'FD');
-      setText(doc, C.purpleDark);
-      doc.text(n, x + w / 2, y + 4.4, {align:'center'});
-      x += w + 3;
+      doc.setLineWidth(0.25);
+      doc.roundedRect(x, y, w, 5.6, 1, 1, 'FD');
+      setText(doc, C.ink);
+      doc.text(n, x + w / 2, y + 3.8, {align:'center'});
+      x += w + 2.5;
     });
-    ctx.y = y + 9;
+    ctx.y = y + 8;
   }
 
   // Caja de lista con encabezado de color (Priorizar / Moderar / Ajustes).
   // Devuelve el alto que ocupó.
   function altoCajaLista(doc, items, w, tamano){
     fuente(doc, F_CUERPO, 'normal', tamano || 8);
-    let h = 11;
+    let h = 10;
     items.forEach(function(it){
-      h += altoTexto(doc, doc.splitTextToSize(it, w - 14)) + 1.4;
+      h += altoTexto(doc, doc.splitTextToSize(it, w - 14)) + 1.2;
     });
-    return h + 3;
+    return h + 2.5;
   }
 
   function dibujarCajaLista(doc, x, y, w, titulo, items, colorBase, colorFondo, tamano, hForzado){
     const h = hForzado || altoCajaLista(doc, items, w, tamano);
     setFill(doc, colorFondo);
-    doc.roundedRect(x, y, w, h, 2.5, 2.5, 'F');
+    setDraw(doc, C.panel2);
+    doc.setLineWidth(0.25);
+    doc.roundedRect(x, y, w, h, 1.5, 1.5, 'FD');
+    // Filete de color a sangre contra el borde izquierdo (antes era una
+    // barra redondeada despegada, que engrosaba la caja sin aportar).
     setFill(doc, colorBase);
-    doc.roundedRect(x, y + 3, 1.4, h - 6, 0.7, 0.7, 'F');
+    doc.rect(x, y, 1, h, 'F');
 
-    fuente(doc, F_CUERPO, 'bold', 8);
+    fuente(doc, F_CUERPO, 'bold', 7.4);
     setText(doc, colorBase);
-    doc.text(titulo, x + 6, y + 7);
+    doc.text(titulo, x + 5.5, y + 6.2);
 
     fuente(doc, F_CUERPO, 'normal', tamano || 8);
     setText(doc, C.ink);
-    let yy = y + 10;
+    let yy = y + 9;
     items.forEach(function(it){
       setFill(doc, colorBase);
-      doc.circle(x + 7.2, yy + 1.5, 0.7, 'F');
-      const usado = parrafo(doc, it, x + 10, yy - 0.8, w - 16);
-      yy += usado + 1.4;
+      doc.circle(x + 6.4, yy + 1.4, 0.5, 'F');
+      const usado = parrafo(doc, it, x + 9, yy - 0.9, w - 14);
+      yy += usado + 1.2;
     });
     return h;
   }
@@ -769,7 +792,7 @@
     const suma = altosDiaTipo(doc, m).reduce(function(a, b){ return a + b; }, 0);
     // El lado de la dona (dona + leyenda al costado + nota) mide ~44 mm.
     // Es el alto del bloque en sí, sin el margen que va después.
-    return Math.max(suma, 44);
+    return Math.max(suma, 42);
   }
 
   // Timeline del día tipo + dona de reparto.
@@ -785,33 +808,33 @@
 
     // Riel vertical del timeline: del centro del primer círculo al del
     // último, para que no sobresalga por arriba ni por abajo.
-    const yUltimo = y0 + altos.slice(0, -1).reduce(function(a, b){ return a + b; }, 0) + 3;
+    const yUltimo = y0 + altos.slice(0, -1).reduce(function(a, b){ return a + b; }, 0) + 2.5;
     setDraw(doc, C.rielTimeline);
-    doc.setLineWidth(0.8);
-    doc.line(M + 3.2, y0 + 3, M + 3.2, yUltimo);
+    doc.setLineWidth(0.4);
+    doc.line(M + 2.5, y0 + 2.5, M + 2.5, yUltimo);
 
     let yy = y0;
     m.diaTipo.forEach(function(it, i){
-      const color = REPARTO_COLOR[it.momento] || C.purple;
+      const color = REPARTO_COLOR[it.momento] || C.acento;
       setFill(doc, color);
-      doc.circle(M + 3.2, yy + 3, 3.2, 'F');
-      fuente(doc, F_CUERPO, 'bold', 7);
+      doc.circle(M + 2.5, yy + 2.5, 2.5, 'F');
+      fuente(doc, F_CUERPO, 'bold', 6);
       setText(doc, C.paper);
-      doc.text(String(i + 1), M + 3.2, yy + 4.1, {align:'center'});
+      doc.text(String(i + 1), M + 2.5, yy + 3.3, {align:'center'});
 
-      fuente(doc, F_CUERPO, 'bold', 8.6);
-      setText(doc, C.purpleDark);
-      doc.text(it.momento, M + 9.5, yy + 4);
+      fuente(doc, F_CUERPO, 'bold', 8.2);
+      setText(doc, C.marca);
+      doc.text(it.momento, M + 8, yy + 3.4);
       // El ancho del momento se mide ANTES de cambiar de cuerpo, o el %
       // queda pegado al texto (se mediría con la tipografía chica).
-      const xPct = M + 9.5 + doc.getTextWidth(it.momento) + 2.6;
-      fuente(doc, F_CUERPO, 'normal', 7);
+      const xPct = M + 8 + doc.getTextWidth(it.momento) + 2.4;
+      fuente(doc, F_CUERPO, 'normal', 6.8);
       setText(doc, C.inkFaint);
-      doc.text(it.pct + '%', xPct, yy + 4);
+      doc.text(it.pct + '%', xPct, yy + 3.4);
 
       fuente(doc, F_CUERPO, 'normal', 8);
       setText(doc, C.inkSoft);
-      parrafo(doc, it.detalle, M + 9.5, yy + 5.4, anchoTexto);
+      parrafo(doc, it.detalle, M + 8, yy + 4.6, anchoTexto);
 
       yy += altos[i];
     });
@@ -819,40 +842,42 @@
     // Dona + leyenda al costado (no debajo): así el bloque entero mide
     // ~44 mm de alto en vez de ~78 y entra junto al timeline sin empujar
     // la sección a la página siguiente.
-    const cx = xDona + 17, cy = y0 + 19;
+    // Anillo fino (16 -> 11,5 mm de radio = 4,5 mm de grosor). Antes era de
+    // 7,5 mm y leía como un gráfico de torta pesado, no como un dato.
+    const cx = xDona + 16, cy = y0 + 18;
     let ang = 0;
     m.diaTipo.forEach(function(it){
       const barrido = it.pct * 3.6;
-      sectorDona(doc, cx, cy, 17, 9.5, ang, ang + barrido, REPARTO_COLOR[it.momento] || C.purple);
+      sectorDona(doc, cx, cy, 16, 11.5, ang, ang + barrido, REPARTO_COLOR[it.momento] || C.acento);
       ang += barrido;
     });
-    fuente(doc, F_TITULO, 'bold', 12);
-    setText(doc, C.purpleDark);
-    doc.text(String(m.diaTipo.length), cx, cy + 1, {align:'center'});
-    fuente(doc, F_CUERPO, 'normal', 5.2);
+    fuente(doc, F_TITULO, 'bold', 11);
+    setText(doc, C.marca);
+    doc.text(String(m.diaTipo.length), cx, cy + 0.6, {align:'center'});
+    fuente(doc, F_CUERPO, 'normal', 5);
     setText(doc, C.inkFaint);
-    doc.text('MOMENTOS', cx, cy + 4.4, {align:'center'});
+    doc.text('MOMENTOS', cx, cy + 3.8, {align:'center'});
 
-    const xLeyenda = xDona + 37;
+    const xLeyenda = xDona + 35;
     let ly = cy - 6.6;
     m.diaTipo.forEach(function(it){
-      setFill(doc, REPARTO_COLOR[it.momento] || C.purple);
-      doc.roundedRect(xLeyenda, ly - 1.9, 2.4, 2.4, 0.6, 0.6, 'F');
+      setFill(doc, REPARTO_COLOR[it.momento] || C.acento);
+      doc.roundedRect(xLeyenda, ly - 1.7, 2, 2, 0.3, 0.3, 'F');
       fuente(doc, F_CUERPO, 'normal', 6.8);
       setText(doc, C.inkSoft);
-      doc.text(it.momento, xLeyenda + 4, ly);
+      doc.text(it.momento, xLeyenda + 3.4, ly);
       fuente(doc, F_CUERPO, 'bold', 6.8);
-      setText(doc, C.purpleDark);
+      setText(doc, C.marca);
       doc.text(it.pct + '%', PAGE_W - M, ly, {align:'right'});
-      ly += 4.6;
+      ly += 4.4;
     });
 
     fuente(doc, F_CUERPO, 'normal', 6.2);
     setText(doc, C.inkFaint);
     const nota = doc.splitTextToSize('Reparto orientativo de la energía del día.', 58);
-    nota.forEach(function(l, i){ doc.text(l, xDona, cy + 21.5 + i * 3); });
+    nota.forEach(function(l, i){ doc.text(l, xDona, cy + 20.5 + i * 3); });
 
-    ctx.y = Math.max(yy, cy + 21.5 + nota.length * 3) + 6;
+    ctx.y = Math.max(yy, cy + 20.5 + nota.length * 3) + 6;
   }
 
   function dibujarAvisos(ctx, m){
@@ -865,21 +890,25 @@
       const alto = a.nivel === 'alto' ? C.red : C.gold;
       const fondo = a.nivel === 'alto' ? C.rojoSuave : C.dorado;
       fuente(doc, F_CUERPO, 'normal', 8);
-      const lineas = doc.splitTextToSize(a.texto, CW - 20);
-      const h = altoTexto(doc, lineas) + 7;
-      ctx.espacio(h + 3);
+      const lineas = doc.splitTextToSize(a.texto, CW - 17);
+      const h = altoTexto(doc, lineas) + 5.5;
+      ctx.espacio(h + 2.5);
       const y = ctx.y;
       setFill(doc, fondo);
-      doc.roundedRect(M, y, CW, h, 2.5, 2.5, 'F');
+      setDraw(doc, C.panel2);
+      doc.setLineWidth(0.25);
+      doc.roundedRect(M, y, CW, h, 1.5, 1.5, 'FD');
+      setFill(doc, alto);
+      doc.rect(M, y, 1, h, 'F');
       // Triángulo de atención
-      triangulo(doc, M + 7, y + 6.6, 4.6, -4.4, alto);
-      fuente(doc, F_CUERPO, 'bold', 5.4);
+      triangulo(doc, M + 6.5, y + 5.6, 3.6, -3.4, alto);
+      fuente(doc, F_CUERPO, 'bold', 4.6);
       setText(doc, C.paper);
-      doc.text('!', M + 7, y + 6.1, {align:'center'});
+      doc.text('!', M + 6.5, y + 5.2, {align:'center'});
       setText(doc, C.ink);
       fuente(doc, F_CUERPO, 'normal', 8);
-      parrafo(doc, a.texto, M + 13, y + 2.2, CW - 20);
-      ctx.y = y + h + 3;
+      parrafo(doc, a.texto, M + 11.5, y + 1.6, CW - 17);
+      ctx.y = y + h + 2.5;
     });
   }
 
@@ -894,11 +923,13 @@
     ctx.espacio(h + 4);
     const y = ctx.y;
     setFill(doc, C.panel);
-    doc.roundedRect(M, y, CW, h, 2.5, 2.5, 'F');
+    setDraw(doc, C.panel2);
+    doc.setLineWidth(0.25);
+    doc.roundedRect(M, y, CW, h, 1.5, 1.5, 'FD');
 
-    fuente(doc, F_CUERPO, 'bold', 7.6);
-    setText(doc, C.purple);
-    doc.text('AVISO', M + 6, y + 7);
+    fuente(doc, F_CUERPO, 'bold', 7);
+    setText(doc, C.marca);
+    doc.text('AVISO', M + 6, y + 6.6);
 
     fuente(doc, F_CUERPO, 'normal', 7.4);
     setText(doc, C.inkSoft);
@@ -951,7 +982,7 @@
 
     // Fila de métricas: barras (izquierda) + IMC (derecha).
     const wIzq = 108, wDer = CW - wIzq - 4;
-    const altoFila = 14 + m.barras.length * 9.6 + 6;
+    const altoFila = 13 + m.barras.length * 8.6 + 6;
     ctx.espacio(altoFila);
     const yFila = ctx.y;
     dibujarBarras(ctx, m, M, yFila, wIzq);
@@ -994,7 +1025,7 @@
       const h = altoCajaLista(doc, m.ajustes, CW);
       tituloSeccion(ctx, 'Ajustado a tu caso', h);
       ctx.espacio(h);
-      dibujarCajaLista(doc, M, ctx.y, CW, 'QUÉ CAMBIA EN TU PLAN', m.ajustes, C.purple, C.lila);
+      dibujarCajaLista(doc, M, ctx.y, CW, 'QUÉ CAMBIA EN TU PLAN', m.ajustes, C.acento, C.acentoSuave);
       ctx.y += h + 6;
     }
 
@@ -1071,6 +1102,7 @@
       pdfTextoSeguro: pdfTextoSeguro,
       pdfDesescaparHTML: pdfDesescaparHTML,
       pdfHexARgb: pdfHexARgb,
+      pdfColorPorcentaje: pdfColorPorcentaje,
       pdfRangoPesoSaludable: pdfRangoPesoSaludable,
       META_PCT: META_PCT,
       REPARTO: REPARTO,
