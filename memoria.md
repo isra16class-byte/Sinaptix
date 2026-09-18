@@ -651,19 +651,49 @@ próximos pasos).
     sí.
 
 - **Contacto (`#lam-06`)**: sobre `.contact-wrap` (columna izquierda +
-  `.contact-form`), la columna izquierda tiene ahora: franja de
-  confianza (`.contact-trust`, 2 ítems con ícono en `--purple`) →
-  `.big-email` con botón circular de copiar al lado (`.copy-email-btn`,
+  `.contact-form`), la columna izquierda tiene: franja de confianza
+  (`.contact-trust`, ítems con ícono en `--purple`) → `.big-email` con
+  botón circular de copiar al lado (`.copy-email-btn`,
   `navigator.clipboard`, tooltip "Copiado ✓" por CSS) → redes sociales
   como grid de tarjetas (`.social-cards`/`.social-card`, 2x2 desktop/1
   col ≤480px, ícono en círculo + nombre + handle), ya no lista de filas.
-  El formulario y su envío por `mailto:` (`js/script.js`) no cambiaron.
+  El formulario y su envío por `mailto:` (`js/script.js`) no cambiaron
+  en su lógica.
   - **Color de marca por red** (`.social-card-icon`): Instagram, Facebook
     y TikTok llevan su color/degradado oficial + ícono blanco
     (`.social-card-icon--instagram/--facebook/--tiktok`, clases
     modificadoras sobre el círculo base). Teléfono queda con el círculo
     genérico `--panel-2`/ícono `--purple` de siempre (no es red social,
     no tiene color de marca que aplicar).
+  - **CTA principal al wizard, email/formulario pasan a alternativa
+    secundaria** (sesión 2026-09-18, pedido explícito: el usuario no
+    quiere estar respondiendo correos uno por uno, prefiere que el
+    plan se genere solo): arriba de `.contact-wrap`, nuevo panel
+    `.contact-cta` (fondo `--purple-soft`, mismo criterio que
+    `.scale-opt:has(input:checked)`) con eyebrow "Sin esperas", título
+    "Generá tu plan de neuroalimentación ahora mismo" y botón
+    `.btn.btn-solid.btn-lg.js-abrir-nutricion` ("Generar mi plan
+    ahora"). `.btn-lg` es un modificador nuevo y genérico (`padding:16px
+    30px;font-size:16px`), reutilizable en cualquier `.btn` del sitio.
+    `.js-abrir-nutricion` es una clase (no id, para poder repetirse en
+    más de un botón a futuro) con listener propio en `js/script.js` que
+    hace lo mismo que `#btnNutricion` (`resetNutriWizard()` +
+    `openModal('modalNutricion')`) — no se reusó el id porque ya existe
+    en Método y los id deben ser únicos en el documento.
+    `.contact-wrap` original queda envuelto en `.contact-wrap-secondary`
+    (`opacity:.92`, ajuste sutil, no oculta nada) con un
+    `.contact-secondary-label` ("¿Preferís escribirnos igual?") arriba
+    del texto. Se sacó el ítem de confianza "Respondemos en menos de
+    24h" (prometía respuesta humana con SLA, contradice el pedido) y se
+    reescribió el copy de la columna ("También podés contactarnos por
+    estos medios para consultas puntuales" en vez de invitar a escribir
+    como acción principal). El botón "Enviar mensaje" del formulario
+    pasó de `.btn-solid` a `.btn-ghost` para que no compita visualmente
+    con el CTA del wizard. No se tocó el envío por `mailto:` en sí — si
+    más adelante se quiere sacar el email de raíz o automatizar la
+    respuesta, ver ideas descartadas/pendientes de la conversación con
+    el usuario (no todas implementadas todavía: FAQ, autorespuesta,
+    redirigir "Enviar mensaje" al wizard, botón flotante global, etc.).
 
 ## Pendientes conocidos
 
@@ -692,6 +722,14 @@ próximos pasos).
   en Método, que el halo de color detrás del marcador no se vea
   demasiado fuerte/artificial, y que las puntas redondeadas del arco se
   vean bien contra el riel gris de fondo.
+- **Verificar en navegador real (sesión 2026-09-18, Contacto — CTA al
+  wizard + email/formulario secundario)**: implementado sin poder ver el
+  resultado en un navegador. Falta confirmar: que `.contact-cta` no se vea
+  desbalanceado contra el resto de la sección (fondo `--purple-soft` muy
+  sutil/muy fuerte), que `.contact-wrap-secondary{opacity:.92}` se note lo
+  suficiente como "secundario" sin parecer un error de estilos, y que el
+  botón `.btn-ghost` de "Enviar mensaje" siga siendo cómodo de ver/clickear
+  sobre `.contact-form` (fondo `--paper`).
 - **Verificar en navegador real (sesión 2026-09-18, íconos de redes +
   tarjetas de Pilares + fundido)**: implementado a partir de una captura
   que mandó el usuario, sin poder correr Playwright (no hay browser

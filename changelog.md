@@ -11,6 +11,43 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Contacto: CTA principal al wizard, email/formulario a segundo plano
+
+Pedido del usuario: no quiere estar respondiendo correos manualmente, prefiere
+que la sección de Contacto empuje al wizard de nutrición (plan automático)
+como acción principal, dejando el email/redes/formulario como alternativa
+secundaria para quien igual prefiera escribir.
+
+Cambios en `index.html`/`css/styles.css`/`js/script.js`:
+- Nuevo panel `.contact-cta` arriba de `.contact-wrap`, con botón
+  `.btn.btn-solid.btn-lg.js-abrir-nutricion` ("Generar mi plan ahora") que
+  abre el mismo modal del wizard que `#btnNutricion` (nuevo listener en
+  `script.js` para la clase `.js-abrir-nutricion`, no se reusó el id porque
+  ya existe en Método).
+- `.contact-wrap` original envuelto en `.contact-wrap-secondary`
+  (`opacity:.92`) con label `.contact-secondary-label` ("¿Preferís
+  escribirnos igual?"), copy reescrito, y se sacó el ítem de confianza
+  "Respondemos en menos de 24h" (prometía SLA de respuesta humana,
+  contradice el pedido).
+- Botón "Enviar mensaje" del formulario: `.btn-solid` → `.btn-ghost`, para
+  que no compita con el CTA nuevo.
+- Nuevo modificador genérico `.btn-lg` en `css/styles.css` (reutilizable en
+  cualquier `.btn`).
+
+No se tocó la lógica de envío del formulario (sigue por `mailto:`) ni el
+wizard en sí. Quedan sobre la mesa (conversadas con el usuario, no
+implementadas todavía): redirigir "Enviar mensaje" al wizard en vez de
+`mailto:`, autorespuesta al enviar el formulario, sección de FAQ, botón
+flotante global "Generar mi plan", y bajar aún más el perfil de las redes
+sociales (marcarlas como difusión, no soporte).
+
+`npm test` corrido tras el cambio: 75 pass / 1 skip (Playwright no instalado
+en este entorno, como siempre) / 0 fail — el cambio es solo de
+markup/estilos/UI, no toca las funciones de cálculo testeadas.
+
+Verificación visual real pendiente (no hay navegador en este entorno): ver
+memoria.md.
+
 ## 2026-09-18 — PDF de "Mi plan": paleta neutra (fuera el morado) y trazos más finos
 
 El usuario revisó el PDF de la entrega anterior y marcó tres cosas: que se
