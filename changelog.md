@@ -24,6 +24,16 @@
   vía `@supports not` para navegadores sin soporte) en `.quote-card`
   (`css/styles.css`). Las frutas se ven difuminadas detrás de las 2
   tarjetas, sin tocar su tamaño/posición/opacidad.
+- Ajuste siguiente, mismo pedido: se agregaron 3 frutas chicas
+  "saliendo" de las tarjetas para que se note más el efecto vidrio —
+  arándanos arriba de la 1ª, kiwi en la costura entre ambas, almendras
+  abajo de la 2ª (`index.html`, dentro de `.reveal.d2` → renombrado
+  `.ben-quotes` con `position:relative`). Cada fruta va antes de su
+  tarjeta en el HTML para quedar detrás por orden de stacking (mismo
+  patrón `deco`/`deco-fruit` sin z-index propio que usa el resto del
+  sitio) — no hay navegador real en este entorno para confirmar el
+  resultado final, la posición de la del medio (kiwi, `top:48%`) es una
+  estimación ya que la altura real de las tarjetas depende del texto.
 
 ## 2026-09-18 — Íconos de redes con color de marca, tarjetas de Pilares más compactas, fundido entre Pilares y Beneficios
 

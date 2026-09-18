@@ -461,6 +461,18 @@ próximos pasos).
     granada) se noten difuminadas detrás de las 2 tarjetas de
     testimonios sin perder legibilidad del texto. No se tocó tamaño/
     posición/opacidad de las frutas — ya coinciden con la referencia.
+  - **3 frutas chicas "saliendo" de las tarjetas** (mismo pedido,
+    ajuste siguiente): contenedor `.reveal.d2` de las 2 `.quote-card`
+    pasa a `.ben-quotes` (`position:relative`, clase nueva). Arándanos
+    (`svg/deco-blob-berries.svg`, 48px) asoman por la esquina superior
+    derecha de la 1ª tarjeta, kiwi (`svg/deco-blob-kiwi.svg`, 42px) por
+    la costura entre ambas (izquierda, `top:48%`) y almendras
+    (`svg/deco-blob-almonds.svg`, 52px) por la esquina inferior derecha
+    de la 2ª. Las 3 van **antes** de su tarjeta correspondiente en el
+    HTML (mismas clases `deco deco-fruit` que el resto del sitio, sin
+    `z-index` propio) para que el orden del DOM las deje detrás de la
+    tarjeta que sigue — la parte que queda tapada se ve difuminada por
+    el `backdrop-filter`, la que sobresale se ve nítida.
 
 - **Contacto (`#lam-06`)**: sobre `.contact-wrap` (columna izquierda +
   `.contact-form`), la columna izquierda tiene ahora: franja de
