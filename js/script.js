@@ -81,14 +81,6 @@
     resetNutriWizard();
     openModal('modalNutricion');
   });
-  // CTA de "Empecemos tu asesoría" (Contacto): mismo wizard que btnNutricion,
-  // pero puede haber varios botones con esta clase (hoy solo el de Contacto).
-  document.querySelectorAll('.js-abrir-nutricion').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      resetNutriWizard();
-      openModal('modalNutricion');
-    });
-  });
   document.getElementById('btnAntropometria').addEventListener('click', ()=>openModal('modalAntropometria'));
   document.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', e=>closeModal(e.target.closest('.modal-overlay')));

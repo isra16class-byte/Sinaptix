@@ -1497,28 +1497,6 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .ben-quote-fruit{filter:none}
 
 /* ---------- 06 CONTACTO ---------- */
-/* Panel CTA principal (sesión 2026-09-18): el usuario no quiere estar
-   respondiendo correos uno por uno, así que el wizard de nutrición (plan
-   automático, sin intervención humana) pasa a ser la acción principal de
-   la sección. El bloque de email/redes/formulario queda como alternativa
-   secundaria, más chica, debajo. */
-.contact-cta{
-  background:var(--purple-soft);border:1px solid var(--panel-line);border-radius:var(--radius);
-  padding:36px 40px;margin-top:50px;margin-bottom:46px;text-align:left;
-}
-.contact-cta-eyebrow{
-  display:inline-block;font-family:var(--font-m);font-size:12px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:var(--purple);margin-bottom:10px;
-}
-.contact-cta-title{font-family:var(--font-d);font-size:clamp(22px,3vw,30px);color:var(--ink);margin-bottom:10px}
-.contact-cta-text{color:var(--panel-text);margin-bottom:22px;max-width:52ch}
-.btn-lg{padding:16px 30px;font-size:16px}
-@media(max-width:600px){.contact-cta{padding:28px 24px}}
-
-.contact-wrap-secondary{opacity:.92}
-.contact-secondary-label{
-  font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;
-}
 .contact-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:70px}
 @media(max-width:900px){.contact-wrap{grid-template-columns:1fr;gap:50px}}
 .contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
