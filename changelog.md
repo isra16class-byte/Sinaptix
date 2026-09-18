@@ -11,6 +11,49 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-02` Visión: los 4 pares ícono+texto subidos de forma uniforme
+
+Pedido del usuario: "subí un poco los 4 íconos con sus respectivos textos
+de manera uniforme" y, después de verlo, "subilos un poco más".
+
+- **`css/styles.css`**: nuevo valor único `--vision-pares-shift`, definido
+  en `.vision-art` dentro del `@media(min-width:901px)` de `.vision-icons`.
+  Está en `%` de la altura de `.vision-art` — la misma referencia que ya
+  usaban todos los `top` de esta sección, así que sigue escalando con el
+  fondo a cualquier ancho. Se aplica como
+  `top:calc(<valor original> + var(--vision-pares-shift))` a los 4
+  `.vision-icon--*` y a los 4 `.stat-annot--*` (dorado/morado/verde/azul),
+  de modo que un solo número mueve los 8 elementos juntos. No se tocó
+  ningún `left` ni ningún `width`.
+- **Valor final**: `-11%` (≈33px a 1440px). Primero se probó `-6.5%`
+  (≈19px) y el usuario pidió subirlos un poco más.
+- **Medido** en el navegador integrado de VS Code (Playwright, 1440×900):
+  los 8 elementos subieron 33px exactos respecto de sus posiciones
+  originales (cerebro/red 289 → 256, reloj 541 → 508, cintas 556 → 523;
+  sus textos 422 → 389 y 713 → 680).
+- Solo desktop: el bloque de mobile (`<900px`) sigue con el fallback en
+  columna sin `.vision-icon` posicionados (no se tocó).
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
+## 2026-09-18 — `#lam-06` Conócenos: halo oscuro del collage un poco más bajo
+
+Pedido del usuario: "quiero que le bajes solo un poco el halo oscuro
+detrás del collage" (el halo se había agregado en el patch anterior, del
+mismo día).
+
+- **`css/styles.css`**: `--collage-halo-alpha` (variable local de `.stage`)
+  pasa de `.62` a `.48`. El blur (`--collage-halo-blur`,
+  `calc(var(--u)*46)`) y todo lo demás del halo quedan igual.
+- **Verificado** en el navegador integrado de VS Code: el `filter`
+  computado a 1440px queda
+  `drop-shadow(rgba(38, 22, 31, 0.48) 0px 0px 39.8px)`.
+- `npm test`: 75 pass / 1 skipped, 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-06` Conócenos: halo oscuro difuso detrás del collage
 
 Pedido del usuario: "una especie de difuminado transparente oscuro por los

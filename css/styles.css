@@ -466,12 +466,23 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    decidido, ver memoria.md → "Pendientes conocidos". */
 .vision-icons{display:none}
 @media(min-width:901px){
+  /* Sesión 2026-09-18 (pedido del usuario: "subí un poco los 4 íconos con
+     sus respectivos textos, de manera uniforme"): los 4 pares
+     ícono+anotación se suben la MISMA distancia con un único valor,
+     `--vision-pares-shift`, en % de la altura de `.vision-art` (la misma
+     referencia que ya usaban todos los `top` de esta sección, para que
+     escale junto con el fondo/íconos a cualquier ancho). Para mover los 8
+     elementos juntos (los 4 `.vision-icon` de acá y las 4 `.stat-annot`
+     de más abajo) basta cambiar este número. Valor final pedido por el
+     usuario: `-11%` ≈ 33px a 1440px (se probó `-6.5%` ≈ 19px primero y
+     después pidió "un poco más"). */
+  .vision-art{--vision-pares-shift:-11%}
   .vision-icons{display:block;position:absolute;inset:0;pointer-events:none}
   .vision-icon{position:absolute;display:block;height:auto}
-  .vision-icon--dorado{left:-5%;top:-14%;width:34%}
-  .vision-icon--morado{left:61%;top:-14%;width:34%}
-  .vision-icon--verde{left:0%;top:71%;width:22%}
-  .vision-icon--azul{left:68%;top:76%;width:32%}
+  .vision-icon--dorado{left:-5%;top:calc(-14% + var(--vision-pares-shift));width:34%}
+  .vision-icon--morado{left:61%;top:calc(-14% + var(--vision-pares-shift));width:34%}
+  .vision-icon--verde{left:0%;top:calc(71% + var(--vision-pares-shift));width:22%}
+  .vision-icon--azul{left:68%;top:calc(76% + var(--vision-pares-shift));width:32%}
 }
 
 #lam-02 .stat-box{
@@ -624,10 +635,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .vision-stats-col{width:100%}
   #lam-02 .stat-annotations{position:absolute;inset:0;display:block}
   #lam-02 .stat-annot{position:absolute;width:34%;transform:translateX(-50%);text-align:left}
-  #lam-02 .stat-annot--dorado{left:55%;top:31%}
-  #lam-02 .stat-annot--morado{left:119%;top:31%}
-  #lam-02 .stat-annot--verde{left:55%;top:129%}
-  #lam-02 .stat-annot--azul{left:119%;top:129%}
+  /* El `+ var(--vision-pares-shift)` (definido arriba, junto a
+     `.vision-icons`) es lo que sube las 4 anotaciones junto con sus
+     íconos, la misma distancia. */
+  #lam-02 .stat-annot--dorado{left:55%;top:calc(31% + var(--vision-pares-shift))}
+  #lam-02 .stat-annot--morado{left:119%;top:calc(31% + var(--vision-pares-shift))}
+  #lam-02 .stat-annot--verde{left:55%;top:calc(129% + var(--vision-pares-shift))}
+  #lam-02 .stat-annot--azul{left:119%;top:calc(129% + var(--vision-pares-shift))}
   #lam-02 .stat-annot-deco{width:90px;height:36px;margin-left:0;transform:none;overflow:visible}
 }
 
@@ -1573,7 +1587,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    a las piezas). Color = `--ink` con alfa (mismo ciruela de las sombras de
    las tarjetas). Ajustar: `--collage-halo-alpha` y `--collage-halo-blur`. */
 .stage{
-  --collage-halo-alpha:.62;--collage-halo-blur:calc(var(--u)*46);
+  --collage-halo-alpha:.48;--collage-halo-blur:calc(var(--u)*46);
   filter:drop-shadow(0 0 var(--collage-halo-blur) rgba(38,22,31,var(--collage-halo-alpha)));
 }
 

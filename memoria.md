@@ -603,6 +603,13 @@ próximos pasos).
     (`<900px`) queda con fallback simple en columna, sin diseñar (ver
     "Pendientes conocidos", sesión 2). Colores por dato: dorado 20%,
     morado 86B, verde 4–6, azul 1:1 — mismos 4 de siempre.
+    **Subida uniforme (2026-09-18)**: `--vision-pares-shift` (definido en
+    `.vision-art`) = `-11%` de la altura de `.vision-art` (≈33px a
+    1440px), aplicado con `top:calc(<original> + var(--vision-pares-shift))`
+    a los 4 `.vision-icon--*` y a los 4 `.stat-annot--*`, para que los 4
+    pares ícono+texto se muevan juntos (pedido del usuario, en 2 tandas:
+    `-6.5%` y después "un poco más"). Los `left` y los `width` no se
+    tocaron. Para volver a subirlos/bajarlos, cambiar solo ese valor.
   - Subtítulos de los 3 bullets de texto (`.vision-bullets strong`) en
     `--purple` (antes casi negro), para combinar con "alimenta" del
     título.
@@ -842,9 +849,10 @@ próximos pasos).
     (`css/styles.css`, justo debajo de `.stage svg`): se pinta **debajo**
     del contenido, sigue la silueta real de las piezas y no toca los
     píxeles del collage. Se ajusta con 2 variables locales de `.stage`:
-    `--collage-halo-alpha` (`.62`) y `--collage-halo-blur`
+    `--collage-halo-alpha` (`.48`) y `--collage-halo-blur`
     (`calc(var(--u)*46)`, escala con el collage). El usuario pidió
-    "más aún" tras ver `.42`/`38u`, de ahí los valores actuales.
+    "más aún" tras ver `.42`/`38u` (de ahí `.62`/`46u`) y después pidió
+    bajarlo "solo un poco": alfa final `.48` (2026-09-18).
     ⚠️ **No reintentar** los 3 enfoques descartados: (1) viñeta encima
     (overlay `linear-gradient` en `::after`) → rectángulo oscuro con
     borde duro; (2) anillo `radial-gradient` elíptico encima → "se ve un
