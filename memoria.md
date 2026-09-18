@@ -294,9 +294,20 @@ próximos pasos).
   - **Tarjeta "Mi IMC"** (`renderMethodImc`): misma jerarquía — frase de
     insight fija por zona, medidor+número+categoría agrupados en
     `.method-imc-featured` con badge de color por zona
-    (`.imc-tier-bajo/-saludable/-sobrepeso/-vigilar`), rango de peso
+    (`.imc-tier-bajo/-saludable/-sobrepeso/-obesidad`), rango de peso
     saludable estimado (`.method-imc-range`, solo si hay talla cargada).
     No afecta `mi-plan.html` (usa sus propias clases sin tocar).
+- **Categoría "obesidad" (antes "rango a vigilar")**: la 4ª zona del IMC
+  (`imc >= 30`) decía "rango a vigilar" por una decisión de tono de una
+  sesión anterior. Corregido en sesión 2026-09-18 a pedido explícito del
+  usuario ("ponele lo que realmente es") — ahora `imcCategoria()`
+  devuelve `{cat:'obesidad', zona:'obesidad'}` (antes `'vigilar'`), y
+  todas las clases CSS que usaban el sufijo `-vigilar`
+  (`.imc-zone-vigilar`, `.imc-cat-vigilar`, `.imc-dot-vigilar`,
+  `.imc-tier-vigilar`, `.imc-gauge-marker-glow-vigilar`) pasan a
+  `-obesidad` en `css/styles.css`, `js/script.js` y `mi-plan.html` —
+  umbrales de IMC (18.5/25/30) sin cambios, son los estándar de la OMS
+  para adultos y ya estaban bien.
 - **Medidor de IMC tipo velocímetro (`.imc-gauge`)**: compartido entre
   `mi-plan.html` (`#miPlanImcGauge`) y "Mi IMC" de Método. Degradado
   continuo dorado→verde→dorado→rojo en un solo `<linearGradient>`
@@ -331,11 +342,11 @@ próximos pasos).
     encima, antes un único círculo); halo de color detrás del marcador
     del valor exacto (`.imc-gauge-marker-glow`, mismo criterio de color
     que `.imc-dot-*`/`.imc-cat-*` — bajo/sobrepeso dorado, saludable
-    verde, vigilar rojo), posición y clase de color puestas por JS junto
+    verde, obesidad rojo), posición y clase de color puestas por JS junto
     con el marcador (`pintarMiPlan()` en `js/mi-plan.js`,
     `renderMethodImc()` en `js/script.js`, elemento
     `#miPlanImcMarcadorGlow` en `mi-plan.html`). Las puntas del arco
-    completo (tramos `.imc-zone-bajo`/`.imc-zone-vigilar`) siguen en
+    completo (tramos `.imc-zone-bajo`/`.imc-zone-obesidad`) siguen en
     `stroke-linecap:round` (los 2 tramos intermedios en `butt`, para no
     dejar costuras redondeadas entre colores) — look más de velocímetro
     real. **Sin confirmar en navegador real** (no hay browser instalado

@@ -182,7 +182,7 @@ que el DOM ya existe). El flujo, en orden:
        la ejecución (return) sin enviar nada.
      - Si todo es válido: calcula IMC = peso / (talla_m)^2 y una
        categoría textual (bajo peso / peso saludable / sobrepeso /
-       rango a vigilar).
+       obesidad).
      - Guarda el resultado en localStorage bajo la key
        "sinaptix_antropometria" (usado luego por "Mi plan").
      - Arma un mailto: con los datos y redirige el navegador a él

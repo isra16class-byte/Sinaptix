@@ -615,7 +615,7 @@
       bajo: 'Tu IMC está en zona de bajo peso — sumar calorías de calidad puede ayudar a sostener tu energía mental durante el día.',
       saludable: 'Tu IMC está en rango saludable — buen punto de partida para sostener tu rendimiento cognitivo.',
       sobrepeso: 'Tu IMC está en sobrepeso — un plan de neuroalimentación puede ayudarte a acercarlo al rango saludable.',
-      vigilar: 'Tu IMC está en un rango a vigilar — vale la pena acompañarlo con seguimiento profesional además del plan de nutrición.'
+      obesidad: 'Tu IMC está en rango de obesidad — vale la pena acompañarlo con seguimiento profesional además del plan de nutrición.'
     };
     return '<div class="gauge-insight">'+
       '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
@@ -682,7 +682,7 @@
             '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
             '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
             '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
-            '<path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+            '<path class="imc-zone imc-zone-obesidad" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
             (typeof imcGaugeMinorTicksHtml === 'function' ? imcGaugeMinorTicksHtml() : '')+
             (typeof imcGaugeTicksHtml === 'function' ? imcGaugeTicksHtml() : '')+
             '<circle class="imc-gauge-marker-glow imc-gauge-marker-glow-'+info.zona+'" cx="'+marcador.x+'" cy="'+marcador.y+'" r="10"/>'+
@@ -701,7 +701,7 @@
         '<li><span class="imc-dot imc-dot-bajo"></span>Bajo peso</li>'+
         '<li><span class="imc-dot imc-dot-saludable"></span>Saludable</li>'+
         '<li><span class="imc-dot imc-dot-sobrepeso"></span>Sobrepeso</li>'+
-        '<li><span class="imc-dot imc-dot-vigilar"></span>A vigilar</li>'+
+        '<li><span class="imc-dot imc-dot-obesidad"></span>Obesidad</li>'+
       '</ul>';
   }
 

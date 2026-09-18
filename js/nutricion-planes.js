@@ -312,14 +312,17 @@ function nutriEscaparHTML(texto){
 // ===================== IMC: categoría y medidor tipo velocímetro =====================
 // Compartido entre el formulario de antropometría (js/script.js, que calcula
 // el IMC) y el medidor de "Mi plan" (js/mi-plan.js, que lo pinta) — antes cada
-// uno tenía su propia copia de estos mismos umbrales. Ver
-// plan-mejoras-mi-plan-y-encuesta.md / continuar-grafico-imc.md: se mantiene
-// 'rango a vigilar' en vez de 'obesidad' (decisión de tono ya tomada).
+// uno tenía su propia copia de estos mismos umbrales. Umbrales estándar OMS
+// para adultos (18.5/25/30) — no cambian. Categoría/color de la 4ª zona
+// corregidos en sesión 2026-09-18: antes decía "rango a vigilar" (eufemismo,
+// decisión de tono de una sesión anterior); a pedido del usuario pasa a decir
+// lo que realmente es, "obesidad" — ver plan-mejoras-mi-plan-y-encuesta.md /
+// continuar-grafico-imc.md para el historial de esa decisión ya revertida.
 function imcCategoria(imc){
   if(imc < 18.5) return {cat:'bajo peso', zona:'bajo'};
   if(imc < 25) return {cat:'peso saludable', zona:'saludable'};
   if(imc < 30) return {cat:'sobrepeso', zona:'sobrepeso'};
-  return {cat:'rango a vigilar', zona:'vigilar'};
+  return {cat:'obesidad', zona:'obesidad'};
 }
 
 // Rango que cubre el arco del medidor (15 a 40) — valores fuera de este
@@ -378,7 +381,7 @@ function imcGaugeMarkerPos(imc){
 
 // ===================== Medidor de IMC: degradado continuo del arco =====================
 // Antes el arco se pintaba con 4 <path> de color sólido, uno por zona
-// (.imc-zone-bajo/-saludable/-sobrepeso/-vigilar en css/styles.css). Los
+// (.imc-zone-bajo/-saludable/-sobrepeso/-obesidad en css/styles.css). Los
 // 4 <path> y sus mismos umbrales (18.5/25/30) NO cambian — lo que cambia
 // es que ahora comparten un único <linearGradient> para que el color se
 // lea como una transición continua en vez de bloques con un corte
@@ -397,13 +400,13 @@ function imcGaugeGradientStops(){
   const centroBajo = (IMC_GAUGE_MIN + 18.5) / 2;
   const centroSaludable = (18.5 + 25) / 2;
   const centroSobrepeso = (25 + 30) / 2;
-  const centroVigilar = (30 + IMC_GAUGE_MAX) / 2;
+  const centroObesidad = (30 + IMC_GAUGE_MAX) / 2;
   const offset = imc => +((imc - IMC_GAUGE_MIN) / (IMC_GAUGE_MAX - IMC_GAUGE_MIN) * 100).toFixed(2);
   return [
     { offset: offset(centroBajo), color: gaugeColorForPercent(50) },       // bajo peso → dorado
     { offset: offset(centroSaludable), color: gaugeColorForPercent(100) }, // saludable → verde
     { offset: offset(centroSobrepeso), color: gaugeColorForPercent(50) },  // sobrepeso → dorado
-    { offset: offset(centroVigilar), color: gaugeColorForPercent(0) }      // a vigilar → rojo
+    { offset: offset(centroObesidad), color: gaugeColorForPercent(0) }     // obesidad → rojo
   ];
 }
 

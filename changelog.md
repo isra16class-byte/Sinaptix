@@ -11,6 +11,27 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — IMC: "obesidad" en vez de "rango a vigilar" (nombre real de la categoría)
+
+Pedido del usuario: verificar que los valores/colores del medidor de
+IMC fueran correctos y corregir el texto "a vigilar" por lo que
+realmente es. Verificación: los umbrales (18.5/25/30) y los colores
+(dorado/verde/dorado/rojo) ya eran correctos — el problema era solo el
+texto de la 4ª categoría, que decía "rango a vigilar" por una decisión
+de tono de una sesión anterior (documentada en el propio código).
+Se cambia en todo el repo a "obesidad" (su nombre real):
+
+- `imcCategoria()` (`js/nutricion-planes.js`): `zona`/`cat` pasan de
+  `'vigilar'`/`'rango a vigilar'` a `'obesidad'`/`'obesidad'`.
+- Todas las clases CSS con sufijo `-vigilar` renombradas a `-obesidad`
+  (`.imc-zone-*`, `.imc-cat-*`, `.imc-dot-*`, `.imc-tier-*`,
+  `.imc-gauge-marker-glow-*`) en `css/styles.css`, `js/script.js` y
+  `mi-plan.html` (path del arco, leyenda "Obesidad" en vez de
+  "A vigilar", insight de la pestaña "Mi IMC" de Método).
+- `tests/nutricion-planes.test.js` y `ESTRUCTURA-DEL-CODIGO.txt`
+  actualizados para que coincidan.
+- Tests (`npm test`, 54/54) siguen pasando.
+
 ## 2026-09-18 — Medidor de IMC: segunda pasada estética (riel, marcas chicas, sombras, halo de color)
 
 El usuario pidió mejorarlo más después de ver una captura del patch

@@ -99,7 +99,7 @@ if(window.netlifyIdentity){
           const info = imcCategoria(d.imc);
           // Halo de color detrás del marcador (sesión 2026-09-18): misma
           // posición que el marcador, clase de color según la zona
-          // (imc-gauge-marker-glow-bajo/-saludable/-sobrepeso/-vigilar,
+          // (imc-gauge-marker-glow-bajo/-saludable/-sobrepeso/-obesidad,
           // ver css/styles.css) para dar contexto sin leer la etiqueta.
           if(marcadorGlowEl && typeof imcGaugeMarkerPos === 'function'){
             const posGlow = imcGaugeMarkerPos(d.imc);

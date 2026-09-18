@@ -186,7 +186,7 @@ test('imcCategoria — bordes exactos de cada rango', () => {
   assert.strictEqual(imcCategoria(24.99).zona, 'saludable');
   assert.strictEqual(imcCategoria(25).zona, 'sobrepeso');
   assert.strictEqual(imcCategoria(29.99).zona, 'sobrepeso');
-  assert.strictEqual(imcCategoria(30).zona, 'vigilar');
+  assert.strictEqual(imcCategoria(30).zona, 'obesidad');
 });
 
 // ===================== imcGaugeAngulo =====================
@@ -252,7 +252,7 @@ test('imcGaugeGradientStops — 4 anclajes en el centro de cada zona, mismos col
   assert.strictEqual(stops[0].color, gaugeColorForPercent(50));  // bajo → dorado
   assert.strictEqual(stops[1].color, gaugeColorForPercent(100)); // saludable → verde
   assert.strictEqual(stops[2].color, gaugeColorForPercent(50));  // sobrepeso → dorado
-  assert.strictEqual(stops[3].color, gaugeColorForPercent(0));   // vigilar → rojo
+  assert.strictEqual(stops[3].color, gaugeColorForPercent(0));   // obesidad → rojo
 });
 
 test('imcGaugeGradientDefsHtml — arma un <linearGradient> con los 4 <stop> y el id pedido', () => {

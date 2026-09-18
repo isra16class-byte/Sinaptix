@@ -662,12 +662,12 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-gauge-track{fill:none;stroke:var(--panel-2);stroke-width:22;stroke-linecap:round}
 .imc-zone{fill:none;stroke-width:18;stroke-linecap:butt;stroke:url(#imcGaugeGradient)}
 /* Puntas redondeadas solo en el primer y el último tramo (bajo peso/a
-   vigilar) — sesión 2026-09-18, pedido de "que se vea más estético":
+   obesidad) — sesión 2026-09-18, pedido de "que se vea más estético":
    .imc-zone ya define stroke-linecap:butt para los 4 tramos por igual
    (necesario para que no queden costuras redondeadas entre tramos
    intermedios); acá se sobreescribe puntualmente solo en los 2 extremos
    del arco completo, look típico de velocímetro. */
-.imc-zone-bajo,.imc-zone-vigilar{stroke-linecap:round}
+.imc-zone-bajo,.imc-zone-obesidad{stroke-linecap:round}
 /* Clases de los <stop> del degradado estático de mi-plan.html (el de
    renderMethodImc/js/script.js se arma en JS con el hex ya resuelto vía
    gaugeColorForPercent, no necesita estas clases). Mismas variables que
@@ -716,7 +716,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-gauge-marker{fill:var(--paper);stroke:var(--ink);stroke-width:2}
 /* Halo de color detrás del marcador (sesión 2026-09-18), mismo criterio
    de color que .imc-dot-*/.imc-cat-* (bajo/sobrepeso en dorado,
-   saludable en verde, vigilar en rojo) — le da al punto blanco un
+   saludable en verde, obesidad en rojo) — le da al punto blanco un
    contexto de color sin tener que leer la etiqueta de categoría. Se
    agrega/actualiza por JS junto con la posición del marcador
    (pintarMiPlan en js/mi-plan.js, renderMethodImc en js/script.js).
@@ -725,19 +725,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-gauge-marker-glow{opacity:.45;filter:blur(3px)}
 .imc-gauge-marker-glow-bajo,.imc-gauge-marker-glow-sobrepeso{fill:var(--gold)}
 .imc-gauge-marker-glow-saludable{fill:var(--green)}
-.imc-gauge-marker-glow-vigilar{fill:var(--red)}
+.imc-gauge-marker-glow-obesidad{fill:var(--red)}
 @media(prefers-reduced-motion:reduce){
   .imc-aguja{transition:none}
 }
 .imc-cat{font-family:var(--font-m);font-size:13px;font-weight:700;margin-top:2px}
 .imc-cat-bajo,.imc-cat-sobrepeso{color:var(--gold)}
 .imc-cat-saludable{color:var(--green)}
-.imc-cat-vigilar{color:var(--red)}
+.imc-cat-obesidad{color:var(--red)}
 .imc-legend{display:flex;flex-wrap:wrap;gap:10px 14px;list-style:none;margin:10px 0 0;padding:0;font-family:var(--font-m);font-size:11.5px;color:var(--ink-soft)}
 .imc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
 .imc-dot-bajo,.imc-dot-sobrepeso{background:var(--gold)}
 .imc-dot-saludable{background:var(--green)}
-.imc-dot-vigilar{background:var(--red)}
+.imc-dot-obesidad{background:var(--red)}
 
 /* Pestaña "Mi IMC" de Método (#lam-03) — mismo tratamiento de jerarquía
    que la pestaña "Mi progreso" (gauge-insight arriba + una zona destacada
@@ -755,7 +755,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #methodGaugesImc .method-imc-featured .gauge-tier-badge{margin-top:8px}
 .gauge-tier-badge.imc-tier-bajo,.gauge-tier-badge.imc-tier-sobrepeso{color:var(--gold)}
 .gauge-tier-badge.imc-tier-saludable{color:var(--green)}
-.gauge-tier-badge.imc-tier-vigilar{color:var(--red)}
+.gauge-tier-badge.imc-tier-obesidad{color:var(--red)}
 .method-imc-range{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin:0 0 16px;text-align:center}
 .method-imc-range strong{color:var(--purple-dark);font-weight:700}
 
