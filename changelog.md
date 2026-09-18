@@ -11,6 +11,37 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-06` Conócenos: collage mucho más grande, sin Facebook, tarjetas en columna
+
+Pedido del usuario a partir de una captura de la sección (1600px):
+"hacela mucho más grande, sacá la tarjeta de Facebook y que las tarjetas
+estén en columna".
+
+- **Collage más grande** (`css/styles.css`): `.conocenos-grid` pasa de
+  `1fr .95fr` (~480px de collage en desktop) a `minmax(0,.8fr)
+  minmax(0,1.2fr)` con `gap:40px` — ahora ~756px a 1440/1600px (~+55%),
+  ~588px a 1100px, ~346px en mobile. Además `.conocenos-collage` sangra
+  hacia la derecha fuera del padding de `.wrap` con
+  `margin-right:calc(-1 * var(--collage-bleed))`, donde
+  `--collage-bleed:clamp(0px,calc((100vw - 1180px)/2 + 30px),120px)`
+  (0 cuando el viewport ya no tiene margen lateral, tope de 120px). Se
+  hizo con margen negativo y NO con `transform:scale` porque la
+  animación `float` de la imagen ya usa `transform`. En `≤900px` el
+  collage queda centrado con `max-width:560px` (antes 520px).
+- **Facebook fuera**: se borró la tarjeta del markup de `index.html` y la
+  regla `.social-card-icon--facebook` de `css/styles.css` (cierra el
+  pendiente que venía de la sesión anterior).
+- **Tarjetas en columna**: `.social-cards` pasa de grilla 2x2 a
+  `flex-direction:column` (`gap:12px`), y quedan 3 tarjetas: Instagram,
+  TikTok, Teléfono. Como la tarjeta vertical vieja (ícono arriba, nombre,
+  handle) quedaba muy alta y ancha a una sola columna, cada `.social-card`
+  pasa a fila con `grid-template-areas` ("icon name" / "icon handle"):
+  ícono a la izquierda (38px, antes 34px), nombre + handle apilados a la
+  derecha. Se eliminó la media query de `≤480px` que ya no hace falta.
+- **Verificado con Playwright** a 1600, 1440, 1100 y 390px: `scrollX` = 0
+  en todos, 3 tarjetas, 0 íconos de Facebook, el collage no choca con las
+  frutas de fondo (granada, kiwi, salmón). Falta confirmar en deploy real.
+
 ## 2026-09-18 — Collage de redes integrado en `#lam-06` "Conócenos", verificado con Playwright
 
 Se retoma la sesión anterior (que había dejado listo el asset recortado

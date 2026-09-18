@@ -663,13 +663,15 @@ próximos pasos).
   (`.contact-trust`, 2 ítems con ícono en `--purple`) → `.big-email` con
   botón circular de copiar al lado (`.copy-email-btn`,
   `navigator.clipboard`, tooltip "Copiado ✓" por CSS) → redes sociales
-  como grid de tarjetas (`.social-cards`/`.social-card`, 2x2 desktop/1
-  col ≤480px, ícono en círculo + nombre + handle). **Se sacó el
+  como **columna** de 3 tarjetas (`.social-cards`/`.social-card`,
+  Instagram, TikTok y Teléfono — **Facebook se sacó**, sesión
+  2026-09-18); cada tarjeta es una fila: ícono en círculo a la izquierda,
+  nombre + handle apilados a la derecha. **Se sacó el
   `<form id="formContacto">`** (nombre/correo/mensaje + envío por
   `mailto:` en `js/script.js`) — ya no existe en el sitio.
-  - **Color de marca por red** (`.social-card-icon`): Instagram, Facebook
-    y TikTok llevan su color/degradado oficial + ícono blanco
-    (`.social-card-icon--instagram/--facebook/--tiktok`, clases
+  - **Color de marca por red** (`.social-card-icon`): Instagram y TikTok
+    llevan su color/degradado oficial + ícono blanco
+    (`.social-card-icon--instagram/--tiktok`, clases
     modificadoras sobre el círculo base). Teléfono queda con el círculo
     genérico `--panel-2`/ícono `--purple` de siempre (no es red social,
     no tiene color de marca que aplicar).
@@ -758,8 +760,15 @@ próximos pasos).
   de "Mi plan", superpuestas con leve inclinación.
   - `.contact-info` (columna de texto/redes que ya existía) y la nueva
     `.conocenos-collage` ahora viven dentro de `.conocenos-grid`
-    (`grid-template-columns:1fr .95fr`, colapsa a 1 columna en `≤900px` —
-    mismo breakpoint que `.hero-grid`/`.ben-grid`). A diferencia de los
+    (`grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)`, colapsa a 1
+    columna en `≤900px` — mismo breakpoint que `.hero-grid`/`.ben-grid`).
+    **Tamaño (2026-09-18, pedido "mucho más grande")**: ~756px en
+    desktop (antes ~480). El collage sangra a la derecha fuera del
+    padding de `.wrap` con `margin-right:calc(-1 * var(--collage-bleed))`
+    (`--collage-bleed` = `clamp(0px,calc((100vw - 1180px)/2 + 30px),120px)`,
+    se define en `.conocenos-grid`); se hace con margen negativo y no con
+    `transform:scale` porque `float` ya usa `transform`. Si se vuelve a
+    agrandar, chequear `window.scrollX` (no solo `scrollWidth`). A diferencia de los
     `.deco-fruit` de esta sección (decoración pura, `display:none` en
     `≤720px`), esta imagen **sí se muestra en mobile** (tiene valor de
     contenido, no es solo decoración): en `≤900px` se centra con
@@ -805,13 +814,6 @@ próximos pasos).
   ver nota en "Entorno de trabajo" más abajo) a 1440px y 390px, ambos se
   ven bien, pero falta el mismo tipo de confirmación que el resto del
   sitio: cómo se ve en un navegador real sobre el deploy de Netlify.
-  - **Relacionado, sin resolver**: la tarjeta de Facebook en
-    `.social-cards` de esta misma sección sigue en el HTML (bloque
-    `<div class="social-cards">` en `index.html`) pero el usuario
-    mencionó en la sesión anterior que "Facebook pidió que lo
-    eliminemos" — no se tocó todavía porque fue un comentario al pasar,
-    no un pedido explícito. Preguntar si hay que sacarla la próxima vez
-    que se toque esta sección.
 
 - **PDF de "Mi plan" — verificar contra el CDN real y en visores reales**:
   todo se verificó con el bundle de jsPDF servido localmente (cdnjs no es
