@@ -468,10 +468,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 @media(min-width:901px){
   .vision-icons{display:block;position:absolute;inset:0;pointer-events:none}
   .vision-icon{position:absolute;display:block;height:auto}
-  .vision-icon--dorado{left:-5%;top:-8%;width:34%}
-  .vision-icon--morado{left:61%;top:-8%;width:34%}
-  .vision-icon--verde{left:0%;top:77%;width:22%}
-  .vision-icon--azul{left:68%;top:79%;width:32%}
+  .vision-icon--dorado{left:-5%;top:-14%;width:34%}
+  .vision-icon--morado{left:61%;top:-14%;width:34%}
+  .vision-icon--verde{left:0%;top:71%;width:22%}
+  .vision-icon--azul{left:68%;top:76%;width:32%}
 }
 
 #lam-02 .stat-box{
@@ -624,10 +624,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .vision-stats-col{width:100%}
   #lam-02 .stat-annotations{position:absolute;inset:0;display:block}
   #lam-02 .stat-annot{position:absolute;width:34%;transform:translateX(-50%);text-align:left}
-  #lam-02 .stat-annot--dorado{left:55%;top:37%}
-  #lam-02 .stat-annot--morado{left:119%;top:37%}
-  #lam-02 .stat-annot--verde{left:55%;top:135%}
-  #lam-02 .stat-annot--azul{left:119%;top:135%}
+  #lam-02 .stat-annot--dorado{left:55%;top:31%}
+  #lam-02 .stat-annot--morado{left:119%;top:31%}
+  #lam-02 .stat-annot--verde{left:55%;top:129%}
+  #lam-02 .stat-annot--azul{left:119%;top:129%}
   #lam-02 .stat-annot-deco{width:90px;height:36px;margin-left:0;transform:none;overflow:visible}
 }
 
