@@ -1562,6 +1562,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 .stage *{box-sizing:border-box}
 .stage svg{display:block}
+/* Sesión 2026-09-18 (pedido: "difuminado transparente oscuro por los
+   bordes del collage, sin alterar la imagen"): halo oscuro difuso DETRÁS
+   de las piezas, que solo se ve en su contorno. Es un `drop-shadow` (se
+   pinta debajo del contenido, no encima), así que NO toca los píxeles del
+   collage — no es overlay ni máscara. Sigue la silueta real de las
+   tarjetas/teléfono (no un óvalo ni un rectángulo, que fue lo que se vio
+   mal en los 2 primeros intentos: viñeta encima y `mask-image` que
+   desvanecía el propio collage). Va en `.stage` (mueve con `float` junto
+   a las piezas). Color = `--ink` con alfa (mismo ciruela de las sombras de
+   las tarjetas). Ajustar: `--collage-halo-alpha` y `--collage-halo-blur`. */
+.stage{
+  --collage-halo-alpha:.62;--collage-halo-blur:calc(var(--u)*46);
+  filter:drop-shadow(0 0 var(--collage-halo-blur) rgba(38,22,31,var(--collage-halo-alpha)));
+}
 
 .mk-card{
   position:absolute;background:#fff;border:calc(var(--u)*1) solid rgba(113,75,103,.14);border-radius:calc(var(--u)*14);overflow:hidden;

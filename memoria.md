@@ -835,6 +835,27 @@ próximos pasos).
     `width:970px` de arriba) y las `deco-fruit` de fondo no chocan con el
     collage. Falta la confirmación de siempre sobre un deploy real (ver
     "Pendientes conocidos").
+  - **Halo oscuro difuso detrás del collage (sesión 2026-09-18)**: pedido
+    del usuario, "difuminado transparente oscuro por los bordes del
+    collage, **sin alterar la imagen**". Se resolvió con un
+    `filter:drop-shadow(0 0 <blur> rgba(38,22,31,<alpha>))` en `.stage`
+    (`css/styles.css`, justo debajo de `.stage svg`): se pinta **debajo**
+    del contenido, sigue la silueta real de las piezas y no toca los
+    píxeles del collage. Se ajusta con 2 variables locales de `.stage`:
+    `--collage-halo-alpha` (`.62`) y `--collage-halo-blur`
+    (`calc(var(--u)*46)`, escala con el collage). El usuario pidió
+    "más aún" tras ver `.42`/`38u`, de ahí los valores actuales.
+    ⚠️ **No reintentar** los 3 enfoques descartados: (1) viñeta encima
+    (overlay `linear-gradient` en `::after`) → rectángulo oscuro con
+    borde duro; (2) anillo `radial-gradient` elíptico encima → "se ve un
+    óvalo oscuro"; (3) `mask-image` en el wrapper → difuminaba el propio
+    collage, que es justo lo que el usuario NO quería. Regla: el efecto
+    va **detrás** de las piezas, nunca encima ni como máscara.
+    Verificado con Playwright (`reducedMotion:'reduce'` para congelar el
+    `float`) comparando pixel a pixel contra la versión sin halo: el
+    contenido de fotos/tarjetas queda igual; lo único que cambia adentro
+    es el antialiasing de los bordes del texto (el navegador pinta bajo un
+    `filter` con otro suavizado, imperceptible a simple vista).
 
 ## Pendientes conocidos
 

@@ -11,6 +11,40 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-06` Conócenos: halo oscuro difuso detrás del collage
+
+Pedido del usuario: "una especie de difuminado transparente oscuro por los
+bordes del collage", aclarando después que **no debe alterar el collage ni
+la imagen** — tiene que ir "atrás" o solo por los bordes. Tras verlo, pidió
+"más aún" y aprobó ("bien ahora sí").
+
+- **`css/styles.css`**: regla nueva en `.stage` (debajo de `.stage svg`):
+  `filter:drop-shadow(0 0 var(--collage-halo-blur) rgba(38,22,31,var(--collage-halo-alpha)))`
+  con `--collage-halo-alpha:.62` y `--collage-halo-blur:calc(var(--u)*46)`.
+  Como `drop-shadow` se pinta debajo del contenido y sigue la silueta real
+  de las tarjetas/teléfono, no hay overlay ni máscara sobre el collage. El
+  color es `--ink` (#26161F) con alfa, el mismo ciruela de las sombras de
+  las tarjetas. Valores iniciales `.42`/`38u`, subidos a `.62`/`46u` a
+  pedido.
+- **Intentos descartados en la misma sesión** (no reintentar):
+  1. Viñeta rectangular encima (4 `linear-gradient` en `::after`): se veía
+     como un rectángulo oscuro con borde duro sobre el fondo lavanda.
+  2. Anillo `radial-gradient` elíptico encima: "se ve un óvalo oscuro".
+  3. `mask-image` en `.conocenos-collage` (desvanecer los bordes a
+     transparente): difuminaba el propio collage, no lo que el usuario
+     quería.
+- **Verificación** (Playwright/Chromium, 1425px, 1911px y 390px,
+  `reducedMotion:'reduce'`): diff pixel a pixel contra la versión sin halo
+  — el contenido interior de las piezas (fotos, tarjetas, colores) no
+  cambia; solo varía el antialiasing de los bordes del texto, porque el
+  navegador lo pinta distinto bajo un `filter`. Sin desborde horizontal en
+  390px. El `scrollWidth` de 1625px a 1425px de ventana y la franja blanca
+  a la derecha en captura headless ya existían antes (sangrado del collage
+  contenido por `overflow-x` de `body`), no son de este cambio.
+- No se tocó JS, HTML ni el layout del collage.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-06` Conócenos: collage un poco más pequeño
 
 Pedido del usuario: "quiero que el collage lo hagas un poco más pequeño",
