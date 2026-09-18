@@ -11,6 +11,27 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Imagen del Hero: PNG de 1.2 MB → WebP de 232 KB (carga lenta al entrar)
+
+El usuario preguntó por qué la imagen grande del cerebro del Hero
+tardaba bastante en cargar al entrar recién a la web. Causa encontrada:
+`img/hero-cerebro-nutricion.png` era un PNG sin comprimir de 1.2 MB
+(1024×1024 RGBA) — el archivo de imagen más pesado del sitio, cargando
+además arriba del pliegue en la primera vista.
+
+- Convertido a `img/hero-cerebro-nutricion.webp` (calidad 85, mismas
+  dimensiones 1024×1024) → 232 KB, ~80% menos peso. Sin pérdida de
+  calidad perceptible al tamaño real de render (~460px en pantalla,
+  `.brain-art` es 82% de `.synapse-art{max-width:560px}`).
+- Se borra el `.png` viejo (no tenía otras referencias en el repo).
+- `index.html`: el `<img>` pasa a apuntar al `.webp`, suma
+  `width="1024" height="1024"` (evita salto de layout mientras carga) y
+  `fetchpriority="high"` (probable elemento LCP de la página — que el
+  navegador la priorice sobre imágenes con `loading="lazy"` más abajo,
+  como los íconos de Pilares).
+- Tests (`npm test`, 54/54) siguen pasando (no toca ninguna función
+  JS).
+
 ## 2026-09-18 — IMC: "obesidad" en vez de "rango a vigilar" (nombre real de la categoría)
 
 Pedido del usuario: verificar que los valores/colores del medidor de

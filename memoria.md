@@ -206,6 +206,18 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Imagen del Hero (`img/hero-cerebro-nutricion.webp`)**: sesión
+  2026-09-18, el usuario notó que tardaba bastante en cargar al entrar a
+  la web. Causa: era un PNG de 1.2 MB (1024×1024 RGBA) sin comprimir —
+  se convirtió a WebP calidad 85 (232 KB, ~80% menos peso, mismas
+  dimensiones; no se percibe pérdida de calidad visible a ese tamaño de
+  render, `.brain-art{width:82%}` sobre `.synapse-art{max-width:560px}`
+  ≈ 460px en pantalla). Se borró el `.png` viejo (sin otras referencias
+  en el repo). Además se le agregó `width="1024" height="1024"` (evita
+  salto de layout mientras carga) y `fetchpriority="high"` (es la imagen
+  más grande arriba del pliegue — probable LCP de la página — así el
+  navegador la prioriza sobre íconos/decoraciones que sí van con
+  `loading="lazy"`, como los de Pilares).
 - **Paleta** (`css/styles.css`, bloque `:root`): fondo blanco `--paper`,
   panel lavanda claro `--panel`, morado de marca `--purple`/`--purple-dark`
   como color estructural, acentos `--green`, `--gold` (terracota),
