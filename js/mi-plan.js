@@ -57,6 +57,7 @@ if(window.netlifyIdentity){
         const gaugeEl = document.getElementById('miPlanImcGauge');
         const agujaEl = document.getElementById('miPlanImcAguja');
         const marcadorEl = document.getElementById('miPlanImcMarcador');
+        const marcadorGlowEl = document.getElementById('miPlanImcMarcadorGlow');
         const catEl = document.getElementById('miPlanImcCat');
         const legendEl = document.getElementById('miPlanImcLegend');
         if(typeof imcGaugeAngulo === 'function' && typeof imcCategoria === 'function'){
@@ -96,6 +97,16 @@ if(window.netlifyIdentity){
             marcadorEl.setAttribute('cy', pos.y);
           }
           const info = imcCategoria(d.imc);
+          // Halo de color detrás del marcador (sesión 2026-09-18): misma
+          // posición que el marcador, clase de color según la zona
+          // (imc-gauge-marker-glow-bajo/-saludable/-sobrepeso/-vigilar,
+          // ver css/styles.css) para dar contexto sin leer la etiqueta.
+          if(marcadorGlowEl && typeof imcGaugeMarkerPos === 'function'){
+            const posGlow = imcGaugeMarkerPos(d.imc);
+            marcadorGlowEl.setAttribute('cx', posGlow.x);
+            marcadorGlowEl.setAttribute('cy', posGlow.y);
+            marcadorGlowEl.setAttribute('class', 'imc-gauge-marker-glow imc-gauge-marker-glow-'+info.zona);
+          }
           if(catEl){
             catEl.textContent = info.cat.charAt(0).toUpperCase()+info.cat.slice(1);
             catEl.className = 'imc-cat imc-cat-'+info.zona;

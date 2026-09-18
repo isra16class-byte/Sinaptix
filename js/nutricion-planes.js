@@ -470,6 +470,38 @@ function imcGaugeTicksHtml(){
   }).join('');
 }
 
+// Marcas chicas intermedias (17.5/22.5/27.5/32.5/37.5 — el punto medio
+// entre cada 2 marcas principales), sin número: solo para que la escala
+// se lea como un instrumento real (velocímetro) y no como 6 rayitas
+// sueltas. Mismo centro/radio que imcGaugeTickPoint, más cortas y más
+// tenues que las principales (ver .imc-tick-minor, css/styles.css).
+const IMC_GAUGE_MINOR_TICKS = [17.5, 22.5, 27.5, 32.5, 37.5];
+const IMC_GAUGE_MINOR_TICK_R_IN = 95;
+const IMC_GAUGE_MINOR_TICK_R_OUT = 100;
+function imcGaugeMinorTicksHtml(){
+  return IMC_GAUGE_MINOR_TICKS.map(function(v){
+    const pIn = imcGaugeTickPoint(v, IMC_GAUGE_MINOR_TICK_R_IN);
+    const pOut = imcGaugeTickPoint(v, IMC_GAUGE_MINOR_TICK_R_OUT);
+    return '<line class="imc-tick-minor" x1="'+pIn.x+'" y1="'+pIn.y+'" x2="'+pOut.x+'" y2="'+pOut.y+'"/>';
+  }).join('');
+}
+
+// "Riel" gris claro de fondo, debajo de los 4 <path> de color
+// (imc-zone-*): mismo trazado que esos 4 juntos (los mismos puntos
+// intermedios, ver arriba), pero como un único <path> más ancho
+// (stroke-width 22 vs 18 de los tramos de color) y con las 2 puntas
+// redondeadas — al ser un solo trazo entero (no 4 tramos) no hay riesgo
+// de costura entre colores. Da la sensación de "ranura" en la que corre
+// el arco de color, en vez de que el arco flote solo sobre el fondo de
+// la tarjeta. Geometría fija (no depende del IMC de nadie), por eso va
+// como constante y no como función.
+const IMC_GAUGE_TRACK_D = 'M25 115 A 85 85 0 0 1 33.09 78.81 '+
+  'A 85 85 0 0 1 83.73 34.16 A 85 85 0 0 1 136.27 34.16 '+
+  'A 85 85 0 0 1 195 115';
+function imcGaugeTrackHtml(){
+  return '<path class="imc-gauge-track" d="'+IMC_GAUGE_TRACK_D+'"/>';
+}
+
 // ===================== Guardar antropometría automáticamente desde la encuesta =====================
 // Si la persona todavía no tiene "datos antropométricos" guardados
 // (sinaptix_antropometria — normalmente se registran aparte en
@@ -651,6 +683,8 @@ if(typeof module !== 'undefined' && module.exports){
     imcGaugeGradientDefsHtml,
     imcGaugeTickPoint,
     imcGaugeTicksHtml,
+    imcGaugeMinorTicksHtml,
+    imcGaugeTrackHtml,
     gaugeComputeAreas,
     gaugeColorForPercent,
     gaugeDeltaHtml,

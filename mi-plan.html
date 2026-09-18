@@ -168,10 +168,19 @@
                   <stop offset="80%" class="imc-stop-red"/>
                 </linearGradient>
               </defs>
+              <path class="imc-gauge-track" d="M25 115 A 85 85 0 0 1 33.09 78.81 A 85 85 0 0 1 83.73 34.16 A 85 85 0 0 1 136.27 34.16 A 85 85 0 0 1 195 115"/>
               <path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>
               <path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>
               <path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>
               <path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>
+              <!-- Marcas chicas intermedias (imcGaugeMinorTicksHtml()),
+                   sesión 2026-09-18: mismo criterio que las marcas
+                   principales de abajo, sin número. -->
+              <line class="imc-tick-minor" x1="19.65" y1="85.64" x2="14.89" y2="84.1"/>
+              <line class="imc-tick-minor" x1="54.16" y1="38.14" x2="51.22" y2="34.1"/>
+              <line class="imc-tick-minor" x1="110" y1="20" x2="110" y2="15"/>
+              <line class="imc-tick-minor" x1="165.84" y1="38.14" x2="168.78" y2="34.1"/>
+              <line class="imc-tick-minor" x1="200.35" y1="85.64" x2="205.11" y2="84.1"/>
               <!-- Marcas y números de escala (15/20/25/30/35/40), sesión
                    2026-09-18: mismas coordenadas que arma
                    imcGaugeTicksHtml() en js/nutricion-planes.js (radios
@@ -192,9 +201,15 @@
               <text class="imc-tick-label" x="199.8" y="49.76" dy="0.35em">35</text>
               <line class="imc-tick" x1="205" y1="115" x2="213" y2="115"/>
               <text class="imc-tick-label" x="221" y="115" dy="0.35em">40</text>
+              <!-- Halo de color detrás del marcador (imc-gauge-marker-
+                   glow), sesión 2026-09-18: cx/cy y la clase de color
+                   (imc-gauge-marker-glow-{zona}) los pone
+                   pintarMiPlan()/js/mi-plan.js junto con el marcador. -->
+              <circle class="imc-gauge-marker-glow" id="miPlanImcMarcadorGlow" cx="110" cy="30" r="10"/>
               <circle class="imc-gauge-marker" id="miPlanImcMarcador" cx="110" cy="30" r="4"/>
               <line class="imc-aguja" id="miPlanImcAguja" x1="110" y1="115" x2="110" y2="45"/>
-              <circle class="imc-pivote" cx="110" cy="115" r="6"/>
+              <circle class="imc-pivote-outer" cx="110" cy="115" r="8.5"/>
+              <circle class="imc-pivote" cx="110" cy="115" r="4.5"/>
             </svg>
           </div>
           <div class="num is-placeholder" id="miPlanImc">—</div>

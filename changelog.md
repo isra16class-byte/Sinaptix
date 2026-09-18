@@ -11,6 +11,39 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Medidor de IMC: segunda pasada estética (riel, marcas chicas, sombras, halo de color)
+
+El usuario pidió mejorarlo más después de ver una captura del patch
+anterior ("se sigue viendo simple"). Se agrega, sobre lo ya hecho:
+
+- **Riel gris claro de fondo** detrás del arco de color
+  (`.imc-gauge-track`, `imcGaugeTrackHtml()` en
+  `js/nutricion-planes.js`) — un único `<path>` más ancho (22 vs 18) que
+  el arco de color, con las 2 puntas redondeadas, da sensación de
+  "ranura" en la que corre el arco en vez de que flote solo.
+- **5 marcas chicas intermedias** sin número (17.5/22.5/27.5/32.5/37.5,
+  `.imc-tick-minor`, `imcGaugeMinorTicksHtml()`) entre cada 2 marcas
+  principales, para reforzar el look de instrumento real.
+- **Sombra suave en la aguja** (`filter:drop-shadow`) para que se sienta
+  levantada sobre el arco.
+- **Pivote con look de "tuerca"**: antes un único círculo sólido
+  (`.imc-pivote`), ahora un anillo claro por debajo
+  (`.imc-pivote-outer`) + el punto oscuro encima.
+- **Halo de color detrás del marcador** del valor exacto
+  (`.imc-gauge-marker-glow` + modificadores `-bajo/-saludable/
+  -sobrepeso/-vigilar`, mismos colores que `.imc-dot-*`/`.imc-cat-*`):
+  da contexto de categoría al punto blanco sin tener que leer la
+  etiqueta de abajo. Nuevo elemento `#miPlanImcMarcadorGlow` en
+  `mi-plan.html`, actualizado en `pintarMiPlan()` (`js/mi-plan.js`,
+  posición + clase de color) junto con el marcador existente; en
+  `renderMethodImc()` (`js/script.js`) se arma directo con la clase de
+  color ya resuelta (`info.zona`) porque ahí todo el SVG se regenera de
+  cero en cada render.
+- Tests (`npm test`, 54/54) siguen pasando.
+- **Sin confirmar en navegador real** — mismo motivo que el patch
+  anterior (no hay browser en este entorno). Ver "Pendientes conocidos"
+  en `memoria.md`.
+
 ## 2026-09-18 — Medidor de IMC: escala numerada + puntas redondeadas
 
 Pedido del usuario a partir de una captura: "mejorá el gráfico de IMC,

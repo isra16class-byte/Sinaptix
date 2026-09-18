@@ -318,13 +318,29 @@ próximos pasos).
     todavía) — si `IMC_GAUGE_TICKS` o sus radios cambian, actualizar
     también ahí. El `viewBox` del `<svg>` en ambos lugares pasó de
     `"0 0 220 140"` a `"-10 -2 240 148"` para darle aire a los números
-    de los extremos (15/40) sin recortarlos. Además, sesión estética: las
-    puntas del arco completo (tramos `.imc-zone-bajo`/`.imc-zone-vigilar`)
-    pasan a `stroke-linecap:round` (los 2 tramos intermedios siguen en
-    `butt`, para no dejar costuras redondeadas entre colores) — look más
-    de velocímetro real. **Sin confirmar en navegador real** (no hay
-    browser instalado en este entorno para captura/Playwright) — ver
-    "Pendientes conocidos".
+    de los extremos (15/40) sin recortarlos.
+  - **Segunda pasada "más estético" (mismo día, a pedido explícito de
+    que "se seguía viendo simple")**: 5 marcas chicas intermedias sin
+    número entre cada 2 principales (`.imc-tick-minor`,
+    `imcGaugeMinorTicksHtml()`); "riel" gris claro de fondo detrás del
+    arco de color (`.imc-gauge-track`, `imcGaugeTrackHtml()` —
+    stroke-width 22 vs 18 del arco de color, un solo `<path>` con las 2
+    puntas redondeadas, da sensación de ranura); sombra suave
+    (`filter:drop-shadow`) en la aguja; pivote con look de "tuerca"
+    (`.imc-pivote-outer` anillo claro + `.imc-pivote` punto oscuro
+    encima, antes un único círculo); halo de color detrás del marcador
+    del valor exacto (`.imc-gauge-marker-glow`, mismo criterio de color
+    que `.imc-dot-*`/`.imc-cat-*` — bajo/sobrepeso dorado, saludable
+    verde, vigilar rojo), posición y clase de color puestas por JS junto
+    con el marcador (`pintarMiPlan()` en `js/mi-plan.js`,
+    `renderMethodImc()` en `js/script.js`, elemento
+    `#miPlanImcMarcadorGlow` en `mi-plan.html`). Las puntas del arco
+    completo (tramos `.imc-zone-bajo`/`.imc-zone-vigilar`) siguen en
+    `stroke-linecap:round` (los 2 tramos intermedios en `butt`, para no
+    dejar costuras redondeadas entre colores) — look más de velocímetro
+    real. **Sin confirmar en navegador real** (no hay browser instalado
+    en este entorno para captura/Playwright) — ver "Pendientes
+    conocidos".
 - **"Mi plan" — estado sin sesión** (`#miPlanSinSesion`, `.miplan-locked`):
   tarjeta blanca centrada (`.miplan-locked-card`) con candado SVG a mano,
   formularios propios de login/registro (ver punto siguiente) y "Volver
@@ -513,12 +529,14 @@ próximos pasos).
 ## Pendientes conocidos
 
 - **Verificar en navegador real (sesión 2026-09-18, escala numerada del
-  medidor de IMC)**: mismo motivo que el punto siguiente — no hay
-  browser en este entorno. Falta confirmar que los números 15/40 de los
-  extremos no queden pegados/cortados contra el borde de la tarjeta
+  medidor de IMC + segunda pasada "más estético": riel de fondo, marcas
+  chicas, sombra de aguja, pivote tipo tuerca, halo del marcador)**: no
+  hay browser en este entorno. Falta confirmar que los números 15/40 de
+  los extremos no queden pegados/cortados contra el borde de la tarjeta
   `.stat-box` en mobile (`mi-plan.html`) ni contra `.method-imc-featured`
-  en Método, y que las puntas redondeadas del arco (bajo peso/a vigilar)
-  se vean bien y no como un error de alineación con el degradado.
+  en Método, que el halo de color detrás del marcador no se vea
+  demasiado fuerte/artificial, y que las puntas redondeadas del arco se
+  vean bien contra el riel gris de fondo.
 - **Verificar en navegador real (sesión 2026-09-18, íconos de redes +
   tarjetas de Pilares + fundido)**: implementado a partir de una captura
   que mandó el usuario, sin poder correr Playwright (no hay browser

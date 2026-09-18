@@ -653,6 +653,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    aguja (imcGaugeAgujaDeg) y la posición del marcador fijo
    (imcGaugeMarkerPos), ambas en js/nutricion-planes.js. */
 .imc-gauge{max-width:220px;margin:0 auto -8px}
+/* "Riel" gris claro debajo del arco de color (imcGaugeTrackHtml(),
+   js/nutricion-planes.js) — sesión 2026-09-18, para que el arco de
+   color se lea como si corriera dentro de una ranura en vez de flotar
+   solo. Más ancho que .imc-zone (22 vs 18) y puntas redondeadas en todo
+   el trazo (es un solo <path>, no hay riesgo de costura entre colores
+   como si pasara con .imc-zone). */
+.imc-gauge-track{fill:none;stroke:var(--panel-2);stroke-width:22;stroke-linecap:round}
 .imc-zone{fill:none;stroke-width:18;stroke-linecap:butt;stroke:url(#imcGaugeGradient)}
 /* Puntas redondeadas solo en el primer y el último tramo (bajo peso/a
    vigilar) — sesión 2026-09-18, pedido de "que se vea más estético":
@@ -675,14 +682,31 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    suave (--ink-soft) para que no compita con el número grande central
    ni con la aguja/el degradado del arco. */
 .imc-tick{stroke:var(--ink-soft);stroke-width:1.5;stroke-linecap:round;opacity:.55}
-.imc-tick-label{font-family:var(--font-m);font-size:9px;font-weight:600;fill:var(--ink-soft);text-anchor:middle}
+.imc-tick-label{font-family:var(--font-m);font-size:10px;font-weight:700;fill:var(--ink-soft);text-anchor:middle}
+/* Marcas chicas intermedias (imcGaugeMinorTicksHtml()), sin número —
+   más cortas/tenues que .imc-tick, solo para reforzar la sensación de
+   instrumento real. */
+.imc-tick-minor{stroke:var(--ink-soft);stroke-width:1;stroke-linecap:round;opacity:.3}
 /* Barrido de la aguja al cargar el plan (pintarMiPlan, js/mi-plan.js):
    arranca en el extremo mínimo del arco y anima hasta su posición real
    con este transition — no aparece ya ubicada. Ver
    @media(prefers-reduced-motion:reduce) más abajo para el caso sin
    animación (el marcador fijo, .imc-gauge-marker, sigue visible en ese
    caso, independiente de la aguja). */
-.imc-aguja{stroke:var(--ink);stroke-width:3;stroke-linecap:round;transition:transform .7s cubic-bezier(.16,.84,.44,1)}
+/* Barrido de la aguja al cargar el plan (pintarMiPlan, js/mi-plan.js):
+   arranca en el extremo mínimo del arco y anima hasta su posición real
+   con este transition — no aparece ya ubicada. Ver
+   @media(prefers-reduced-motion:reduce) más abajo para el caso sin
+   animación (el marcador fijo, .imc-gauge-marker, sigue visible en ese
+   caso, independiente de la aguja). Sombra suave (drop-shadow, no
+   box-shadow — es un <line> de SVG) agregada sesión 2026-09-18 para que
+   la aguja se sienta "levantada" sobre el arco en vez de plana. */
+.imc-aguja{stroke:var(--ink);stroke-width:3;stroke-linecap:round;transition:transform .7s cubic-bezier(.16,.84,.44,1);filter:drop-shadow(0 2px 2px rgba(38,22,31,.3))}
+/* Eje/pivote con look de "tuerca" (sesión 2026-09-18): antes un único
+   círculo sólido (.imc-pivote); ahora un anillo claro por debajo
+   (.imc-pivote-outer, mismo tono que el fondo de la tarjeta + borde) y
+   el punto oscuro encima, en vez de un círculo plano. */
+.imc-pivote-outer{fill:var(--paper);stroke:var(--ink-soft);stroke-width:1.5}
 .imc-pivote{fill:var(--ink)}
 /* Marcador fijo del valor exacto sobre el arco (imcGaugeMarkerPos,
    js/nutricion-planes.js) — independiente de la aguja, visible aunque
@@ -690,6 +714,18 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    fija. Blanco+contorno oscuro para distinguirse de cualquier color del
    degradado que tenga detrás. */
 .imc-gauge-marker{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+/* Halo de color detrás del marcador (sesión 2026-09-18), mismo criterio
+   de color que .imc-dot-*/.imc-cat-* (bajo/sobrepeso en dorado,
+   saludable en verde, vigilar en rojo) — le da al punto blanco un
+   contexto de color sin tener que leer la etiqueta de categoría. Se
+   agrega/actualiza por JS junto con la posición del marcador
+   (pintarMiPlan en js/mi-plan.js, renderMethodImc en js/script.js).
+   Blur vía filter (no hay <feGaussianBlur> propio, más simple) para que
+   se lea como resplandor y no como un círculo sólido duro. */
+.imc-gauge-marker-glow{opacity:.45;filter:blur(3px)}
+.imc-gauge-marker-glow-bajo,.imc-gauge-marker-glow-sobrepeso{fill:var(--gold)}
+.imc-gauge-marker-glow-saludable{fill:var(--green)}
+.imc-gauge-marker-glow-vigilar{fill:var(--red)}
 @media(prefers-reduced-motion:reduce){
   .imc-aguja{transition:none}
 }
