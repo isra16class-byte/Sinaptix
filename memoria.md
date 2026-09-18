@@ -8,25 +8,31 @@
 
 ## Histórico (archivos anteriores de memoria/changelog)
 
-El **14/09/2026** este archivo y `changelog.md` se archivaron por tamaño
-(habían crecido a ~2200 y ~1960 líneas respectivamente, con el detalle
-completo de cada sesión de diseño) y se reiniciaron con una versión
-condensada. Los archivos completos quedaron en:
+Este archivo y `changelog.md` se archivaron dos veces por tamaño:
 
-- `historico/memoria-2026-09-14.md` — todo el detalle de decisiones de
-  diseño/arquitectura tomadas hasta esa fecha (paleta, tipografía,
-  wizard de nutrición, backend, ilustraciones, ajustes pixel-a-pixel de
-  cada sección, etc.).
-- `historico/changelog-2026-09-14.md` — historial cronológico completo de
-  patches hasta esa fecha.
+- **14/09/2026**: `memoria.md` y `changelog.md` habían crecido a ~2200 y
+  ~1960 líneas. Quedaron completos en `historico/memoria-2026-09-14.md`
+  y `historico/changelog-2026-09-14.md` (detalle de decisiones de
+  diseño/arquitectura hasta esa fecha: paleta, tipografía, wizard de
+  nutrición, backend, ilustraciones, ajustes pixel-a-pixel de cada
+  sección, etc.).
+- **17/09/2026**: volvieron a crecer a ~2060 y ~3400 líneas. Quedaron
+  completos en `historico/memoria-2026-09-17.md` y
+  `historico/changelog-2026-09-17.md` (todo el detalle de la etapa de
+  "Mi plan" con login/registro propios, el rediseño de las 3 tarjetas
+  del dashboard, la animación de los anillos de Método, y el proceso
+  completo de Visión: reemplazo del fondo por composición generada por
+  código, separación de íconos en archivos individuales, y el plan de
+  anotaciones en 2 sesiones — incluye todos los intentos descartados,
+  bugs encontrados/corregidos y el detalle pixel-a-pixel de cada ajuste).
 
 **Si vas a tocar algo que ya existe en el sitio y esta memoria condensada
 no trae el detalle suficiente (por qué se hizo así, qué se probó y se
-descartó, ajustes finos de posición/color/tamaño), buscá primero en
-`historico/memoria-2026-09-14.md`** (tiene índice de secciones con `##`,
-es fácil de grepear por palabra clave: sección, componente, archivo) antes
-de asumir o rehacer algo que ya se resolvió. No se repite ese contenido
-acá para no volver a inflar este archivo.
+descartó, ajustes finos de posición/color/tamaño), buscá primero en el
+histórico más reciente que mencione el tema** (tienen índice de
+secciones con `##`/`###`, es fácil de grepear por palabra clave: sección,
+componente, archivo) antes de asumir o rehacer algo que ya se resolvió.
+No se repite ese contenido acá para no volver a inflar este archivo.
 
 Si en el futuro esta memoria vuelve a crecer demasiado, repetir el mismo
 patrón: archivar con fecha en `historico/`, reiniciar condensado, y
@@ -130,19 +136,21 @@ próximos pasos).
 - `index.html` — todo el markup del sitio principal, secciones `lam-01` a
   `lam-06` (Hero, Visión, Método, Pilares, Beneficios, Contacto).
 - `mi-plan.html` — página propia (no sección de `index.html`) para "Mi
-  plan": nav propio, estado sin sesión (login de Identity inline) y estado
-  con sesión (dashboard con IMC, objetivo, gráfico de barras, detalle del
-  plan).
+  plan": nav propio, estado sin sesión (`#miPlanSinSesion`, con
+  login/registro propios) y estado con sesión (`#miPlanConSesion`,
+  dashboard con IMC, objetivo, gráfico de barras, detalle del plan).
 - `css/styles.css` — toda la hoja de estilos (paleta, tipografía, layout).
 - `js/script.js` — lógica específica de `index.html` (wizard modal de
   nutrición, formularios, Netlify Identity, anillos de progreso de
   Método).
-- `js/mi-plan.js` — lógica propia de `mi-plan.html` (init de Identity,
-  pintar el plan, logout, encuesta inline).
+- `js/mi-plan.js` — lógica propia de `mi-plan.html` (login/registro/
+  recuperación de contraseña propios, init de Identity, pintar el plan,
+  logout, encuesta inline).
 - `js/nutricion-planes.js` — **compartido** entre `index.html` y
-  `mi-plan.html`: `NUTRI_PLANES`, funciones puras de cálculo/render (plan
-  resuelto, gráfico de barras, medidor de IMC). Debe cargarse **antes**
-  que `js/script.js`/`js/mi-plan.js`.
+  `mi-plan.html`: `NUTRI_PLANES`, `NUTRI_RANGOS`, funciones puras de
+  cálculo/render (plan resuelto, gráfico de barras, medidor de IMC,
+  validación de campos libres). Debe cargarse **antes** que
+  `js/script.js`/`js/mi-plan.js`.
 - `js/nutricion-wizard.js` — **compartido**: motor de navegación/validación
   del wizard de 8 pasos (`#formNutricion`), usado tanto por el modal de
   `index.html` como por la encuesta inline de `mi-plan.html`. Se carga
@@ -154,103 +162,45 @@ próximos pasos).
   de los 3 bloques de datos de "Mi plan" contra Netlify Database.
   **Formato moderno** (`export default`, Web Request/Response) — no usar
   el formato clásico (`exports.handler`), rompe la inyección de la
-  connection string.
+  connection string. Importa `TIPOS_VALIDOS`/`esTipoValido` desde
+  `netlify/functions/plan-validacion.mjs` (módulo aparte, sin imports de
+  `@netlify/identity`/`@netlify/database`, para poder testearlo solo).
 - `netlify/database/migrations/` — esquema de la tabla `mi_plan` (Postgres,
   vía Netlify Database/`@netlify/database`). El esquema se maneja **solo**
   con migraciones nuevas, nunca editando ni recreando en runtime.
-- `svg/`, `img/` — assets (decoraciones SVG tipo `deco-*`, frutas
-  `deco-blob-*`, iconos ilustrados en `img/Iconos/`, fotos generadas en
-  `img/generadas*`). `img/decoraciones-neurona/fondo-vision-red-sin-iconos.webp`
-  (fondo de Visión sin los 4 íconos, solo listones conectores) +
-  `img/decoraciones-neurona/vision-iconos/icon-{cerebro,red-neuronal,
-  reloj-arena,cintas-azules}.webp` (los 4 íconos, ahora archivos
-  individuales con transparencia real) — ver "Estado actual del diseño"
-  → Visión → "Íconos separados en archivos individuales" para el
-  detalle de cómo se armaron (`scripts/separar-iconos-vision.py`) y
-  cómo se posicionan. `svg/icon-*.svg` (calendario-check, red-nodos,
-  conversacion, bateria-rayo): set de 4 iconos de línea (un solo `fill`,
-  sin `stroke`, hardcodeado en el propio archivo `.svg` como
-  `#714B67` — mismo tono que `--purple`; no puede ser la variable CSS
-  porque se cargan como `<img src="...">`, no inline, así que no leen
-  `:root` — antes `#26161F`/`--ink`, cambiado a pedido del usuario, ver
-  `changelog.md`), usados como `.stat-icon` en las 4 tarjetas de
-  `#lam-02` (Visión) a 70×70px (`#lam-02 .stat-icon`; el de
-  `icon-conversacion.svg`, tarjeta "1:1", va más grande —96×96px— porque
-  a igual tamaño se veía más chico que los otros 3, ver "Estado actual
-  del diseño" → "Visión" para el detalle). Ver `changelog.md` para el
-  porqué de `icon-conversacion.svg` tener un `viewBox` recortado distinto
-  a los otros 3. Antes usaban los `.webp`
-  ilustrados de `img/Iconos/` (`icon-energia-cerebral`, `icon-neuronas`,
-  `icon-semanas`, `icon-acompanamiento`); esos archivos siguen en el
-  repo por si se necesitan en otro lado, pero ya no están referenciados
-  en `index.html`.
+- `svg/`, `img/` — assets. Notables: `svg/deco-scribble-purple.svg` (trazo
+  "marcador" de títulos, `--purple-dark`), `svg/icon-{calendario-check,
+  red-nodos,conversacion,bateria-rayo}.svg` (íconos de línea de las
+  tarjetas de Visión, ver sección Visión abajo),
+  `img/decoraciones-neurona/` (fondo de Visión, íconos separados de
+  Visión, ilustraciones de "Mi plan"), `scripts/generar-fondo-vision.py`
+  y `scripts/separar-iconos-vision.py` (reproducen por código los assets
+  de Visión, ver sección Visión).
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests
 
-Sesión 2026-09-15: se armó `plan-tests-sinaptix.md` (entregado al
-usuario, no vive en el repo) y se implementaron su Prioridad 1 y
-Prioridad 2.
-
-- **Qué cubre**: `tests/nutricion-planes.test.js` — 54 tests con
-  `node --test` (nativo de Node, sin dependencias nuevas) sobre las
-  funciones de cálculo puro de `js/nutricion-planes.js`
-  (`nutriResolverObjetivo`, `nutriConstruirAjustes`,
-  `nutriConstruirAvisos`, `nutriGuardarAntropometriaSiFalta`,
-  `imcCategoria`, `imcGaugeAngulo`, `imcGaugeAgujaDeg`,
-  `imcGaugeAgujaDegInicial`, `imcGaugeMarkerPos`, `imcGaugeGradientStops`,
-  `imcGaugeGradientDefsHtml`, `gaugeComputeAreas`,
-  `gaugeColorForPercent`, `gaugeDeltaHtml`). No cubre las que arman HTML
-  (`nutriBuildResumenHTML`, `nutriBuildBarChartHTML`) ni el contenido de
-  `NUTRI_PLANES` — no son cálculo, quedan fuera de esta tanda a propósito.
-- **Cómo correrlos**: `npm test` (= `node --test`, sin ruta — pasarle
-  `tests/` como argumento posicional lo resuelve como *módulo* a
-  requerir, no como carpeta a explorar, y falla con `MODULE_NOT_FOUND`;
-  sin argumentos, Node descubre solo los `*.test.js` bajo `tests/`).
-- **Por qué corre en Node sin romper el navegador**:
-  `js/nutricion-planes.js` se carga como `<script>` plano en
-  `index.html`/`mi-plan.html` (sin `export`/`import`), así que al final
-  del archivo se agregó un bloque guardado
-  `if(typeof module !== 'undefined' && module.exports){...}` que solo se
-  ejecuta cuando Node lo `require()`; en el navegador `module` no existe,
-  así que ese bloque no hace nada ahí.
-- **Mock de `localStorage`**: `nutriGuardarAntropometriaSiFalta` usa
-  `localStorage` como variable global (asume navegador). El test file
-  define un mock in-memory (`crearLocalStorageMock()`) y lo asigna a
-  `global.localStorage` **antes** de requerir el módulo, para que esa
-  referencia libre la encuentre.
-- **Prioridad 2 — `esTipoValido` de `netlify/functions/plan.mjs`**:
-  `plan.mjs` valida el campo `tipo` del POST contra
-  `TIPOS_VALIDOS.includes(tipo)`; esa constante y la validación se
-  extrajeron a un módulo nuevo, **`netlify/functions/plan-validacion.mjs`**
-  (`export const TIPOS_VALIDOS`, `export function esTipoValido(tipo)`),
-  sin ningún import de `@netlify/identity` ni `@netlify/database`.
-  `plan.mjs` ahora importa `{ TIPOS_VALIDOS, esTipoValido }` de ese
-  archivo en vez de declarar la constante y usa `esTipoValido(tipo)` en
-  el POST; el resto del handler (GET/POST, auth, SQL) no cambió. Se
-  separó en un módulo aparte (y no se agregó `export` directo en
-  `plan.mjs`) porque `plan.mjs` importa `@netlify/identity` y
-  `@netlify/database` a nivel de módulo — esos paquetes solo están
-  declarados en `package.json` para que Netlify los instale en el
-  deploy, no viven en `node_modules` en este entorno de trabajo, así que
-  importar `plan.mjs` directo desde un test rompería con
-  `ERR_MODULE_NOT_FOUND` aunque lo único que se quisiera testear sea la
-  validación.
-  Test: `tests/plan-validacion.test.mjs` (5 tests, ESM — `.mjs` porque
-  `plan-validacion.mjs` usa `export`/`import`, a diferencia de
-  `nutricion-planes.test.js` que es CommonJS): los 3 tipos válidos dan
-  `true`; inválido, vacío, `undefined` y `null` dan `false`. No requiere
-  ningún mock.
-  El resto de `plan.mjs` (auth real vía `getUser()`, SQL real vía
-  `getDatabase()`) sigue **sin testear**, a propósito: solo se puede
-  verificar contra un deploy real de Netlify (ver "Pendientes
-  conocidos"), no es alcanzable desde este entorno.
-- **No se testea (a propósito, ver `plan-tests-sinaptix.md`)**: el
-  diseño/layout del sitio (cambia cada sesión, se sigue verificando con
-  Playwright ad hoc en cada patch de UI, no en una suite fija).
-- **CI**: no hay pipeline configurado — `netlify.toml` tiene
-  `command = ""`, así que Netlify no corre `npm test` en el deploy. Correr
-  los tests es manual (`npm test`) antes de generar cada patch que toque
+- **`tests/nutricion-planes.test.js`** — 54 tests con `node --test`
+  (nativo de Node, sin dependencias nuevas) sobre las funciones de
+  cálculo puro de `js/nutricion-planes.js` (resolución de objetivo,
+  ajustes/avisos, antropometría, categoría/gauge de IMC, gauges de
+  Método, validación de rango/nombre, escapado HTML). No cubre las que
+  arman HTML (`nutriBuildResumenHTML`, `nutriBuildBarChartHTML`) ni el
+  contenido de `NUTRI_PLANES` — no son cálculo, quedan fuera a propósito.
+  `js/nutricion-planes.js` se carga como `<script>` plano en el navegador
+  (sin `export`/`import`); al final tiene un bloque guardado
+  (`if(typeof module!=='undefined'...)`) que solo corre bajo Node. El
+  test mockea `localStorage` in-memory antes de requerir el módulo.
+- **`tests/plan-validacion.test.mjs`** — 5 tests ESM sobre
+  `netlify/functions/plan-validacion.mjs` (`esTipoValido`). El resto de
+  `plan.mjs` (auth real, SQL real) sigue **sin testear** — solo
+  verificable contra un deploy real de Netlify.
+- **Cómo correrlos**: `npm test` (= `node --test`, sin argumentos —
+  pasarle `tests/` como argumento lo resuelve como módulo y falla).
+- **No se testea a propósito**: diseño/layout (se verifica con Playwright
+  ad hoc en cada patch de UI, no hay suite fija).
+- **CI**: no hay pipeline (`netlify.toml` con `command=""`). Correr los
+  tests es manual antes de generar cualquier patch que toque
   `js/nutricion-planes.js` o `netlify/functions/plan.mjs`/
   `plan-validacion.mjs`.
 
@@ -259,1800 +209,246 @@ Prioridad 2.
 - **Paleta** (`css/styles.css`, bloque `:root`): fondo blanco `--paper`,
   panel lavanda claro `--panel`, morado de marca `--purple`/`--purple-dark`
   como color estructural, acentos `--green`, `--gold` (terracota),
-  `--navy-bright`. Texto `--ink`. Método (`lam-03`) tenía una paleta
-  cálida crema+café propia superpuesta (mockup de referencia); se
-  descartó en sesión 2026-09-15 y ahora usa el mismo `--panel`/`--purple`
-  estándar que el resto de las secciones "dark" (Beneficios, Contacto).
-- **Tipografía**: `Inter` para cuerpo/UI, `Fraunces` (800, normal+itálica)
-  para títulos, `Caveat` (`--font-hand`, clase `.title-hand`) para títulos
-  con look manuscrito (Método, Pilares, título de "Mi plan").
-- **Títulos de sección — mismo color combinado que el Hero**: el Hero
-  combina `--ink` (grueso del título) + `--purple` (la palabra `<em>`,
-  "claridad") vía `.hero h1 em{color:var(--purple)}`. El resto de
-  `<h2 class="lam-title">` ahora sigue el mismo patrón vía
-  `.title-mark{color:var(--purple)}` (además del subrayado marcador que
-  ya tenía) — cubre "genérica" (`#lam-03`), "trabajo" (`#lam-04`), "carga
-  alta" (`#lam-05`) y "asesoría" (`#lam-06`). `#lam-02` no tenía ninguna
-  palabra remarcada (llevaba un ícono svg inline en vez de
-  `.title-mark`); se le agregó `<span class="title-mark">` sobre
-  "alimenta" en `index.html` para que las 6 secciones compartan el mismo
-  lenguaje. No aplica a `mi-plan.html`: sus `<h2 class="lam-title">` no
-  usan `.title-mark`, siguen 100% `--ink`.
-- **Títulos de sección — trazos "marcador" (subrayado ± curva) en morado
-  oscuro** (sesión 2026-09-16, con ajuste a continuación): las rayas que
-  acompañan los títulos eran naranja/dorado y pasaron a un único asset
-  `svg/deco-scribble-purple.svg` (`stroke="#4B2E45"`, `--purple-dark` —
-  primer intento con `--purple` #714B67 quedó muy claro/poco contraste
-  a criterio del usuario, se oscureció) que reemplaza a `deco-scribble.svg`
-  y `deco-scribble-gold.svg` en todo el sitio. Estado final por sección:
-  - `#lam-03` (Método) y `#lam-04` (Pilares): título centrado, con
-    **ambos** elementos — subrayado `.title-mark` (detrás de "genérica"/
-    "trabajo") + curva `.title-scribble` centrada debajo del `<h2>` (en
-    Pilares también el `<img class="deco deco-scribble">` suelto de
-    `.lam-title-frame`, ver entrada de abajo) — se ven bien distinguidos
-    porque la curva queda centrada bajo todo el título, no pegada a una
-    sola palabra.
-  - `#lam-05` (Beneficios) y `#lam-06` (Contacto): título alineado a la
-    izquierda. Acá **se sacó** el `.title-scribble` (quedaba como una
-    segunda raya redundante pegada justo debajo del subrayado de
-    `.title-mark`, mismo color — el usuario lo marcó como "repetida"/
-    "sobrante"). Queda solo el subrayado de `.title-mark` sobre "carga
-    alta"/"asesoría". CSS: se sacó la regla `#lam-05 .title-scribble,
-    #lam-06 .title-scribble{margin:6px 0 0}` (ya no aplica a nada).
-  - `#lam-02` (Visión): sin curva ni subrayado, sin cambios (ya estaba
-    así a propósito).
-  Los `deco-espiga.svg` (motivo de espigas sueltas, no relacionado) no se
-  tocaron. Solo CSS + `index.html` (atributos `src`/markup), nada de JS.
-  Verificado con Playwright, desktop 1440px, las 4 secciones con acento.
-- **Pilares (`#lam-04`) — trazos "marcador" del título**: dentro de
-  `.lam-title-frame` quedó **un solo** `<img class="deco deco-scribble">`
-  suelto (`style="right:110px;bottom:14px;width:320px..."`), más los 2
-  elementos fijos que ya existían aparte del array — `<img
-  class="title-scribble">` (centrado debajo del `<h2>`) y el subrayado
-  de la palabra "trabajo" vía `.title-mark` (CSS `background-image` en
-  el `<span>`, no es un `<img>`) — total 3 trazos visibles pegados al
-  título. Se sacaron los otros 6 `<img class="deco deco-scribble">` que
-  estaban dispersos más lejos del título (3 arriba a la derecha, 1 a la
-  izquierda, 2 abajo a la derecha) a pedido del usuario, que los marcó
-  con círculos sobre una captura del deploy real (ver `changelog.md`,
-  décima tanda, para el detalle de cómo se identificó cada uno). No se
-  tocó `#lam-03` (Método), que usa el mismo patrón de trazos sueltos y
-  sigue con los suyos intactos.
-- **Beneficios (`#lam-05`) y Contacto (`#lam-06`) — títulos sin acento,
-  ahora con marker+scribble+chispa**: eran los 2 únicos `<h2 class="lam-title">`
-  del sitio sin ninguna decoración (a diferencia de `#lam-02` que ya tenía
-  un ícono svg inline, y `#lam-03`/`#lam-04` con `.title-mark`+
-  `.title-scribble` centrados). Se les sumó el mismo lenguaje visual pero
-  **sin centrar** (quedan alineados a la izquierda, como estaban): `<span
-  class="title-mark">` sobre "carga alta" (`lam-05`) y "asesoría"
-  (`lam-06`), `<img class="title-scribble" src="svg/deco-scribble.svg">`
-  suelto después del `<h2>` (mismo asset, `margin:6px 0 0` en vez de
-  `auto` — override en CSS por `#lam-05 .title-scribble,#lam-06
-  .title-scribble` porque la regla base lo centra), y 1-2 `<span
-  class="brain-spark">` (mismo asset que las chispas del hero,
-  `keyframes spark-twinkle`) posicionados con `position:relative` en el
-  propio `<h2>` — width/height reducidos a 7px vía `#lam-05 .lam-title
-  .brain-spark,#lam-06 .lam-title .brain-spark` para que no compitan con
-  el texto. **No se tocó la tipografía** (`--font-hand`/Caveat intacta,
-  pedido explícito del usuario) ni ningún otro título del sitio.
-  `.title-scribble` se sigue ocultando en mobile (`<720px`) por la regla
-  general ya existente, mismo comportamiento que `lam-03`/`lam-04`.
-  Verificado con Playwright, desktop 1440px y mobile 390px — no rompe el
-  layout de las columnas (`.ben-grid`, `.contact-wrap`) ni el ancho del
-  `<h2>` (`max-width:14ch` sin cambios).
-- **Método (`#lam-03`) — frutas pequeñas**: la sección tiene 3
-  `deco-fruit` chicas de fruta real (fresa, arándanos, cereza, de
-  `img/imagenes-frutas/`) scatterizadas detrás del contenido. (Las 2
-  rayas del título de esta sección pasaron de naranja a dorado en su
-  momento — `changelog.md`, diecisieteava tanda — y luego, junto con el
-  resto del sitio, de dorado a `--purple`; ver la entrada de "Títulos de
-  sección" más arriba para el estado actual.)
-- **Método (`#lam-03`) — tarjeta "Tu progreso" con jerarquía**: la tarjeta
-  de anillos (`.method-gauges`, generada en `js/script.js`) ya no muestra
-  4 anillos idénticos. Ahora: una frase de insight arriba (mayor avance /
-  área con más margen de mejora), el área que peor está destacada aparte
-  (más grande, con borde e ícono + badge de nivel), las otras 3 en grilla
-  de 3 columnas, delta como badge con flecha (verde arriba / rojo abajo),
-  e ícono lineal por área. Paleta propia de esta tarjeta (morado oscuro →
-  dorado → verde salvia, `METHOD_GAUGE_LOW/MID/HIGH` en `js/script.js`) —
-  el semáforo genérico (`GAUGE_LOW/MID/HIGH` de `js/nutricion-planes.js`)
-  sigue intacto para el gráfico de barras de "Mi plan", que no se tocó.
-  Detalle completo, incluyendo el bug de especificidad CSS que se
-  encontró y corrigió (`.gauge-item svg` → `.gauge-ring svg`), en
-  `changelog.md`, dieciochoava tanda.
-- **Método (`#lam-03`) — neuronas decorativas laterales reemplazadas**
-  (sesión 2026-09-15): los 2 `<img class="deco deco-fruit">` sueltos a
-  los costados del título (`neurona-izquierda.webp` a la izquierda,
-  `neurona-derecha.webp` a la derecha — mismos nombres de archivo, mismo
-  `style` inline con `left`/`right`/`top`/`width`, sin tocar
-  `index.html`) ahora usan una sola ilustración nueva provista por el
-  usuario: neurona completa vista de frente (cuerpo dorado/violeta
-  brillante al centro, dendritas azul/violeta/dorado irradiando en
-  círculo), a diferencia de los assets anteriores que eran **medias
-  neuronas** recortadas (cuerpo cortado en el borde de la página,
-  pensadas para la posición de bleed). Se le quitó el fondo blanco
-  (conversión a alpha por canal, blanco puro → transparente) para que
-  siga flotando sobre el fondo de `#lam-03` igual que antes (crema en su
-  momento, morado/lila desde la sesión 2026-09-15 que revirtió la
-  paleta — ver bullet de "vuelta al morado estándar" más abajo), y se
-  reexportó a `.webp` (~640px de ancho, calidad 82) — ambos archivos
-  quedaron con el mismo contenido (no hay versión espejada). Como la
-  posición/tamaño no cambiaron, el resultado visual es la misma
-  ilustración completa "sangrando" en las mismas esquinas donde antes
-  solo se veía la mitad de la neurona. Verificado con Playwright,
-  desktop 1440px (visible) y mobile 390px (sigue oculto por la regla
-  general `@media(max-width:720px){.deco-fruit{display:none}}`, sin
-  cambios).
-- **Método (`#lam-03`) — vuelta al morado estándar del sitio** (sesión
-  2026-09-15, a continuación de las neuronas decorativas): se borraron
-  las custom properties que `#lam-03` sobreescribía para su paleta propia
-  crema+café (`--panel`, `--panel-line`, `--panel-text`, `--purple`,
-  `--purple-dark`, `--purple-soft`, `--gauge-card`, `--shadow`), así que
-  ahora hereda el mismo morado/lila de `:root` que usan Beneficios y
-  Contacto (fondo, texto, línea de tiempo, tarjeta "Mi progreso"/"Mi
-  IMC", botones). El difuminado de fondo (`background:linear-gradient`
-  en `#lam-03`, blanco → panel → blanco para no cortar en seco contra
-  lam-02/lam-04) se mantuvo igual, solo cambia el color al que funde.
-  Colores semánticos de gauges sin cambios. Verificado con Playwright,
-  desktop 1440px.
-- **Método (`#lam-03`) — botones pegados al final del timeline en vez de
-  a la fila completa** (sesión 2026-09-15, continuación): `.method-cta`
-  (los 2 botones "Generar nutrición especializada"/"Registrar datos
-  antropométricos") vivía como hermano de `.method-body` (la grilla de 2
-  columnas timeline/`.method-gauges`), así que se ubicaba debajo de la
-  fila entera, a la altura de la columna más alta. Cuando `.method-gauges`
-  crece mucho (caso real: diagnóstico + reevaluación con los 4 anillos +
-  insight + leyenda, como en la captura que mandó el usuario), el timeline
-  queda mucho más corto y dejaba un hueco vacío entre el paso 04 y los
-  botones. Fix: nuevo wrapper `.method-left` (flex-column, sin estilos de
-  layout propios más que eso) envuelve `.timeline` + `.method-cta` como
-  primer hijo de `.method-body`; `.method-gauges` sigue siendo el segundo
-  hijo/columna. Con esto los botones quedan siempre pegados al final del
-  timeline sin importar cuánto crezca la tarjeta de la derecha, que ahora
-  vive en su propia columna independiente. No se tocó ningún `id` ni la
-  lógica de `js/script.js` (que solo usa `getElementById`, no depende de
-  la jerarquía del DOM). Verificado con Playwright reproduciendo el mismo
-  estado de la captura (objetivo + reevaluación en `localStorage`),
-  desktop 1600px y mobile 390px — en mobile el orden visual (timeline →
-  botones → tarjeta de progreso) tampoco cambió.
-- **Método (`#lam-03`) — círculos numerados del timeline con degradado y
-  sombra** (sesión 2026-09-16): `.tl-num` (los círculos 01-04 de
-  `.timeline`, `css/styles.css`) pasó de círculo blanco liso con borde
-  fino (`1px solid var(--panel-line)`, número en `--purple`) a círculo
-  con relleno `linear-gradient(135deg,var(--purple),var(--purple-dark))`,
-  número en blanco, y `box-shadow` de dos capas: sombra difusa
-  (`0 8px 20px rgba(75,46,69,.28)`) + un anillo sólido del color de fondo
-  de la sección (`0 0 0 4px var(--panel)`) que separa visualmente el
-  círculo de `.tl-line` (la línea vertical que pasa detrás, ahora también
-  en degradado `var(--purple)` → transparente en vez de color plano, para
-  que se note más arriba y se vaya diluyendo hacia abajo). Solo CSS, no
-  se tocó el HTML (`.tl-item`/`.tl-num` en `index.html`) ni JS. Elegido
-  por el usuario entre 3 propuestas (esta opción "A"; las otras eran una
-  línea curva tipo trazo a mano y números tipográficos grandes sin
-  círculo). Verificado con Playwright, desktop 1440px y mobile 390px.
-- **Método (`#lam-03`) — pestaña "Mi IMC" con la misma jerarquía que "Mi
-  progreso"** (sesión 2026-09-15, continuación; a pedido del usuario, que
-  la vio "simple, no resalta" al lado de la tarjeta de progreso ya
-  rediseñada). `renderMethodImc()` en `js/script.js` gana 3 piezas nuevas,
-  mismo lenguaje visual que `renderMethodGauges()`:
-  1. **Frase de insight** (`methodImcInsightHtml(zona)`, nueva función):
-     mensaje fijo por zona (bajo/saludable/sobrepeso/vigilar), mismo
-     `.gauge-insight` (ícono + texto) que ya usaba "Mi progreso" — no hay
-     comparación antes/después para IMC, así que el texto es fijo, no
-     calculado a partir de una medición previa.
-  2. **Zona destacada con borde propio** (`.method-imc-featured`, nueva
-     clase, escopada a `#methodGaugesImc`): agrupa el medidor + número +
-     label + categoría en una tarjeta con `border:1.5px solid
-     var(--purple-dark)`, mismo tratamiento que `.gauge-item.is-featured`
-     de la otra pestaña, en vez de dejar el número suelto sobre el fondo
-     general. La categoría pasa de texto plano (`.imc-cat`) a un badge
-     (`.gauge-tier-badge`, reusa la clase de "Mi progreso") con una
-     variante de color por zona (`.imc-tier-bajo/-sobrepeso` dorado,
-     `-saludable` verde, `-vigilar` rojo — mismos colores que ya usaban
-     las zonas del arco, ahora también en el badge).
-  3. **Rango de peso saludable** (`.method-imc-range`, nuevo párrafo):
-     "Peso saludable estimado para tu talla: X–Y kg", calculado con
-     IMC 18.5–24.9 sobre `antro.tallaCm` (dato ya guardado, no pide nada
-     nuevo). Solo se muestra si hay `tallaCm` en el registro.
-  De paso se corrigió un bug menor: el eyebrow de esta pestaña decía "Tu
-  progreso" (copiado sin querer del header de la otra pestaña) — ahora
-  dice "Antropometría".
-  **Nada de esto toca `mi-plan.html`**: la tarjeta "Antropometría" de "Mi
-  plan" sigue usando `.imc-gauge`/`.imc-cat`/`.imc-legend` con su CSS
-  original sin cambios (esas reglas de base no se tocaron); las clases
-  nuevas (`.method-imc-featured`, `.method-imc-range`, `.imc-tier-*`) o
-  están escopadas con el selector `#methodGaugesImc` o son clases que
-  simplemente no existen en el markup de `mi-plan.html`.
-  Verificado con Playwright: las 4 categorías (bajo peso IMC 16.9,
-  saludable 22.0, sobrepeso 26.4, a vigilar 32.1) con el color del badge
-  coincidiendo con la zona del arco, y el estado vacío (sin datos
-  antropométricos) sin cambios.
-- **"Mi plan"** es el flujo más complejo del sitio: página propia,
-  dashboard de 2 columnas (`.miplan-grid`/`.miplan-detalle-grid`), medidor
-  de IMC tipo velocímetro, gráfico de barras Foco/Memoria/Energía/Calma
-  (con comparación antes/después si hay reevaluación), encuesta de
-  nutrición inline (mismo `#formNutricion` que el modal de `index.html`).
-- **Medidor de IMC tipo velocímetro (`.imc-gauge`) — degradado continuo +
-  barrido de la aguja (sesión 2026-09-16, décimoprimera tanda).**
-  Componente compartido entre `mi-plan.html` (markup estático,
-  `#miPlanImcGauge`) y el switch "Mi IMC" de Método
-  (`renderMethodImc`/`#methodGaugesImc`, `js/script.js`, arma el mismo
-  SVG como string). Antes: 4 `<path>` con `stroke` sólido fijo por zona
-  y la aguja apareciendo directo en su posición final. Ahora:
-  - Los 4 `<path>` (mismos umbrales de IMC 18.5/25/30, sin cambios)
-    comparten un único `<linearGradient id="imcGaugeGradient">` en vez
-    de tener cada uno su color fijo — degradado continuo dorado→
-    verde→dorado→rojo. Los 3 colores de anclaje son los mismos hex que
-    devuelve `gaugeColorForPercent` (compartida con los anillos de
-    Método): `imcGaugeGradientStops()` (`js/nutricion-planes.js`) los
-    pide llamando a esa función en vez de hardcodearlos de nuevo, con
-    anclas en el centro de cada zona de IMC (no en el umbral exacto).
-    `imcGaugeGradientDefsHtml(id)` arma el `<defs>` como string (lo usa
-    `renderMethodImc`); en `mi-plan.html` (HTML estático) el `<defs>`
-    equivalente está escrito a mano con los mismos offsets
-    (7%/27%/50%/80%) vía clases `.imc-stop-gold/-green/-red` → mismas
-    `var(--gold)/--green/--red`.
-  - La aguja (`.imc-aguja`) ahora tiene `transition:transform .7s
-    cubic-bezier(.16,.84,.44,1)` (CSS). En `pintarMiPlan`
-    (`js/mi-plan.js`) arranca en `imcGaugeAgujaDegInicial()` (extremo
-    mínimo del arco) y, tras un doble `requestAnimationFrame` (mismo
-    truco que `gaugeAnimateArcs` para los anillos de Método), se le
-    asigna la rotación final `imcGaugeAgujaDeg(imc)`. `renderMethodImc`
-    (Método) sigue sin barrido — pinta directo en la posición final,
-    como siempre; el pedido de animación era específico de "Mi plan".
-    `prefers-reduced-motion: reduce` lo desactiva en dos capas: JS
-    (`pintarMiPlan` detecta `matchMedia` y salta la secuencia de rAF) y
-    CSS (`@media(prefers-reduced-motion:reduce){.imc-aguja{transition:
-    none}}` como red adicional).
-  - Marcador fijo nuevo (`.imc-gauge-marker`, círculo blanco con
-    contorno oscuro) sobre el arco en el valor exacto del IMC,
-    independiente de la aguja — usa `imcGaugeMarkerPos(imc)` (mismo
-    centro/radio que el arco, recortado al mismo rango `[15,40]` que la
-    aguja). Siempre en su posición final sin animar, así sigue siendo
-    útil durante el barrido o con `prefers-reduced-motion` activo (por
-    ejemplo, para capturas). Presente en ambos lugares (`mi-plan.html` y
-    `renderMethodImc`).
-  - `imcGaugeAgujaDeg(imc)` (= `90 - imcGaugeAngulo(imc)`) reemplaza la
-    misma fórmula que antes estaba duplicada tal cual en `js/mi-plan.js`
-    y `js/script.js`.
-  - No cambió: el número mostrado sigue siendo el IMC real sin recortar
-    (solo la posición de aguja/marcador se recorta a `[15,40]`); el
-    estado "sin datos" sigue con `class="hidden"` en `#miPlanImcGauge`
-    hasta que existe `sinaptix_antropometria`; sin dependencias nuevas
-    (SVG + CSS + JS vanilla).
-  - Verificado con Playwright (sí hubo acceso a Chromium en esta
-    sesión): las 4 zonas de prueba (16.8/22.1/27.4/33.9), barrido
-    confirmado (captura a mitad de camino ≠ captura final), marcador en
-    la posición correcta en las 4, estado sin datos sin romperse,
-    `prefers-reduced-motion: reduce` saltando la animación, y el switch
-    "Mi IMC" de Método con el mismo degradado/marcador funcionando sin
-    tocar nada más de esa tarjeta.
-- **"Mi plan" — estado sin sesión (`#miPlanSinSesion`, clase
-  `.miplan-locked`)**: rediseño visual (no toca `js/mi-plan.js`, siguen
-  existiendo `#miPlanSinSesion` y `#btnLoginMiPlan` con el mismo
-  comportamiento). Combina dos referencias: candado ilustrado + tarjeta
-  crema (variante A) y un cerebro ilustrado de fondo (variante B, hoy
-  imagen real, ver abajo — reemplaza la maraña SVG de la sesión anterior).
-  Estructura: `.miplan-locked` (flex centrado) con 3 capas —
-  1. 1 `<img class="deco miplan-locked-brain is-right">` con el asset
-     `img/decoraciones-neurona/cerebro-mi-plan.webp` (imagen provista por
-     el usuario, no generada acá: cerebro con dendritas, línea fina
-     terracota/dorada), grande, sangrando sobre el borde derecho
-     (`width:clamp(420px,48vw,560px);right:-300px;top:-30px`), mismo
-     criterio de bleed que `neurona-derecha`/`vision-brain-bg`. La copia
-     chica junto al aguacate (`.is-left`) se quitó (HTML + CSS) a pedido
-     del usuario. El `right` de `.is-right` pasó por `-60px` → `-140px` →
-     `-300px`: los primeros dos valores parecían suficientes probando
-     local, pero en producción a anchos grandes (~1600px) la tarjeta
-     seguía tapando ~100px del cerebro (el gap tarjeta↔cerebro es
-     **constante en todo el rango de anchos** porque ambos elementos
-     escalan igual al centrarse, así que no alcanza con probar un solo
-     ancho: medir `getBoundingClientRect()` de `.miplan-locked-card` y
-     `.miplan-locked-brain.is-right` con Playwright en varios anchos
-     — 900/1024/1280/1440/1600/1920 — es la forma confiable de confirmar
-     que no se solapan, no alcanza con una sola captura visual). Con
-     `-300px` el gap real es de ~48-60px en todo ese rango.
-     `opacity:.92` sin filtros (el fondo de la imagen, `~#F6F0F4`, ya
-     matchea `--panel` de esta sección, no hizo falta `mix-blend-mode`).
-     Oculto en mobile (`<900px`, mismo breakpoint que
-     `#lam-02 .vision-brain-bg`). El diseño anterior (SVG inline
-     `svg.miplan-locked-web`/`.bw-*` dibujado a mano con curvas
-     Catmull-Rom) quedó descartado — detalle en `historico/` si hace falta.
-  2. 3 `<img class="deco deco-fruit miplan-locked-fruit is-*">` reusando
-     `svg/deco-blob-avocado.svg`, `deco-blob-kiwi.svg`,
-     `deco-blob-almonds.svg` (mismos assets de siempre, clase
-     `.deco-fruit` ya trae animación float + ocultamiento `<720px`) —
-     posicionadas con clases `is-avocado`/`is-kiwi`/`is-almonds` propias
-     de este bloque, no confundir con las frutas a nivel de sección
-     `#miPlan` (esas son otro grupo de `<img>`, anteriores al `.wrap`, no
-     se tocaron).
-  3. `.miplan-locked-card`: tarjeta blanca (`--paper`) redondeada, con
-     candado inline SVG a mano (`.miplan-locked-lock`, trazo `--purple`)
-     arriba del `eyebrow`/`h2.lam-title`/`p.lam-text` — estos no
-     cambiaron de texto ni de id/clase. Debajo, `.miplan-auth`: los
-     **formularios propios de login/registro** (ver su propio punto más
-     abajo) — reemplazaron a los 2 botones `#btnLoginMiPlan`/
-     `#btnRegistrarseMiPlan` que abrían el widget nativo de Netlify
-     Identity, que **ya no existen** ni en el HTML ni en `js/mi-plan.js`.
-     "Volver al sitio" bajó de `btn-row` a link de texto simple debajo
-     (`.miplan-locked-back`, subrayado, `var(--panel-text)`) para no
-     competir visualmente con las 2 acciones reales — con 3 `.btn` en la
-     misma fila quedaba sobrecargado.
-  CSS nuevo todo bajo selectores propios (`.miplan-locked*`, `.lock-*`) en
-  `css/styles.css`, no se tocó ninguna regla que afecte `#miPlanConSesion`
-  (el dashboard con datos — su propio rediseño se hizo en una sesión
-  posterior, ver más abajo).
-  **Verificado con Playwright** (esta sesión sí tuvo acceso a
-  Chromium/Playwright): capturas a 1280px/1440px calzan contra la
-  referencia del usuario, mobile (390px) oculta los 2 cerebros
-  correctamente, y `window.scrollX===0` tras forzar scroll horizontal —
-  no rompe el criterio de `overflow-x` de más abajo pese al bleed de
-  `.is-right`. Altura total: `#miPlan{padding:88px 0 40px;min-height:100vh;overflow:hidden}`
-  (antes `104px 0 56px`, sin min-height/overflow; **afecta a ambos
-  estados** de "Mi plan"), `#miPlan footer{margin-top:28px}` (antes
-  `48px`), `.miplan-locked{min-height:clamp(380px,48vh,460px);padding:20px 0}`
-  (antes `clamp(460px,58vh,600px);28px 0`), `.miplan-locked-card{padding:30px 40px 28px}`
-  (antes `44px 46px 40px`, después `36px 40px 32px`). El título de la tarjeta **sigue heredando**
-  el tamaño de `.lam-title` (`clamp(40px,6vw,68px)`, wrap a 3 líneas,
-  tarjeta angosta/alta) — se probó achicarlo pero el usuario prefirió la
-  forma original, así que esa parte quedó revertida. `min-height:100vh` +
-  `overflow:hidden` en `#miPlan` evita una franja blanca del `body` por
-  debajo del footer en viewports altos (el `overflow:hidden` es acotado a
-  esta sección, no toca `html`/`body`). Resultado: entra sin scroll hasta
-  ~1024px de alto de viewport (medido con Playwright a 1440px de ancho;
-  eran ~986px antes de sumar el link "¿Olvidaste tu contraseña?").
-  **Ese número era ~825px antes de los formularios propios de
-  login/registro**: la tarjeta pasó de 618px a 841px de alto al cambiar 2
-  botones por pestañas + campos, y se recuperaron ~98px compactando
-  paddings (`.miplan-locked`, `.miplan-locked-card`) y ocultando los
-  `<label>` con `.sr-only`. La única palanca grande que queda para bajar
-  más es achicar el título, que el usuario ya evaluó y descartó en una
-  sesión anterior — no rehacerlo sin preguntarle.
-- **"Mi plan" — login/registro propios (`.miplan-auth`, reemplazan al
-  widget nativo de Netlify Identity)**: dentro de `.miplan-locked-card`,
-  layout "variante A" confirmado con el usuario: 2 pestañas
-  (`#tabLoginMiPlan`/`#tabRegistroMiPlan`, clase `.miplan-auth-tab`,
-  activa con `.is-active`) y un solo formulario visible por vez
-  (`#formLoginMiPlan` / `#formRegistroMiPlan`, se alternan con la clase
-  `.hidden` de siempre). Login pide correo + contraseña; registro pide
-  **nombre (`required`)** + correo + contraseña (`minlength=8`). Los
-  `<label>` existen pero van con `.sr-only` (el layout aprobado muestra
-  solo placeholders). Los inputs (`.miplan-auth-input`) reusan el mismo
-  tratamiento visual que `.contact-form`, no se inventó un segundo estilo
-  de campo. Mensajes inline por formulario
-  (`#loginMsgMiPlan`/`#registroMsgMiPlan`, `.miplan-auth-msg`, rojo
-  `--red`; con `.is-ok` pasan a verde para el aviso de "revisá tu
-  correo").
-  **Estrategia: híbrida, no 100% API.** `js/mi-plan.js` usa el cliente
-  GoTrue que el widget ya expone (`netlifyIdentity.gotrue`) —
-  `.login(email, pass, true)` y `.signup(email, pass, {full_name})` — en
-  vez de hacer `fetch` a mano contra `/.netlify/identity`. El motivo
-  concreto (verificado leyendo el fuente del widget, no asumido):
-  `netlifyIdentity.currentUser()` **no** devuelve un estado interno del
-  widget, devuelve `gotrue.currentUser()`, que lee la sesión de
-  `localStorage` — así que logueando por esta vía `js/plan-sync.js` (que
-  arma el header `Authorization` con `currentUser()`) sigue funcionando
-  **sin tocarlo y sin recargar la página**, igual que `user.update()` y
-  `user.jwt()`. El `true` del 3er argumento de `login()` (remember) es lo
-  que persiste la sesión; sin él no habría sesión en la próxima carga.
-  Dos consecuencias de saltear el widget, ya resueltas en el código:
-  1. El evento `netlifyIdentity.on('login')` **no se dispara** (el widget
-     lo emite al cambiar su estado interno, que acá no se toca), así que
-     `mostrarEstadoConSesion(user)` se llama a mano desde el `.then()`.
-  2. `netlifyIdentity.logout()` **no cierra la sesión** si esta se creó
-     por esta vía en la misma carga de página (su implementación no hace
-     nada cuando su estado interno está vacío). Por eso `doLogout()` usa
-     `netlifyIdentity.currentUser().logout()` (el `User` de gotrue-js, que
-     sí hace `POST /logout` y limpia `localStorage` en ambos casos) y
-     hace el `window.location.href='index.html'` explícito, porque
-     tampoco se dispara el evento `logout` del widget.
-  **API de GoTrue (confirmada contra el fuente de `gotrue-js`, no
-  adivinada)**: `POST /.netlify/identity/signup` es JSON
-  `{email, password, data}` y `data` es lo que el servidor guarda como
-  `user_metadata` (por eso `full_name` es la misma clave que ya leía
-  `pintarMiPlan()`); `POST /.netlify/identity/token` es
-  `application/x-www-form-urlencoded` con
-  `grant_type=password&username=…&password=…` (no JSON); los errores
-  llegan en `err.message` en inglés (`Invalid Password`,
-  `No user found with this email`, `Email not confirmed`,
-  `…already been registered`, `Signups not allowed for this instance`) y
-  `authMensajeError()` los mapea a castellano por substring, con
-  fallback genérico para no dejar el formulario mudo.
-  **Confirmación por correo: desactivada** por el usuario desde el panel
-  de Netlify (Identity → plantilla de confirmación → "Allow users to sign
-  up without verifying their email address"). Por eso, tras un signup
-  exitoso el código hace login automático y entra directo al dashboard,
-  sin pedir los datos dos veces. Igual **hay fallback**: si esa opción se
-  volviera a activar, el login post-signup falla con `Email not
-  confirmed`, y en vez de un error se vuelve a la pestaña de login con el
-  aviso verde de revisar el correo. Se eligió intentar el login en vez de
-  consultar `gotrue.settings()` aparte para no sumar un request más.
-  **Nota de desarrollo local**: si se abre el sitio en `localhost` sin
-  haberle cargado antes la Site URL de Netlify, `netlifyIdentity.gotrue`
-  es `null` y el widget abre su propio modal para pedirla; en el sitio
-  desplegado no pasa. El código lo contempla mostrando un mensaje de
-  error en vez de romper.
-  **Recuperación de contraseña (`#formRecuperarMiPlan` /
-  `#formNuevaPassMiPlan`)**: reemplaza al "Forgot password?" del widget.
-  Son 2 paneles más dentro del mismo `.miplan-auth`, sin pestaña propia
-  (se llega desde el link `#linkOlvideMiPlan` debajo del login, o desde
-  el correo) — cuando están visibles, `mostrarPanelAuth()` oculta la fila
-  de pestañas y agrega `.is-recuperando` a la tarjeta, que esconde el
-  `.lam-text` (el párrafo "Iniciá sesión (o creá una cuenta)" ya no
-  describe lo que la persona está haciendo; el título sí se mantiene).
-  Flujo: `gotrue.requestPasswordRecovery(email)` (POST
-  `/.netlify/identity/recover` con `{email}`) manda el correo; la
-  respuesta al usuario es **la misma exista o no la cuenta**, a propósito
-  — responder distinto permitiría averiguar qué correos están
-  registrados. El enlace del correo vuelve con `#recovery_token=…`, y
-  `gotrue.recover(token, true)` lo canjea por una **sesión real**: a
-  partir de ahí la persona ya está logueada aunque no haya elegido
-  contraseña, así que el paso final es un `user.update({password})`
-  normal (mismo comportamiento que tenía el widget). Si `recover()` falla
-  (token vencido o ya usado) se vuelve al panel de pedir el enlace con el
-  aviso, en vez de dejarla escribir una contraseña que no se va a poder
-  guardar.
-  **El token se intercepta antes de que el widget lo vea**, con scripts
-  inline en el `<head>` de las dos páginas, ubicados **antes** del
-  `<script>` de `identity.netlify.com` (si el widget ve ese fragmento,
-  abre su modal nativo, que es justo lo que este flujo reemplaza):
-  `index.html` reenvía a `mi-plan.html#recovery_token=…` (el correo
-  apunta a la raíz del sitio, no a "Mi plan"), y `mi-plan.html` guarda el
-  valor en `window.SINAPTIX_RECOVERY_TOKEN` y limpia el hash con
-  `history.replaceState`. El handler de `on('init')` le da prioridad a
-  ese flujo por sobre una sesión ya abierta en el navegador.
-  **Verificado con Playwright** (`netlifyIdentity` mockeado, sin red
-  real): toggle entre pestañas, registro → llamada a `signup` con
-  `{full_name}` → login automático → dashboard con avatar "A" y nombre
-  "Ana Pérez" pintados, credenciales inválidas, email ya registrado,
-  fallback de email sin confirmar, botón que se restaura tras el error,
-  mobile 390px, y `window.scrollX===0` tras forzar scroll horizontal. El
-  gap tarjeta↔cerebro (criterio de más arriba) se remidió en
-  900/1024/1280/1440/1600/1920: idéntico al de antes del cambio
-  (50-60px), porque la tarjeta creció en alto y no en ancho. La
-  recuperación de contraseña se verificó aparte: link con el correo
-  precargado desde el login, pedido del enlace, vuelta desde el correo
-  (hash capturado y limpiado), contraseñas que no coinciden, token
-  vencido, prioridad sobre una sesión previa, y el reenvío de
-  `index.html` a `mi-plan.html`.
-- **Nav de `index.html` — "Iniciar sesión"/"Acceder"**: ambos son ahora
-  links normales (`href="mi-plan.html"`), llevan a la pantalla de login
-  propia del sitio. Antes `#btnLogin` abría el widget de Netlify Identity
-  inline (`netlifyIdentity.open('login'/'user')`, con `e.preventDefault()`)
-  y `#btnAcceder` hacía scroll a `#lam-06` (contacto) — se sacó ese
-  comportamiento de `js/script.js` a pedido del usuario, para unificar
-  todo el flujo de login/registro en `mi-plan.html`. `setLoginButton()`
-  sigue cambiando el texto de `#btnLogin` a "Mi cuenta"/nombre cuando hay
-  sesión (esa parte no se tocó), solo cambió qué pasa al hacer click.
+  `--navy-bright`. Texto `--ink`. Todas las secciones "dark" (Método,
+  Beneficios, Contacto) comparten esta misma paleta estándar (la paleta
+  cálida crema+café que tuvo Método en su momento se descartó).
+- **Tipografía**: `Inter` cuerpo/UI, `Fraunces` (800, normal+itálica)
+  títulos, `Caveat` (`--font-hand`, `.title-hand`) para look manuscrito
+  (Método, Pilares, título de "Mi plan").
+- **Títulos de sección**: todos los `<h2 class="lam-title">` del sitio
+  (salvo Visión) usan `.title-mark{color:var(--purple)}` sobre una
+  palabra clave, igual que el Hero. Método (`#lam-03`) y Pilares
+  (`#lam-04`), centrados, suman `.title-scribble` (curva centrada debajo,
+  `svg/deco-scribble-purple.svg`). Beneficios (`#lam-05`) y Contacto
+  (`#lam-06`), alineados a la izquierda, suman el mismo `.title-scribble`
+  (sin centrar) + 1-2 `.brain-spark` chicos. Visión (`#lam-02`) sin
+  acento, sin cambios. `mi-plan.html` no usa `.title-mark` en ninguno de
+  sus `<h2>`.
+- **Pilares (`#lam-04`)**: dentro de `.lam-title-frame` queda un solo
+  `<img class="deco deco-scribble">` suelto cerca del título (los otros 6
+  que estaban dispersos se sacaron a pedido del usuario), más
+  `.title-scribble` y `.title-mark` — 3 trazos totales pegados al título.
+- **Método (`#lam-03`)**: paleta estándar del sitio (no crema/café). 3
+  `deco-fruit` chicas de fruta real. 2 neuronas laterales decorativas
+  (`neurona-izquierda/derecha.webp`) son una ilustración completa (no
+  media neurona recortada), fondo transparente. Círculos numerados del
+  timeline (`.tl-num`) con degradado `--purple`→`--purple-dark` + sombra
+  de 2 capas; `.tl-line` en degradado. Botones (`.method-cta`) viven
+  dentro de `.method-left` (wrapper junto al timeline), siempre pegados
+  al final del timeline sin importar cuánto crezca `.method-gauges` al
+  lado. El switch "Mi progreso"/"Mi IMC" (`.gauges-switch`) vive en un
+  footer (`.gauges-footer`) al pie de la tarjeta, junto al botón de
+  acción de la pestaña activa (renderizado ahí, no dentro de cada panel).
+  - **Tarjeta "Mi progreso"** (`renderMethodGauges`, `js/script.js`):
+    frase de insight arriba, área con más margen de mejora destacada
+    aparte (más grande, borde + ícono + badge de nivel), las otras 3 en
+    grilla de 3 columnas, delta como badge con flecha, ícono lineal por
+    área. Paleta propia `METHOD_GAUGE_LOW/MID/HIGH` (no confundir con el
+    semáforo genérico de "Mi plan"). Animación de llenado
+    (`stroke-dashoffset`, ~0.7s, escalonada: destacado primero, los 3
+    chicos ~90ms después) + marcador de "antes" (punto blanco/gris sobre
+    el arco, solo si hay reevaluación) vía `gaugeArc`/`gaugeAnimateArcs`/
+    `gaugeArcMarker`. Respeta `prefers-reduced-motion`. **Pendiente de
+    verificación en navegador real** (no se pudo correr Playwright en la
+    sesión que la implementó).
+  - **Tarjeta "Mi IMC"** (`renderMethodImc`): misma jerarquía — frase de
+    insight fija por zona, medidor+número+categoría agrupados en
+    `.method-imc-featured` con badge de color por zona
+    (`.imc-tier-bajo/-saludable/-sobrepeso/-vigilar`), rango de peso
+    saludable estimado (`.method-imc-range`, solo si hay talla cargada).
+    No afecta `mi-plan.html` (usa sus propias clases sin tocar).
+- **Medidor de IMC tipo velocímetro (`.imc-gauge`)**: compartido entre
+  `mi-plan.html` (`#miPlanImcGauge`) y "Mi IMC" de Método. Degradado
+  continuo dorado→verde→dorado→rojo en un solo `<linearGradient>`
+  (`imcGaugeGradientStops()`/`imcGaugeGradientDefsHtml()`,
+  `js/nutricion-planes.js`). En "Mi plan" la aguja anima con barrido
+  (~0.7s) desde el extremo mínimo hasta el valor real (no en Método, que
+  pinta directo en la posición final); marcador fijo
+  (`.imc-gauge-marker`) sobre el arco en el valor exacto, sin animar.
+  Respeta `prefers-reduced-motion` en JS y CSS.
+- **"Mi plan" — estado sin sesión** (`#miPlanSinSesion`, `.miplan-locked`):
+  tarjeta blanca centrada (`.miplan-locked-card`) con candado SVG a mano,
+  formularios propios de login/registro (ver punto siguiente) y "Volver
+  al sitio" como link de texto. Detrás, 1 ilustración grande de cerebro
+  (`img/decoraciones-neurona/cerebro-mi-plan.webp`, sangrando por el
+  borde derecho, oculta en mobile `<900px`) + 3 `deco-fruit` reusadas
+  (aguacate/kiwi/almendras). `#miPlan{min-height:100vh;overflow:hidden}`
+  para evitar franja blanca bajo el footer.
+- **"Mi plan" — login/registro propios** (`.miplan-auth`, reemplazan al
+  widget nativo de Netlify Identity): 2 pestañas
+  (`#tabLoginMiPlan`/`#tabRegistroMiPlan`) + recuperación de contraseña
+  propia (`#formRecuperarMiPlan`/`#formNuevaPassMiPlan`). Estrategia
+  **híbrida**: usa el cliente GoTrue que expone el widget
+  (`netlifyIdentity.gotrue`, métodos `.login()`/`.signup()`/
+  `.requestPasswordRecovery()`/`.recover()`) en vez de `fetch` a mano, así
+  `js/plan-sync.js` (que depende de `currentUser()`) sigue funcionando
+  sin cambios. Como se saltea el widget, `js/mi-plan.js` dispara a mano
+  `mostrarEstadoConSesion(user)` tras login/registro y usa
+  `currentUser().logout()` en vez de `netlifyIdentity.logout()`.
+  Registro pide nombre obligatorio (`full_name`) — cierra el viejo
+  pendiente de fallback de avatar sin nombre para cuentas nuevas (las
+  cuentas viejas sin nombre siguen con el fallback del prefijo del
+  email). Confirmación por correo está **desactivada** en el panel de
+  Netlify, así que tras un signup exitoso se hace login automático (con
+  fallback al aviso de "revisá tu correo" si `Email not confirmed`).
+  El `#recovery_token=…` del correo se intercepta con un script inline
+  en el `<head>` de `index.html` (reenvía a `mi-plan.html`) y
+  `mi-plan.html` (antes de que el widget lo vea). Mensajes de error de
+  GoTrue (en inglés) se mapean a castellano por substring en
+  `authMensajeError()`. **Sin probar contra Netlify real** (todo
+  verificado con `netlifyIdentity` mockeado) — ver "Pendientes
+  conocidos".
+- **Nav de `index.html`**: "Iniciar sesión"/"Acceder" son ahora links
+  normales a `mi-plan.html` (antes abrían el widget nativo o hacían
+  scroll a Contacto). `setLoginButton()` sigue cambiando el texto a "Mi
+  cuenta"/nombre cuando hay sesión.
 - **Backend real**: Netlify Database (Postgres) + Netlify Functions
   (`plan.mjs`) espejando `localStorage` al servidor cuando hay sesión.
   Verificado funcionando en producción (`master@94d6ba4`).
-- **Encuesta de nutrición**: wizard de 8 pasos en `#formNutricion`
-  (compartido entre modal de `index.html` y sección inline de
-  `mi-plan.html`), 4 planes con "día tipo" cada uno + resolución
-  automática si el usuario no está seguro de su objetivo.
-- **Visión (`lam-02`)**: fondo ilustrado grande
-  (`img/decoraciones-neurona/fondo-vision-red.webp`), `opacity:.92`,
-  oculto en mobile (`<900px`). `#lam-02 .split{align-items:center;gap:130px}`
-  (en mobile vuelve a `44px`, mismo breakpoint que `.split`).
-  **Composición reemplazada (sesión 2026-09-17, décima tanda) — ver
-  "Plan: reemplazar `fondo-vision-red.webp`..." más abajo para el
-  historial completo del porqué.** El archivo `fondo-vision-red.webp` ya
-  no es el fondo generado de una sola vez por IA: ahora es el lienzo
-  compuesto por código `fondo-vision-nuevo-redonda.webp` (mismo nombre
-  de archivo final, contenido reemplazado; el usuario eligió la variante
-  "redonda" del cúmulo de neuronas sobre la alternativa "corazón" —
-  ambas quedan igual en `img/decoraciones-neurona/vision-elementos/`
-  por si se quiere cambiar más adelante), 1700×1040 con transparencia
-  real (no fondo blanco), grilla 2×2 con márgenes generosos: cerebro
-  (arriba-izq.), red neuronal (arriba-der.), reloj de arena
-  (abajo-izq.), cintas azules (abajo-der.), listones conectores
-  dibujados por código (curvas `CubicSpline`, mauve translúcido).
-  **Esta composición es reproducible por código**: `scripts/generar-fondo-vision.py`
-  (sesión 2026-09-17, trigésima octava tanda) reconstruye ambos lienzos
-  (`-redonda` y `-corazon`) desde cero a partir de los 5 `elemento-*.webp`
-  — ver "Pendientes conocidos" más abajo, o el propio script, para el
-  detalle de cada constante (posición/tamaño de los 4 elementos, puntos
-  de control de los listones, estilo). Si hace falta mover o agrandar
-  algún elemento, conviene tocar las constantes del script y volver a
-  correrlo en vez de editar los `.webp` a mano.
-  **⚠️ Desvío de este criterio (sesión 2026-09-17, "íconos más
-  grandes"): el agrandado de los 4 íconos de esta tanda se hizo editando
-  el `.webp` final directamente (recorte+escala+repegado por alfa, ver
-  "Pendientes conocidos"), no tocando las constantes de
-  `generar-fondo-vision.py` y corriéndolo de nuevo — no se llegó a
-  revisar si el script tiene una constante de tamaño por elemento fácil
-  de ajustar. Si se vuelve a correr `generar-fondo-vision.py` tal como
-  está, pisa `fondo-vision-red.webp` y se pierde el agrandado de esta
-  sesión.** Próxima vez que se toque el tamaño de estos íconos, evaluar
-  primero si conviene migrar este ajuste al script (más prolijo y
-  reproducible) en vez de seguir apilando ediciones directas del `.webp`.
-  **El `width` en `vw`/`clamp()` y el bleed en `right`/`top` que tuvo
-  esta imagen en las tandas anteriores ya no existen** — sesión
-  2026-09-17 (trigésima séptima tanda) la pasó a vivir dentro de
-  `.vision-art`/`.vision-stats-col` con `width:100%;height:auto`, ver el
-  párrafo "Posicionamiento" más abajo para el detalle completo y el
-  porqué.
-  **Los 4 datos ya no son tarjetas de caja** (`.stat-box`/`.stat-grid` —
-  historial completo de esa etapa, con todos sus ajustes pixel a pixel,
-  en `changelog.md` y `historico/`): a partir de la sesión 1 del plan de
-  anotaciones (2026-09-17, ver "Pendientes conocidos" más abajo) son 4
-  `.stat-annot` (`.stat-annotations` adentro de `.vision-stats-col`) —
-  un punto de color (`.stat-annot-deco`, SVG con `circle`+`line`
-  punteada, mismo lenguaje que `.lam-title-deco`) + número en Fraunces
-  (`.stat-annot-num`, `var(--font-d)`, `var(--purple-dark)`) + etiqueta
-  corta en Inter (`.stat-annot-lab`, `var(--ink-soft)`), sin ícono SVG
-  (los `svg/icon-*.svg` que antes usaban como `.stat-icon` quedan sin
-  uso en esta sección, se mantienen intactos por si se reusan en otro
-  lado). Color por dato vía `currentColor` en el SVG, controlado con una
-  clase modificadora en el contenedor: `.stat-annot--dorado{color:
-  var(--gold)}` (20%), `--morado{var(--purple)}` (86B),
-  `--verde{var(--green)}` (4–6), `--azul{var(--navy-bright)}` (1:1) —
-  mismos 4 colores que ya tenían los íconos de las tarjetas viejas.
-  Textos actuales: "de la energía diaria la consume el cerebro" (20%),
-  "neuronas conectándose en cada decisión" (86B), "semanas para notar
-  el cambio" (4–6), "acompañamiento personal" (1:1) — versión abreviada
-  de los labels largos que tenían las tarjetas, tomada de la captura de
-  referencia que mostró el usuario.
-  **Posicionamiento — solo desktop (`min-width:901px`), sesión 1 de 2
-  (mobile queda pendiente, ver "Pendientes conocidos"). Reescrito por
-  completo en la sesión 2026-09-17 (trigésima séptima tanda) — ver esa
-  entrada en `changelog.md` para el diagnóstico y la verificación
-  completa, acá solo el estado final:**
-  `vision-brain-bg` dejó de ser un `<img class="deco">` suelto fuera de
-  `.wrap` con posición en `vw`/`clamp()`, y pasó a vivir dentro de
-  `.vision-stats-col`, envuelta junto con `.stat-annotations` en un
-  contenedor nuevo, `.vision-art{position:relative}` (`index.html`). La
-  imagen mide `width:100%;height:auto` de esa caja (ya no usa
-  `vw`/`clamp()`/`--vw100`) y `#lam-02 .stat-annotations{position:
-  absolute;inset:0}` ocupa exactamente esa misma caja — con esto, cada
-  `.stat-annot` se posiciona con `left`/`top` en **porcentajes** de la
-  imagen en vez de píxeles fijos, así que quedan alineadas al arte a
-  cualquier ancho de pantalla por construcción (ya no hace falta
-  remedir a mano cada vez que cambia el ancho de ventana o el lienzo de
-  fondo — antes, por encima de ~1440px, la imagen seguía creciendo
-  mientras las anotaciones quedaban clavadas en su lugar).
-  Layout: grilla 2×2 (una anotación por cuadrante, cada una en el margen
-  de su cuadrante sin tapar el elemento que señala) — `#lam-02
-  .stat-annot{width:38%}`, dorado `left:1%;top:1%` (cerebro, arriba-izq.),
-  morado `left:41%;top:2%` (red neuronal, arriba-der.), verde
-  `left:1%;top:40%` (reloj de arena, abajo-izq.), azul `left:41%;top:40%`
-  (cintas azules, abajo-der.) — **el `top` de verde/azul subió de `64%`
-  a `40%` en la sesión 2026-09-17 ("íconos más grandes", ver "Pendientes
-  conocidos"): al agrandar los íconos de esa fila dentro de la imagen,
-  el `top:64%` que tenían antes quedaba dentro del área del ícono ya
-  agrandado y el texto se veía tapado.** El número (`.stat-annot-num`) y la
-  etiqueta (`.stat-annot-lab`) usan `font-size:clamp(...)` (26–36px y
-  12–14px respectivamente, ver `css/styles.css`) en vez de tamaño fijo:
-  a anchos angostos dentro del rango desktop (~901–1100px) el texto
-  ocupa menos alto y envuelve a menos líneas, necesario para que la
-  fila de abajo (verde/azul) no quede pisando el reloj de arena/cintas
-  — sin este achique, con los 4 textos a tamaño completo una sola fila
-  ya ocupaba ~80% del alto de la imagen a esos anchos angostos.
-  `#lam-02 .vision-stats-col{width:100%}` (dentro del mismo `@media`) es
-  necesario porque `.vision-stats-col` no está en un contexto de
-  grid/flex que lo estire (tiene `margin:auto` para centrarse dentro del
-  hueco de `.split`) — sin esto, `.vision-art` colapsaba al ancho de su
-  contenido en vez de ocupar toda la columna disponible.
-  **Verificado con Playwright real** (esta sesión sí pudo levantar
-  Chromium — a diferencia de la sesión anterior que solo pudo probar con
-  `wkhtmltoimage`, que ni siquiera soporta `display:grid`) en 390, 899,
-  901, 1024, 1440 y 1920px: las 4 anotaciones no se superponen entre sí
-  en ninguno de esos anchos, la imagen queda contenida dentro de `.wrap`
-  (no crece sin límite como antes) y el estado mobile (`<900px`, imagen
-  oculta, `.stat-annotations` en columna simple) sigue intacto. Sí queda
-  un solape menor **intencional** (mismo criterio que ya tenían "20%"
-  sobre el cerebro desde la sesión anterior): el número/etiqueta de cada
-  anotación roza el borde del elemento que señala en vez de dejar aire
-  completo — es el mismo lenguaje visual de "anotación con puntero", no
-  un bug.
-  `#lam-02 .vision-stats-col{max-width:560px;width:100%;margin-left:
-  auto;margin-right:auto}` en desktop (en mobile, ancho completo, sin
-  `margin-top` propio salvo `90px` de `.vision-stats-col` base en
-  `<900px` para no pegarse a los bullets al apilarse) — sin cambios,
-  sigue siendo el límite de ancho real de la columna (la imagen no llega
-  a tocar los 560px salvo en viewports muy anchos, contenida antes por
-  el ancho de la columna del grid).
-  Variables `--vision-card-dorado/-morado/-verde/-azul` (+ `-line`) y
-  las reglas `#lam-02 .stat-box`/`.stat-icon`/`.num`/`.lab` de la etapa
-  de tarjetas **quedan en el archivo sin usarse** en esta sección (no se
-  borraron en la sesión 1, ver comentario en `css/styles.css` junto a
-  esas reglas) — decidir limpieza en la sesión 2 del plan.
-- **Visión (`#lam-02`) — íconos separados en 4 archivos individuales**
-  (sesión 2026-09-17, cuadragésima tanda, a pedido del usuario). Hasta
-  este patch, los 4 íconos (cerebro, red neuronal, reloj de arena,
-  cintas azules) vivían quemados dentro de un único archivo,
-  `fondo-vision-red.webp`. Ahora ese archivo dejó de referenciarse (sigue
-  en el repo intacto, sin uso, por si hace falta volver atrás) y
-  `.vision-brain-bg` apunta a
-  `img/decoraciones-neurona/fondo-vision-red-sin-iconos.webp` (mismo
-  lienzo 1700×1040, mismos listones conectores, con las 4 zonas de los
-  íconos borradas/transparentes). Los 4 íconos ahora son archivos
-  propios en `img/decoraciones-neurona/vision-iconos/`
-  (`icon-cerebro.webp` 496×318, `icon-red-neuronal.webp` 598×348,
-  `icon-reloj-arena.webp` 330×407, `icon-cintas-azules.webp` 507×369),
-  recortados directo del canal alfa del `fondo-vision-red.webp` viejo
-  (ya era RGBA con transparencia real, no hubo que quitar fondo blanco
-  como con los `elemento-*.webp` de `vision-elementos/`). Nuevo HTML:
-  `<div class="vision-icons">` con los 4 `<img class="vision-icon
-  vision-icon--{dorado,morado,verde,azul}">`, hermano de
-  `.stat-annotations` dentro de `.vision-art` (mismo contenedor que
-  `.vision-brain-bg`). CSS: cada `.vision-icon` usa `left`/`top`/`width`
-  en porcentaje del mismo sistema de coordenadas que ya usan las 4
-  `.stat-annot` (`position:absolute` dentro de `.vision-icons`, que
-  comparte caja con `.vision-art`), calculados para reproducir
-  exactamente la posición/tamaño que tenía cada ícono dentro del fondo
-  viejo — es un recorte 1:1, no un reposicionamiento. Oculto en mobile
-  (`<900px`, mismo breakpoint que `.vision-brain-bg`) — el
-  posicionamiento en ese rango sigue sin decidir (ver "Pendientes
-  conocidos"). **Reproducible**: `scripts/separar-iconos-vision.py`
-  (Pillow + numpy, comentado, no versionado hasta este patch) rehace los
-  4 recortes + el fondo sin íconos a partir de `fondo-vision-red.webp`
-  si hace falta volver a generarlos (por ejemplo si se cambia el margen
-  de recorte). **Bug corregido (segunda vuelta, misma sesión, a
-  continuación de que el usuario reportara "no se ven")**: la primera
-  versión de este patch dejaba `.vision-icons{display:none}` sin volver
-  a ponerlo visible dentro del `@media(min-width:901px)` que lo
-  reposiciona (solo tenía `position:absolute;inset:0`, faltaba
-  `display:block`) — los 4 íconos existían en el DOM con la posición
-  correcta pero el contenedor entero quedaba oculto, en cualquier ancho
-  de pantalla. Corregido agregando `display:block` a esa regla. Se
-  verificó por separado (reconstrucción píxel a píxel, ver el detalle
-  más abajo en esta misma entrada) que el contenido/posición de los 4
-  recortes es correcto — el problema era solo la visibilidad del
-  contenedor, no la data. **Sigue sin verificación en un navegador
-  real** (Chromium/Playwright no se pudo descargar en este entorno,
-  ver "Pendientes conocidos") — antes de dar esto por definitivo, falta
-  confirmar en un navegador real que ahora los 4 íconos se ven en el
-  mismo lugar que antes de la separación.
-  **Verificación por reconstrucción píxel a píxel (hecha en esta
-  sesión, no reemplaza un navegador real pero confirma que el recorte
-  en sí no tiene errores)**: se volvió a pegar cada ícono sobre el
-  fondo sin íconos, en la posición exacta que calcula
-  `scripts/separar-iconos-vision.py`, y se comparó contra
-  `fondo-vision-red.webp` original — la diferencia quedó acotada al
-  contorno fino de cada ícono (ruido esperable de recompresión WEBP en
-  bordes), sin ningún desplazamiento ni "fantasma" detectable, y los
-  porcentajes `left`/`top`/`width` de `css/styles.css` coinciden
-  exactamente con los recalculados desde cero. Qué hacer con los 4
-  íconos ya separados (moverlos, agrandarlos individualmente,
-  animarlos, rediseñar su posición) queda para la próxima instrucción
-  del usuario — no estaba decidido de antemano, solo se pidió la
-  separación técnica.
-- **Visión (`#lam-02`) — subtítulos de los 3 bullets en morado** (sesión
-  2026-09-16): `.vision-bullets strong` ("Atención individualizada.",
-  "No más dietas genéricas.", "Rendimiento cognitivo.") pasó de
-  `var(--ink)` (casi negro) a `var(--purple)`, el mismo morado que ya
-  usa la palabra "alimenta" del título (`.title-mark{color:var(--purple)}`),
-  a pedido del usuario, para que combinen. El resto del texto de cada
-  bullet (`.vision-bullets span`, sin `<strong>`) sigue en `var(--ink-soft)`
-  sin cambios; los íconos de línea siguen en `var(--gold)`.
-- **Visión (`#lam-02`) — ícono de las 4 tarjetas en la esquina
-  superior derecha (sesión 2026-09-16): OBSOLETO**, era de la etapa de
-  tarjetas de caja (`.stat-box`/`.stat-icon`), reemplazada por las
-  anotaciones sin ícono descritas arriba (sesión 2026-09-17, ver
-  "Pendientes conocidos"). Detalle completo en `changelog.md`/
-  `historico/` si hace falta para contexto de por qué existía.
-- **"Mi plan" — estado con sesión (`#miPlanConSesion`, dashboard "Tu
-  progreso con SINAPTIX")**: rediseño visual sobre los mismos componentes
-  de datos de siempre (medidor de IMC tipo velocímetro, tarjeta de
-  objetivo, gráfico de barras, resumen de nutrición, `.miplan-cierre`) —
-  no se tocó `js/mi-plan.js` en su lógica de qué pinta cada dato, solo se
-  agregaron 4 líneas aditivas (ver abajo) y no se tocó `js/nutricion-planes.js`.
-  Referencia: mockup IA con sidebar + tarjetas "Datos clave" (silueta
-  corporal / brújula) + tarjeta ancha "Detalle del plan". **La sidebar no
-  se implementó** — a pedido explícito del usuario (afectaría el `<nav>`
-  fijo compartido por `index.html` y ambos estados de `mi-plan.html`,
-  fuera del alcance de esta sesión que solo tocaba `#miPlanConSesion`):
-  se adaptó a una sola columna con el nav superior existente, sin tocar
-  `<nav>`/`#miPlanSinSesion`.
-  0. **Las 3 tarjetas del dashboard tienen fondo de color sólido +
-     ilustración propia** (sesión 2026-09-15, sexta y séptima tanda — reemplaza el
-     punto anterior de "misma cabecera", que sigue documentado abajo por
-     el contexto de por qué existe `.miplan-card-head`/`.miplan-ring`).
-     El usuario mostró una referencia nueva: 3 tarjetas con fondo sólido
-     (verde/dorado/lila) y su propia ilustración, y pidió ir hacia ese
-     estilo. Decisiones tomadas con el usuario antes de construir (se le
-     mostró una maqueta con 2 opciones en el visualizador):
-     - Fondo sólido de color (no blanco con acento) — 3 variables nuevas
-       en `:root`, `--miplan-card-verde`/`--miplan-card-dorado`/
-       `--miplan-card-lila` (tintes opacos, no rgba, para leer como
-       tarjeta de color, no como estado hover). Aplicadas con
-       `#miPlan .miplan-grid > .stat-box` (Antropometría, verde),
-       `#miPlan .stat-box.miplan-objetivo` (dorado) y
-       `#miPlan .miplan-cierre` (lila) — necesitan más especificidad que
-       la regla general `#miPlan .stat-box,.bar-chart-card{background:
-       var(--paper)}` que ya existía.
-     - El ícono de línea morado de la cabecera **se reemplazó** (no
-       convive) por la ilustración en Antropometría y Objetivo cognitivo:
-       `<img class="miplan-card-illustration">` en el mismo lugar del
-       `<svg class="miplan-card-icon">` que tenían antes. "Cierre" **no**
-       tiene ilustración de cabecera (de las 3 imágenes que dio el
-       usuario, ninguna era para ese lugar) — conserva su ícono de línea
-       (clipboard con check) sin cambios.
-     - El anillo de progreso (`.miplan-ring`) se mantuvo igual, arriba a
-       la derecha de la cabecera — no se tocó su CSS ni posición.
-     - La tira de 5 íconos nueva **reemplazó** (no convive) a la fila de
-       íconos redondos sueltos que ya existía en "Cierre"
-       (`.miplan-cierre-icons`, antes 5 `<img>` de `img/Iconos/` sin
-       relación temática). Ahora es un único `<img class="miplan-cierre-
-       icons-strip">` — la pieza ya viene diseñada como una tira
-       (plato/cubiertos/cerebro/bowl/hueso, cada uno en su recuadro), no
-       se recorta en íconos sueltos. Sigue el mismo criterio de
-       visibilidad que antes (`#miPlanCta.hidden + .miplan-cierre-icons
-       {display:none}`, CSS puro, sin tocar JS).
-     Assets: las 3 imágenes que dio el usuario (generadas con Gemini) NO
-     tenían transparencia real pese a decir "fondo transparente" — eran
-     JPEG con un patrón de cuadros gris/blanco **dibujado como píxeles
-     reales** (falsa transparencia, típico de algunos generadores). Se
-     procesaron (`Pillow`: máscara por saturación/valor para detectar el
-     patrón de cuadros y convertirlo a alpha real, recorte al bounding
-     box, exportadas como PNG) antes de copiarlas a
-     `img/ilustraciones-mi-plan/` (`antropometria-cuerpo.png`,
-     `objetivo-cerebro.png`, `cierre-iconos-plan.png`). Si en el futuro
-     el usuario sube más imágenes de Gemini para este sitio, revisar
-     primero si el "fondo transparente" es real (`Image.open(...).mode`)
-     antes de asumirlo.
-     Nota sobre el pedido original: el cerebro de "Objetivo cognitivo" se
-     describió como "tonos dorados, low-poly" pero la imagen real
-     entregada es un dibujo de línea fina morado/berenjena (no dorado, no
-     low-poly relleno) — se usó la imagen tal como se recibió, no la
-     descripción; el fondo dorado de la tarjeta le da contraste igual.
-     **Verificado con Playwright**: dashboard sin datos (CTA + tira de
-     íconos visibles, 3 tarjetas con su color), con datos seedeados
-     (gauge de IMC, objetivo y anillos completos no rompen el layout de
-     color) y mobile 390px (tarjetas apiladas, ilustraciones escalan
-     bien). `window.scrollX===0` tras forzar scroll horizontal — el
-     bleed de las ilustraciones no rompe el criterio de `overflow-x` de
-     más abajo. Se confirmó que `index.html` sigue cargando normalmente
-     (no se tocó nada fuera de `mi-plan.html`/`css/styles.css`).
-     **Séptima tanda (mismo día):** el usuario reportó (con captura del
-     sitio real desplegado) que Antropometría y Objetivo cognitivo
-     quedaban con alturas distintas en desktop — el motivo era
-     `.miplan-grid{align-items:start}`, que hace que cada columna del
-     grid tome solo la altura de su propio contenido en vez de la altura
-     de la fila. Fix: `align-items:stretch` en `.miplan-grid` +
-     `flex:1` en `.miplan-objetivo` (sin el `flex:1`, solo se estira el
-     wrapper invisible `.miplan-col`, no la tarjeta de color en sí, que
-     seguía corta — Antropometría no necesitó cambios porque es un ítem
-     directo del grid, sin wrapper de por medio). Verificado con
-     Playwright midiendo `getBoundingClientRect().height` de ambas
-     tarjetas en desktop (1440px): quedan exactamente iguales tanto sin
-     datos (266px) como con datos (403px). En mobile (<900px) el grid
-     pasa a 1 columna (regla ya existente) así que ahí no aplica — cada
-     tarjeta apilada mantiene su alto natural, que es lo esperable.
-  0.1 **Las 3 tarjetas del dashboard (Antropometría / Objetivo cognitivo /
-     Cierre) tienen la misma cabecera** (sesión 2026-09-15, quinta tanda —
-     a pedido del usuario, con una captura de la referencia original al
-     lado del estado real del sitio, mostrando que "Cierre" se veía como
-     un componente distinto). Fondo, padding y `border-radius` ya eran
-     idénticos entre las 3 desde antes (`#miPlan .stat-box, .bar-chart-card,
-     .miplan-cierre{padding:20px 20px}`, más arriba en este archivo) — lo
-     que las diferenciaba era la cabecera: las 2 primeras llevan
-     `.miplan-card-head` (ícono a la izquierda + anillo de progreso a la
-     derecha) y el título en `.miplan-card-title` (15px, `--ink`) debajo;
-     "Cierre" no tenía ícono y el título iba inline con el avatar, en su
-     propia clase `.miplan-cierre-title` (18px, `--purple-dark`) — **esa
-     clase ya no existe**, se quitó del CSS. Ahora `.miplan-cierre-head`
-     tiene un ícono nuevo (clipboard con check, dibujado a mano con
-     `<path>` para heredar el mismo estilo de trazo que los otros 2 —
-     `rect` no hereda esa regla) en el lugar donde las otras 2 tienen su
-     ícono propio, y el avatar+nombre (`#miPlanCierreUser`) sigue del lado
-     derecho, en el mismo lugar donde ellas tienen el anillo (no es un
-     anillo real: "Cierre" no tiene un dato de progreso propio, es la
-     identidad de la cuenta). El título "Cierre" pasó a usar directamente
-     la clase `.miplan-card-title` (no una copia con los mismos valores)
-     para que quede garantizado que las 3 tarjetas usan la tipografía
-     exacta, con `.miplan-cierre .miplan-card-title{margin-bottom:0}`
-     porque esa clase trae `margin-bottom:12px` pensado para bloques
-     sueltos, y acá el padre ya es flex column con `gap:14px` — sin
-     cancelarlo el espaciado quedaba más grande que el del resto de los
-     hijos de `.miplan-cierre`.
-     **Verificado con Playwright**: dashboard sin datos (avatar+ícono+
-     título alineados igual en las 3 tarjetas), con plan generado
-     (gauge de IMC, objetivo y barras de estado ya pintados no rompen el
-     layout), y mobile 390px (las 3 tarjetas apiladas mantienen la misma
-     cabecera). Tipografía/fondo/padding/radio confirmados iguales por
-     `getComputedStyle` entre `.miplan-grid .stat-box` y `.miplan-cierre`.
-     No se tocó el estado sin sesión (`#miPlanSinSesion`) ni los
-     formularios de login/registro/recuperación de las tandas anteriores
-     — se re-verificó que siguen intactos.
-  1. Cada una de las 2 tarjetas de "Datos clave" (`.stat-box.miplan-card`)
-     suma un header (`.miplan-card-head`): ícono SVG inline a mano, trazo
-     fino `stroke:var(--purple)` (silueta corporal para Antropometría,
-     círculos concéntricos tipo "objetivo/diana" para Objetivo cognitivo
-     — no existen como asset en `img/Iconos/`, se descartó inventar una
-     ruta de imagen) + un anillo de progreso (`.miplan-ring`, SVG puro:
-     `<circle>` de fondo + `<circle>` con `stroke-dasharray`/
-     `stroke-dashoffset`, sin imagen ni librería). El anillo es un
-     indicador de **2 estados** (vacío/completo), no un medidor real: no
-     hay un dato continuo de "% de progreso" para IMC u objetivo, solo
-     presente/ausente. `.miplan-ring.is-complete` (verde `--green` para
-     `#miPlanAntroRing`, azul `--navy-bright` para `#miPlanObjetivoRing`)
-     rellena el círculo y muestra un check — la clase la agrega
-     `js/mi-plan.js` dentro de los mismos bloques `try` que ya parsean
-     `sinaptix_antropometria`/`sinaptix_objetivo` en `pintarMiPlan()`
-     (2 líneas nuevas por bloque, no se modificó nada de lo que ya
-     existía ahí). Debajo de cada tarjeta, un CTA propio
-     (`.miplan-card-cta`, `btn-ghost` chico) — como no existe un flujo
-     para cargar *solo* antropometría o *solo* objetivo por separado (los
-     dos salen de la misma encuesta de 8 pasos), el CTA es un simple
-     `<a href="#miplanCierreAnchor">` que hace scroll (nativo,
-     `scroll-behavior:smooth` ya en `html`) hasta el botón real
-     "Generar mi plan" — cero JS nuevo para esto. `.stat-box:has(.miplan-ring.is-complete)
-     .miplan-card-cta{display:none}` oculta el CTA de la tarjeta una vez
-     completa (evita 2 botones que abren la misma encuesta).
-  2. `.miplan-cierre` (tarjeta ancha "Detalle del plan de nutrición", ya
-     existía) suma una fila de íconos decorativos
-     (`.miplan-cierre-icons`, reusa los mismos `img/Iconos/icon-*.webp`
-     que ya usa el resto del sitio: omega3, neuronas, antioxidantes,
-     hidratación, complejo B — no se generó ningún ícono nuevo para esto)
-     entre el texto de `#miPlanCta` y los botones. Solo visible mientras
-     no hay plan generado: `#miPlanCta.hidden + .miplan-cierre-icons{display:none}`,
-     resuelto con CSS puro (hermano inmediato de `#miPlanCta`, que
-     `js/mi-plan.js` ya ocultaba/mostraba sin cambios) — no hizo falta
-     tocar JS para esto.
-  3. `#miPlan .stat-box`/`.miplan-grid`/etc. (paddings, gaps, fondo
-     `--paper` sobre `.dark`) no cambiaron — son las reglas ya
-     documentadas más arriba, compartidas con el resto de "Mi plan".
-- **"Detalle del plan de nutrición" — 3 columnas (Plan / Prioridades y
-  Moderación / columna derecha apilada)**: `nutriBuildResumenHTML(d, opts)`
-  (`js/nutricion-planes.js`, compartida entre `#nutriResumen` del wizard en
-  `index.html` y `#miPlanDetalle` en `mi-plan.html`) arma, por cada plan
-  resuelto, un `.nutri-plan-block` con 2 hijos: `.nutri-plan-main` (ícono
-  SVG de cerebro `NUTRI_ICON_BRAIN` + título, enfoque, nutrientes clave,
-  día tipo) y `.nutri-plan-side` (cajas `.nutri-side-box--priorizar`/
-  `--moderar`, íconos `NUTRI_ICON_CHECK`/`NUTRI_ICON_WARN`, mismo
-  criterio de línea fina que `.miplan-card-icon`). Por defecto
-  (`.nutri-plan-block{flex-direction:column}`) los 2 sub-bloques se
-  apilan — así el modal angosto de `index.html` sigue en una sola columna
-  sin CSS especial; el grid de 2 columnas
-  (`grid-template-columns:1.6fr 1fr`) solo se activa dentro de `#miPlan`
-  desde 680px de ancho. **Esto reemplazó el viejo `column-count:2` de
-  `#miPlan .nutri-summary`** (repartía los `<div>` sueltos del resumen
-  en 2 columnas tipo "diario") — ya no existe ese mecanismo, ahora cada
-  plan arma sus propias 2 columnas explícitas.
-  "Ajustado a tu caso" (de `nutriConstruirAjustes(d)`, es de toda la
-  encuesta, no de un plan en particular) tiene **tratamiento distinto
-  según el contexto** (sesión 2026-09-16, décimosegunda tanda): en el
-  wizard de `index.html` sigue colgado del `.nutri-plan-side` del
-  **último** plan resuelto, como `.nutri-side-box--ajustes` con fondo
-  sólido `--gold` (llamado sin el 2do parámetro de
-  `nutriBuildResumenHTML`, que por default lo embebe ahí — sin cambios,
-  ese modal angosto no tenía el problema de tarjeta desbalanceada). En
-  `mi-plan.html` en cambio pasó a tarjeta propia (`.miplan-ajustes`,
-  mismo fondo `--gold`/texto blanco): con muchos ajustes, el bloque
-  embebido dejaba "Prioridades y Moderación" mucho más alta que el plan
-  de al lado. `js/mi-plan.js` (`pintarMiPlan()`) llama
-  `nutriBuildResumenHTML(o.encuesta,{incluirAjustesEnSide:false})` para
-  que no se duplique, y pinta `#miPlanAjustesList` aparte llamando
-  directo a `nutriConstruirAjustes(o.encuesta)`; la tarjeta
-  (`#miPlanAjustes`) se oculta si no hay ajustes o no hay objetivo
-  guardado. Si ningún plan resolvió pero sí hay ajustes (caso borde que
-  no debería darse en la práctica), el fallback que los muestra sueltos
-  sigue existiendo pero solo aplica cuando `incluirAjustesEnSide` es
-  `true` (o sea, en el wizard).
-  La columna derecha de `.miplan-detalle-grid` (antes solo `.miplan-cierre`)
-  ahora es un wrapper `.miplan-detalle-side` (flex-column, mismo gap que
-  el resto de "Mi plan") con `.miplan-ajustes` arriba y `.miplan-cierre`
-  debajo, sin cambios de contenido en esta última.
-  **Ojo con `min-width:0` y `overflow-wrap`** (bug reportado por el
-  usuario en la tanda siguiente, décimotercera, con captura: un texto
-  largo sin espacios en "disgustos" comprimía la columna del plan a una
-  tira vertical y hacía desbordar `.miplan-ajustes` fuera del viewport):
-  `.miplan-ajustes` necesita `overflow-wrap:anywhere;word-break:break-word`
-  (mismo motivo que ya tenía `.nutri-side-box`) y las 2 grillas de esta
-  pantalla (`.miplan-detalle-grid` y, dentro de `#miPlan`,
-  `.nutri-plan-block`) necesitan `min-width:0` en sus hijos directos —
-  si se agrega alguna tarjeta/columna nueva a este layout con texto libre
-  del usuario adentro, revisar que tenga las 2 protecciones o puede volver
-  a pasar lo mismo.
-  `.miplan-cierre` suma `.miplan-cierre-head` con avatar (inicial, círculo
-  `.miplan-avatar`) + nombre: `js/mi-plan.js` (`pintarMiPlan()`) lo arma
-  desde `user.user_metadata.full_name`, o el prefijo del email antes de
-  la `@` como fallback si la persona no cargó nombre al registrarse en
-  Netlify Identity. Este fallback quedó **superado**: desde que existe el
-  registro propio (`.miplan-auth`, ver más abajo) el nombre es un campo
-  obligatorio, así que toda cuenta nueva trae `full_name`. El fallback
-  **se deja igual** como red de seguridad para las cuentas creadas antes
-  de este cambio (y para las creadas a mano desde el panel de Netlify),
-  que sí pueden no tener nombre — no es código muerto, pero ya no debería
-  activarse en el flujo normal.
-  El texto "Sesión iniciada como {email}" (antes debajo del título
-  "Tu progreso con SINAPTIX", `<p id="miPlanEmail">`) se movió dentro de
-  esta misma tarjeta, pegado a los botones "Generar mi plan"/"Cerrar
-  sesión" (`.miplan-cierre-session`, a pedido del usuario, sesión
-  2026-09-15 continuación) — mismo `id` y misma lógica de
-  `pintarMiPlan()`, solo cambió dónde vive el `<p>` en el HTML.
-  Verificado con Playwright (mock de `netlifyIdentity`, sin red real):
-  desktop 1440px, mobile 390px (apila todo en 1 columna) y el modal de
-  `index.html` (paso 8 del wizard, sigue apilado, no se rompió).
-- **Título "Tu progreso con SINAPTIX" — palabra "SINAPTIX" encerrada**
-  (sesión 2026-09-16/17, décimocuarta a trigésima tanda): solo esa
-  palabra vive en `<span class="miplan-brand-circled">`, con texto en
-  `--purple-dark` y un círculo como `::after` con `background-image`.
-  **El círculo es una foto real** (recorte de `img/ilustraciones-mi-plan/
-  circulo-brand-sinaptix.png`, un trazo de crayón/marcador sobre papel al
-  que se le sacó el fondo y quedó con transparencia real — **no** un SVG
-  dibujado a mano por Claude; hubo un intento SVG en la décimocuarta
-  tanda, `svg/deco-circle-brand.svg`, que el usuario pidió reemplazar por
-  esta foto en la décimoquinta porque "se veía simple", y ese SVG ya no
-  existe). **Color actual: `--gold`** (`#C1703B`, tanda vigesimonovena —
-  el usuario pidió cambiarle el color y dejó la elección a Claude; el
-  original de la foto era turquesa, quedó reemplazado en el mismo
-  archivo). El recoloreado se hace a nivel de píxel conservando la
-  textura real de crayón (luminosidad de cada píxel del color viejo +
-  matiz/saturación del color nuevo, con un ajuste de nivel si el color
-  nuevo es más claro/oscuro que el viejo — ver el script de esa sesión si
-  hay que volver a recolorear esta imagen a otro tono) — el color final
-  **no** es una variable de `:root`, vive fijo en los píxeles del PNG. Si
-  algún día cambia el texto de este título o su tamaño de fuente, revisar
-  los offsets de `.miplan-brand-circled::after` (`left/right/top/
-  bottom`, en `%` relativos al propio `<span>`) — están ajustados a ojo
-  para "SINAPTIX" en `Caveat` contra esta imagen puntual (su recorte/
-  proporción no cambió al recolorearla, así que los offsets siguen
-  valiendo), no son un cálculo genérico.
-  **Tamaño del título (tanda trigésima, corregido en la trigésimoprimera)**:
-  `#miPlanConSesion .sec-head-center .lam-title{font-size:clamp(30px,
-  3.9vw,42px);font-weight:700}` — el usuario pidió "que no se sienta
-  fuera de contexto" al lado de `.miplan-subhead` (19px) y las tarjetas
-  del dashboard; el primer recorte (26-34px, peso 600, tanda trigésima)
-  se pasó de chico ("te pasaste un poco", con captura), se subió a este
-  punto medio y se volvió al peso 700 original (600 se leía débil a este
-  tamaño). Todo esto **solo acá**, sin tocar `.lam-title` global
-  (`clamp(40px,6vw,68px)`, la escala de hero que siguen usando todos los
-  títulos de sección de `index.html`). No es un tamaño "final" — quedó
-  en lo que se sintió bien contra el dashboard actual, si la pantalla
-  cambia (más contenido al lado, otro layout) conviene revisar de nuevo.
-  El usuario también preguntó si convenía recolorear todo el título (no
-  solo "SINAPTIX") — se le recomendó que no: el contraste entre el texto
-  neutro y la única palabra destacada es lo que dirige la mirada a
-  "SINAPTIX", un título entero de un color (o multicolor) perdería esa
-  jerarquía y sumaría ruido en una pantalla ya cargada de color (tarjetas
-  verde/dorado/lila). No se tocó código por esto — si en algún momento
-  se pide explícitamente, tenerlo en cuenta al implementarlo.
-  **Ojo con `margin` shorthand en `#miPlanConSesion .sec-head-center
-  .lam-title`**: en la décimocuarta tanda quedó con `margin:14px 0 6px`,
-  que sin querer pisaba el `margin-left/right:auto` que centra el título
-  y lo dejaba pegado a la izquierda (bug reportado por el usuario y
-  arreglado en la décimoquinta, ahora usa `margin-top`/`margin-bottom`
-  nada más) — cualquier ajuste de margen vertical acá tiene que usar las
-  propiedades largas, no el shorthand `margin`.
-- Para el detalle completo de esta sesión (íconos SVG exactos, capturas
-  de verificación) ver la entrada 2026-09-15 en `changelog.md`.
-- Para el detalle completo del resto de estos puntos (por qué se
-  diseñó así, decisiones descartadas, valores exactos de CSS, capturas
-  de verificación) ver `historico/memoria-2026-09-14.md`.
-- **Overflow horizontal: NO poner `overflow-x` en `html`, solo en `body`**.
-  Historial de esto (para no repetir el error): se creyó en una sesión
-  anterior que el bleed grande de `vision-brain-bg` (`right:-160px`)
-  rompía el layout con scroll horizontal real, y se "corrigió" agregando
-  `overflow-x:hidden` también a `html`. **Ese diagnóstico era incorrecto**:
-  verificado con Playwright forzando scroll horizontal (`mouse.wheel` +
-  leer `window.scrollX`) en versiones con y sin el bleed grande, **nunca**
-  hubo scroll horizontal real — `body{overflow-x:hidden}` (que ya existía
-  desde antes) sola es suficiente para contener cualquier desborde de
-  decoraciones `position:absolute` dentro de `section`s `position:relative`,
-  sin importar cuánto "bleed" tengan.
-  El agregado de `overflow-x:hidden` en `html` sí tuvo un efecto secundario
-  real y visible: al fijar `overflow-x` sin fijar también `overflow-y`,
-  la spec de CSS fuerza `overflow-y` de `visible` a `auto` en el elemento
-  raíz. En Chrome/Windows, en cuanto `<html>` tiene **cualquier**
-  `overflow` explícito, el navegador dejar de usar el scrollbar nativo
-  "moderno" de la ventana y renderiza `<html>` como una caja de scroll
-  normal con el scrollbar **clásico** (gris sólido, con flechas
-  arriba/abajo) — eso es lo que el usuario reportó como "doble scroll"/
-  "se ve gris". Se revirtió: `html` vuelve a llevar solo
-  `scroll-behavior:smooth` (sin overflow), `body` sigue con
-  `overflow-x:hidden` (eso no se toca, es lo que realmente contiene el
-  desborde). **No volver a agregar `overflow-x`/`overflow-y` a `html`** ni
-  a `body` "para estar seguros": si aparece un desborde nuevo, verificar
-  primero con Playwright (`window.scrollX` tras forzar scroll, no solo
-  comparar `scrollWidth` vs `clientWidth` — `scrollWidth` no baja aunque
-  el contenido esté bien clippeado, así que no sirve para diagnosticar
-  esto) antes de tocar `overflow` en el elemento raíz.
-- **Tarjeta "Objetivo cognitivo" (`.miplan-objetivo`): orden de textos y
-  anillo alineados con Antropometría** (sesión 2026-09-15, quinta tanda
-  continuación — a pedido del usuario con captura de referencia).
-  Dos ajustes en `mi-plan.html`/`css/styles.css`, sin tocar JS:
-  - **Orden del texto**: en `mi-plan.html` el bloque de esta tarjeta
-    mostraba primero `.lab` ("Objetivo cognitivo principal", itálica) y
-    debajo `.num` (`#miPlanObjetivo`, el valor real o el placeholder
-    `—`) — al revés que Antropometría, que muestra primero `.num`
-    (`#miPlanImc`) y debajo su `.lab`. Se invirtió el orden de los 2
-    `<div>` (mismos `id`/clases, nada de JS depende del orden en el DOM)
-    para que quede igual: título → `.num` (`—` o el objetivo resuelto) →
-    `.lab` en itálica.
-  - **Anillo pegado al ícono en vez de ir al borde derecho**: causa real,
-    no visual — `.miplan-objetivo{display:flex;flex-direction:column;
-    align-items:flex-start}` hace que sus hijos block (incluido
-    `.miplan-card-head`) se achiquen al ancho de su contenido en vez de
-    ocupar el ancho completo de la tarjeta, así que el
-    `justify-content:space-between` de `.miplan-card-head` no tenía
-    espacio para repartir. En Antropometría no pasaba porque `.stat-box`
-    no es flex, así que su `.miplan-card-head` ya ocupaba el 100% por
-    comportamiento default de bloque. Fix: `width:100%` agregado a la
-    regla general de `.miplan-card-head` (afecta a las 2 tarjetas que la
-    usan, no rompe Antropometría porque ahí ya se comportaba así).
-  Verificado con Playwright (mock de `netlifyIdentity`): estado sin
-  datos (placeholder `—` arriba, texto itálico abajo, anillo vacío a la
-  derecha) y con plan generado (objetivo real arriba, anillo relleno
-  a la derecha, igual que el check de Antropometría), desktop 1440px y
-  mobile 390px.
-- **Tarjeta "Tu estado actual" (`#miPlanBarras`/`.bar-chart-card`,
-  gráfico de barras foco/memoria/energía/calma) pasa a fondo dorado**
-  (mismo pedido/sesión que el punto anterior). Vive en la misma columna
-  que "Objetivo cognitivo" y depende del mismo dato (la encuesta de
-  objetivo), así que ahora comparte su color: `#miPlan .bar-chart-card`
-  pasó de `background:var(--paper)` (blanco) a
-  `background:var(--miplan-card-dorado)` (el mismo `#F6E7D6` que ya usa
-  `.miplan-objetivo`). No se tocó su padding/radius/tipografía, ni la
-  tarjeta blanca del wizard en `index.html` (esa no pasa por
-  `#miPlan .bar-chart-card`, sigue con el fondo genérico de
-  `.bar-chart-card` sin el override de esta página).
-  Verificado con Playwright: dashboard con plan generado, desktop y
-  mobile — las 2 tarjetas de la columna derecha ("Objetivo cognitivo" y
-  "Tu estado actual") quedan del mismo tono, sin afectar la tarjeta
-  verde de Antropometría ni la lila de "Cierre".
-- **Botón de "Datos clave" desnivelado entre las 2 tarjetas — anclado al
-  borde inferior** (misma sesión, sexta tanda — el usuario mandó captura
-  del deploy real mostrando el problema apenas se aplicó el punto
-  anterior). Causa: `.num` usa `font-size:36px` en Antropometría pero
-  `22px` en Objetivo cognitivo (a propósito, para que un objetivo largo
-  tipo "Mejorar el foco y la memoria" no desborde) — esa diferencia de
-  alto entre los dos bloques de arriba hacía que el botón
-  (`.miplan-card-cta`) quedara a distinta altura en cada tarjeta en el
-  estado "sin datos" (con datos cargados el botón se oculta vía
-  `.stat-box:has(.miplan-ring.is-complete) .miplan-card-cta{display:none}`,
-  así que ahí no se notaba). Se igualaron fuentes en vez de forzar el
-  mismo tamaño (rompería el objetivo largo) anclando el botón siempre al
-  fondo de la tarjeta: `.stat-box.miplan-card` (clase que comparten las 2
-  tarjetas) pasa a `display:flex;flex-direction:column` — sin fijar
-  `align-items` en esa regla a propósito, así Antropometría (gobernada
-  solo por esta regla) hereda el valor inicial `normal` → se comporta
-  como `stretch` (igual que el bloque normal que tenía antes, necesario
-  para que `.imc-gauge{margin:0 auto}` se siga centrando sobre el ancho
-  completo) y Objetivo cognitivo sigue con su propio
-  `align-items:flex-start` (`.miplan-objetivo`, sin cambios, ya tenía el
-  fix de `.miplan-card-head{width:100%}` de la tanda anterior). Con la
-  tarjeta en flex-column, `.miplan-card-cta` suma `margin-top:auto`
-  (empuja el botón al fondo sin importar cuánto mida el contenido de
-  arriba) y `align-self:flex-start` (para que no se estire a todo el
-  ancho, efecto por default de un flex-column sin `align-items:flex-start`
-  — reemplaza el `margin-top:14px` fijo que tenía antes).
-  Verificado con Playwright: estado sin datos (los 2 botones ahora a la
-  misma altura, desktop 1440px y mobile 390px) y con plan generado (sigue
-  igual que antes, el botón no se ve porque está oculto). No se tocó
-  `index.html`: `.miplan-card`/`.miplan-card-cta` son clases exclusivas
-  de `mi-plan.html`.
-- **"—" placeholder de Antropometría desparejo contra el de Objetivo
-  cognitivo** (sesión 2026-09-15, continuación — el usuario mandó captura del estado
-  sin datos mostrando el problema; el botón ya quedaba anclado al fondo
-  por el punto anterior, pero el "—" en sí seguía viéndose más grande y
-  más abajo en la tarjeta verde). Causa: igual que el punto anterior,
-  `.num` es 36px en Antropometría y 22px en Objetivo cognitivo — eso no
-  se tocó (sigue haciendo falta para el objetivo largo), pero antes de
-  cargar un dato real ambos elementos muestran el mismo placeholder "—",
-  así que no había motivo para que se vieran distintos en ese estado.
-  Fix: el `<div class="num">` de Antropometría (`#miPlanImc`) suma la
-  clase `is-placeholder` en el HTML; `.stat-box.miplan-card
-  .num.is-placeholder{font-size:22px}` (`css/styles.css`) lo iguala al
-  tamaño de Objetivo cognitivo mientras no hay dato. En
-  `js/mi-plan.js` (`pintarMiPlan()`), al pintar el IMC real se agrega
-  `imcEl.classList.remove('is-placeholder')` — así el número real (ej.
-  "24.2") vuelve a mostrarse grande (36px), que es lo que se quiere para
-  un dato protagonista; solo el placeholder debía igualarse. Objetivo
-  cognitivo no se tocó (ya usaba 22px siempre, con o sin dato).
-  Verificado con Playwright: estado sin datos (los 2 "—" al mismo
-  tamaño y altura, desktop 1440px y mobile 390px, botones siguen
-  parejos) y estado con IMC cargado (vuelve a 36px, sin afectar
-  Objetivo cognitivo).
-- **Wizard de nutrición (`#modalNutricion`) — botón "Iniciar sesión" real
-  en el último paso, en vez de depender del widget nativo automático**
-  (sesión 2026-09-15, continuación — el usuario mandó captura del deploy
-  real mostrando el mensaje final sin ningún botón visible). Antes, sin
-  sesión, al guardar el plan se llamaba a `setTimeout(() =>
-  netlifyIdentity.open('login'), 900)`: abría el widget **nativo** de
-  Netlify Identity automáticamente — inconsistente con el resto del
-  sitio, que ya reemplazó ese widget por pantallas propias de
-  login/registro en `mi-plan.html` (`#btnLogin`/`#btnAcceder` del header
-  ya apuntan ahí, no al widget). En el deploy real tampoco se veía ningún
-  botón en ese paso. Fix: `index.html` agrega
-  `<a href="mi-plan.html" class="btn btn-ghost nutri-login-btn hidden"
-  id="nutriLoginBtn">Iniciar sesión</a>` justo debajo de
-  `#nutriResultado`; `js/script.js` (handler de submit del wizard) sacó
-  el `setTimeout`/`netlifyIdentity.open('login')` y en su lugar hace
-  `loginBtn.classList.remove('hidden')` cuando no hay sesión — mismo
-  destino (`mi-plan.html`) que el resto de los accesos de login del
-  sitio. `js/nutricion-wizard.js` (`resetNutriWizard()`) vuelve a ocultar
-  el botón (`classList.add('hidden')`) al reabrir el wizard, igual que ya
-  hacía con `#nutriResultado`, para que no quede visible de una sesión
-  anterior del wizard. El caso con sesión iniciada no cambió (sigue
-  redirigiendo directo a "Mi plan" a los 900ms).
-  **Tamaño y estilo del botón** (misma sesión, ajuste siguiente — el
-  usuario mandó captura mostrando el botón `btn-solid` estirado a todo
-  el ancho del modal, "feo"/pesado al lado de "Guardar mi plan"). Causa:
-  `.modal-form` es `display:flex;flex-direction:column` sin
-  `align-items` propio → default `stretch`, y a diferencia de
-  "Atrás"/"Guardar mi plan" (que viven adentro de `.nutri-nav`, una fila
-  flex aparte con `.btn{flex:none}`), `#nutriLoginBtn` cuelga directo del
-  `.modal-form`, así que heredaba ese stretch y ocupaba el 100% del
-  ancho. Fix: nueva clase `.nutri-login-btn{align-self:flex-start;
-  margin-top:10px;padding:11px 24px;font-size:13.5px}` (`css/styles.css`)
-  le da tamaño natural de contenido y lo alinea a la izquierda; además
-  pasó de `btn-solid` a `btn-ghost` (outline, no relleno) para bajarle
-  jerarquía visual frente al solid morado de "Guardar mi plan", que ya
-  fue la acción principal de este paso.
-  Verificado con Playwright (mock del DOM en vez del widget real, no
-  alcanzable desde este entorno): botón chico, alineado a la izquierda,
-  estilo `.btn-ghost`, desktop 1440px y mobile 390px.
-  **Auto-scroll a mensaje + botón al guardar (sesión 2026-09-16)**: el
-  usuario reportó, ya con el patch anterior aplicado, no ver el botón
-  aunque funcionaba — el modal (`.modal-card`, `max-height:88vh;
-  overflow:auto` en `css/styles.css`) es su propio contenedor con scroll,
-  y con todos los avisos nutricionales del último paso, el mensaje de
-  éxito (`#nutriResultado`) + `#nutriLoginBtn` quedan por debajo del
-  fold sin que se note que hay más para scrollear. Fix en `js/script.js`
-  (handler de submit, rama sin sesión): al mostrar el botón se hace
-  `modalCard.scrollTo({top: modalCard.scrollHeight, behavior:'smooth'})`
-  dentro de un `requestAnimationFrame` (para que el botón ya esté
-  visible — no `display:none` — antes de medir `scrollHeight`). Solo se
-  aplica a la rama sin sesión (el caso con sesión ya redirige solo a los
-  900ms, no hace falta). **No se pudo verificar con Playwright en esta
-  sesión** (no hay acceso de red a los dominios de descarga del browser
-  de Playwright desde este entorno); la lógica se revisó a mano y por
-  sintaxis (`node --check`), pero falta confirmación visual — si en el
-  deploy real el scroll no llega justo al fondo o se ve brusco, revisar
-  acá primero.
-  **Nombre/correo del paso 1 — ocultos/prellenados si ya hay sesión, y
-  usados para precargar login/registro (sesión 2026-09-16, continuación)**:
-  a raíz de una pregunta del usuario ("¿para qué pido nombre/correo si no
-  se usan?"), se confirmó que `nutriNombre`/`nutriEmail` (paso 1) hoy no
-  alimentan nada aguas abajo (`nutriBuildResumenHTML` no los toca) — solo
-  quedan guardados en `sinaptix_objetivo`. Se decidió dejarlos (no
-  quitarlos) pero con dos mejoras:
-  1. **Ocultar/prellenar si hay sesión** (`js/nutricion-wizard.js`,
-     `resetNutriWizard()`): mismo patrón visual que peso/talla
-     (`#nutriAntroInputs`/`#nutriAntroResumen`) — nuevos
-     `#nutriContactoInputs` (envuelve el `.modal-row` de nombre/correo,
-     agregado en `index.html` y `mi-plan.html`) y
-     `#nutriContactoResumen`/`#nutriContactoResumenTexto` +
-     `#btnNutriContactoEditar` ("Usar otro nombre o correo", mismo
-     listener que `btnNutriAntroEditar` para volver a mostrar los
-     inputs). Con `netlifyIdentity.currentUser()` disponible: si hay
-     `email` **y** `user_metadata.full_name`, se prellenan ambos inputs
-     (por debajo, ocultos) y se muestra el resumen; si solo hay `email`
-     (cuentas viejas sin `full_name`, previas a que el registro propio lo
-     pidiera obligatorio), se dejan los inputs **visibles pero
-     prellenados** — no se oculta con el campo `required` de nombre
-     vacío. Sin sesión, comportamiento sin cambios (inputs vacíos,
-     visibles).
-  2. **Precargar login/registro en "Mi plan" con esos datos** (sin
-     sesión): cuando el wizard guarda sin sesión, `sinaptix_objetivo` ya
-     tenía `email` y `encuesta.nombre` (paso 1). `js/mi-plan.js` agrega
-     `prefillAuthDesdeEncuesta()`, llamada solo en la rama sin sesión de
-     `netlifyIdentity.on('init', …)` (no en el flujo de recuperación de
-     contraseña, que muestra otro panel) — lee `sinaptix_objetivo` de
-     localStorage y, si hay `email`, completa `#loginEmailMiPlan` y
-     `#registroEmailMiPlan`; si hay `encuesta.nombre`, completa
-     `#registroNombreMiPlan`; nunca pisa un campo que la persona ya haya
-     escrito a mano (`if(!el.value)`). Si se completó el email, además
-     pone el foco en `#loginPassMiPlan` (pestaña de login, activa por
-     defecto) — asume que quien llega así ya tiene cuenta y solo le falta
-     escribir la contraseña; si en realidad quiere registrarse, el nombre
-     también quedó cargado en esa otra pestaña.
-  Verificado con Playwright (mock de `netlifyIdentity`, igual que el
-  resto de esta memoria — el script real no es alcanzable desde este
-  entorno): paso 1 sin sesión (inputs visibles y vacíos), con sesión
-  full_name+email (ocultos + resumen con el texto correcto + botón
-  "editar" los vuelve a mostrar sin perder el valor), con sesión solo
-  email (visibles y prellenados, no ocultos); y en `mi-plan.html` sin
-  sesión, con `sinaptix_objetivo` guardado (login/registro precargados,
-  foco en contraseña) y sin ese dato guardado (no rompe nada, campos
-  vacíos como antes) y sin pisar un valor ya tipeado por el usuario.
-
-- **Método (`#lam-03`) — interruptor "Mi progreso"/"Mi IMC" movido al pie,
-  al lado del botón de acción** (sesión 2026-09-15, continuación): antes
-  `.gauges-switch` vivía arriba de todo en `.method-gauges`, suelto. Ahora
-  vive en un footer nuevo (`.gauges-footer`, al final del `<aside
-  id="methodGauges">`) junto al botón de la pestaña activa (`id`
-  `gaugesFooterCtaProgreso`/`gaugesFooterCtaImc`, spans `display:contents`
-  para que el botón que insertan sea un ítem flex más del footer). Los
-  botones "Generar mi diagnóstico", "Actualizar" (antes "Actualizar mi
-  estado"/"Actualizar mi estado otra vez" — se simplificó el texto, ahora
-  es siempre "Actualizar") y "Registrar datos antropométricos" se
-  renderizan ahí en vez de adentro de cada panel (`js/script.js`,
-  `renderMethodGauges()`/`renderMethodImc()`). `setGaugesView()` togglea
-  `.hidden` en el slot de CTA correspondiente junto con su panel. Los 3
-  listeners de click (antes repartidos entre `#methodGauges` y
-  `#methodGaugesImc`) quedaron unificados por delegación sobre
-  `#methodGauges`. Verificado con Playwright: sin datos/con datos, ambas
-  pestañas, desktop 1440px y mobile 390px (el footer envuelve en 2 líneas
-  si no entran en una fila).
-
-**Anillos de progreso de Método — animación de llenado + marcador de
-"antes" (sesión 2026-09-16).** Sobre la base descrita en
-`historico/memoria-2026-09-14.md` ("Anillos de progreso en Método": un
-solo anillo por área, sin doble anillo concéntrico — esa opción quedó
-descartada, no se reintrodujo):
-- **Animación de llenado** (`gaugeArc`/`gaugeAnimateArcs`,
-  `js/script.js`): cada anillo arranca "vacío" y se llena hasta su
-  porcentaje real con `stroke-dashoffset` animado por CSS
-  (`.gauge-arc-value{transition:stroke-dashoffset .7s
-  cubic-bezier(.16,.84,.44,1)}` en `css/styles.css`), ~0.7s ease-out.
-  Técnica: `stroke-dasharray` fijo a la circunferencia completa
-  (`"C C"`) y el offset va de `C` (anillo vacío) a `C - largoDelArco`
-  (valor final) — reemplaza el `dasharray="largo circunferencia"` de
-  antes, que dibujaba el arco ya resuelto y no se podía animar sin
-  recalcularlo en cada frame. `gaugeAnimateArcs(el)` se llama justo
-  después de pintar el `innerHTML` en `renderMethodGauges` y usa un
-  doble `requestAnimationFrame` para forzar que el navegador pinte el
-  estado "vacío" antes de disparar la transición al valor final (si se
-  cambia en el mismo frame que el `innerHTML`, varios navegadores saltan
-  directo al valor final sin barrido).
-  - **Escalonado**: el anillo destacado arranca en 0ms; los 3 chicos
-    ~90ms después (delay pedido por el usuario para que no se sientan
-    como 4 anillos disparando a la vez), con 30ms de diferencia extra
-    entre ellos. El delay es inline (`transition-delay`, en el propio
-    `<circle>`) porque cada anillo necesita un valor distinto — la
-    duración/easing viven en CSS.
-  - **`prefers-reduced-motion: reduce`**: `gaugeArc` arranca esos
-    anillos directo en su valor final (sin barrido, sin `transition`
-    inline) y `gaugeAnimateArcs` no hace nada; además hay una regla CSS
-    `@media(prefers-reduced-motion:reduce){.gauge-arc-value{transition:none}}`
-    como red adicional. La lectura de la preferencia
-    (`gaugePrefersReducedMotion`, `matchMedia`) es una sola vez al cargar
-    el script, no reactiva a cambios en caliente de la config del SO
-    (recargar la página sí la vuelve a leer).
-  - **No se reinicia sola con el scroll**: `renderMethodGauges` solo se
-    llama al cargar la página y después de guardar un diagnóstico o una
-    reevaluación (ver los `renderMethodGauges()` en `js/script.js`) — no
-    hay ningún listener de scroll/`IntersectionObserver` que la
-    dispare, así que la animación no se re-ejecuta al pasar la sección
-    por el viewport más de una vez.
-  - Los `aria-label` de cada `<svg>` (`gaugeBuildItem`) siguen
-    reflejando siempre el valor final real, nunca un valor intermedio
-    de la animación — no dependen del estado visual del arco.
-- **Marcador de "antes" sobre el propio anillo** (`gaugeArcMarker`,
-  `js/script.js`; estilo `.gauge-arc-marker`, `css/styles.css`): un
-  punto chico (círculo blanco `var(--paper)` con contorno gris
-  `var(--ink-soft)`), no un segundo anillo, ubicado sobre el mismo radio
-  del arco en el ángulo correspondiente a `area.antesPct`. Se dibuja
-  solo cuando `area.despuesPct != null` (mismo criterio que ya usaba el
-  badge de texto `methodDeltaBadge`/la línea "Antes: X%"). El color
-  blanco+gris es deliberado para no confundirse con el extremo actual
-  del arco (que usa la paleta `METHOD_GAUGE_LOW/MID/HIGH`) mientras
-  anima. `size.marker` (5px en el destacado `r:46`, 3.5px en los chicos
-  `r:34`) mantiene el punto legible sin pisar el ícono/porcentaje del
-  centro en ningún tamaño. El badge de texto (`methodDeltaBadge`) y la
-  línea "Antes: X%" **no se tocaron** — el marcador es un refuerzo
-  visual adicional, el dato accesible en texto sigue igual.
-- **Sin dependencias nuevas**: sigue siendo SVG + CSS + JS vanilla, sin
-  build step, igual que el resto de la tarjeta.
-- **Pendiente de verificación visual real**: no se pudo correr
-  Playwright en esta sesión (mismo problema de siempre en este
-  entorno — sin acceso de red al dominio de descarga del browser,
-  `cdn.playwright.dev` no está en la allowlist). Revisado a mano y por
-  sintaxis únicamente (incluye chequeo de sintaxis con `node --check` y
-  la suite de `node --test`, 46/46 ok — no cambia lógica de cálculo,
-  así que no hacía falta un test nuevo). Falta confirmar en un navegador
-  real: el barrido de llenado se ve fluido y escalonado como se espera
-  (desktop y mobile ≤900px, donde `.method-body` se apila), el marcador
-  de "antes" se lee claramente distinto del extremo del arco en el
-  anillo destacado y en al menos un anillo chico, y que
-  `prefers-reduced-motion: reduce` efectivamente salta la animación.
-
-## Validación de respuestas irracionales en la encuesta (sesión 2026-09-16)
-
-A pedido del usuario, se agregó validación de rango/formato a los **7
-campos libres** del wizard de nutrición (el resto son selects/radios de
-opciones fijas, ahí no hace falta nada). Plan completo entregado al
-usuario en `plan-validacion-encuesta-nutricion.md` (no vive en el
-repo, mismo criterio que otros planes de sesión).
-
-- **Rangos numéricos** (`NUTRI_RANGOS` en `js/nutricion-planes.js`,
-  **fuente única** compartida por los 3 lugares que antes tenían sus
-  propios límites, desalineados entre sí): edad 14–120 (el máximo cubre
-  casos reales documentados de longevidad extrema, no es "típico"),
-  peso 30–250 kg, talla 100–230 cm, horas de pantalla/estudio seguido
-  0–18 h. `nutriValidarRango(campo, valor)` devuelve `null` si es válido
-  (vacío incluido, en campos opcionales) o un mensaje de error. Se
-  aplican en dos capas: atributos `min`/`max` en `index.html` y
-  `mi-plan.html` (los 4 inputs numéricos del wizard) + el mismo
-  `min`/`max` en `#antroPeso`/`#antroTalla`/`#antroEdad`; y en JS, en
-  `#formAntro` (`js/script.js`) y en `nutriGuardarAntropometriaSiFalta`
-  (`js/nutricion-planes.js`), que antes tenían cada uno sus propios
-  números hardcodeados (peso hasta 400, talla hasta 250, sin mínimo de
-  edad) — ahora los tres usan `nutriValidarRango`.
-- **`nutriNombre`**: `minlength="2"` + `pattern=".*[A-Za-zÀ-ÿ].*"` (al
-  menos una letra, rechaza vacío-con-espacios/solo-números/solo-símbolos)
-  + `maxlength="60"`, resuelto con validación nativa del navegador — no
-  hizo falta JS nuevo, `nutriValidateStep()` (`js/nutricion-wizard.js`)
-  ya usaba `:invalid` para el chequeo de cada paso, así que estos
-  atributos ya quedan cubiertos por ese mismo mecanismo. Se ajustó el
-  mensaje de `nutriValidateStep` para distinguir "fuera de rango"/
-  "nombre inválido" de "campo obligatorio" (antes un solo mensaje
-  genérico para los tres casos).
-- **`nutriAlergiaOtra`/`nutriDisgustos`** (`maxlength="80"`/`"200"`)
-  además tenían un **XSS real**: `nutriConstruirAjustes` los concatenaba
-  tal cual en strings que `nutriBuildResumenHTML` mete con `innerHTML`
-  (wizard paso 8 y "Mi plan"). Se agregó `nutriEscaparHTML(texto)` y se
-  aplica a los dos en `nutriConstruirAjustes`, antes de que entren al
-  HTML.
-- **`nutriCondicion` — "Prefiero no decir"** ya no convive con el resto
-  de checkboxes del grupo (antes se podía tildar "Prefiero no decir" y
-  "Diabetes" a la vez): listener de `change` en
-  `js/nutricion-wizard.js` que destilda la rama contraria.
-- **Fuera de alcance de esta pasada** (a propósito, ver el plan): el
-  formulario de contacto (mismo tipo de problema, no tocado); y
-  coherencia cruzada peso/talla → IMC imposible (cada campo por
-  separado queda dentro de rango, pero la combinación podría dar un IMC
-  inviable) — no se bloquea, para no generar falsos positivos con casos
-  reales atípicos.
-- Tests nuevos en `tests/nutricion-planes.test.js` (16 casos) para
-  `nutriValidarRango`, `nutriValidarNombre`, `nutriEscaparHTML` y el
-  escapado dentro de `nutriConstruirAjustes`. Suite completa: 46/46 ok.
-
-**Cadenas sin espacios en texto libre de la encuesta desbordan el modal
-(sesión 2026-09-16, cuarta tanda) — corregido.** El usuario probó
-pegar una cadena larga sin espacios (ej. 200 "c" seguidas) en
-"Alimentos que no te gustan" (paso 7) para ver si rompía algo: rompía —
-`.nutri-summary`/`.nutri-side-box`/`.nutri-note` (paso 8, donde
-`nutriConstruirAjustes`/`nutriConstruirAvisos` insertan ese texto vía
-`innerHTML`, ver `js/nutricion-planes.js`) no tenían
-`overflow-wrap`/`word-break`, así que una cadena sin espacios no tenía
-dónde cortar y estiraba `.modal-card` entero — como ese es el
-contenedor con scroll propio (`max-height:88vh;overflow:auto`), el
-resultado visual era **todo el modal** ensanchado con scroll horizontal
-Y vertical a la vez, no solo el texto desbordado. Confirmado con
-Playwright que el bug ya existía antes de este patch (mismo
-`scrollWidth`/`clientWidth` en el commit anterior). Fix en
-`css/styles.css`: `overflow-wrap:anywhere;word-break:break-word` en
-`.nutri-summary`, `.nutri-side-box` y `.nutri-note` (los 3 contenedores
-que pueden recibir texto libre de la encuesta — `disgustos` y
-`alergiaOtra`, ambos ya escapados con `nutriEscaparHTML` desde el
-patch de validación anterior, esto es aparte, es un tema de layout no
-de seguridad). Mismas clases se reusan en `#miPlan` (`mi-plan.html`),
-así que el fix aplica ahí también sin tocar nada más. Verificado con
-Playwright: con la cadena de 200 caracteres sin espacios,
-`modal-card.scrollWidth === clientWidth` (antes: 1456 vs 560) y
-captura visual confirmando que el texto se corta en varias líneas
-dentro del ancho normal de la caja "Ajustado a tu caso". Suite de unit
-tests sin cambios (46/46 ok, este fix es puro CSS).
+- **Wizard de nutrición** (`#formNutricion`, 8 pasos, compartido entre
+  modal de `index.html` y sección inline de `mi-plan.html`): 4 planes con
+  "día tipo" cada uno + resolución automática. Paso 1 (nombre/correo) se
+  oculta/prellena si hay sesión, y si no hay sesión, esos datos
+  precargan el login/registro de "Mi plan" al llegar ahí
+  (`prefillAuthDesdeEncuesta()`). Último paso: si no hay sesión, muestra
+  un botón real "Iniciar sesión" (`#nutriLoginBtn`, `btn-ghost`, link a
+  `mi-plan.html`) con auto-scroll al mostrarse, en vez de abrir el widget
+  nativo automáticamente.
+- **Validación de la encuesta**: `NUTRI_RANGOS`
+  (`js/nutricion-planes.js`) es la fuente única de rangos (edad 14–120,
+  peso 30–250kg, talla 100–230cm, horas 0–18h) usada tanto en atributos
+  HTML como en JS (antes desalineados entre 3 lugares). Nombre validado
+  por patrón (al menos una letra). Campos de texto libre
+  (`nutriAlergiaOtra`/`nutriDisgustos`) escapados con `nutriEscaparHTML`
+  antes de insertarse vía `innerHTML` (eran XSS reales) y con
+  `overflow-wrap:anywhere;word-break:break-word` en los contenedores que
+  los muestran (`.nutri-summary`, `.nutri-side-box`, `.nutri-note`,
+  reusadas en "Mi plan") para que cadenas sin espacios no desborden el
+  modal. "Prefiero no decir" ya no convive con otras condiciones
+  tildadas.
+- **Overflow horizontal**: **nunca poner `overflow-x`/`overflow-y` en
+  `html`** (solo en `body`, que ya lo tiene). Ponerlo en `html` sin fijar
+  también `overflow-y` fuerza el scrollbar clásico de Chrome/Windows
+  (efecto "doble scroll gris" ya reportado una vez). Si aparece un
+  desborde nuevo, diagnosticar con Playwright (`window.scrollX` tras
+  forzar scroll), no con `scrollWidth` vs `clientWidth` solamente.
+- **"Mi plan" — dashboard con sesión** (`#miPlanConSesion`): una sola
+  columna (sin sidebar, descartada a pedido del usuario). Las 3 tarjetas
+  (Antropometría/verde, Objetivo cognitivo/dorado, Cierre/lila) tienen
+  fondo sólido de color (`--miplan-card-verde/-dorado/-lila`) + su propia
+  ilustración de cabecera (`.miplan-card-illustration`, reemplaza el
+  ícono de línea — "Cierre" conserva su ícono de línea) + mismo layout de
+  cabecera (`.miplan-card-head`: ícono/avatar + anillo de progreso de
+  2 estados vacío/completo, `.miplan-ring`). Alturas igualadas
+  (`align-items:stretch` en `.miplan-grid` + `flex:1` en
+  `.miplan-objetivo`). "Cierre" suma una tira de íconos decorativa
+  (`.miplan-cierre-icons-strip`) visible solo sin plan generado. El texto
+  "Sesión iniciada como {email}" vive pegado a los botones de
+  `.miplan-cierre` (no bajo el título). Botón "Datos clave" anclado
+  siempre al fondo de cada tarjeta vía flex (`margin-top:auto`).
+  - **Detalle del plan**: `nutriBuildResumenHTML()` arma cada plan con
+    `.nutri-plan-main` (ícono+título+enfoque+día tipo) +
+    `.nutri-plan-side` (cajas priorizar/moderar). En `mi-plan.html` se
+    activa un grid de 2 columnas desde 680px; en el modal angosto queda
+    apilado. "Ajustado a tu caso" va embebido en el último plan dentro
+    del wizard, pero en `mi-plan.html` es tarjeta propia
+    (`.miplan-ajustes`, `incluirAjustesEnSide:false`) para no desbalancear
+    la columna cuando hay muchos ajustes.
+  - **Título "Tu progreso con SINAPTIX"**: la palabra "SINAPTIX" va en
+    `<span class="miplan-brand-circled">` con un círculo `::after` hecho
+    de una foto real (`img/ilustraciones-mi-plan/circulo-brand-sinaptix.png`,
+    trazo de crayón, recoloreado a nivel de píxel — actualmente
+    `--gold`). Tamaño de este `<h2>` puntual:
+    `clamp(30px,3.9vw,42px)` (no toca `.lam-title` global).
+- **Visión (`#lam-02`)**: fondo `.vision-brain-bg` es una composición
+  armada por código a partir de 5 elementos generados por separado
+  (cerebro, red neuronal, reloj de arena, cintas azules + listones
+  conectores dibujados con curvas), no un fondo único de IA — variante
+  "redonda" del cúmulo de neuronas, elegida sobre la alternativa
+  "corazón" (ambas archivadas en `img/decoraciones-neurona/
+  vision-elementos/`). Reproducible con
+  `scripts/generar-fondo-vision.py` (constantes de posición/tamaño de
+  cada elemento y de los listones documentadas en el propio script).
+  - **Los 4 íconos son archivos individuales** en
+    `img/decoraciones-neurona/vision-iconos/` (`icon-cerebro`,
+    `icon-red-neuronal`, `icon-reloj-arena`, `icon-cintas-azules`), no
+    quemados en el fondo — el fondo sin íconos es
+    `fondo-vision-red-sin-iconos.webp`. **Estado actual: revertidos a la
+    versión original tal cual se generaron la primera vez** (sin el
+    agrandado que se probó y descartó en tandas intermedias, sin recortes
+    contra el borde del lienzo). Reproducibles con
+    `scripts/separar-iconos-vision.py` si hace falta volver a generarlos.
+    ⚠️ Estas proporciones no son las que calibraron `.vision-icon--*`
+    (width/top en `css/styles.css`) — **falta confirmar en navegador real
+    si tapan el texto de las anotaciones de abajo**; si tapa, ajustar
+    `.vision-icon--*`, no las imágenes.
+  - **Los 4 datos ya no son tarjetas** (`.stat-box`, descartado): son 4
+    `.stat-annot` (punto de color + número Fraunces + etiqueta corta) con
+    posición libre en porcentaje dentro de `.vision-art` (contenedor
+    compartido con `.vision-brain-bg`, así escalan juntos a cualquier
+    ancho). **Solo hecho para desktop (`min-width:901px`)** — mobile
+    (`<900px`) queda con fallback simple en columna, sin diseñar (ver
+    "Pendientes conocidos", sesión 2). Colores por dato: dorado 20%,
+    morado 86B, verde 4–6, azul 1:1 — mismos 4 de siempre.
+  - Subtítulos de los 3 bullets de texto (`.vision-bullets strong`) en
+    `--purple` (antes casi negro), para combinar con "alimenta" del
+    título.
+  - `svg/icon-*.svg` (los íconos de línea `.stat-icon` de la etapa vieja
+    de tarjetas) y las variables `--vision-card-*` quedan sin uso en esta
+    sección — no se borraron, limpieza pendiente para la sesión 2.
 
 ## Pendientes conocidos
 
-**Íconos de Visión — revertidos a la versión original (sesión
-2026-09-17, cuadragésima tercera tanda).** El recorte de la tanda
-anterior (desde `fondo-vision-red.webp` agrandado) reintrodujo el corte
-contra el borde del lienzo en 3 de los 4 íconos; el usuario pidió volver
-a los archivos tal cual se generaron la primera vez (sin ese agrandado,
-sin cortes). Ver `changelog.md`, cuadragésima tercera tanda, para el
-detalle. **Ojo**: estos íconos tienen proporciones distintas a las que
-calibraron `.vision-icon--*` en `css/styles.css` (más cuadrados/altos) —
-**falta confirmar en el navegador real si eso tapa el texto de abajo**
-(mismo riesgo que ya se había dado antes con el agrandado). Si tapa,
-ajustar `.vision-icon--*` (width/top), no volver a recortar las
-imágenes sin que el usuario lo pida.
-
-**Íconos de Visión recortados de nuevo sin artefactos de IA (sesión
-2026-09-17, cuadragésima segunda tanda).** Los 4 WEBP de
-`img/decoraciones-neurona/vision-iconos/` (que la tanda anterior había
-generado con segmentación por IA sobre el recorte ya compuesto) se
-volvieron a recortar desde `fondo-vision-red.webp` aprovechando su canal
-alfa real (mismo criterio que `scripts/separar-iconos-vision.py`, sin
-IA), lo que eliminó el halo blanquecino/bordes en escalera que el
-usuario reportó viendo en local. Detalle completo en `changelog.md`,
-cuadragésima segunda tanda. **Falta**: confirmar en el navegador que se
-ven limpios y bien posicionados (no se pudo tomar captura nueva en esta
-sesión). Sigue sin resolverse el corte contra el borde del lienzo en 3
-de los 4 íconos (preexistente, no introducido en esta tanda — ver nota
-en el changelog).
-
-**Íconos de Visión separados en 4 archivos individuales (sesión
-2026-09-17, cuadragésima/cuadragésima primera tanda) — bug encontrado y
-corregido.** La primera vuelta (cuadragésima tanda) se hizo sin
-verificación visual, a pedido explícito del usuario. El usuario aplicó
-ese patch y reportó "no se ven": los 4 íconos no aparecían en absoluto.
-**Causa**: `.vision-icons` tenía `display:none` como base (para
-ocultarlo en mobile, breakpoint `<900px`) pero el
-`@media(min-width:901px)` que lo reposiciona **nunca volvía a poner
-`display` en algo visible** — solo `position:absolute;inset:0`, así que
-seguía en `display:none` en cualquier ancho de pantalla. Se corrigió
-agregando `display:block` a esa regla (mismo patrón que ya usa
-`#lam-02 .stat-annotations`, que sí tenía su `display:block`
-correspondiente — se pasó por alto al copiar el criterio para
-`.vision-icons`).
-Tampoco en esta segunda vuelta hubo Chromium/Playwright disponible
-(sigue sin poder descargarse en este entorno) para confirmarlo con un
-navegador real: se revisó el CSS a mano buscando cualquier otra regla
-que pudiera estar ocultando `.vision-icon*` (no se encontró ninguna
-más) y, por separado, se había verificado con un script de
-reconstrucción píxel a píxel que el contenido/posición de los 4
-recortes en sí es correcto (ver "Estado actual del diseño" → Visión
-para el detalle de esa verificación) — es decir, lo que faltaba no era
-la posición ni el contenido de los íconos, sino que el contenedor
-entero estaba oculto por CSS. **Falta para quien retome esto**:
-confirmar en un navegador real que ahora sí se ven los 4 íconos en su
-lugar, y que el usuario todavía no dijo qué quiere hacer con ellos una
-vez separados (moverlos, agrandarlos individualmente, animarlos,
-rediseñar la composición) — esperar esa instrucción antes de tocar
-`.vision-icon*` de nuevo. `fondo-vision-red.webp` (el archivo viejo, con
-los íconos quemados adentro) sigue en el repo sin usarse, por si hace
-falta volver atrás rápido.
-
-**Íconos de Visión agrandados dentro de la imagen + reacomodo de texto
-(sesión 2026-09-17) — sin verificación visual, el usuario pidió no
-seguir haciendo capturas en esta sesión.** El usuario pidió agrandar los
-4 íconos de `#lam-02` (cerebro, red neuronal, reloj de arena, nudo/
-cintas azules) y "acomodar" el texto que quedó tapado. Los 4 íconos
-**no son SVGs sueltos**: viven quemados dentro de un único archivo,
-`img/decoraciones-neurona/fondo-vision-red.webp` (1700×1040px, RGBA con
-canal alfa real — el "blanco" de fondo es transparente, no pintado).
-Se agrandaron con un script Python/PIL (no versionado en el repo, corrió
-en `/home/claude/work` de esta sesión): por cada ícono, recorta un
-parche alrededor de su bounding box (umbral de canal alfa >150) con
-margen generoso (2.5x), lo escala ~1.35x con Lanczos, **borra el parche
-viejo dejándolo transparente** y pega el parche agrandado encima usando
-su propio canal alfa como máscara — este orden importa: pegar el ícono
-grande directamente sobre el chico sin borrar antes deja un "fantasma"
-semitransparente doble (se probó primero así y se descartó por eso).
-`img/decoraciones-neurona/fondo-vision-red.webp` quedó reemplazado en el
-repo con la versión agrandada.
-
-Nuevas coordenadas del contenido de cada ícono (mismo script de medición
-de siempre, umbral alfa >150, sobre la imagen ya agrandada): cerebro
-≈10–37%×0–29%, red neuronal ≈63–96%×0–32%, reloj de arena
-≈15–32%×63–100%, cintas azules ≈64–91%×66–100%. Los dos de abajo crecieron
-lo suficiente para tapar el texto de esa fila (`.stat-annot--verde`/
-`--azul`, que tenían `top:64%`, ahora dentro del rango del ícono
-agrandado) — se subió su `top` a `40%` en `css/styles.css` (queda en el
-hueco libre entre el borde inferior de la fila de arriba, ≈29–32%, y el
-inicio del ícono de abajo, ≈63–66%). La fila de arriba (dorado/morado,
-`top:1%/2%`) no se tocó: no hubo reporte ni indicio de que se tape con
-el cerebro/red ya agrandados, pero **tampoco se reverificó con
-Playwright después del agrandado** (sí se había verificado, sin
-problema, antes de agrandar los íconos de abajo).
-
-**Falta para quien retome esto:**
-- Verificar con Playwright (desktop ≥901px, donde aplica el
-  posicionamiento absoluto) que "4–6"/"1:1" ya no queden tapados por el
-  reloj/nudo agrandados, y que el `top:40%` no los deje demasiado
-  pegados a la fila de arriba ni con el label de 2 líneas cortado.
-- Confirmar que dorado/morado (fila de arriba) siguen sin tocarse con el
-  cerebro/red ya agrandados — no debería haber cambiado nada ahí (el
-  `top` no se movió) pero no se re-tomó captura para confirmarlo en esta
-  tanda.
-- Revisar en mobile (≤900px): en ese breakpoint las `.stat-annot` no
-  usan posicionamiento absoluto (ver la regla base más simple, columna
-  apilada) así que el agrandado del ícono de fondo no debería afectar el
-  texto ahí, pero no se verificó.
-- El script de agrandado no quedó guardado en el repo (vivió en
-  `/home/claude/work` de la sesión de trabajo, no en `Sinaptix/`). Si se
-  necesita volver a tocar el tamaño de algún ícono, hay que rehacerlo
-  desde cero con el mismo método (recorte por alfa + Lanczos + borrar-
-  antes-de-pegar) en vez de editar el `.webp` a mano.
-- Queda un backup de la imagen **anterior** al agrandado (íconos
-  originales, antes de esta sesión) en `/home/claude/work/
-  fondo-vision-red-ORIGINAL-backup.webp` de esta sesión de trabajo — no
-  está en el repo ni en el patch; si hace falta revertir el tamaño de
-  los íconos y ese entorno de trabajo ya no existe, hay que recrearlo
-  desde el historial de git (el commit anterior a este todavía tiene el
-  `.webp` viejo).
-
-**Plan: reemplazar las tarjetas de Visión por anotaciones a mano (2
-sesiones) — sesión 1 hecha (2026-09-17), sesión 2 (mobile + limpieza)
-pendiente.** El usuario mostró
-capturas de las 4 tarjetas (`.stat-box` dentro de `#lam-02`, ver "Estado
-actual del diseño" → Visión) y no se sentía conforme; se descartó que
-fuera un tema de íconos o de tipografía del número (`.stat-box .num` ya
-usa `--font-d`/Fraunces, la misma familia que `h1-h3` y el logo — es
-consistente con el resto del sitio). El diagnóstico al que se llegó: el
-problema es el *formato de contenedor* — una caja redondeada con ícono
-arriba a la izquierda y grid 2×2 parejo es el patrón visual de un "stat
-card" de dashboard/SaaS, y choca de género con la identidad
-manuscrita/editorial del resto de la sección (título `.lam-title` en
-Caveat cursiva, frutas `.brain-fruit` flotando, el garabato punteado
-`.lam-title-deco` junto a "alimenta"). Dirección elegida (ver mockups
-mostrados en el chat de esa sesión, no forman parte del repo): sacar las
-4 tarjetas de caja y reemplazarlas por 4 anotaciones sueltas — un punto
-de color + línea punteada (mismo lenguaje que `.lam-title-deco`) +
-número en Fraunces (se mantiene el tratamiento actual de `.stat-box
-.num`) + etiqueta corta en Inter — flotando sobre `vision-brain-bg` en
-vez de encajonadas. Colores por dato: se mantienen los mismos 4 que ya
-tienen los íconos SVG actuales (dorado `#C1703B` 20%, morado `#714B67`
-86B, verde `#2E7D5B` 4–6, azul `#3B6EA5` 1:1).
-
-Por ser un cambio de estructura (HTML + CSS, no solo color) y no solo un
-ajuste, se dividió en 2 sesiones en vez de intentarlo todo de una:
-
-- **Sesión 1 — HECHA (2026-09-17).** Versión desktop (≥901px)
-  únicamente: `.stat-grid`/`.stat-box` dentro de `#lam-02
-  .vision-stats-col` reemplazado por `.stat-annotations`/`.stat-annot`
-  con posicionamiento libre a mano (no grid parejo) — ver "Estado actual
-  del diseño" → Visión para el detalle completo (posiciones exactas,
-  colores, textos, y el bug de contenedor colapsado a 0px que hubo que
-  diagnosticar). No se tocó mobile (queda con un fallback simple en
-  columna, sin diseñar, a propósito). Verificado con Playwright en
-  1440px en este entorno (`python -m http.server`, sin red para assets
-  remotos pero `vision-brain-bg` es local); **capturas mostradas al
-  usuario y confirmadas explícitamente** antes de cerrar la sesión y
-  generar el patch, como pide la nota de abajo. Quedan dos observaciones
-  que el usuario vio y aceptó dejar así por ahora (no son bugs, son
-  posibles ajustes futuros si se retoma el tema): la pareja 86B/1:1 cae
-  sobre la parte más cargada de `vision-brain-bg` y se lee algo peor que
-  20%/4–6 (que caen sobre espacio en blanco), y el punto+línea de esos
-  mismos dos casi no contrasta contra el arte de fondo.
-**Plan: reemplazar `fondo-vision-red.webp` (fondo único generado por IA)
-por una composición armada a partir de elementos generados por separado
-(sesión 2026-09-17, tercera/cuarta/décima tanda) — HECHO, integrado en
-HTML/CSS y verificado con Playwright a 1440px.**
-
-Motivo del cambio: `fondo-vision-red.webp` (el fondo actual, ver arriba)
-no tiene puntos de anclaje reales para las 4 `.stat-annot` — el punto+
-línea de cada dato cae en coordenadas libres sin relación con ningún
-elemento del arte de fondo, que es justo la causa de la observación ya
-documentada arriba (86B y 1:1 sobre zonas cargadas, poco contraste). En
-vez de pedirle a la IA un fondo compuesto de una sola vez (con 4
-elementos + listones conectores en un solo prompt), se optó por generar
-**cada elemento suelto por separado** y armar la composición final por
-código (no por IA), porque:
-- Gemini no itera bien sobre una composición ya generada: ante un pedido
-  de "más margen a los costados" sobre la imagen completa, devolvió
-  exactamente la misma imagen sin cambios.
-- Gemini pierde consistencia de estilo cuando tiene que resolver varios
-  elementos distintos dentro de un mismo prompt/imagen — se vio claro con
-  el elemento de "semanas": la primera vuelta salió como ícono 3D
-  glossy con texto y números (se había pedido evitar ambos), la segunda
-  como boceto técnico en perspectiva isométrica, y recién la tercera
-  (reloj de arena, pero con marco de bronce "vintage") y cuarta (mismo
-  reloj de arena en versión moderna/minimalista) lograron igualar la
-  técnica pictórica semi-realista de los otros elementos.
-- Generando el listón/cinta conectora por código (no por IA) se controla
-  el espaciado exacto entre elementos, que es el requisito central de
-  todo este cambio (poder anclar cada anotación a un punto real).
-
-Elementos ya generados, aprobados por el usuario y agregados en este
-patch a `img/decoraciones-neurona/vision-elementos/` (formato `.webp`,
-1024×1024, fondo blanco, sin integrar todavía en el HTML/CSS):
-- `elemento-energia-cerebral.webp` — cerebro con arco de progreso
-  terracota (para el dato 20%, dorado `#C1703B`).
-- `elemento-red-neuronal.webp` — cúmulo de neuronas moradas (para el dato
-  86B, morado `#714B67`).
-- `elemento-red-neuronal-alt-corazon.webp` — variante del mismo cúmulo de
-  neuronas con silueta de corazón, generada como alternativa. **No está
-  decidido cuál de las dos usar** — falta confirmar con el usuario antes
-  de integrar cualquiera de las dos.
-- `elemento-acompanamiento-1a1.webp` — dos cintas de luz azules
-  entrelazadas en forma de infinito (para el dato 1:1, azul `#3B6EA5`).
-- `elemento-semanas-progreso.webp` — reloj de arena verde de diseño
-  moderno, sin marco antiguo (para el dato 4–6, verde `#2E7D5B`); el que
-  más iteraciones costó (ver `changelog.md` de esta tanda para el detalle
-  completo de los 3 intentos descartados y por qué).
-
-**Composición ya armada (sesión 2026-09-17, cuarta tanda) — por código,
-no por IA.** Se les quitó el fondo blanco a los 5 elementos (transparencia
-real vía umbral de luminosidad + recorte ajustado al contenido) y se
-armaron **2 lienzos candidatos completos** en
-`img/decoraciones-neurona/vision-elementos/` (1700×1040, `.webp`), uno
-por cada variante de red neuronal:
-- `fondo-vision-nuevo-redonda.webp` (con `elemento-red-neuronal.webp`)
-- `fondo-vision-nuevo-corazon.webp` (con `elemento-red-neuronal-alt-corazon.webp`)
-
-En ambos, mismo layout en cuadrícula 2×2 con márgenes generosos (~180px
-contra los bordes laterales, sin overlap entre elementos): cerebro
-arriba-izquierda, red neuronal arriba-derecha, reloj de arena
-abajo-izquierda, cintas azules abajo-derecha. Los listones conectores de
-fondo (curvas suaves tipo `CubicSpline`, varias líneas finas por haz con
-jitter aleatorio, color mauve `rgb(130,95,115)` con alpha bajo,
-supersampleado 2x para antialiasing) se generaron por código para poder
-controlar el espaciado, en vez de pedírselos a la IA.
-
-**El script que arma estos 2 lienzos está en el repo** (sesión
-2026-09-17, trigésima octava tanda): `scripts/generar-fondo-vision.py`.
-Corriéndolo desde la raíz del repo (`python3 scripts/generar-fondo-vision.py`,
-requiere `pillow numpy scipy`) reproduce exactamente
-`fondo-vision-nuevo-redonda.webp` y `fondo-vision-nuevo-corazon.webp` a
-partir de los 5 `elemento-*.webp` — verificado pixel a pixel (diff 0)
-contra los archivos ya commiteados. Todas las constantes relevantes están
-nombradas y comentadas dentro del script (no hardcodeadas sin explicar):
-posición/tamaño de cada elemento dentro del lienzo 1700×1040
-(`ELEMENTO_CEREBRO`, `ELEMENTO_RELOJ_ARENA`, `ELEMENTO_CINTAS_AZULES`,
-`RED_NEURONAL_CENTRO`/`RED_NEURONAL_MAX`), los puntos de control de los 6
-haces de listones (`LISTONES_PUNTOS_DE_CONTROL`), y los parámetros de
-estilo de los listones (`RIBBON_COLOR`, `RIBBON_LINES_PER_BUNDLE`,
-`RIBBON_BASE_ALPHA`, `RIBBON_LINE_WIDTH`, `RIBBON_SEED_BASE`) y del
-recorte de cada elemento (`UMBRAL_BLANCO_BAJO`/`UMBRAL_BLANCO_ALTO`,
-`AUTOCROP_PADDING`). Si en una próxima sesión hace falta mover o agrandar
-algún elemento (por ejemplo para separarlos más y dejar lugar a texto
-entre ellos), conviene tocar las constantes del script y volver a
-correrlo en vez de editar los `.webp` a mano, para que quede
-reproducible.
-
-**Integración hecha (sesión 2026-09-17, décima tanda):**
-1. El usuario confirmó la variante "redonda" (cúmulo esférico) sobre la
-   alternativa "corazón" — ambos lienzos quedan en el repo por si se
-   quiere cambiar más adelante, solo se referencia uno.
-2. `fondo-vision-red.webp` fue reemplazado (mismo nombre de archivo,
-   contenido nuevo = el lienzo compuesto elegido). `index.html` ajustó el
-   `width`/bleed inline de `.vision-brain-bg` para la nueva proporción
-   (ver "Estado actual del diseño" → Visión para los valores exactos).
-3. Las 4 `.stat-annot` se remidieron y reposicionaron contra el render
-   real (ver "Estado actual del diseño" → Visión para los valores
-   finales de `left`/`top` y el porqué de cada uno).
-4. Verificado con Playwright a 1440px, iterando sobre capturas hasta que
-   los 4 puntos cayeran sobre su elemento real y ningún label quedara con
-   bajo contraste. **Nota sobre el criterio de mostrar captura antes de
-   cerrar la sesión (ver más abajo, "Importante para quien retome
-   esto"):** en esta sesión puntual el usuario pidió explícitamente pasar
-   directo a actualizar memoria/changelog y generar el patch sin ver la
-   captura final — no es que se haya saltado sin avisar, quedó
-   confirmado en el chat. Si esto no se ve bien en un navegador real,
-   son solo 4 números `left`/`top` en `css/styles.css` (sección de
-   arriba) los que hay que tocar. Sesión 2 (mobile, ver bullet de abajo)
-   sigue pendiente aparte, no se tocó nada de `<900px` en esta sesión.
-
-- **Sesión 2026-09-17 (trigésima séptima tanda) — fix de escala/
-  alineación en anchos grandes — HECHO y verificado con Playwright
-  real.** El usuario reportó con una captura a ~1920px que las 4
-  anotaciones ya no caían sobre su elemento (`vision-brain-bg` crecía
-  con `vw`/`clamp()` mientras las anotaciones tenían `left`/`top` en
-  píxeles fijos calculados solo para 1440px). Se rehizo el
-  posicionamiento a porcentajes de una caja compartida (`.vision-art`) —
-  ver "Estado actual del diseño" → Visión, párrafo "Posicionamiento",
-  para el detalle completo. A diferencia del intento anterior (que no
-  pudo verificarse porque `wkhtmltoimage`/Xvfb no soporta `display:grid`
-  y Playwright no podía descargar Chromium), esta vez **sí se pudo
-  levantar Chromium real en el entorno** y se verificó con capturas +
-  medición de `bounding_box()` en 390, 899, 901, 1024, 1440 y 1920px. De
-  paso se encontró y corrigió un bug propio de este arreglo antes de
-  entregarlo (no reportado por el usuario, detectado en la propia
-  verificación): con las coordenadas iniciales, "4–6" y "1:1" quedaban
-  apiladas en la misma columna y se superponían entre sí — se resolvió
-  pasando a una grilla 2×2 (una anotación por cuadrante) en vez de 2
-  columnas de 2 filas cada una.
-
-- **Sesión 2 (siguiente)** — mobile (≤900px) + limpieza. El posicionamiento libre de
-  la sesión 1 probablemente no sirve en pantallas angostas — definir en
-  esa sesión si conviene una versión apilada (punto + número + etiqueta
-  en línea) u otra solución; no está decidido de antemano. Revisar que
-  las anotaciones no choquen con `.brain-fruit`/`.deco-blob-berries`/
-  `.deco-scribble` en ningún breakpoint. Decidir si se limpian las
-  variables/reglas que quedan sin uso (`--vision-card-*`, los `#lam-02
-  .stat-box:nth-child(n)` de color, etc.) o se dejan comentadas.
-  Verificar con Playwright en 1440 y 390px, actualizar memoria/changelog,
-  generar el patch final.
-
-Importante para quien retome esto: **antes de dar por buena la sesión 1
-o la 2, mostrar una captura al usuario y esperar confirmación explícita
-antes de seguir** — el cambio de colores de íconos y de fondo pastel de
-esta misma sección se había implementado en sesiones anteriores sin
-poder verse en un navegador real, y terminó siendo justamente lo que no
-convenció al usuario ahora. No repetir ese patrón acá.
-
-**Fondo pastel por tarjeta en Visión (sesión 2026-09-17, novena tanda) —
-verificado con Playwright en este entorno (desktop 1440px y mobile
-390px), falta confirmar en un navegador real/deploy que los 4 pasteles
-se lean bien también contra el arte de fondo real en producción (acá se
-sirvió el sitio con `python -m http.server`, no hubo red para
-`identity.netlify.com` ni assets remotos, pero `vision-brain-bg` es un
-asset local así que cargó igual).**
-
-**Íconos de las tarjetas de Visión con color propio (sesión 2026-09-17)
-— falta verificación visual.** Ver `changelog.md` y "Estado actual del
-diseño" → Visión → "Color de los 4 íconos" para el detalle (dorado,
-verde, azul y morado en vez de los 4 en morado uniforme). No se pudo
-correr Playwright en esta sesión — revisado a mano abriendo cada
-`.svg`. Falta confirmar en un navegador real que los 4 colores se lean
-bien contra el fondo translúcido de cada tarjeta (incluida la
-destacada, `.is-featured`, con fondo un poco más blanco) y que no
-queden dos colores demasiado parecidos entre sí a simple vista.
-
-**Tarjetas de Visión más grandes + fix de cascada (sesión 2026-09-17) —
-falta verificación visual.** Ver `changelog.md` para el detalle del bug
-(un `@media` de agrandado quedaba anulado por reglas base con la misma
-especificidad más abajo en el archivo) y "Estado actual del diseño" →
-Visión para los valores finales. No se pudo correr Playwright en esta
-sesión (sin acceso de red al dominio de descarga del browser desde este
-entorno). Revisado a mano confirmando el orden de las reglas en
-`css/styles.css`, pero falta confirmar en un navegador real, desktop
-≥901px: que las 4 tarjetas se vean notoriamente más grandes que antes,
-que el número/label no se solapen con el ícono en ninguna (en particular
-la 4ª, "1:1", con ícono más grande), y que la columna con
-`max-width:560px` no se salga del hueco disponible contra el arte de
-fondo (`vision-brain-bg`).
-
-**Animación de llenado + marcador de "antes" en los anillos de Método
-(sesión 2026-09-16) — falta verificación visual.** Implementado (ver
-"Estado actual del diseño" → "Anillos de progreso de Método") pero no
-se pudo correr Playwright en esta sesión (sin acceso de red al dominio
-de descarga del browser desde este entorno). Revisado a mano y por
-sintaxis únicamente. Falta confirmar en un navegador real, en desktop y
-mobile ≤900px: que el barrido se vea fluido y escalonado (destacado vs.
-los 3 chicos), que el marcador de "antes" se lea claramente distinto
-del extremo del arco en el estado "con reevaluación", y que
-`prefers-reduced-motion: reduce` salte la animación correctamente.
-
-**Auto-scroll del wizard al mensaje final (sesión 2026-09-16) — falta
-verificación visual.** Se implementó (ver "Estado actual del diseño" →
-entrada del botón "Iniciar sesión" del wizard) pero no se pudo correr
-Playwright en esta sesión (sin acceso de red a los dominios de descarga
-del browser desde este entorno). Revisado a mano y por sintaxis
-únicamente. Falta confirmar en un navegador real: que el scroll llegue
-justo al fondo del modal (mensaje + botón completamente visibles, no
-cortados) y que no se vea brusco, en desktop y mobile.
-
-**Login/registro propios — IMPLEMENTADO** (sesión 2026-09-15, tercera
-tanda). El plan que vivía acá como "a futuro" (reemplazar el widget
-nativo de Netlify Identity por pantallas propias en `mi-plan.html`) ya
-está hecho: ver "Estado actual del diseño" → "Mi plan — login/registro
-propios" para el detalle de qué se construyó, qué API se usa y por qué
-la estrategia quedó híbrida. Con esto quedaron **cerrados** los dos
-pendientes que este plan absorbía: el criterio de fallback del avatar
-(el nombre ahora es obligatorio en el registro) y la "Opción B" de un
-signup propio contra GoTrue.
-
-Lo que quedó abierto de este cambio, para una próxima sesión:
-- **Falta probarlo contra Netlify de verdad.** Toda la verificación se
-  hizo con `netlifyIdentity` mockeado y Playwright: el script real de
-  `identity.netlify.com` no es alcanzable desde el entorno de trabajo, y
-  no hay credenciales de Netlify. Falta confirmar en el sitio desplegado:
-  (a) que el signup con la confirmación por correo desactivada
-  efectivamente entra directo al dashboard, (b) los textos exactos que
-  devuelve el servidor para credenciales inválidas y email repetido — si
-  alguno no coincide con las expresiones de `authMensajeError()` en
-  `js/mi-plan.js`, se cae al mensaje genérico y hay que agregar el caso,
-  y (c) que `plan-sync.js` sigue sincronizando con el backend después de
-  un login hecho por esta vía.
-- **La pantalla volvió a necesitar scroll en viewports bajos** (entra sin
-  scroll desde ~986px de alto, antes ~825px). Ver el detalle y las
-  palancas que quedan en "Estado actual del diseño"; la única grande es
-  achicar el título, que el usuario ya descartó antes.
-- **La recuperación de contraseña ya está implementada** (sesión
-  2026-09-15, cuarta tanda; ver "Estado actual del diseño"), pero
-  **tampoco se probó contra Netlify de verdad**. Lo que más conviene
-  mirar en el deploy: que la plantilla del correo de recuperación apunte
-  a `{{ .SiteURL }}/#recovery_token={{ .Token }}` (con eso, el script
-  inline de `index.html` reenvía solo a "Mi plan"); si el usuario le
-  cambió el destino desde el panel de Netlify, hay que ajustar el
-  intercepto. También falta confirmar que el token vencido devuelva un
-  error y no un 200.
-- **Cambio de correo**: el widget atendía también `#email_change_token=…`
-  y eso no se reemplazó. Hoy ese fragmento llegaría a `index.html`, donde
-  el widget seguiría abriendo su modal nativo — el intercepto del
-  `<head>` solo mira `recovery_token`. No hay ninguna parte del sitio que
-  ofrezca cambiar el correo, así que no es alcanzable en la práctica,
-  pero si algún día se agrega hay que cubrir ese caso.
-- **Login con Google/GitHub**: sigue sin existir (tampoco existía antes).
-  `gotrue.loginExternalUrl(provider)` lo haría, pero requiere habilitar
-  el proveedor en el panel de Netlify primero.
-
-**Sesión 2026-09-15 (continuación) — email de sesión movido a la tarjeta
-"Cierre":** resuelto y commiteado en esta misma sesión (ver
-`changelog.md`). El `<p id="miPlanEmail">` que decía "Sesión iniciada
-como X" debajo del título de `#miPlanConSesion` se sacó de ahí y ahora
-vive dentro de `.miplan-cierre`, pegado a los botones "Generar mi
-plan"/"Cerrar sesión" — mismo `id` y misma lógica de `js/mi-plan.js`
-(`pintarMiPlan()`), no se tocó JS, solo el HTML/CSS.
-
-**Verificación visual de "Mi plan" con Playwright — hecha en la sesión
-2026-09-15 (continuación):** se pudo levantar Chromium en este entorno
-(a diferencia de sesiones anteriores). Se revisó con `netlifyIdentity`
-mockeado (el script real de `identity.netlify.com` no es alcanzable
-desde este entorno, se bloquea la request) + datos válidos seedeados en
-`localStorage`: dashboard con sesión (desktop 1440px y mobile 390px),
-fallback de avatar sin `full_name`, y el modal del wizard (paso 8) en
-`index.html`. **No se encontró ninguna rotura** — todo coincide con lo
-documentado en "Estado actual del diseño". No se llegó a revisar cada
-ícono/decoración suelta de otras secciones, solo el bloque que estaba
-marcado como pendiente de verificar.
-
+- **Visión — sesión 2 (mobile + limpieza)**: falta decidir y construir el
+  posicionamiento de las 4 `.stat-annot` en mobile (`≤900px`) — el
+  posicionamiento libre de desktop no aplica ahí tal cual, puede requerir
+  una versión apilada (punto + número + etiqueta en línea) u otra
+  solución, no decidido de antemano. Revisar que no choquen con
+  `.brain-fruit`/`.deco-blob-berries`/`.deco-scribble` en ningún
+  breakpoint. Decidir si se limpian las variables/reglas sin uso
+  (`--vision-card-*`, `svg/icon-*.svg` de la etapa de tarjetas) o quedan
+  comentadas. Verificar con Playwright en 1440 y 390px antes de cerrar.
+- **Verificación visual real pendiente** (implementado y revisado a
+  mano/con Playwright local, pero no confirmado en un navegador real
+  sobre el deploy) en varios frentes:
+  - Íconos de Visión ya revertidos a tamaño original — confirmar que no
+    tapan el texto de "4–6"/"1:1" (ver bullet de arriba).
+  - Animación de llenado + marcador de "antes" de los anillos de Método,
+    y auto-scroll del wizard al mensaje final — no se pudo correr
+    Playwright en las sesiones que las implementaron.
+  - Login/registro/recuperación de contraseña propios de "Mi plan":
+    todo lo anterior se verificó con `netlifyIdentity` mockeado (el
+    script real de `identity.netlify.com` no es alcanzable desde este
+    entorno). Falta confirmar contra Netlify real: (a) signup con
+    confirmación desactivada entra directo al dashboard, (b) los textos
+    exactos de error del servidor coinciden con `authMensajeError()`
+    (si no, cae al mensaje genérico y hay que agregar el caso), (c)
+    `plan-sync.js` sigue sincronizando tras un login por esta vía, (d) la
+    plantilla de recuperación de Netlify apunta a
+    `{{ .SiteURL }}/#recovery_token={{ .Token }}`, y (e) un token vencido
+    da error y no un 200.
+- **Cambio de correo** (`#email_change_token=…`): no está cubierto por el
+  intercepto del `<head>` (solo mira `recovery_token`). No hay ninguna
+  parte del sitio que ofrezca cambiar el correo, así que hoy no es
+  alcanzable en la práctica, pero si se agrega esa opción hay que sumar
+  el caso.
+- **Login con Google/GitHub**: no existe. `gotrue.loginExternalUrl(provider)`
+  lo haría, pero requiere habilitar el proveedor en el panel de Netlify
+  primero.
 - Ver `README.md` → "Próximos pasos" para el detalle funcional. El único
-  punto realmente accionable ahí (punto 5, verificación en un deploy
-  real) **no se puede hacer desde este entorno**: no hay credenciales de
-  Netlify ni acceso de red a dominios `netlify.app`/`netlify.com`.
-- Descartado: trazos tipo "marcador" dispersos por el sitio (rompía el
-  wrapping de títulos con `display:flex`). Si se retoma, ver el detalle
-  en `historico/memoria-2026-09-14.md` antes de repetir el mismo error.
-  (No confundir con los trazos manuscritos naranjas de Método/Pilares,
-  que son una función distinta y sí siguen vigentes en el sitio.)
+  punto realmente accionable ahí (verificación en un deploy real) **no
+  se puede hacer desde este entorno**: no hay credenciales de Netlify ni
+  acceso de red a dominios `netlify.app`/`netlify.com`.
+- Descartado (no reintroducir sin que el usuario lo pida): trazos tipo
+  "marcador" dispersos sueltos por el sitio (rompía el wrapping de
+  títulos con `display:flex`); doble anillo concéntrico en los gauges de
+  Método; sidebar en el dashboard de "Mi plan"; `overflow-x`/`overflow-y`
+  en el elemento `html`.
+
+**Importante para quien retome cualquier cambio visual: mostrar una
+captura al usuario y esperar confirmación explícita antes de dar la
+sesión por buena.** Ya pasó más de una vez que un cambio (colores de
+íconos, fondo pastel, tamaño de íconos de Visión) se implementó sin
+poder verse en un navegador real y terminó siendo revertido o corregido
+en la sesión siguiente porque no convenció o rompía algo — no repetir
+ese patrón.
