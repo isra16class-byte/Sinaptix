@@ -1493,6 +1493,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   color:var(--panel-2);z-index:0;pointer-events:none;user-select:none;
 }
 .ben-quotes{position:relative}
+.quote-card-wrap{position:relative}
+.ben-quote-fruit{filter:none}
 
 /* ---------- 06 CONTACTO ---------- */
 .contact-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:70px}

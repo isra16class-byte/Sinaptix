@@ -330,6 +330,29 @@ ponele números y rayitas, que se vea más estético". Cambios:
 - **Sin confirmar en navegador real** — no hay browser instalado en este
   entorno para capturar ni correr Playwright. Ver "Pendientes conocidos"
   en `memoria.md`.
+## 2026-09-18 — Frutas chicas de Beneficios: que se vean "saliendo" de la tarjeta, no como stickers sueltos
+
+- El usuario mandó captura del resultado agrandado y dijo que no lo
+  convencía; le pregunté qué exactamente (posición / frutas elegidas /
+  se ven como stickers sueltos / sacarlo) y eligió: **se ven como
+  stickers sueltos, no como que "salen" de la tarjeta**.
+- Causa: el `filter:drop-shadow(...)` que trae `.deco-fruit` de fábrica
+  (pensado para las frutas grandes que flotan solas en el fondo) crea
+  una sombra propia alrededor de cada fruta chica, dando el efecto de
+  "estampita flotando encima" en vez de "asomando desde atrás del
+  vidrio". Se agregó `.ben-quote-fruit{filter:none}` para sacarles esa
+  sombra.
+- También tenían más superficie afuera de la tarjeta que adentro
+  (~39% afuera), lo que no dejaba ver casi nada a través del vidrio.
+  Se achicó el `top`/`right`/`bottom`/`left` a -14/-16px (antes
+  -30/-34px) para que la mayoría quede detrás del `backdrop-filter` y
+  solo la punta sobresalga.
+- Se separó el contenedor único (`.ben-quotes`) en un `.quote-card-wrap`
+  por tarjeta, así cada fruta se ancla a la esquina real de su propia
+  tarjeta en vez de a un punto estimado (`top:48%`) del contenedor
+  conjunto — ya no depende de adivinar la altura del texto. Quedó:
+  arándanos arriba-derecha de la 1ª tarjeta, kiwi arriba-izquierda de
+  la 2ª, almendras abajo-derecha de la 2ª.
 
 ## 2026-09-18 — Frutas chicas de Beneficios más grandes (quedaron muy chicas)
 
