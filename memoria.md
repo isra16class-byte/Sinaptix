@@ -425,6 +425,19 @@ próximos pasos).
     de tarjetas) y las variables `--vision-card-*` quedan sin uso en esta
     sección — no se borraron, limpieza pendiente para la sesión 2.
 
+- **Beneficios (`#lam-05`, "Para quién es")**: fondo `--panel` (lavanda
+  claro, heredado de `section.dark`). Los 4 destinatarios son un grid 2x2
+  (`.ben-audience-grid`/`.ben-audience-item`) con ícono de línea propio
+  arriba del texto (`svg/icon-maletin.svg`, `icon-graduacion.svg`,
+  `icon-equipo.svg`, `icon-reloj-fatiga.svg` — stroke `currentColor`,
+  creados para esto, no existía ese estilo en el repo). Las 2
+  `.quote-card` de testimonios tienen: 5 estrellas outline + badge
+  "Verified Client" con ícono escudo-check arriba; texto sin cursiva ni
+  comillas propias; avatar circular con iniciales + nombre en negrita/rol
+  en línea aparte (`.quote-card-author`); comilla grande decorativa de
+  fondo (`.quote-mark`, esquina inferior derecha, recortada con
+  `overflow:hidden`).
+
 ## Pendientes conocidos
 
 - **Visión — sesión 2 (mobile + limpieza)**: falta decidir y construir el

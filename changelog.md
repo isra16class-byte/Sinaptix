@@ -11,6 +11,32 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-17 (cuarta tanda) — Beneficios: rediseño de "Para quién es" y de las tarjetas de testimonio
+
+Rediseño visual de `#lam-05` (Beneficios) a pedido del usuario, a partir de
+una captura de referencia:
+
+- **"Para quién es"**: los 4 ítems dejaron de ser una lista con checkmarks
+  (`.ben-list`) y pasan a un grid 2x2 (`.ben-audience-grid` /
+  `.ben-audience-item`), cada uno con ícono de línea propio arriba del
+  texto. Se crearon 4 SVG nuevos (no existía nada con ese estilo en el
+  repo): `svg/icon-maletin.svg`, `svg/icon-graduacion.svg`,
+  `svg/icon-equipo.svg`, `svg/icon-reloj-fatiga.svg` (stroke
+  `currentColor`, mismo trazo que los checks que reemplazan).
+- **`.quote-card`**: rediseño completo. Ahora tiene: fila superior con 5
+  estrellas outline (`.quote-stars`, SVG inline) + badge "Verified Client"
+  con ícono de escudo-check (`.quote-verified`); el texto de la cita ya no
+  va en cursiva ni con comillas propias; abajo, avatar circular con
+  iniciales (`.quote-avatar`) + nombre en negrita y rol en línea aparte
+  (`.quote-card-author` / `.quote-author-info`, reemplaza el `<cite>`
+  anterior); comilla grande decorativa de fondo (`.quote-mark`, glyph
+  `&rdquo;` en Georgia, color `--panel-2`, esquina inferior derecha,
+  `overflow:hidden` en la card para recortarla).
+- El fondo de la sección no cambió: `section.dark` ya usaba `--panel`
+  (lavanda claro), que coincidía con la referencia.
+- Verificado con Playwright en 1440px y 390px antes de mostrar captura al
+  usuario y recibir confirmación.
+
 ## 2026-09-17 (tercera tanda) — Pilares: recortar más la granada del cluster junto al título
 
 Commit: ver hash en el archivo `.patch` generado para esta tanda.
