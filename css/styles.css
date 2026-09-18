@@ -1496,9 +1496,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .quote-card-wrap{position:relative}
 .ben-quote-fruit{filter:none}
 
-/* ---------- 06 CONTACTO ---------- */
-.contact-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:70px}
-@media(max-width:900px){.contact-wrap{grid-template-columns:1fr;gap:50px}}
+/* ---------- 06 CONOCENOS (antes "Contacto") ---------- */
+/* .contact-wrap era grid de 2 columnas (info + .contact-form). El
+   formulario se sacó (sesión 2026-09-18, el usuario ya no quiere
+   responder correos a mano: la acción principal ahora es el wizard de
+   nutrición, ver sección "07 CIERRE" más abajo), así que la columna de
+   info quedó sola: .contact-info en vez de grid, ancho limitado para
+   que no se estire a todo lo ancho de .wrap en desktop. */
+.contact-info{max-width:640px}
 .contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
 .contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:600;color:var(--purple)}
 .contact-trust-item svg{width:16px;height:16px;flex:none}
@@ -1549,17 +1554,40 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .social-card:hover .arrow{transform:translateX(4px);display:inline-block}
 .arrow{transition:transform .2s ease;display:inline-block}
 
-.contact-form{display:flex;flex-direction:column;gap:14px;background:var(--paper);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px}
-.contact-form input,.contact-form textarea{
-  background:var(--paper-2);border:1px solid var(--line);color:var(--ink);
-  padding:14px 16px;font-family:var(--font-b);font-size:14.5px;border-radius:var(--radius-sm);
-  outline:none;transition:border-color .2s;
+/* ---------- 07 CIERRE (CTA final al wizard) ---------- */
+/* Reemplaza al panel .contact-cta descartado (sesión 2026-09-18, ver
+   memoria.md → Pendientes conocidos / Descartado): en vez de un panel
+   dentro de Contacto, es una sección propia al final del sitio, tipo
+   mini-hero de cierre, centrada. #lam-06 (arriba) es `section.dark`
+   (--panel); esta sección no lleva esa clase (fondo --paper, blanco,
+   como la referencia del usuario), así que se funde el borde de arriba
+   igual que #lam-03/#lam-05 para no cortar en seco (la diferencia
+   --panel→--paper es sutil pero se mantiene el mismo criterio). */
+#lam-07{
+  background:linear-gradient(180deg,var(--panel) 0,var(--paper) 140px,var(--paper) 100%);
+  text-align:center;
 }
-.contact-form input::placeholder,.contact-form textarea::placeholder{color:var(--ink-faint)}
-.contact-form input:focus,.contact-form textarea:focus{border-color:var(--purple)}
-.contact-form button{
-  margin-top:6px;align-self:flex-start;
+.closing-deco{position:relative;max-width:620px;margin:0 auto 4px}
+.closing-sparks{display:block;width:100%;height:auto}
+.closing-title{
+  font-family:var(--font-hand);
+  font-weight:700;
+  line-height:1.05;
+  margin:0 auto 34px;
 }
+.closing-title-line1{display:block;font-size:clamp(46px,6.4vw,76px);color:var(--ink)}
+.closing-title-line2{display:block;margin-top:2px;font-size:clamp(52px,7.6vw,92px);color:var(--green)}
+.closing-arrow{
+  display:block;margin:22px auto 0;width:26px;height:26px;color:var(--green);
+  animation:closing-arrow-bounce 1.8s ease-in-out infinite;
+}
+@keyframes closing-arrow-bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+@media(prefers-reduced-motion:reduce){.closing-arrow{animation:none}}
+.closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:15px}
+#lam-07 footer{text-align:left}
 
 footer{
   border-top:1px solid var(--panel-line);

@@ -81,6 +81,13 @@
     resetNutriWizard();
     openModal('modalNutricion');
   });
+  // Botón "Descubrir mi plan personalizado" del bloque de cierre (#lam-07):
+  // misma acción que #btnNutricion, id propio porque un id no puede
+  // repetirse en el documento.
+  document.getElementById('btnNutricionCierre').addEventListener('click', ()=>{
+    resetNutriWizard();
+    openModal('modalNutricion');
+  });
   document.getElementById('btnAntropometria').addEventListener('click', ()=>openModal('modalAntropometria'));
   document.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', e=>closeModal(e.target.closest('.modal-overlay')));
@@ -178,24 +185,6 @@
       }
     });
   }
-
-  // Formulario de contacto: envía un correo real a hola@sinaptix.com
-  document.getElementById('formContacto').addEventListener('submit', function(e){
-    e.preventDefault();
-    const nombre = document.getElementById('contactoNombre').value.trim();
-    const email = document.getElementById('contactoEmail').value.trim();
-    const mensaje = document.getElementById('contactoMensaje').value.trim();
-
-    const asunto = encodeURIComponent('Contacto desde la web — '+nombre);
-    const cuerpo = encodeURIComponent(
-      'Nombre: '+nombre+'\n'+
-      'Correo: '+email+'\n\n'+
-      'Objetivo cognitivo:\n'+mensaje
-    );
-
-    window.location.href = 'mailto:hola@sinaptix.com?subject='+asunto+'&body='+cuerpo;
-    this.querySelector('button').textContent = 'Abriendo tu correo… ✓';
-  });
 
   // ===================== Encuesta de nutrición especializada (wizard) =====================
   // El motor del wizard (navegación entre pasos, validación, recolección de

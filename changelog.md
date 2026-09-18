@@ -11,6 +11,50 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Conócenos + Cierre: nueva sección final con CTA al wizard, se saca el formulario de contacto
+
+Segundo intento (el primero fue el panel `.contact-cta`, revertido, ver
+entrada de abajo) para resolver que el usuario no quiere responder correos
+manualmente: en vez de un panel dentro de Contacto, se creó una sección
+nueva y propia al final del sitio, a partir de una imagen de referencia que
+mandó el usuario (mini-hero de cierre centrado, con destellos decorativos,
+título en 2 colores, botón sólido al wizard, flecha y texto chico).
+
+- **`#lam-06` renombrada "Conócenos" (antes "Contacto")**: eyebrow y título
+  actualizados, copy del párrafo reescrito. Se saca `<form id="formContacto">`
+  completo (nombre/correo/mensaje + su envío por `mailto:` en
+  `js/script.js`) — la sección queda solo con la franja de confianza, el
+  email grande con botón de copiar, y las tarjetas de redes sociales.
+  `.contact-wrap` (grid de 2 columnas) pasa a `.contact-info` (una sola
+  columna, `max-width:640px`), ya no hace falta grid con una sola columna.
+- **`#lam-07` (sección nueva) "Cierre"**: `svg/deco-sparkle-burst.svg`
+  (destellos dorados + 2 corazones) como decoración — **calcado por visión
+  por computadora** de la imagen de referencia del usuario (OpenCV:
+  threshold + `findContours` + `approxPolyDP` + conversión Catmull-Rom→
+  Bézier a los contornos reales, no dibujado a mano — un primer intento a
+  mano no se pareció al original, se rehizo con este método). Título de 2
+  líneas en `--font-hand`: "Potencia" en `--ink`, "tu claridad mental y
+  enfoque" en `--green` y más grande. Botón `.btn.btn-solid` "Descubrir mi
+  plan personalizado" (`#btnNutricionCierre`) con un segundo
+  `addEventListener` en `js/script.js` que dispara exactamente lo mismo que
+  `#btnNutricion` (`resetNutriWizard()` + `openModal('modalNutricion')`) —
+  id propio porque no se puede repetir `#btnNutricion` en el documento.
+  Flecha SVG hacia arriba en `--green` con rebote suave propio
+  (`closing-arrow-bounce`). El `<footer>` del sitio se movió desde `#lam-06`
+  a esta sección — ahora es el cierre real del `<body>`.
+- El botón "Solicitar asesoría" del nav pasa de `href="#lam-06"` a
+  `href="#lam-07"` (la intención es "empezar", tiene que llevar al wizard).
+  El link "Contacto" del nav se deja igual, sigue apuntando a `#lam-06`
+  (ahí vive el email/redes, sigue siendo correcto).
+
+`npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF de "Mi plan",
+se saltea porque Playwright no está instalado en este entorno — esperado,
+no relacionado a este cambio). No hay suite de Playwright para `#lam-07`
+todavía.
+
+⚠️ Sin browser en este entorno para verlo renderizado — pendiente de
+verificación visual real, ver "Pendientes conocidos" en `memoria.md`.
+
 ## 2026-09-18 — Contacto: CTA al wizard, implementado y revertido
 
 Se implementó un panel `.contact-cta` arriba de `.contact-wrap` (botón para

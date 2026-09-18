@@ -134,7 +134,9 @@ próximos pasos).
 ## Estructura de archivos
 
 - `index.html` — todo el markup del sitio principal, secciones `lam-01` a
-  `lam-06` (Hero, Visión, Método, Pilares, Beneficios, Contacto).
+  `lam-07` (Hero, Visión, Método, Pilares, Beneficios, Conócenos, Cierre —
+  ver "Estado actual del diseño" para el detalle de las dos últimas, que
+  antes eran una sola sección "Contacto").
 - `mi-plan.html` — página propia (no sección de `index.html`) para "Mi
   plan": nav propio, estado sin sesión (`#miPlanSinSesion`, con
   login/registro propios) y estado con sesión (`#miPlanConSesion`,
@@ -650,20 +652,72 @@ próximos pasos).
     confirmado por elección múltiple, no fue posición ni las frutas en
     sí.
 
-- **Contacto (`#lam-06`)**: sobre `.contact-wrap` (columna izquierda +
-  `.contact-form`), la columna izquierda tiene ahora: franja de
-  confianza (`.contact-trust`, 2 ítems con ícono en `--purple`) →
-  `.big-email` con botón circular de copiar al lado (`.copy-email-btn`,
+- **Conócenos (`#lam-06`, antes "Contacto", sesión 2026-09-18)**: el
+  usuario no quiere responder correos a mano; la acción principal del
+  sitio para "empezar" ya no es este formulario, es el wizard de
+  nutrición (ver bullet "Cierre" abajo). Esta sección se redujo a solo
+  información de contacto pasivo: eyebrow "Conócenos", título "Conócenos
+  <span class="title-mark">de cerca</span>", un párrafo corto, y sobre
+  `.contact-info` (antes `.contact-wrap`, ya no es grid de 2 columnas —
+  `max-width:640px`, una sola columna): franja de confianza
+  (`.contact-trust`, 2 ítems con ícono en `--purple`) → `.big-email` con
+  botón circular de copiar al lado (`.copy-email-btn`,
   `navigator.clipboard`, tooltip "Copiado ✓" por CSS) → redes sociales
   como grid de tarjetas (`.social-cards`/`.social-card`, 2x2 desktop/1
-  col ≤480px, ícono en círculo + nombre + handle), ya no lista de filas.
-  El formulario y su envío por `mailto:` (`js/script.js`) no cambiaron.
+  col ≤480px, ícono en círculo + nombre + handle). **Se sacó el
+  `<form id="formContacto">`** (nombre/correo/mensaje + envío por
+  `mailto:` en `js/script.js`) — ya no existe en el sitio.
   - **Color de marca por red** (`.social-card-icon`): Instagram, Facebook
     y TikTok llevan su color/degradado oficial + ícono blanco
     (`.social-card-icon--instagram/--facebook/--tiktok`, clases
     modificadoras sobre el círculo base). Teléfono queda con el círculo
     genérico `--panel-2`/ícono `--purple` de siempre (no es red social,
     no tiene color de marca que aplicar).
+- **Cierre (`#lam-07`, sección nueva, sesión 2026-09-18)**: mini-hero de
+  cierre al final del sitio, reemplaza al panel `.contact-cta` descartado
+  (ver "Pendientes conocidos" → Descartado) como forma de empujar el
+  wizard de nutrición sin depender de que alguien responda un correo. A
+  partir de una imagen de referencia del usuario. Sección propia (no
+  `section.dark`, fondo `--paper` blanco — funde el borde de arriba
+  igual que `#lam-03`/`#lam-05`, mismo criterio aunque acá el salto de
+  color panel→paper es sutil), todo centrado (`#lam-07{text-align:center}`):
+  - `.closing-deco` (`max-width:620px`, `position:relative`): la imagen
+    `svg/deco-sparkle-burst.svg` (destellos dorados + 2 corazones,
+    calcado por visión por computadora de la imagen de referencia del
+    usuario — contornos reales, no dibujado a mano, ver
+    `historico`/conversación de chat si hace falta el detalle del
+    proceso) más 2 `.brain-spark` sueltos encima para el brillo animado
+    que ya usa el resto del sitio.
+  - `.closing-title`: dos líneas en `--font-hand` (Caveat) — "Potencia"
+    en `--ink` (`.closing-title-line1`, `clamp(46px,6.4vw,76px)`) y "tu
+    claridad mental y enfoque" en `--green` (`.closing-title-line2`,
+    más grande, `clamp(52px,7.6vw,92px)`), cada una su propio `<span
+    class="closing-title-lineN">` en bloque (no hay `.title-mark` acá,
+    el color va directo en el span).
+  - Botón `.btn.btn-solid` "Descubrir mi plan personalizado"
+    (`#btnNutricionCierre`) — **mismo listener que `#btnNutricion`**
+    (`resetNutriWizard()` + `openModal('modalNutricion')`) pero id
+    propio porque un id no puede repetirse en el documento; se agregó
+    un segundo `addEventListener` en `js/script.js`, no se reusó ningún
+    selector de clase compartido.
+  - `.closing-arrow` (flecha SVG simple apuntando arriba, `color:
+    var(--green)`) con una animación propia de rebote suave
+    (`closing-arrow-bounce`, 1.8s, respeta
+    `prefers-reduced-motion`) — no reutiliza `@keyframes float` del
+    sitio (ese tiene un recorrido más grande, pensado para elementos
+    flotantes grandes).
+  - `.closing-sub`: texto chico "Diseñamos tu plan de neuroalimentación
+    en menos de 3 minutos." debajo de la flecha.
+  - El `<footer>` (antes al final de `#lam-06`) se movió acá — ahora es
+    el cierre real del `<body>`. `#lam-07 footer{text-align:left}`
+    para que no herede el `text-align:center` de la sección (el footer
+    ya se alinea solo vía flex `space-between`, esto es solo por el
+    texto dentro de cada span/div).
+  - El botón "Solicitar asesoría" del nav (`href` en `#lam-01`) ahora
+    apunta a `#lam-07` en vez de `#lam-06` — es la acción de "empezar",
+    tiene que llevar al wizard, no a la info de contacto pasivo. El link
+    "Contacto" del nav (`#lam-06`) no se tocó: sigue siendo correcto,
+    ahí vive el email/redes.
 
 ## Pendientes conocidos
 
@@ -712,6 +766,18 @@ próximos pasos).
 - **Verificación visual real pendiente** (implementado y revisado a
   mano/con Playwright local, pero no confirmado en un navegador real
   sobre el deploy) en varios frentes:
+  - **`#lam-07` (Cierre, sesión 2026-09-18)**: no hay browser en este
+    entorno, todo se armó a partir de la imagen de referencia del
+    usuario sin poder verlo renderizado. Falta confirmar sobre todo: (a)
+    que las 2 líneas de `.closing-title` ("Potencia" / "tu claridad
+    mental y enfoque") no se vean desproporcionadas entre sí ni se
+    corten en mobile, (b) que `svg/deco-sparkle-burst.svg` (calcado por
+    visión por computadora) se vea bien a `max-width:620px` — no se
+    ajustó nada a mano después de generarlo, (c) que el salto de color
+    `--panel`→`--paper` entre `#lam-06` y `#lam-07` sea tan sutil como
+    se asume (ambos son casi blancos) y no haga falta un fundido más
+    marcado, y (d) que `#formContacto` no dejara nada roto al sacarlo
+    (revisado el markup y el JS a mano, pero no visualmente).
   - Íconos de Visión ya revertidos a tamaño original — confirmar que no
     tapan el texto de "4–6"/"1:1" (ver bullet de arriba).
   - Animación de llenado + marcador de "antes" de los anillos de Método,
@@ -748,9 +814,14 @@ próximos pasos).
   arriba de Contacto con el bloque de email/formulario atenuado como
   secundario, sesión 2026-09-18) — implementado y revertido en la misma
   sesión, el usuario lo vio y no le gustó (sin más detalle de qué
-  específicamente; si se retoma la idea de reducir la carga de responder
-  correos, preguntar primero qué no funcionó de este enfoque antes de
-  repetirlo).
+  específicamente). **Reemplazado (misma sesión 2026-09-18) por un
+  enfoque distinto que si se implementó**: sección `#lam-07` propia al
+  final del sitio (mini-hero de cierre centrado, a partir de una imagen
+  de referencia del usuario) en vez de un panel dentro de Contacto — ver
+  "Estado actual del diseño" → bullet "Cierre". Si el usuario tampoco
+  queda conforme con este segundo intento, no volver al panel
+  `.contact-cta` sin preguntar primero qué no convenció de ninguno de
+  los dos.
 
 **Importante para quien retome cualquier cambio visual: mostrar una
 captura al usuario y esperar confirmación explícita antes de dar la
