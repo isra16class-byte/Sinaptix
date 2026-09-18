@@ -1408,7 +1408,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .quote-card{
   position:relative;overflow:hidden;
   border:1px solid var(--panel-line);padding:24px 26px;margin-bottom:16px;
-  background:var(--paper);border-radius:var(--radius);
+  background:rgba(255,255,255,.55);border-radius:var(--radius);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+/* Sin soporte de backdrop-filter (navegadores viejos): tarjeta sólida como
+   antes, para no perder legibilidad del texto sobre la fruta de fondo. */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .quote-card{background:var(--paper)}
 }
 .quote-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .quote-stars{display:flex;gap:2px}

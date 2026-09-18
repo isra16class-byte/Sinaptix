@@ -452,6 +452,15 @@ próximos pasos).
   (`.quote-card-author`); comilla grande decorativa de fondo
   (`.quote-mark`, esquina inferior derecha, recortada con
   `overflow:hidden`).
+  - **`.quote-card` con efecto "vidrio esmerilado"** (sesión 2026-09-18,
+    a partir de una imagen de referencia del usuario): fondo pasó de
+    `var(--paper)` sólido a `rgba(255,255,255,.55)` +
+    `backdrop-filter:blur(10px)` (con prefijo `-webkit-` y fallback a
+    fondo sólido vía `@supports not` para navegadores sin soporte), para
+    que las frutas de fondo de `#lam-05` (remolacha/naranja/chocolate/
+    granada) se noten difuminadas detrás de las 2 tarjetas de
+    testimonios sin perder legibilidad del texto. No se tocó tamaño/
+    posición/opacidad de las frutas — ya coinciden con la referencia.
 
 - **Contacto (`#lam-06`)**: sobre `.contact-wrap` (columna izquierda +
   `.contact-form`), la columna izquierda tiene ahora: franja de

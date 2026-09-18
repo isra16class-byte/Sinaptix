@@ -11,6 +11,20 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Tarjetas de testimonios de Beneficios con efecto "vidrio esmerilado"
+
+- El usuario mandó una captura de referencia de otro sitio con las
+  tarjetas de comentarios semi-transparentes sobre fruta ilustrada de
+  fondo, preguntando si algo así se podía aplicar a "Para quién es"
+  (`#lam-05`).
+- En vez de transparencia total (que hacía perder legibilidad del texto
+  con la remolacha/naranja/chocolate/granada de fondo), se aplicó
+  `background:rgba(255,255,255,.55)` + `backdrop-filter:blur(10px)`
+  (con `-webkit-backdrop-filter` y fallback a fondo sólido `var(--paper)`
+  vía `@supports not` para navegadores sin soporte) en `.quote-card`
+  (`css/styles.css`). Las frutas se ven difuminadas detrás de las 2
+  tarjetas, sin tocar su tamaño/posición/opacidad.
+
 ## 2026-09-18 — Íconos de redes con color de marca, tarjetas de Pilares más compactas, fundido entre Pilares y Beneficios
 
 Pedido puntual del usuario a partir de una captura del sitio en vivo:
