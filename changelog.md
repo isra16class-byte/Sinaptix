@@ -11,6 +11,28 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-06` Conócenos: collage un poco más pequeño
+
+Pedido del usuario: "quiero que el collage lo hagas un poco más pequeño",
+ya sobre la versión integrada en HTML/CSS (no la imagen de IA).
+
+- **`css/styles.css`**: `--collage-bleed` (definido en `.conocenos-grid`)
+  pasa de `clamp(0px,calc((100vw - 1180px)/2 + 140px),340px)` a
+  `clamp(0px,calc((100vw - 1180px)/2 + 100px),280px)`. Es el único knob
+  que hace falta: como `.stage` define `--u:calc(100cqw/1000)` y todas las
+  medidas de las piezas salen de esa unidad, bajar el sangrado encoge el
+  collage completo (texto incluido) en proporción, sin media queries ni
+  tocar la grilla. No se tocó la grilla, ni `left:20px`, ni el breakpoint
+  de `≤900px`.
+- **Medido** en el navegador integrado de VS Code (Playwright, 1425px de
+  viewport): wrapper/`.collage` **906px → 866px** de ancho y 550px → 525px
+  de alto, con el borde izquierdo en el mismo píxel (646px) y el corte por
+  el borde derecho bajando de 127px a 87px.
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — Collage de redes de #lam-06 integrado en HTML/CSS (reemplaza la imagen de IA)
 
 El usuario vio la maqueta (`docs/mockup-collage-redes.html`, entrada

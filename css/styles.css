@@ -1528,7 +1528,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    es margen de seguridad para no provocar scroll horizontal (100vw
    incluye la barra de scroll). */
 .conocenos-grid{
-  --collage-bleed:clamp(0px,calc((100vw - 1180px)/2 + 140px),340px);
+  --collage-bleed:clamp(0px,calc((100vw - 1180px)/2 + 100px),280px);
   display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px;align-items:center;
 }
 @media(max-width:900px){.conocenos-grid{grid-template-columns:1fr;gap:44px}}

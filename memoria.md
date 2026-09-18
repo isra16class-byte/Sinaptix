@@ -765,11 +765,16 @@ próximos pasos).
   - `.contact-info` (columna de texto/redes que ya existía) y la nueva
     `.conocenos-collage` viven dentro de `.conocenos-grid`
     (`grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)`, colapsa a 1
-    columna en `≤900px`). Tamaño/posición del wrapper (sangrado a la
-    derecha con `--collage-bleed`, `left:20px` en desktop, `left:0` +
-    `max-width:560px` centrado en `≤900px`) **sin cambios** respecto a la
-    versión anterior — ver `css/styles.css` para el detalle de esas
-    reglas, no repetido acá.
+    columna en `≤900px`). Tamaño/posición del wrapper: sangrado a la
+    derecha con `--collage-bleed` =
+    `clamp(0px,calc((100vw - 1180px)/2 + 100px),280px)` (offset base
+    `+100px`, tope `280px`; bajado desde `+140px/340px` el 2026-09-18 a
+    pedido del usuario: "un poco más pequeño"), `left:20px` en desktop,
+    `left:0` + `max-width:560px` centrado en `≤900px`. Como todas las
+    medidas internas salen de `100cqw`, bajar el sangrado encoge todo el
+    collage en proporción: **~866px × 525px** a 1425px de ventana (antes
+    906px × 550px), con el borde izquierdo en el mismo lugar. Ver
+    `css/styles.css` para el detalle de esas reglas, no repetido acá.
   - **`.collage`** (antes `.conocenos-collage-img`): `container-type:
     inline-size`, `width:100%`, `aspect-ratio:1162/705`, con la animación
     `float` (la misma `@keyframes float` del Hero/Pilares) +
@@ -859,13 +864,15 @@ próximos pasos).
   ver nota en "Entorno de trabajo" más abajo) a 1440px y 390px, ambos se
   ven bien, pero falta el mismo tipo de confirmación que el resto del
   sitio: cómo se ve en un navegador real sobre el deploy de Netlify.
-  - Ajuste fino del 2026-09-18 (tamaño ~970px + `left:20px`, ver
-    changelog): verificado en el navegador integrado de VS Code sobre
-    Live Server a 1000/1100/1280/1366/1440/1567/1920px. En el deploy real
-    conviene mirar sobre todo el borde derecho: el collage se sale de
-    pantalla ~88px a 1567px (corte aceptado por el usuario) y en ventanas
-    de ~1000px `.contact-info` desborda su columna 113px (el email grande
-    + botón de copiar) — desborde preexistente, sin tocar en esta sesión.
+  - Ajuste fino del 2026-09-18 (ver changelog): verificado en el
+    navegador integrado de VS Code sobre Live Server a
+    1000/1100/1280/1366/1440/1567/1920px (versión imagen, ~970px de ancho
+    a 1567px) y a 1425px (versión HTML/CSS, ~866px con `--collage-bleed`
+    en `+100px/280px`). En el deploy real conviene mirar sobre todo el
+    borde derecho: el collage se sale de pantalla ~87–88px (corte
+    aceptado por el usuario) y en ventanas de ~1000px `.contact-info`
+    desborda su columna 113px (el email grande + botón de copiar) —
+    desborde preexistente, sin tocar.
 
 - **PDF de "Mi plan" — verificar contra el CDN real y en visores reales**:
   todo se verificó con el bundle de jsPDF servido localmente (cdnjs no es
