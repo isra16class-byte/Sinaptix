@@ -11,6 +11,42 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Medidor de IMC: escala numerada + puntas redondeadas
+
+Pedido del usuario a partir de una captura: "mejorá el gráfico de IMC,
+ponele números y rayitas, que se vea más estético". Cambios:
+
+- **Nueva escala de referencia** alrededor del arco: 6 rayitas + números
+  (15/20/25/30/35/40 — los extremos del rango del medidor + pasos de 5),
+  `.imc-tick`/`.imc-tick-label` en `css/styles.css`. Geometría calculada
+  por función nueva en `js/nutricion-planes.js`
+  (`IMC_GAUGE_TICKS`/`imcGaugeTickPoint()`/`imcGaugeTicksHtml()`), no a
+  mano — usa el mismo centro/radio (`imcGaugeAngulo`) que ya calculaba
+  la posición de la aguja y el marcador, así la escala queda
+  perfectamente alineada con el arco sin depender de números "a ojo". Es
+  una escala fija (no depende del IMC de la persona), a diferencia de la
+  aguja/marcador/degradado.
+- `renderMethodImc` (`js/script.js`, pestaña "Mi IMC" de Método) llama a
+  `imcGaugeTicksHtml()` para insertar la escala. `mi-plan.html` la tiene
+  escrita a mano dentro del `<svg>` estático (mismo criterio que ya
+  usaba el `<linearGradient>` de al lado — es HTML que el navegador
+  parsea antes de que corra ningún JS).
+- El `viewBox` del `<svg>` del medidor pasa de `"0 0 220 140"` a
+  `"-10 -2 240 148"` en ambos lugares, para darle aire a los números "15"
+  y "40" de los extremos (quedaban pegados/cortados contra el borde del
+  lienzo original).
+- **Puntas redondeadas** en los 2 tramos extremos del arco
+  (`.imc-zone-bajo`/`.imc-zone-vigilar` → `stroke-linecap:round`,
+  sobreescribiendo el `butt` general de `.imc-zone`) para un look más de
+  velocímetro real — los 2 tramos intermedios siguen en `butt` a
+  propósito, si llevaran `round` se verían costuras redondeadas donde un
+  color de degradado se cruza con el siguiente.
+- Tests (`npm test`, 54/54) siguen pasando — no se tocó ninguna función
+  de cálculo existente, solo se agregaron funciones nuevas.
+- **Sin confirmar en navegador real** — no hay browser instalado en este
+  entorno para capturar ni correr Playwright. Ver "Pendientes conocidos"
+  en `memoria.md`.
+
 ## 2026-09-18 — Frutas chicas de Beneficios más grandes (quedaron muy chicas)
 
 - El usuario mandó captura del resultado del patch anterior (arándanos/

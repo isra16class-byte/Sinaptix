@@ -306,6 +306,25 @@ próximos pasos).
   pinta directo en la posición final); marcador fijo
   (`.imc-gauge-marker`) sobre el arco en el valor exacto, sin animar.
   Respeta `prefers-reduced-motion` en JS y CSS.
+  - **Escala con marcas y números (sesión 2026-09-18)**: 6 rayitas +
+    números (15/20/25/30/35/40, `.imc-tick`/`.imc-tick-label`) alrededor
+    del arco, geometría fija calculada por radio/ángulo desde el mismo
+    centro que el arco (`IMC_GAUGE_TICKS`/`imcGaugeTickPoint()`/
+    `imcGaugeTicksHtml()`, `js/nutricion-planes.js` — no depende del IMC
+    de la persona, es la misma escala siempre). `renderMethodImc`
+    (`js/script.js`) la inserta llamando a `imcGaugeTicksHtml()`;
+    `mi-plan.html` la tiene escrita a mano (mismo motivo que el
+    `<linearGradient>` de al lado: es HTML estático, sin JS corrido
+    todavía) — si `IMC_GAUGE_TICKS` o sus radios cambian, actualizar
+    también ahí. El `viewBox` del `<svg>` en ambos lugares pasó de
+    `"0 0 220 140"` a `"-10 -2 240 148"` para darle aire a los números
+    de los extremos (15/40) sin recortarlos. Además, sesión estética: las
+    puntas del arco completo (tramos `.imc-zone-bajo`/`.imc-zone-vigilar`)
+    pasan a `stroke-linecap:round` (los 2 tramos intermedios siguen en
+    `butt`, para no dejar costuras redondeadas entre colores) — look más
+    de velocímetro real. **Sin confirmar en navegador real** (no hay
+    browser instalado en este entorno para captura/Playwright) — ver
+    "Pendientes conocidos".
 - **"Mi plan" — estado sin sesión** (`#miPlanSinSesion`, `.miplan-locked`):
   tarjeta blanca centrada (`.miplan-locked-card`) con candado SVG a mano,
   formularios propios de login/registro (ver punto siguiente) y "Volver
@@ -493,6 +512,13 @@ próximos pasos).
 
 ## Pendientes conocidos
 
+- **Verificar en navegador real (sesión 2026-09-18, escala numerada del
+  medidor de IMC)**: mismo motivo que el punto siguiente — no hay
+  browser en este entorno. Falta confirmar que los números 15/40 de los
+  extremos no queden pegados/cortados contra el borde de la tarjeta
+  `.stat-box` en mobile (`mi-plan.html`) ni contra `.method-imc-featured`
+  en Método, y que las puntas redondeadas del arco (bajo peso/a vigilar)
+  se vean bien y no como un error de alineación con el degradado.
 - **Verificar en navegador real (sesión 2026-09-18, íconos de redes +
   tarjetas de Pilares + fundido)**: implementado a partir de una captura
   que mandó el usuario, sin poder correr Playwright (no hay browser

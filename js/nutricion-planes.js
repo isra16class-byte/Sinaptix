@@ -431,6 +431,45 @@ function imcGaugeGradientDefsHtml(gradientId){
   '</linearGradient></defs>';
 }
 
+// ===================== Medidor de IMC: marcas y números de escala =====================
+// Escala fija de referencia (15/20/25/30/35/40, los extremos del arco +
+// pasos de 5) independiente del IMC de cada persona — a diferencia del
+// degradado/aguja/marcador, esto NO depende de ningún dato de usuario,
+// así que se puede precalcular una sola vez. Se generan igual por
+// función (en vez de escribir los 6 números sueltos) para que la
+// geometría (radios/ángulos) salga siempre de imcGaugeAngulo y quede
+// perfectamente alineada con el arco, sin números "a ojo".
+const IMC_GAUGE_TICKS = [15, 20, 25, 30, 35, 40];
+// Radios de las marcas (rayitas) y de los números, medidos desde el
+// mismo centro que el arco (IMC_GAUGE_CX/CY). El arco pinta entre
+// radio ~76 y ~94 (IMC_GAUGE_R=85 ± mitad de stroke-width:18), así que
+// la marca arranca apenas afuera (95) y el número un poco más afuera
+// todavía (111), para que quede "rayita, después número" y no se pisen.
+const IMC_GAUGE_TICK_R_IN = 95;
+const IMC_GAUGE_TICK_R_OUT = 103;
+const IMC_GAUGE_TICK_R_LABEL = 111;
+function imcGaugeTickPoint(imc, r){
+  const rad = imcGaugeAngulo(imc) * Math.PI / 180;
+  return {
+    x: +(IMC_GAUGE_CX + r * Math.cos(rad)).toFixed(2),
+    y: +(IMC_GAUGE_CY - r * Math.sin(rad)).toFixed(2)
+  };
+}
+// Arma las 6 `<line>` (rayita) + `<text>` (número) de la escala, listas
+// para insertar dentro del mismo `<svg>` del medidor. `dy="0.35em"` en
+// vez de ajustar cada `y` a mano centra el texto verticalmente sobre su
+// punto sea cual sea el ángulo (funciona igual para las 2 marcas
+// horizontales de los extremos que para las 4 en diagonal/arriba).
+function imcGaugeTicksHtml(){
+  return IMC_GAUGE_TICKS.map(function(v){
+    const pIn = imcGaugeTickPoint(v, IMC_GAUGE_TICK_R_IN);
+    const pOut = imcGaugeTickPoint(v, IMC_GAUGE_TICK_R_OUT);
+    const pLabel = imcGaugeTickPoint(v, IMC_GAUGE_TICK_R_LABEL);
+    return '<line class="imc-tick" x1="'+pIn.x+'" y1="'+pIn.y+'" x2="'+pOut.x+'" y2="'+pOut.y+'"/>'+
+      '<text class="imc-tick-label" x="'+pLabel.x+'" y="'+pLabel.y+'" dy="0.35em">'+v+'</text>';
+  }).join('');
+}
+
 // ===================== Guardar antropometría automáticamente desde la encuesta =====================
 // Si la persona todavía no tiene "datos antropométricos" guardados
 // (sinaptix_antropometria — normalmente se registran aparte en
@@ -610,6 +649,8 @@ if(typeof module !== 'undefined' && module.exports){
     imcGaugeMarkerPos,
     imcGaugeGradientStops,
     imcGaugeGradientDefsHtml,
+    imcGaugeTickPoint,
+    imcGaugeTicksHtml,
     gaugeComputeAreas,
     gaugeColorForPercent,
     gaugeDeltaHtml,

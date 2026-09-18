@@ -654,6 +654,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    (imcGaugeMarkerPos), ambas en js/nutricion-planes.js. */
 .imc-gauge{max-width:220px;margin:0 auto -8px}
 .imc-zone{fill:none;stroke-width:18;stroke-linecap:butt;stroke:url(#imcGaugeGradient)}
+/* Puntas redondeadas solo en el primer y el último tramo (bajo peso/a
+   vigilar) — sesión 2026-09-18, pedido de "que se vea más estético":
+   .imc-zone ya define stroke-linecap:butt para los 4 tramos por igual
+   (necesario para que no queden costuras redondeadas entre tramos
+   intermedios); acá se sobreescribe puntualmente solo en los 2 extremos
+   del arco completo, look típico de velocímetro. */
+.imc-zone-bajo,.imc-zone-vigilar{stroke-linecap:round}
 /* Clases de los <stop> del degradado estático de mi-plan.html (el de
    renderMethodImc/js/script.js se arma en JS con el hex ya resuelto vía
    gaugeColorForPercent, no necesita estas clases). Mismas variables que
@@ -662,6 +669,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .imc-stop-gold{stop-color:var(--gold)}
 .imc-stop-green{stop-color:var(--green)}
 .imc-stop-red{stop-color:var(--red)}
+/* Marcas (rayitas) y números de escala del medidor (15/20/25/30/35/40),
+   sesión 2026-09-18 — geometría generada por imcGaugeTicksHtml()
+   (js/nutricion-planes.js), ver comentario ahí y en mi-plan.html. Tono
+   suave (--ink-soft) para que no compita con el número grande central
+   ni con la aguja/el degradado del arco. */
+.imc-tick{stroke:var(--ink-soft);stroke-width:1.5;stroke-linecap:round;opacity:.55}
+.imc-tick-label{font-family:var(--font-m);font-size:9px;font-weight:600;fill:var(--ink-soft);text-anchor:middle}
 /* Barrido de la aguja al cargar el plan (pintarMiPlan, js/mi-plan.js):
    arranca en el extremo mínimo del arco y anima hasta su posición real
    con este transition — no aparece ya ubicada. Ver

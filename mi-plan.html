@@ -151,7 +151,7 @@
           </div>
           <div class="miplan-card-title">Antropometría</div>
           <div class="imc-gauge hidden" id="miPlanImcGauge" aria-hidden="true">
-            <svg viewBox="0 0 220 140" width="100%">
+            <svg viewBox="-10 -2 240 148" width="100%">
               <!-- Degradado continuo del arco (sesión 2026-09-16): mismos
                    offsets/colores que arma imcGaugeGradientStops en
                    js/nutricion-planes.js (7%/27%/50%/80% ≈ centro de cada
@@ -172,6 +172,26 @@
               <path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>
               <path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>
               <path class="imc-zone imc-zone-vigilar" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>
+              <!-- Marcas y números de escala (15/20/25/30/35/40), sesión
+                   2026-09-18: mismas coordenadas que arma
+                   imcGaugeTicksHtml() en js/nutricion-planes.js (radios
+                   95/103/111 desde el mismo centro 110,115 del arco),
+                   escritas a mano acá por el mismo motivo del degradado
+                   de arriba (HTML estático, sin JS corrido todavía). Si
+                   la escala (IMC_GAUGE_TICKS) o sus radios cambiaran,
+                   actualizar también acá. -->
+              <line class="imc-tick" x1="15" y1="115" x2="7" y2="115"/>
+              <text class="imc-tick-label" x="-1" y="115" dy="0.35em">15</text>
+              <line class="imc-tick" x1="33.14" y1="59.16" x2="26.67" y2="54.46"/>
+              <text class="imc-tick-label" x="20.2" y="49.76" dy="0.35em">20</text>
+              <line class="imc-tick" x1="80.64" y1="24.65" x2="78.17" y2="17.04"/>
+              <text class="imc-tick-label" x="75.7" y="9.43" dy="0.35em">25</text>
+              <line class="imc-tick" x1="139.36" y1="24.65" x2="141.83" y2="17.04"/>
+              <text class="imc-tick-label" x="144.3" y="9.43" dy="0.35em">30</text>
+              <line class="imc-tick" x1="186.86" y1="59.16" x2="193.33" y2="54.46"/>
+              <text class="imc-tick-label" x="199.8" y="49.76" dy="0.35em">35</text>
+              <line class="imc-tick" x1="205" y1="115" x2="213" y2="115"/>
+              <text class="imc-tick-label" x="221" y="115" dy="0.35em">40</text>
               <circle class="imc-gauge-marker" id="miPlanImcMarcador" cx="110" cy="30" r="4"/>
               <line class="imc-aguja" id="miPlanImcAguja" x1="110" y1="115" x2="110" y2="45"/>
               <circle class="imc-pivote" cx="110" cy="115" r="6"/>
