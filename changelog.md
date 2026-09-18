@@ -11,6 +11,42 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Asset listo para collage de redes en `#lam-06` "Conócenos" (integración pendiente)
+
+Sesión enfocada solo en preparar un asset de imagen, no en tocar código de
+la web todavía — el usuario pidió explícitamente dejar el terreno listo
+para que otra sesión haga la integración real.
+
+- El usuario quiere sumar del lado derecho de "Conócenos" un collage tipo
+  "app showcase" (capturas del perfil de SINAPTIX en Instagram, TikTok,
+  Gmail y el dashboard "Mi plan", superpuestas con leve inclinación, estilo
+  landing de SaaS). Se iteró varias rondas de prompts para Gemini
+  (composición de 3 y luego 4 pantallas, ajuste de orden, intento fallido
+  de edición puntual de una imagen ya generada — Gemini no pudo hacer
+  ediciones parciales, hubo que regenerar la escena completa de nuevo cada
+  vez —, y finalmente un fondo sólido morado `#4B2E45` en vez de las
+  decoraciones de fondo, pedido a propósito para poder recortarlo).
+- Con el resultado final del usuario, se hizo el recorte de fondo **en este
+  entorno** (no con Gemini, que no genera transparencia): máscara por
+  distancia de color en Python/Pillow/numpy contra el morado sólido de
+  fondo (umbral suave 14→40 sobre la distancia RGB, sin IA de segmentación
+  — alcanzaba por ser un fondo plano), recorte al bounding box del
+  contenido no transparente, y export a webp lossy calidad 88 (mismo
+  criterio que `hero-cerebro-nutricion.webp`).
+- **Nuevo archivo**: `img/generadas-cutout/collage-redes-miplan.webp`
+  (1162×705, fondo transparente, ~135 KB). Ver `memoria.md` →
+  "Pendientes conocidos" para el detalle completo de qué contiene la
+  imagen, los dos bordes cortados que se aceptaron a propósito (TikTok a
+  la izquierda, ventana de "Mi plan" a la derecha — límite del render de
+  Gemini, no del recorte de fondo), y qué falta decidir para integrarlo
+  (layout de 2 columnas en `#lam-06`, comportamiento responsive/mobile,
+  si lleva animación `float`).
+- De paso, el usuario mencionó que "Facebook pidió que lo eliminemos"
+  (la tarjeta de Facebook en `.social-cards` de esta misma sección) — no
+  se tocó el código en esta sesión por ser un comentario al pasar, no un
+  pedido explícito, pero queda anotado en `memoria.md` para preguntar
+  cuando se retome esta sección.
+
 ## 2026-09-18 — Cierre `#lam-07`: el texto entra en los destellos, bloque ~15% más grande, flecha turquesa más gruesa
 
 2ª pasada sobre la sección de cierre recién creada. Es la primera vez

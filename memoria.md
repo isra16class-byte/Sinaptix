@@ -750,6 +750,56 @@ próximos pasos).
 
 ## Pendientes conocidos
 
+- **Integrar collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18,
+  pendiente para la próxima sesión)**: el usuario quiere agregar del lado
+  derecho de esta sección un collage tipo "app showcase" con capturas del
+  perfil de SINAPTIX en Instagram, TikTok, el correo (Gmail) y el dashboard
+  de "Mi plan", superpuestas con leve inclinación (como los collages de
+  landing de SaaS). El asset ya está listo, generado con Gemini a partir de
+  varias iteraciones de prompt (composición + corrección de encuadre + fondo
+  sólido para poder recortarlo) y con el fondo ya recortado (transparente)
+  por este lado con Python/Pillow (máscara por distancia de color al morado
+  sólido `#4B2E45` que se le pidió de fondo a Gemini, sin IA de segmentación
+  — el fondo era plano así que alcanzó con eso, sin halos visibles en los
+  bordes):
+  - **Archivo**: `img/generadas-cutout/collage-redes-miplan.webp` (1162×705,
+    fondo transparente, ~135 KB, webp lossy calidad 88 — mismo criterio que
+    `hero-cerebro-nutricion.webp`).
+  - **Contenido de la imagen** (fijo, dibujado por la IA, no es HTML/CSS
+    real): teléfono con el perfil de Instagram al frente y centrado
+    (`@SINAPTIX`, bio, grilla de posts), tarjeta de TikTok asomando detrás a
+    la izquierda, bandeja de Gmail (`hola@sinaptix.com`) a la derecha,
+    ventana de navegador con el dashboard "Mi plan" (gauge de IMC, tarjeta
+    "Objetivo cognitivo", gráfico de barras) abajo a la derecha. Texto en
+    inglés/con errores menores en la bio de Instagram (limitación de la IA
+    generando texto) — aceptado así a propósito, es un collage decorativo,
+    no contenido funcional que se lea de cerca.
+  - **Cortes conocidos, aceptados a propósito**: el borde izquierdo de la
+    tarjeta de TikTok y el borde derecho de la ventana de "Mi plan" quedan
+    cortados por el límite de la imagen (no por el recorte de fondo — así
+    salió del render de Gemini, no se pudo corregir con más iteraciones,
+    la IA no respetaba la instrucción de encuadre). El usuario los dio por
+    buenos porque van a quedar parcialmente ocultos/superpuestos con otros
+    elementos de la sección de todas formas. Si en la integración se nota
+    mucho el corte, es candidato a pedir un regenerado o a taparlo con una
+    decoración por encima.
+  - **Falta hacer** (no arrancado): decidir cómo se monta en el layout de
+    `#lam-06` (hoy la sección es un solo `.wrap` centrado, sin columna
+    derecha — hay que armar una grilla de 2 columnas o similar), tamaño y
+    posición responsive (mobile probablemente oculto u ocupando el ancho
+    completo debajo del texto, ≤900px — criterio ya usado en otras
+    decoraciones `deco-fruit` del sitio), si lleva animación `float` como
+    el resto de las decoraciones, y si hace falta ajustar el resto de la
+    sección (hoy tiene varias `deco-fruit` de fondo dispersas que podrían
+    quedar recargadas si se suma este collage al lado).
+  - **Relacionado**: la tarjeta de Facebook en `.social-cards` de esta
+    misma sección sigue en el HTML (ver bloque `<div class="social-cards">`
+    en `index.html`) pero el usuario mencionó en esta sesión que "Facebook
+    pidió que lo eliminemos" — no se tocó el código todavía porque no fue
+    un pedido explícito de esta sesión (solo mencionado de pasada), pero
+    si se retoma esta sección conviene preguntar si hay que sacar esa
+    tarjeta ahora que se está tocando `#lam-06` igual.
+
 - **PDF de "Mi plan" — verificar contra el CDN real y en visores reales**:
   todo se verificó con el bundle de jsPDF servido localmente (cdnjs no es
   alcanzable desde el entorno de trabajo) y mirando el PDF rasterizado con
