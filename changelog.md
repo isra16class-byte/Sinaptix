@@ -11,6 +11,51 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Cierre `#lam-07`: el texto entra en los destellos, bloque ~15% más grande, flecha turquesa más gruesa
+
+2ª pasada sobre la sección de cierre recién creada. Es la primera vez
+que se puede **ver la sección renderizada** (browser disponible), así que
+el usuario fue guiando el resultado a ojo, en pasos: subir el texto,
+bajarlo, agrandarlo, subirlo otra vez, cambiar el color de una línea y
+engrosar la flecha.
+
+- **El bloque de texto sube en conjunto, los destellos no se mueven**
+  (pedido explícito del usuario). Nueva variable local `--closing-lift` en
+  `#lam-07`: `calc(.4 * min(620px,100%) / 1.9185)` = ~40% de la altura
+  del deco, expresado como fracción de su **ancho** porque un `margin-top`
+  en `%` resuelve contra el ancho del contenedor (así también escala solo
+  en mobile). Se aplica como `margin-top` negativo al `.closing-title`,
+  que al ser el primer elemento después de la decoración **arrastra
+  título + botón + flecha + pie** hacia arriba, metiéndolos dentro del
+  racimo de destellos. Se agregó `z-index` (deco `0`, título `1`) para
+  que el texto quede por encima de los destellos. El número se ajustó dos
+  veces a pedido del usuario (`.45` → `.38` → `.32` → `.4`).
+- **Bloque ~15% más grande, uniforme**: `.closing-title-line1`
+  `clamp(46px,6.4vw,76px)`→`clamp(60px,8.3vw,98px)` (con un extra de
+  ~13% aparte, pedido solo para la palabra "Potencia"),
+  `.closing-title-line2` `clamp(52px,7.6vw,92px)`→`clamp(60px,8.7vw,106px)`,
+  flecha `26px`→`30px`, `.closing-sub` `15px`→`17px`. El botón se agranda
+  con un override **local** `.closing-btn`
+  (`font-size:16.5px;padding:17px 35px`) para no tocar el `.btn` global
+  del sitio, que se usa en nav, hero y modales.
+- **Color `#00CEB3`**: verde azulado **muestreado del dominante no-blanco
+  de la imagen de referencia** que mandó el usuario (929×134, muestreo con
+  `System.Drawing`). Se aplica solo a "tu claridad mental y enfoque" y a
+  la flecha, vía la variable local `--closing-teal`. **No se tocó el
+  `--green` global** (`#2E7D5B`), que usan otras secciones.
+- **Flecha más robusta**: `stroke-width` del `<path>` en `index.html` de
+  `2` a `3.25` (~4px efectivos sobre los 30px que ocupa el SVG), en dos
+  pasos a pedido del usuario (`2` → `2.75` → `3.25`).
+
+`npm test`: 75 pass / 1 skipped (el e2e de Playwright, mismo estado que
+antes — el cambio es CSS/HTML de presentación, sin JS). Verificado con
+browser en escritorio 1440px y móvil 390px, sin desborde horizontal; en
+mobile la 2ª línea del título pasa a 3 líneas.
+
+Actualiza memoria.md y changelog.md (el pendiente "sin browser para
+verlo renderizado" de la entrada anterior queda resuelto, ver
+"Pendientes conocidos" en `memoria.md`).
+
 ## 2026-09-18 — Conócenos + Cierre: nueva sección final con CTA al wizard, se saca el formulario de contacto
 
 Segundo intento (el primero fue el panel `.contact-cta`, revertido, ver

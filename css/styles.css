@@ -1566,27 +1566,41 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #lam-07{
   background:linear-gradient(180deg,var(--panel) 0,var(--paper) 140px,var(--paper) 100%);
   text-align:center;
+  /* Cuánto sube el bloque de texto (título + botón + flecha + subtítulo)
+     respecto de su posición natural, para entrar dentro del racimo de
+     destellos. Se mide como fracción del ancho del deco (620px tope) para
+     que escale solo en pantallas chicas. Los destellos NO se mueven:
+     quedan fijos en su sitio. */
+  --closing-lift:calc(.4 * min(620px,100%) / 1.9185);
+  /* Verde azulado de la referencia del usuario (muestreado de la imagen:
+     #00CEB3). Solo para la 2ª línea del título y la flecha del cierre. */
+  --closing-teal:#00CEB3;
 }
-.closing-deco{position:relative;max-width:620px;margin:0 auto 4px}
+.closing-deco{position:relative;z-index:0;max-width:620px;margin:0 auto 4px}
 .closing-sparks{display:block;width:100%;height:auto}
 .closing-title{
+  position:relative;z-index:1;
   font-family:var(--font-hand);
   font-weight:700;
   line-height:1.05;
-  margin:0 auto 34px;
+  margin:calc(-1 * var(--closing-lift)) auto 34px;
 }
-.closing-title-line1{display:block;font-size:clamp(46px,6.4vw,76px);color:var(--ink)}
-.closing-title-line2{display:block;margin-top:2px;font-size:clamp(52px,7.6vw,92px);color:var(--green)}
+.closing-title-line1{display:block;font-size:clamp(60px,8.3vw,98px);color:var(--ink)}
+.closing-title-line2{display:block;margin-top:2px;font-size:clamp(60px,8.7vw,106px);color:var(--closing-teal)}
+/* El bloque de cierre (título, botón, flecha y pie) se agranda ~15% en
+   conjunto respecto de los valores base del sitio; el botón se sobreescribe
+   acá para no tocar `.btn` global. */
+.closing-btn{font-size:16.5px;padding:17px 35px}
 .closing-arrow{
-  display:block;margin:22px auto 0;width:26px;height:26px;color:var(--green);
+  display:block;margin:22px auto 0;width:30px;height:30px;color:var(--closing-teal);
   animation:closing-arrow-bounce 1.8s ease-in-out infinite;
 }
 @keyframes closing-arrow-bounce{
   0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-6px)}
+  50%{transform:translateY(-7px)}
 }
 @media(prefers-reduced-motion:reduce){.closing-arrow{animation:none}}
-.closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:15px}
+.closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:17px}
 #lam-07 footer{text-align:left}
 
 footer{

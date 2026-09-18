@@ -681,33 +681,62 @@ próximos pasos).
   `section.dark`, fondo `--paper` blanco — funde el borde de arriba
   igual que `#lam-03`/`#lam-05`, mismo criterio aunque acá el salto de
   color panel→paper es sutil), todo centrado (`#lam-07{text-align:center}`):
-  - `.closing-deco` (`max-width:620px`, `position:relative`): la imagen
-    `svg/deco-sparkle-burst.svg` (destellos dorados + 2 corazones,
-    calcado por visión por computadora de la imagen de referencia del
-    usuario — contornos reales, no dibujado a mano, ver
+  - `.closing-deco` (`max-width:620px`, `position:relative;z-index:0`):
+    la imagen `svg/deco-sparkle-burst.svg` (destellos dorados + 2
+    corazones, calcado por visión por computadora de la imagen de
+    referencia del usuario — contornos reales, no dibujado a mano, ver
     `historico`/conversación de chat si hace falta el detalle del
     proceso) más 2 `.brain-spark` sueltos encima para el brillo animado
-    que ya usa el resto del sitio.
+    que ya usa el resto del sitio. **Los destellos quedan fijos en su
+    sitio** (pedido explícito del usuario): lo que se mueve es el texto,
+    ver `--closing-lift` abajo.
+  - **`--closing-lift` (2ª pasada, 2026-09-18)**: variable local de
+    `#lam-07`, `calc(.4 * min(620px,100%) / 1.9185)` = ~40% de la altura
+    del deco (el `1.9185` es su aspect ratio, 1412/736; va como fracción
+    del **ancho** del deco porque un `margin-top` en `%` resuelve contra
+    el ancho del contenedor, no el alto — así escala solo en mobile).
+    Se aplica como `margin-top` negativo al `.closing-title`
+    (`.closing-title{position:relative;z-index:1;margin:calc(-1 *
+    var(--closing-lift)) auto 34px}`): como es el primer elemento después
+    del deco, **arrastra todo el bloque** (título + botón + flecha +
+    pie) hacia arriba en conjunto, hasta meterlo dentro del racimo de
+    destellos. El `z-index` (deco `0`, título `1`) es para que el texto
+    quede por encima de los destellos. Subir/bajar ese número mueve el
+    bloque entero.
   - `.closing-title`: dos líneas en `--font-hand` (Caveat) — "Potencia"
-    en `--ink` (`.closing-title-line1`, `clamp(46px,6.4vw,76px)`) y "tu
-    claridad mental y enfoque" en `--green` (`.closing-title-line2`,
-    más grande, `clamp(52px,7.6vw,92px)`), cada una su propio `<span
-    class="closing-title-lineN">` en bloque (no hay `.title-mark` acá,
-    el color va directo en el span).
+    en `--ink` (`.closing-title-line1`, `clamp(60px,8.3vw,98px)`) y "tu
+    claridad mental y enfoque" en `--closing-teal`
+    (`.closing-title-line2`, más grande, `clamp(60px,8.7vw,106px)`),
+    cada una su propio `<span class="closing-title-lineN">` en bloque
+    (no hay `.title-mark` acá, el color va directo en el span). Ambas
+    líneas se agrandaron ~15% respecto de los valores originales, y
+    "Potencia" otro ~13% extra (el usuario pidió más presencia para esa
+    palabra). En desktop la 2ª línea entra en 1 sola línea (1010px de
+    1100 disponibles); en mobile pasa a 3 líneas, sin desborde.
+  - `--closing-teal:#00CEB3`: verde azulado **muestreado del dominante
+    no-blanco de la imagen de referencia** que mandó el usuario. Variable
+    local de `#lam-07` para **no tocar el `--green` global** (`#2E7D5B`),
+    que usan otras secciones. Solo lo llevan la 2ª línea del título y la
+    flecha.
   - Botón `.btn.btn-solid` "Descubrir mi plan personalizado"
     (`#btnNutricionCierre`) — **mismo listener que `#btnNutricion`**
     (`resetNutriWizard()` + `openModal('modalNutricion')`) pero id
     propio porque un id no puede repetirse en el documento; se agregó
     un segundo `addEventListener` en `js/script.js`, no se reusó ningún
-    selector de clase compartido.
+    selector de clase compartido. Lleva además `.closing-btn`
+    (`font-size:16.5px;padding:17px 35px`), un override **local** para
+    agrandarlo ~15% sin tocar el `.btn` global del sitio.
   - `.closing-arrow` (flecha SVG simple apuntando arriba, `color:
-    var(--green)`) con una animación propia de rebote suave
-    (`closing-arrow-bounce`, 1.8s, respeta
+    var(--closing-teal)`, `30px` de lado, y el `stroke-width` del
+    `<path>` en `index.html` subido de `2` a `3.25` a pedido del usuario
+    — ~4px efectivos, se ve "robusta") con una animación propia de rebote
+    suave (`closing-arrow-bounce`, 1.8s, recorrido de 7px, respeta
     `prefers-reduced-motion`) — no reutiliza `@keyframes float` del
     sitio (ese tiene un recorrido más grande, pensado para elementos
     flotantes grandes).
   - `.closing-sub`: texto chico "Diseñamos tu plan de neuroalimentación
-    en menos de 3 minutos." debajo de la flecha.
+    en menos de 3 minutos." debajo de la flecha (`17px`, agrandado ~15%
+    junto con el resto del bloque).
   - El `<footer>` (antes al final de `#lam-06`) se movió acá — ahora es
     el cierre real del `<body>`. `#lam-07 footer{text-align:left}`
     para que no herede el `text-align:center` de la sección (el footer
@@ -766,18 +795,17 @@ próximos pasos).
 - **Verificación visual real pendiente** (implementado y revisado a
   mano/con Playwright local, pero no confirmado en un navegador real
   sobre el deploy) en varios frentes:
-  - **`#lam-07` (Cierre, sesión 2026-09-18)**: no hay browser en este
-    entorno, todo se armó a partir de la imagen de referencia del
-    usuario sin poder verlo renderizado. Falta confirmar sobre todo: (a)
-    que las 2 líneas de `.closing-title` ("Potencia" / "tu claridad
-    mental y enfoque") no se vean desproporcionadas entre sí ni se
-    corten en mobile, (b) que `svg/deco-sparkle-burst.svg` (calcado por
-    visión por computadora) se vea bien a `max-width:620px` — no se
-    ajustó nada a mano después de generarlo, (c) que el salto de color
-    `--panel`→`--paper` entre `#lam-06` y `#lam-07` sea tan sutil como
-    se asume (ambos son casi blancos) y no haga falta un fundido más
-    marcado, y (d) que `#formContacto` no dejara nada roto al sacarlo
-    (revisado el markup y el JS a mano, pero no visualmente).
+  - **`#lam-07` (Cierre)**: ✅ **verificado visualmente** en la 2ª pasada
+    del 2026-09-18, ya con browser disponible (escritorio 1440px +
+    móvil 390px, sin desborde horizontal). Confirmado: que el deco se ve
+    bien a `max-width:620px`, que el texto entra en el racimo con
+    `--closing-lift`, que las 2 líneas del título no se ven
+    desproporcionadas, y que el salto `--panel`→`--paper` contra
+    `#lam-06` es sutil y no necesita un fundido más marcado. Falta solo
+    verlo sobre un deploy real (hasta ahora, todo local).
+  - `#formContacto` sacado de `#lam-06` (sesión 2026-09-18): revisado el
+    markup y el JS a mano, pero **no visualmente** — confirmar que no
+    dejó nada roto.
   - Íconos de Visión ya revertidos a tamaño original — confirmar que no
     tapan el texto de "4–6"/"1:1" (ver bullet de arriba).
   - Animación de llenado + marcador de "antes" de los anillos de Método,
