@@ -228,6 +228,28 @@ próximos pasos).
   `<img class="deco deco-scribble">` suelto cerca del título (los otros 6
   que estaban dispersos se sacaron a pedido del usuario), más
   `.title-scribble` y `.title-mark` — 3 trazos totales pegados al título.
+  **Frutas/alimentos grandes difuminados de fondo (sesión 2026-09-17)**:
+  antes la sección solo tenía 1 `.deco-fruit` (aguacate). Ahora tiene 6,
+  todas `.deco-fruit` (ocultas en mobile `<720px` por la regla general,
+  con la animación float de siempre):
+  - 4 en las esquinas del `<section>`, grandes (150–230px) y con
+    opacidad baja (.4–.5) para leerse como fondo difuminado, no como
+    protagonistas: aguacate (`svg/deco-blob-avocado.svg`, arriba-izq.),
+    granada (`img/generadas-cutout/granada.webp`, arriba-der.), huevo
+    (`img/generadas-cutout/huevo.webp`, abajo-izq.) y té
+    (`img/generadas-cutout/te.webp`, abajo-der.) — mismo criterio visual
+    que ya usan Beneficios/Contacto.
+  - 2 más chicas y más opacas (.6–.9, se leen más nítidas, no son
+    "fondo") forman un cluster junto a la granada, a la derecha del
+    título, a pedido explícito del usuario con una imagen de referencia:
+    una hoja fina (`svg/deco-leaf-beneficios.svg`) y una naranja
+    (`svg/deco-blob-orange.svg` — este asset ya traía su propio halo/blob
+    suave detrás del gajo, es el mismo efecto de "círculo detrás de la
+    fruta" que pedía la referencia, no se agregó CSS nuevo para eso).
+    No hay asset de hoja rellena tipo perejil en el repo (la única hoja
+    disponible es este trazo fino en un solo color) — si el usuario pide
+    que se note más, es de las primeras cosas a ajustar (agrandar/subir
+    opacidad, o cambiarla por otra fruta chica ya usada en Método).
 - **Método (`#lam-03`)**: paleta estándar del sitio (no crema/café). 3
   `deco-fruit` chicas de fruta real. 2 neuronas laterales decorativas
   (`neurona-izquierda/derecha.webp`) son una ilustración completa (no
