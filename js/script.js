@@ -694,6 +694,36 @@
       '</ul>';
   }
 
+  // Medidor de IMC dentro del dashboard de "Mi plan" del collage propio de
+  // #lam-06 "Conócenos" (sesión 2026-09-18, ver css/styles.css → .collage).
+  // Es una tarjeta de ejemplo (prueba social ilustrativa), no el IMC de la
+  // persona: usa un valor fijo con las mismas funciones/clases que Método y
+  // "Mi plan" para no duplicar la lógica del degradado/aguja. Sin marcas
+  // numeradas (15/20/…/40, no se leerían a este tamaño) ni animación de
+  // barrido (se pinta directo en la posición final, como en Método).
+  function renderConocenosImcGauge(){
+    const host = document.getElementById('conocenosImcGauge');
+    if(!host || typeof imcGaugeAgujaDeg !== 'function') return;
+    const imc = 24.5;
+    const deg = imcGaugeAgujaDeg(imc);
+    const marcador = imcGaugeMarkerPos(imc);
+    const info = imcCategoria(imc);
+    host.innerHTML =
+      '<svg viewBox="8 16 204 109">'+
+        imcGaugeGradientDefsHtml()+
+        (typeof imcGaugeTrackHtml === 'function' ? imcGaugeTrackHtml() : '')+
+        '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
+        '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
+        '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
+        '<path class="imc-zone imc-zone-obesidad" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+        '<circle class="imc-gauge-marker-glow imc-gauge-marker-glow-'+info.zona+'" cx="'+marcador.x+'" cy="'+marcador.y+'" r="10"/>'+
+        '<circle class="imc-gauge-marker" cx="'+marcador.x+'" cy="'+marcador.y+'" r="4"/>'+
+        '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
+        '<circle class="imc-pivote-outer" cx="110" cy="115" r="8.5"/>'+
+        '<circle class="imc-pivote" cx="110" cy="115" r="4.5"/>'+
+      '</svg>';
+  }
+
   function setGaugesView(view){
     const progresoEl = document.getElementById('methodGaugesProgreso');
     const imcEl = document.getElementById('methodGaugesImc');
@@ -788,6 +818,7 @@
 
   renderMethodGauges();
   renderMethodImc();
+  renderConocenosImcGauge();
   setGaugesView('progreso'); // arranca siempre en "Mi progreso", nunca en "Mi IMC"
 
   // Reveal on scroll

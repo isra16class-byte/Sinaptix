@@ -751,75 +751,85 @@ próximos pasos).
     tiene que llevar al wizard, no a la info de contacto pasivo. El link
     "Contacto" del nav (`#lam-06`) no se tocó: sigue siendo correcto,
     ahí vive el email/redes.
-- **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18)**: nueva
-  columna derecha con una sola imagen decorativa/de prueba social,
-  `img/generadas-cutout/collage-redes-miplan.webp` — un mockup tipo "app
-  showcase" (generado con Gemini en varias iteraciones de prompt y
-  recortado con Python/Pillow en este entorno, sin IA de segmentación:
-  máscara por distancia de color contra el fondo sólido morado que se le
-  pidió a Gemini) que muestra capturas fijas (dibujadas por la IA, no HTML
-  real) del perfil de SINAPTIX en Instagram, TikTok, Gmail y el dashboard
-  de "Mi plan", superpuestas con leve inclinación.
+- **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18, integrado
+  en HTML/CSS propio)**: nueva columna derecha con una composición tipo
+  "app showcase" — perfil de TikTok, teléfono con Instagram, correo y
+  dashboard de "Mi plan", superpuestos con leve inclinación — armada 100%
+  con HTML/CSS/SVG y assets reales del sitio (texto seleccionable, sin
+  pixelado). **Reemplaza** a la versión anterior (imagen `.webp` generada
+  por IA, que traía texto deformado y bordes sucios de recorte — el
+  archivo se borró del repo, ya no lo usa nada). Portado 1:1 desde
+  `docs/mockup-collage-redes.html` (esa maqueta sigue en el repo como
+  referencia/banco de pruebas para futuros ajustes, no se carga desde
+  ninguna página del sitio).
   - `.contact-info` (columna de texto/redes que ya existía) y la nueva
-    `.conocenos-collage` ahora viven dentro de `.conocenos-grid`
+    `.conocenos-collage` viven dentro de `.conocenos-grid`
     (`grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)`, colapsa a 1
-    columna en `≤900px` — mismo breakpoint que `.hero-grid`/`.ben-grid`).
-    **Tamaño y posición (2026-09-18, ajuste fino)**: **~970px** de ancho
-    en desktop a 1567px (alto ~588px); ~826px a 1280px, ~906px a 1440px,
-    ~976px a 1920px (tope del sangrado). Antes de esta sesión era ~756px
-    en desktop (y ~480px antes del primer agrandado). El collage sangra a
-    la derecha fuera del padding de `.wrap` con
-    `margin-right:calc(-1 * var(--collage-bleed))`
-    (`--collage-bleed` = `clamp(0px,calc((100vw - 1180px)/2 + 140px),340px)`,
-    se define en `.conocenos-grid`; offset base `+140px`, tope `340px`);
-    se hace con margen negativo y no con `transform:scale` porque `float`
-    ya usa `transform`. Además `.conocenos-collage` lleva **`left:20px`**
-    (en `≤900px` se anula con `left:0`). **Ojo: no posicionar con
-    `transform`** — el wrapper lleva `.reveal` y
-    `.reveal.in{transform:translateY(0)}` tiene más especificidad, así que
-    un `translateX()` ahí se pierde al terminar la animación de entrada
-    (detalle en `changelog.md`, 2026-09-18 "collage reposicionado y
-    reescalado"). Con el sangrado + `left:20px` el collage **se sale
-    ~88px por la derecha a 1567px**: es una decisión de diseño aceptada
-    explícitamente por el usuario, no un bug pendiente. Si se vuelve a
-    agrandar, chequear `window.scrollX` (no solo `scrollWidth`). A diferencia de los
-    `.deco-fruit` de esta sección (decoración pura, `display:none` en
-    `≤720px`), esta imagen **sí se muestra en mobile** (tiene valor de
-    contenido, no es solo decoración): en `≤900px` se centra con
-    `max-width:560px` debajo del resto del contenido en vez de
-    ocultarse.
-  - `.conocenos-collage-img` lleva `animation:float` (la misma
-    `@keyframes float` del Hero/Pilares) + `drop-shadow`, respeta
-    `prefers-reduced-motion`. `width="1162" height="705"` fijos en el
-    `<img>` para reservar el espacio y evitar salto de layout mientras
-    carga (`loading="lazy"`, no es LCP — está debajo del fold). `alt=""`
-    + contenedor `aria-hidden="true"`: es decorativa/ilustrativa, el
-    contacto real y accesible ya está en `.social-cards` al lado.
-  - **✅ Verificado visualmente** en este entorno con Playwright/Chromium
-    a 1440px y 390px (ver nota de entorno al inicio de "Pendientes
-    conocidos"): en ambos anchos el collage no queda tapado por ni tapa
-    a las `deco-fruit` de fondo de la sección (granada, kiwi, salmón,
-    etc. quedan lo bastante lejos), no hay overflow horizontal, y en
-    mobile queda bien centrado debajo de las tarjetas de redes sin
-    chocar con el nav fijo. Falta la confirmación de siempre sobre un
-    deploy real (ver "Pendientes conocidos").
-  - **Alternativa en HTML/CSS (maqueta, sesión 2026-09-18, NO integrada)**:
-    `docs/mockup-collage-redes.html`. Motivo: el `.webp` de IA trae texto
-    deformado, caras pintadas y bordes sucios del recorte, y se nota más
-    al agrandarlo. La maqueta arma las mismas 4 piezas (TikTok, teléfono
-    con Instagram, correo, dashboard de "Mi plan") con texto y vectores
-    reales. Se escala con `container-type:inline-size` + `--u` =
-    `calc(100cqw/1000)`: cambiar el ancho de `.collage` reescala todo. El
-    medidor de IMC usa las funciones reales de `js/nutricion-planes.js`.
-    ⚠️ Los números (seguidores, vistas, correos, IMC, barras) son de
-    ejemplo y hay que poner reales o quitarlos. ⚠️ `.imc-gauge` trae
-    `max-width:220px` y `margin-bottom:-8px` en px reales: se neutralizan
-    en `.mk-mini` para que no rompan el escalado. **Falta que el usuario
-    la vea y decida**; si aprueba, integrar reemplazando el `<img
-    class="conocenos-collage-img">` por ese markup (prefijo `mk-` a
-    `css/styles.css`, quitar los botones de tamaño y `float`/`drop-shadow`
-    del `<img>` viejo se puede llevar al contenedor) y borrar el `.webp`
-    si ya nada lo usa. Detalle en `changelog.md`.
+    columna en `≤900px`). Tamaño/posición del wrapper (sangrado a la
+    derecha con `--collage-bleed`, `left:20px` en desktop, `left:0` +
+    `max-width:560px` centrado en `≤900px`) **sin cambios** respecto a la
+    versión anterior — ver `css/styles.css` para el detalle de esas
+    reglas, no repetido acá.
+  - **`.collage`** (antes `.conocenos-collage-img`): `container-type:
+    inline-size`, `width:100%`, `aspect-ratio:1162/705`, con la animación
+    `float` (la misma `@keyframes float` del Hero/Pilares) +
+    `prefers-reduced-motion`. Adentro, `.stage` define `--u:calc(100cqw/
+    1000)` y **todas** las medidas de las piezas (`.mk-*`) salen de esa
+    unidad — cambiar el ancho del wrapper reescala todo (texto incluido),
+    sin media queries adicionales.
+    ⚠️ **Ojo con `width` fijo en `.collage`**: en la maqueta original tenía
+    `width:970px;max-width:100%` (pensado para verse bien "suelto"). Puesto
+    dentro de `.conocenos-collage` (grid item con `margin:auto`/sizing
+    automático), ese `width:970px` fijo se filtraba al cálculo de tamaño
+    intrínseco (`max-content`) de los contenedores padre — los navegadores
+    ignoran `max-width` en porcentaje durante ese cálculo — y terminaba
+    **desbordando el layout ~190px en mobile** aunque visualmente pareciera
+    contenido. Se resolvió sacando el `width:970px` y dejando `width:100%`
+    a secas (el propio `.conocenos-collage` ya define el ancho máximo real).
+    Si se vuelve a copiar código desde `docs/mockup-collage-redes.html`
+    (que sigue con `width:970px;max-width:100%`, ahí no da problema porque
+    no vive dentro de un contenedor con sizing automático), **no copiar
+    esa línea tal cual** a `styles.css`.
+  - El dashboard de "Mi plan" dentro del collage (`.mk-dash`) dibuja su
+    propio medidor de IMC de ejemplo con **las mismas funciones y clases**
+    que Método/"Mi plan" (`imcGaugeAgujaDeg`, `imcGaugeMarkerPos`,
+    `imcCategoria`, `imcGaugeGradientDefsHtml`, clases `.imc-*`) — función
+    `renderConocenosImcGauge()` en `js/script.js` (llamada junto con
+    `renderMethodGauges()`/`renderMethodImc()` al cargar), host
+    `#conocenosImcGauge`. Valor fijo (IMC 24,5, "Saludable"), sin marcas
+    numeradas ni animación de barrido — mismo criterio que el medidor
+    chico de la maqueta original.
+  - ⚠️ **Datos de ejemplo sin reemplazar**: seguidores/publicaciones/"me
+    gusta" de TikTok e Instagram, remitentes/asuntos del correo, y el IMC/
+    objetivo/barras del dashboard son todos inventados (idénticos a los de
+    `docs/mockup-collage-redes.html`). Mostrar métricas de redes falsas en
+    el sitio real puede jugar en contra — reemplazar por datos reales o
+    quitar los números antes de un deploy a producción. Pendiente, no
+    resuelto en esta sesión (el usuario aprobó el diseño, no dio números
+    reales todavía).
+  - ⚠️ **Legibilidad del texto en mobile**: medido en este entorno con
+    Playwright a 390px de viewport (ancho real del collage ≈346px, dentro
+    de `.conocenos-grid`), el texto queda entre **~3.5px y ~5px** de
+    tamaño de fuente real (ej. `.mk-ig-bio` ~3.8px, `.mk-mail-row .sub`
+    ~3.5px) — nítido (es vectorial) pero prácticamente ilegible a simple
+    vista en un teléfono real. El wrapper ya es `aria-hidden="true"` (es
+    "prueba social" visual, no contenido que deba leerse letra por letra —
+    incluye el mismo criterio que ya usaba la imagen de IA, que tampoco
+    era legible a ese tamaño) y una sesión anterior ya había decidido que
+    este bloque se achica en vez de ocultarse en mobile (no es decoración
+    pura como los `.deco-fruit` de alrededor). Se deja así a propósito,
+    pero si en algún momento se pide que se lea mejor en mobile, las
+    opciones son: (a) subir el `max-width` mínimo del wrapper en `≤900px`
+    a costa de permitir que sobresalga un poco del grid, o (b) mostrar
+    menos piezas en mobile (ej. solo el teléfono) para poder agrandarlas.
+  - **✅ Verificado visualmente** en este entorno con Playwright/Chromium a
+    1440px y 390px (mismo browser cacheado que otras verificaciones de esta
+    fecha, ver nota de entorno más abajo): a 1440px se ve idéntico en
+    composición/posición a la versión con imagen; a 390px **no hay overflow
+    horizontal** (`scrollWidth === clientWidth`, corregido el bug de
+    `width:970px` de arriba) y las `deco-fruit` de fondo no chocan con el
+    collage. Falta la confirmación de siempre sobre un deploy real (ver
+    "Pendientes conocidos").
 
 ## Pendientes conocidos
 

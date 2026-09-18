@@ -11,6 +11,64 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Collage de redes de #lam-06 integrado en HTML/CSS (reemplaza la imagen de IA)
+
+El usuario vio la maqueta (`docs/mockup-collage-redes.html`, entrada
+anterior de este changelog) y confirmó que le gustaba. Se integró
+reemplazando por completo la imagen generada por IA que estaba en
+`#lam-06` "Conócenos".
+
+- **`index.html`**: el `<img class="conocenos-collage-img"
+  src="img/generadas-cutout/collage-redes-miplan.webp">` de
+  `.conocenos-collage` se reemplazó por el markup completo de las 4
+  piezas (TikTok, teléfono con Instagram, correo, dashboard de "Mi
+  plan"), portado de la maqueta con las rutas de imagen ajustadas
+  (`img/...` en vez de `../img/...`, ya que ahora vive en la raíz del
+  sitio y no en `docs/`).
+- **`css/styles.css`**: se agregó el bloque `.collage`/`.stage`/`.mk-*`
+  (portado de la maqueta) inmediatamente después de las reglas de
+  `.conocenos-collage`, en reemplazo de la regla `.conocenos-collage-img`
+  (borrada — ya no hay `<img>` único, la animación `float` pasó al
+  wrapper `.collage`). El tamaño/posición del wrapper `.conocenos-collage`
+  (sangrado, `left`, breakpoint `≤900px`) no se tocó.
+- **`js/script.js`**: nueva función `renderConocenosImcGauge()` (llamada
+  junto con `renderMethodGauges()`/`renderMethodImc()`), dibuja el
+  medidor de IMC de ejemplo del dashboard (`#conocenosImcGauge`, IMC fijo
+  24,5) con las mismas funciones de `js/nutricion-planes.js` que ya usan
+  Método y "Mi plan" — sin marcas numeradas ni animación de barrido.
+- **Bug encontrado y corregido durante la verificación**: `.collage`
+  tenía `width:970px;max-width:100%` (igual que en la maqueta suelta).
+  Puesto dentro de `.conocenos-collage` (grid item con sizing
+  automático), ese `width` fijo se filtraba al cálculo de tamaño
+  intrínseco (`max-content`) de los contenedores padre — los navegadores
+  ignoran el `max-width` en porcentaje durante ese cálculo — y producía
+  overflow horizontal real en mobile (~190px, `scrollWidth` 582 vs
+  `clientWidth` 390 a 390px de viewport), aunque las capturas a simple
+  vista no lo dejaban tan claro (el contenido se veía "dentro" pero el
+  layout de la página sí se corría). Se corrigió sacando el `width:970px`
+  y dejando `width:100%` a secas. Detalle y advertencia para no repetir
+  el error en `memoria.md`.
+- **Archivo borrado**: `img/generadas-cutout/collage-redes-miplan.webp`
+  (la imagen de IA, sin más usos en el repo tras este cambio).
+- **Verificado con Playwright** en este entorno (Chromium disponible
+  esta sesión) a 1440px y 390px: sin overflow horizontal
+  (`document.documentElement.scrollWidth === clientWidth` en mobile tras
+  el fix), sin imágenes rotas (los únicos 404 son scripts externos —
+  Netlify Identity, Google Fonts — que ya fallan siempre en este entorno
+  sin red), composición visualmente idéntica a la maqueta aprobada.
+  `npm test` sigue en 75/76 (1 skip esperado, ver `memoria.md` → Tests).
+- ⚠️ **Pendiente, no resuelto en esta sesión** (quedó en `memoria.md` →
+  "Pendientes conocidos"): (a) los datos del collage (seguidores,
+  correos, IMC, barras) siguen siendo los mismos de ejemplo de la
+  maqueta — hay que poner reales o sacarlos antes de un deploy a
+  producción; (b) a 390px de viewport el texto del collage renderiza a
+  ~3.5–5px de fuente real (nítido pero prácticamente ilegible a simple
+  vista) — se dejó así a propósito (mismo criterio que la imagen de IA
+  que reemplaza, que tampoco se leía a ese tamaño, y una sesión anterior
+  ya había decidido que este bloque se achica en vez de ocultarse en
+  mobile), pero queda flagueado por si se pide mejorarlo; (c) falta la
+  confirmación de siempre sobre un deploy real de Netlify.
+
 ## 2026-09-18 — Maqueta del collage de redes en HTML/CSS (aparte, NO integrada)
 
 El usuario preguntó por qué el collage de `#lam-06` se veía con "esos
