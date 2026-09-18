@@ -11,6 +11,16 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Frutas chicas de Beneficios más grandes (quedaron muy chicas)
+
+- El usuario mandó captura del resultado del patch anterior (arándanos/
+  kiwi/almendras) señalando que quedaron muy pequeñas.
+- Se agrandaron los 3 (`index.html`, dentro de `.ben-quotes`): arándanos
+  48px→88px, kiwi 42px→78px, almendras 52px→92px. Se ajustó también el
+  offset negativo (`top`/`right`/`bottom`/`left`) proporcional al nuevo
+  tamaño para que sigan asomando por el borde de la tarjeta en la misma
+  proporción, no solo más grandes en el mismo punto.
+
 ## 2026-09-18 — Tarjetas de testimonios de Beneficios con efecto "vidrio esmerilado"
 
 - El usuario mandó una captura de referencia de otro sitio con las
