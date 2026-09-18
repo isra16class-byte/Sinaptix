@@ -11,6 +11,30 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Bajar cluster granada/hoja/naranja de Pilares + quitar regla de "esperar confirmación visual" de la memoria
+
+- El usuario mandó una captura del sitio con un círculo y 2 flechas
+  dibujadas a mano sobre la granada/hoja/naranja de `#lam-04` (Pilares),
+  pidiendo bajar el trío en conjunto (sin perder la separación entre
+  ellas) hasta más o menos donde apunta la flecha más larga.
+- Medí en píxeles la captura (1912×932, círculo y flechas detectados por
+  color rojo puro con PIL/numpy) para estimar el desplazamiento: la
+  flecha corta que sale de la hoja mide ~350px del inicio a la punta.
+  Apliqué ese mismo delta (+350) al `top` de los 3 elementos en
+  `index.html`, `#lam-04`:
+  - granada: `top:10px` → `top:360px`
+  - hoja: `top:225px` → `top:575px`
+  - naranja: `top:315px` → `top:665px`
+  Los gaps entre los 3 quedan iguales que antes (granada→hoja 35px,
+  hoja→naranja 10px), solo se corrió el conjunto hacia abajo.
+- **No hay navegador real en este entorno** para confirmar el resultado
+  final — la posición nueva es una estimación a partir de medir la
+  captura, no una verificación visual. Si no coincide con lo esperado,
+  el ajuste va en esas mismas 3 líneas.
+- A pedido del usuario, se quitó de `memoria.md` (sección "Pendientes
+  conocidos") el párrafo final que pedía mostrar captura y esperar
+  confirmación explícita antes de cerrar cualquier sesión visual.
+
 ## 2026-09-18 — Íconos de redes con color de marca, tarjetas de Pilares más compactas, fundido entre Pilares y Beneficios
 
 Pedido puntual del usuario a partir de una captura del sitio en vivo:

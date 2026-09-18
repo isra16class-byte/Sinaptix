@@ -523,11 +523,10 @@ próximos pasos).
   títulos con `display:flex`); doble anillo concéntrico en los gauges de
   Método; sidebar en el dashboard de "Mi plan"; `overflow-x`/`overflow-y`
   en el elemento `html`.
-
-**Importante para quien retome cualquier cambio visual: mostrar una
-captura al usuario y esperar confirmación explícita antes de dar la
-sesión por buena.** Ya pasó más de una vez que un cambio (colores de
-íconos, fondo pastel, tamaño de íconos de Visión) se implementó sin
-poder verse en un navegador real y terminó siendo revertido o corregido
-en la sesión siguiente porque no convenció o rompía algo — no repetir
-ese patrón.
+- **Cluster granada/hoja/naranja de Pilares (sesión 2026-09-18)**: bajado
+  ~350px en conjunto (mismo delta en `top` para los 3, gaps entre ellos
+  intactos) a pedido del usuario con una captura anotada (círculo +
+  flechas). Posición nueva estimada **midiendo píxeles de la captura**
+  (no hay navegador real en este entorno) — si al verlo en el sitio no
+  quedó donde se esperaba, es el primer lugar para ajustar (`top` de las
+  3 líneas en `#lam-04` en `index.html`, justo debajo del aguacate).
