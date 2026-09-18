@@ -1364,17 +1364,38 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:64px}
 @media(max-width:900px){.pillar-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.pillar-grid{grid-template-columns:1fr}}
+/* Tarjetas más compactas (antes min-height:250px + padding 34px dejaban
+   mucho aire suelto abajo, se leían "vacías"): se baja el min-height, se
+   ajusta el padding y el ícono ahora vive dentro de un círculo con tinte
+   (--panel-2) en vez de flotar solo sobre el blanco, para que la tarjeta
+   tenga algo de color arriba y no dependa solo del texto para no verse
+   en blanco. */
 .pillar{
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  padding:34px 26px;min-height:250px;display:flex;flex-direction:column;gap:16px;
+  padding:28px 26px;min-height:198px;display:flex;flex-direction:column;gap:14px;
   transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease;
 }
 .pillar:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent}
-.pillar-icon-img{width:56px;height:56px;object-fit:contain}
+.pillar-icon-circle{
+  width:60px;height:60px;border-radius:50%;background:var(--panel-2);
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.pillar-icon-img{width:32px;height:32px;object-fit:contain}
 .pillar h3{font-size:18px;font-weight:700}
 .pillar p{font-size:14.5px;color:var(--ink-soft)}
 
 /* ---------- 05 BENEFICIOS ---------- */
+/* La sección hereda background:var(--panel) de `section.dark`, que contra
+   el blanco (--paper) de Pilares (#lam-04) justo arriba cortaba en seco y
+   se veía como una raya fea en el cambio de color. Mismo criterio que ya
+   se usó en #lam-03: se pisa "background" (más específico por ID) con un
+   gradiente que arranca en --paper y funde a --panel en los primeros
+   ~180px. No hace falta fundir de nuevo al final: el vecino de abajo
+   (#lam-06, Contacto) es `section.dark` también, mismo --panel, así que
+   ahí no hay corte que disimular. */
+#lam-05{
+  background:linear-gradient(180deg,var(--paper) 0,var(--panel) 180px,var(--panel) 100%);
+}
 .ben-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px}
 @media(max-width:900px){.ben-grid{grid-template-columns:1fr;gap:48px}}
 .ben-list{list-style:none;display:flex;flex-direction:column;gap:18px}
@@ -1447,6 +1468,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   display:flex;align-items:center;justify-content:center;
 }
 .social-card-icon svg{width:17px;height:17px}
+/* Color de marca por red (antes las 4 usaban currentColor con el mismo
+   --purple del sitio, se pidió que cada ícono lleve su color real).
+   Teléfono no es una red social: se deja con el morado de marca de
+   siempre, no tiene "color oficial" que aplicar. */
+.social-card-icon--instagram{
+  background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);color:#fff;
+}
+.social-card-icon--facebook{background:#1877F2;color:#fff}
+.social-card-icon--tiktok{background:#010101;color:#fff}
 .social-card-name{font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--ink)}
 .social-card-handle{font-size:13px;color:var(--panel-text)}
 .social-card:hover .arrow{transform:translateX(4px);display:inline-block}

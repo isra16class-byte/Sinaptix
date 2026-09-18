@@ -256,6 +256,18 @@ próximos pasos).
     disponible es este trazo fino en un solo color) — si el usuario pide
     que se note más, es de las primeras cosas a ajustar (agrandar/subir
     opacidad, o cambiarla por otra fruta chica ya usada en Método).
+  - **Tarjetas `.pillar`** (las 4 de "Cuatro frentes de trabajo"):
+    compactas (`min-height:198px`, padding `28px 26px`, gap `14px` — antes
+    250px/34px/16px, se veían muy vacías). Cada ícono va dentro de
+    `.pillar-icon-circle` (60px, fondo `--panel-2`) con el ícono a 32px
+    adentro, en vez de flotar solo (56px) sobre el blanco de la tarjeta.
+  - **Fundido con Beneficios**: `#lam-05` pisa su `background` (heredado
+    de `section.dark`) con un `linear-gradient` que arranca en `--paper`
+    y funde a `--panel` en los primeros 180px, para no cortar en seco
+    contra el blanco de esta sección — mismo criterio que `#lam-03` (ver
+    comentario en `css/styles.css` de esa sección). Solo hace falta
+    fundir el borde de arriba: el vecino de abajo de `#lam-05` es
+    `#lam-06`, también `--panel`, sin corte que disimular ahí.
 - **Método (`#lam-03`)**: paleta estándar del sitio (no crema/café). 3
   `deco-fruit` chicas de fruta real. 2 neuronas laterales decorativas
   (`neurona-izquierda/derecha.webp`) son una ilustración completa (no
@@ -449,9 +461,23 @@ próximos pasos).
   como grid de tarjetas (`.social-cards`/`.social-card`, 2x2 desktop/1
   col ≤480px, ícono en círculo + nombre + handle), ya no lista de filas.
   El formulario y su envío por `mailto:` (`js/script.js`) no cambiaron.
+  - **Color de marca por red** (`.social-card-icon`): Instagram, Facebook
+    y TikTok llevan su color/degradado oficial + ícono blanco
+    (`.social-card-icon--instagram/--facebook/--tiktok`, clases
+    modificadoras sobre el círculo base). Teléfono queda con el círculo
+    genérico `--panel-2`/ícono `--purple` de siempre (no es red social,
+    no tiene color de marca que aplicar).
 
 ## Pendientes conocidos
 
+- **Verificar en navegador real (sesión 2026-09-18, íconos de redes +
+  tarjetas de Pilares + fundido)**: implementado a partir de una captura
+  que mandó el usuario, sin poder correr Playwright (no hay browser
+  instalado en este entorno ni acceso de red para instalarlo). Falta
+  confirmar: que el degradado de Instagram se vea bien, que el tamaño
+  nuevo de `.pillar` ya no se sienta vacío, y que el fundido de
+  `#lam-05` disimule el corte contra `#lam-04` en pantallas reales
+  (no solo en la lógica del gradiente).
 - **Visión — sesión 2 (mobile + limpieza)**: falta decidir y construir el
   posicionamiento de las 4 `.stat-annot` en mobile (`≤900px`) — el
   posicionamiento libre de desktop no aplica ahí tal cual, puede requerir

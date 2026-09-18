@@ -11,6 +11,47 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Íconos de redes con color de marca, tarjetas de Pilares más compactas, fundido entre Pilares y Beneficios
+
+Pedido puntual del usuario a partir de una captura del sitio en vivo:
+
+- **Íconos de redes sociales con su color de marca** (`.social-card-icon`
+  en Contacto, `#lam-06`): antes las 4 tarjetas (Instagram, Facebook,
+  TikTok, Teléfono) usaban el mismo círculo `--panel-2`/ícono `--purple`
+  del sitio. Ahora Instagram lleva el degradado oficial de la marca
+  (amarillo→naranja→magenta→violeta→azul), Facebook el azul `#1877F2` y
+  TikTok negro (`#010101`), los 3 con ícono blanco encima
+  (`.social-card-icon--instagram/--facebook/--tiktok`, nuevas clases
+  modificadoras sumadas al `<span>` en `index.html`). Teléfono queda sin
+  cambios (no es una red social, no tiene "color oficial" que aplicar).
+- **Tarjetas de Pilares (`.pillar`, `#lam-04`) más compactas**: el usuario
+  las vio "demasiado grandes y en blanco, como vacías". Se bajó
+  `min-height` de 250px a 198px, el padding de 34px a 28px verticales y
+  el gap interno de 16px a 14px. Para que la parte de arriba no dependa
+  solo del blanco de fondo, cada ícono (antes suelto, 56px) ahora vive
+  dentro de un círculo con tinte `--panel-2` (`.pillar-icon-circle`,
+  60px) con el ícono más chico adentro (32px) — mismo lenguaje visual que
+  ya usan `.social-card-icon`/`.quote-avatar` en otras secciones, no es
+  un patrón nuevo.
+- **Corte duro entre Pilares y Beneficios** (`#lam-04`→`#lam-05`): el
+  usuario señaló una "raya fea" en el cambio de color (blanco→lavanda).
+  Es el mismo problema ya resuelto en `#lam-03`, documentado ahí: fondo
+  sólido de `section.dark` contra un vecino blanco corta en seco. Se
+  aplicó el mismo fix a `#lam-05`: se pisa `background` con un
+  `linear-gradient` que arranca en `--paper` y funde a `--panel` en los
+  primeros 180px. No hizo falta fundir también el borde inferior de
+  `#lam-05` (a diferencia de `#lam-03`, que está rodeada de blanco por
+  los dos lados): el vecino de abajo es `#lam-06` (Contacto), que también
+  es `section.dark`/`--panel`, mismo color, sin corte que disimular ahí.
+- `npm test` corrido antes del patch (54/54 OK) — este cambio es solo
+  CSS/HTML, no toca las funciones que cubren los tests, se corrió por la
+  regla de "ante la duda, documentar/verificar".
+- **Sin verificar en navegador real ni con Playwright** (no hay browser
+  instalado en este entorno y no hay acceso de red a los dominios que
+  necesitaría para instalarlo) — pendiente que el usuario confirme cómo
+  se ve el degradado de Instagram, el tamaño nuevo de las tarjetas de
+  Pilares y el fundido de color antes de dar la sesión por buena.
+
 ## 2026-09-18 — Contacto: franja de confianza, botón copiar correo y redes como tarjetas
 
 Rediseño de `#lam-06` (Contacto), a partir de una lluvia de ideas
