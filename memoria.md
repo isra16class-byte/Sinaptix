@@ -762,17 +762,29 @@ próximos pasos).
     `.conocenos-collage` ahora viven dentro de `.conocenos-grid`
     (`grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)`, colapsa a 1
     columna en `≤900px` — mismo breakpoint que `.hero-grid`/`.ben-grid`).
-    **Tamaño (2026-09-18, pedido "mucho más grande")**: ~756px en
-    desktop (antes ~480). El collage sangra a la derecha fuera del
-    padding de `.wrap` con `margin-right:calc(-1 * var(--collage-bleed))`
-    (`--collage-bleed` = `clamp(0px,calc((100vw - 1180px)/2 + 30px),120px)`,
-    se define en `.conocenos-grid`); se hace con margen negativo y no con
-    `transform:scale` porque `float` ya usa `transform`. Si se vuelve a
+    **Tamaño y posición (2026-09-18, ajuste fino)**: **~970px** de ancho
+    en desktop a 1567px (alto ~588px); ~826px a 1280px, ~906px a 1440px,
+    ~976px a 1920px (tope del sangrado). Antes de esta sesión era ~756px
+    en desktop (y ~480px antes del primer agrandado). El collage sangra a
+    la derecha fuera del padding de `.wrap` con
+    `margin-right:calc(-1 * var(--collage-bleed))`
+    (`--collage-bleed` = `clamp(0px,calc((100vw - 1180px)/2 + 140px),340px)`,
+    se define en `.conocenos-grid`; offset base `+140px`, tope `340px`);
+    se hace con margen negativo y no con `transform:scale` porque `float`
+    ya usa `transform`. Además `.conocenos-collage` lleva **`left:20px`**
+    (en `≤900px` se anula con `left:0`). **Ojo: no posicionar con
+    `transform`** — el wrapper lleva `.reveal` y
+    `.reveal.in{transform:translateY(0)}` tiene más especificidad, así que
+    un `translateX()` ahí se pierde al terminar la animación de entrada
+    (detalle en `changelog.md`, 2026-09-18 "collage reposicionado y
+    reescalado"). Con el sangrado + `left:20px` el collage **se sale
+    ~88px por la derecha a 1567px**: es una decisión de diseño aceptada
+    explícitamente por el usuario, no un bug pendiente. Si se vuelve a
     agrandar, chequear `window.scrollX` (no solo `scrollWidth`). A diferencia de los
     `.deco-fruit` de esta sección (decoración pura, `display:none` en
     `≤720px`), esta imagen **sí se muestra en mobile** (tiene valor de
     contenido, no es solo decoración): en `≤900px` se centra con
-    `max-width:520px` debajo del resto del contenido en vez de
+    `max-width:560px` debajo del resto del contenido en vez de
     ocultarse.
   - `.conocenos-collage-img` lleva `animation:float` (la misma
     `@keyframes float` del Hero/Pilares) + `drop-shadow`, respeta
@@ -814,6 +826,13 @@ próximos pasos).
   ver nota en "Entorno de trabajo" más abajo) a 1440px y 390px, ambos se
   ven bien, pero falta el mismo tipo de confirmación que el resto del
   sitio: cómo se ve en un navegador real sobre el deploy de Netlify.
+  - Ajuste fino del 2026-09-18 (tamaño ~970px + `left:20px`, ver
+    changelog): verificado en el navegador integrado de VS Code sobre
+    Live Server a 1000/1100/1280/1366/1440/1567/1920px. En el deploy real
+    conviene mirar sobre todo el borde derecho: el collage se sale de
+    pantalla ~88px a 1567px (corte aceptado por el usuario) y en ventanas
+    de ~1000px `.contact-info` desborda su columna 113px (el email grande
+    + botón de copiar) — desborde preexistente, sin tocar en esta sesión.
 
 - **PDF de "Mi plan" — verificar contra el CDN real y en visores reales**:
   todo se verificó con el bundle de jsPDF servido localmente (cdnjs no es

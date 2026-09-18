@@ -1528,12 +1528,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    es margen de seguridad para no provocar scroll horizontal (100vw
    incluye la barra de scroll). */
 .conocenos-grid{
-  --collage-bleed:clamp(0px,calc((100vw - 1180px)/2 + 30px),120px);
+  --collage-bleed:clamp(0px,calc((100vw - 1180px)/2 + 140px),340px);
   display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:40px;align-items:center;
 }
 @media(max-width:900px){.conocenos-grid{grid-template-columns:1fr;gap:44px}}
-.conocenos-collage{position:relative;z-index:1;margin-right:calc(-1 * var(--collage-bleed))}
-@media(max-width:900px){.conocenos-collage{max-width:560px;margin:0 auto}}
+/* Sesión 2026-09-18 (pedido: "mové la imagen un poco hacia la derecha"):
+   el desplazamiento va en el wrapper (.conocenos-collage) y se hace con
+   `left` (ya es position:relative), NO con transform: el wrapper lleva la
+   clase `.reveal`, y `.reveal.in{transform:translateY(0)}` tiene más
+   especificidad, así que cualquier transform de aquí se perdía al terminar
+   la animación de entrada. Con `left` tampoco choca con la animación
+   `float` de la <img>. Solo desktop; en el breakpoint de 1 columna se
+   anula para no descentrar el collage. */
+.conocenos-collage{position:relative;z-index:1;left:20px;margin-right:calc(-1 * var(--collage-bleed))}
+@media(max-width:900px){.conocenos-collage{max-width:560px;margin:0 auto;left:0}}
 .conocenos-collage-img{
   display:block;width:100%;height:auto;
   filter:drop-shadow(0 22px 44px rgba(75,46,69,.22));

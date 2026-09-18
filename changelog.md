@@ -11,6 +11,76 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-06` Conócenos: collage reposicionado y reescalado (970px a 1567px)
+
+Sesión de ajuste fino sobre el collage de redes, hecha en varios turnos
+incrementales a partir de lo que el usuario veía en el navegador:
+"mové la imagen un poco hacia la derecha" → "hacela más grande" → "más
+grande" → "un poco a la izquierda" → "más a la izquierda" → "un poco más
+pequeña" → "un poco hacia la derecha". Estado final: **`left:20px`** en
+`.conocenos-collage` y **`--collage-bleed:clamp(0px,calc((100vw - 1180px)/2
++ 140px),340px)`** en `.conocenos-grid`.
+
+- **Bug encontrado (importante para el futuro)**: el primer intento de
+  desplazamiento se hizo con `transform:translateX()` en el wrapper y
+  **no funcionaba**. `.conocenos-collage` lleva la clase `.reveal`, y
+  `.reveal.in{transform:translateY(0)}` (especificidad 0,2,0) pisa
+  cualquier `transform` declarado en `.conocenos-collage` (0,1,0): durante
+  la animación de entrada se veía desplazado y, al terminar, la imagen
+  volvía a su lugar. Se detectó esperando la animación completa y leyendo
+  `getComputedStyle().transform` (`matrix(1,0,0,1,0,0)`) + `getBoundingClientRect()`.
+  **Solución**: desplazar con `left` sobre el wrapper (ya es
+  `position:relative`), que además no choca con la animación `float` de la
+  `<img>`. Regla general: en esta sección no usar `transform` para
+  posicionar, está tomado por `.reveal` (wrapper) y `float` (imagen).
+- **Desplazamiento horizontal** (`css/styles.css`): `.conocenos-collage`
+  pasa a llevar `left:20px` (arrancó en 80px, se bajó a 40, a 0, a −40, a
+  −20 y volvió a 20px). En `≤900px` se anula (`left:0`) para no descentrar
+  el collage en 1 columna.
+- **Tamaño** (`css/styles.css`): `--collage-bleed` pasa de
+  `clamp(0px,calc((100vw - 1180px)/2 + 30px),120px)` a
+  `clamp(0px,calc((100vw - 1180px)/2 + 140px),340px)` — es decir, el
+  collage crece (offset base +140px en vez de +30px) y el tope sube de
+  120px a 340px. Durante la iteración se probaron topes de 200px y 460px;
+  el usuario terminó pidiendo bajarlo, y el valor final es 340px.
+  La grilla (`minmax(0,.8fr) minmax(0,1.2fr)`, `gap:40px`) **no se tocó**:
+  se descartó agrandar la columna del collage porque `.contact-info` ya
+  desborda su columna (ver más abajo) y se rompería el email grande.
+- **Mediciones** (Chromium vía Playwright, `getBoundingClientRect()` del
+  `.conocenos-collage-img`, ancho × alto):
+
+  | Viewport | Antes de la sesión | Final |
+  |---|---|---|
+  | 1000px | 539px | 569px |
+  | 1280px | 716px | 826px |
+  | 1440px | 796px | 906px |
+  | 1567px | 836px | **970px** (alto 588px) |
+  | 1920px | 836px | 976px (tope del bleed) |
+
+- **Corte por el borde derecho, aceptado explícitamente**: como el collage
+  ya sangraba hasta el borde de la ventana, desplazarlo y agrandarlo hace
+  que se salga de pantalla (88px a 1567px). Se midió y se le reportó al
+  usuario (tabla de "fuera de pantalla" por ancho), que pidió seguir
+  igual: *"no me des avisos solo sigue mis ordenes"*. Queda como decisión
+  de diseño aceptada; si en el futuro se quiere "grande y completo", la
+  vía es ensanchar la columna del collage en la grilla (y antes arreglar
+  el desborde de `.contact-info`).
+- **Efectos secundarios medidos y NO tocados** (preexistentes, no los
+  introduce este patch): (a) en ventanas de ~1000px `.contact-info`
+  desborda su columna **113px** (el `big-email` a 40px + su botón de
+  copiar); con `left:-20px` eso se solapaba 26px con el collage — con el
+  `left:20px` final quedan ~40px de hueco, sin solape; (b) el documento
+  tiene ~200px de overflow horizontal por las `.deco` de la sección
+  (`.deco-scribble`), presente desde antes de esta sesión.
+- **Verificado en el navegador integrado de VS Code** (Live Server,
+  `http://127.0.0.1:5500/`) con la página compartida: recargas forzadas
+  sin caché, mediciones a 1000/1100/1280/1366/1440/1567/1920px y capturas
+  de la sección. Falta la confirmación de siempre en un deploy real.
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-06` Conócenos: collage mucho más grande, sin Facebook, tarjetas en columna
 
 Pedido del usuario a partir de una captura de la sección (1600px):
