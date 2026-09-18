@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Referencia visual — Collage de redes (HTML/CSS) · SINAPTIX</title>
+<!--
+  MAQUETA del collage de redes de #lam-06 "Conócenos", armado 100% con
+  HTML/CSS en vez de la imagen generada por IA
+  (img/generadas-cutout/collage-redes-miplan.webp).
+
+  Qué es: una página aparte para MIRAR cómo queda. NO está integrada en
+  index.html ni se carga desde ninguna página del sitio (mismo criterio
+  que docs/mockup-pdf-mi-plan.html).
+
+  Por qué existe: la imagen de IA trae el texto deformado ("Neuroalimen-
+  ristion and brote cognitive"), las caras de las miniaturas pintadas y
+  bordes sucios del recorte, y al agrandarla se nota más. Acá todo es
+  texto real y vectores, así que queda nítido a cualquier tamaño.
+
+  Cómo escala: .collage es un container (container-type:inline-size) y
+  TODAS las medidas salen de --u = 1/1000 del ancho del contenedor. Al
+  cambiar el ancho de .collage, se reescala completo (texto incluido)
+  sin media queries. Los botones de arriba solo cambian ese ancho para
+  poder verlo a distintos tamaños.
+
+  DATOS DE EJEMPLO (reemplazar o quitar antes de integrarlo): los números
+  de seguidores/publicaciones/vistas, los remitentes y asuntos del correo
+  y los valores del dashboard (IMC 24,5, barras) son inventados. Que un
+  sitio muestre métricas de redes falsas puede jugar en contra, así que
+  hay que poner las reales o sacarlas.
+
+  Reutiliza del sitio: css/styles.css (variables de paleta/tipografía y
+  las clases .imc-*), js/nutricion-planes.js (el medidor de IMC se dibuja
+  con las mismas funciones que "Mi plan"/Método) y los assets de img/.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,800;1,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="../img/sinaptix-icon.png">
+<link rel="stylesheet" href="../css/styles.css">
+<style>
+/* ---------- página de referencia (no forma parte del collage) ---------- */
+.mk-body{background:var(--panel);min-height:100vh;padding:36px 24px 72px}
+.mk-head{max-width:1000px;margin:0 auto 30px}
+.mk-head h1{font-family:var(--font-d);font-weight:800;font-size:26px;color:var(--ink);line-height:1.2;margin-bottom:8px}
+.mk-head p{font-size:14px;color:var(--ink-soft);max-width:70ch}
+.mk-sizes{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.mk-sizes button{
+  font:600 13px var(--font-m);color:var(--purple);background:var(--paper);
+  border:1px solid var(--panel-line);border-radius:var(--radius-pill);padding:7px 16px;cursor:pointer;
+}
+.mk-sizes button[aria-pressed="true"]{background:var(--purple);border-color:var(--purple);color:#fff}
+.mk-stagewrap{display:flex;justify-content:center}
+
+/* ---------- el collage ---------- */
+.collage{container-type:inline-size;width:970px;max-width:100%;aspect-ratio:1162/705;position:relative}
+.stage{
+  --u:calc(100cqw/1000);
+  position:absolute;inset:0;font-family:var(--font-b);color:var(--ink);line-height:1.25;
+}
+.stage *{box-sizing:border-box}
+.stage svg{display:block}
+
+.mk-card{
+  position:absolute;background:#fff;border:calc(var(--u)*1) solid rgba(113,75,103,.14);border-radius:calc(var(--u)*14);overflow:hidden;
+  box-shadow:0 calc(var(--u)*18) calc(var(--u)*38) rgba(75,46,69,.16),0 calc(var(--u)*3) calc(var(--u)*8) rgba(75,46,69,.08);
+}
+
+/* ===== Tarjeta izquierda: perfil de TikTok ===== */
+.mk-tiktok{left:calc(var(--u)*16);top:calc(var(--u)*56);width:calc(var(--u)*350);transform:rotate(-2.4deg);z-index:1;padding-top:calc(var(--u)*16)}
+.mk-tt-top{text-align:center;padding:0 calc(var(--u)*16)}
+.mk-tt-avatar{
+  width:calc(var(--u)*56);height:calc(var(--u)*56);border-radius:50%;margin:0 auto;background:var(--panel-2);
+  display:flex;align-items:center;justify-content:center;border:calc(var(--u)*2) solid #fff;
+  box-shadow:0 calc(var(--u)*2) calc(var(--u)*8) rgba(75,46,69,.18);
+}
+.mk-tt-avatar img{width:74%;height:74%;object-fit:contain}
+.mk-tt-handle{font-size:calc(var(--u)*15);font-weight:800;margin:calc(var(--u)*7) 0 calc(var(--u)*6)}
+.mk-tt-stats{display:flex;justify-content:center;gap:calc(var(--u)*28)}
+.mk-tt-stats b{display:block;font-size:calc(var(--u)*14);font-weight:800}
+.mk-tt-stats span{font-size:calc(var(--u)*10);color:var(--ink-soft)}
+.mk-tt-btns{display:flex;justify-content:center;gap:calc(var(--u)*6);margin:calc(var(--u)*11) 0 calc(var(--u)*9)}
+.mk-btn{
+  height:calc(var(--u)*30);border-radius:calc(var(--u)*6);display:flex;align-items:center;justify-content:center;
+  font-size:calc(var(--u)*12);font-weight:700;background:var(--panel);color:var(--ink);
+}
+.mk-btn--primary{background:var(--purple);color:#fff;width:calc(var(--u)*124)}
+.mk-btn--sq{width:calc(var(--u)*30)}
+.mk-btn svg{width:calc(var(--u)*13);height:calc(var(--u)*13)}
+.mk-tt-bio{font-size:calc(var(--u)*11);color:var(--ink-soft);margin-bottom:calc(var(--u)*11)}
+.mk-tabs{display:flex;border-top:calc(var(--u)*1) solid var(--line)}
+.mk-tabs > span{
+  flex:1;height:calc(var(--u)*30);display:flex;align-items:center;justify-content:center;color:var(--ink-faint);
+  border-bottom:calc(var(--u)*2) solid transparent;
+}
+.mk-tabs > span.is-on{color:var(--ink);border-bottom-color:var(--ink)}
+.mk-tabs svg{width:calc(var(--u)*15);height:calc(var(--u)*15)}
+.mk-tt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*2)}
+.mk-cover{position:relative;aspect-ratio:1/1.16;overflow:hidden;background:var(--panel-2)}
+.mk-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mk-cover::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(38,22,31,0) 38%,rgba(38,22,31,.78) 100%);
+}
+.mk-cover-cap{
+  position:absolute;left:calc(var(--u)*8);right:calc(var(--u)*8);bottom:calc(var(--u)*22);z-index:1;color:#fff;
+  font-size:calc(var(--u)*12);font-weight:800;line-height:1.1;text-shadow:0 calc(var(--u)*1) calc(var(--u)*4) rgba(0,0,0,.35);
+}
+.mk-cover-views{
+  position:absolute;left:calc(var(--u)*8);bottom:calc(var(--u)*7);z-index:1;color:#fff;font-size:calc(var(--u)*10);font-weight:600;
+  display:flex;align-items:center;gap:calc(var(--u)*3);
+}
+.mk-cover-views svg{width:calc(var(--u)*9);height:calc(var(--u)*9)}
+
+/* ===== Tarjeta derecha arriba: correo ===== */
+.mk-mail{left:calc(var(--u)*594);top:calc(var(--u)*126);width:calc(var(--u)*392);padding-left:calc(var(--u)*40);transform:rotate(1.6deg);z-index:1}
+.mk-mail-title{
+  font-family:var(--font-d);font-weight:800;font-size:calc(var(--u)*24);line-height:1.1;color:var(--ink);
+  padding:calc(var(--u)*16) calc(var(--u)*18) calc(var(--u)*12);
+}
+.mk-mail-body{display:flex;border-top:calc(var(--u)*1) solid var(--line)}
+.mk-mail-side{width:calc(var(--u)*92);flex:none;padding:calc(var(--u)*10) calc(var(--u)*8);border-right:calc(var(--u)*1) solid var(--line)}
+.mk-compose{
+  display:flex;align-items:center;gap:calc(var(--u)*6);height:calc(var(--u)*26);padding:0 calc(var(--u)*10);margin-bottom:calc(var(--u)*8);
+  background:#fff;border-radius:calc(var(--u)*14);font-size:calc(var(--u)*10);font-weight:600;
+  box-shadow:0 calc(var(--u)*1) calc(var(--u)*5) rgba(75,46,69,.22);
+}
+.mk-compose svg{width:calc(var(--u)*11);height:calc(var(--u)*11);color:var(--purple)}
+.mk-mail-nav{display:flex;flex-direction:column;gap:calc(var(--u)*1)}
+.mk-mail-nav span{
+  display:flex;justify-content:space-between;align-items:center;height:calc(var(--u)*22);padding:0 calc(var(--u)*8);
+  border-radius:calc(var(--u)*11);font-size:calc(var(--u)*10);color:var(--ink-soft);
+}
+.mk-mail-nav span.is-on{background:var(--panel-2);color:var(--purple-dark);font-weight:700}
+.mk-mail-list{flex:1;min-width:0;padding:calc(var(--u)*4) 0}
+.mk-mail-row{
+  display:grid;grid-template-columns:calc(var(--u)*12) calc(var(--u)*66) 1fr calc(var(--u)*30);gap:calc(var(--u)*7);align-items:center;
+  height:calc(var(--u)*23);padding:0 calc(var(--u)*10);font-size:calc(var(--u)*10);border-bottom:calc(var(--u)*1) solid rgba(38,22,31,.06);
+}
+.mk-mail-row.is-head{font-weight:700;color:var(--ink);height:calc(var(--u)*20)}
+.mk-mail-row i{width:calc(var(--u)*9);height:calc(var(--u)*9);border:calc(var(--u)*1) solid var(--ink-faint);border-radius:calc(var(--u)*2)}
+.mk-mail-row.is-head i{visibility:hidden}
+.mk-mail-row .who,.mk-mail-row .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk-mail-row .when{text-align:right;color:var(--ink-faint);font-size:calc(var(--u)*9)}
+.mk-mail-row.is-unread{font-weight:700;color:var(--ink)}
+.mk-mail-row:not(.is-unread):not(.is-head){color:var(--ink-soft)}
+
+/* ===== Teléfono (perfil de Instagram) ===== */
+.mk-phone{
+  position:absolute;left:calc(var(--u)*348);top:calc(var(--u)*1);width:calc(var(--u)*284);height:calc(var(--u)*604);z-index:3;
+  background:#17111c;border-radius:calc(var(--u)*46);padding:calc(var(--u)*9);
+  box-shadow:0 calc(var(--u)*26) calc(var(--u)*52) rgba(38,22,31,.34),0 calc(var(--u)*4) calc(var(--u)*12) rgba(38,22,31,.2),inset 0 0 0 calc(var(--u)*1.5) #3c3145;
+}
+.mk-phone::before,.mk-phone::after{content:"";position:absolute;background:#17111c;border-radius:calc(var(--u)*2)}
+.mk-phone::before{left:calc(var(--u)*-2.5);top:calc(var(--u)*120);width:calc(var(--u)*3);height:calc(var(--u)*44)}
+.mk-phone::after{right:calc(var(--u)*-2.5);top:calc(var(--u)*150);width:calc(var(--u)*3);height:calc(var(--u)*68)}
+.mk-screen{position:relative;width:100%;height:100%;background:#fff;border-radius:calc(var(--u)*37);overflow:hidden}
+.mk-notch{
+  position:absolute;top:calc(var(--u)*8);left:50%;width:calc(var(--u)*86);height:calc(var(--u)*25);margin-left:calc(var(--u)*-43);
+  background:#17111c;border-radius:calc(var(--u)*14);z-index:2;
+}
+.mk-status{
+  height:calc(var(--u)*40);padding:calc(var(--u)*13) calc(var(--u)*24) 0;display:flex;justify-content:space-between;align-items:flex-start;
+  font-size:calc(var(--u)*12);font-weight:700;
+}
+.mk-status-r{display:flex;gap:calc(var(--u)*5);align-items:center;margin-top:calc(var(--u)*1)}
+.mk-status-r svg:first-child{width:calc(var(--u)*16);height:calc(var(--u)*11)}
+.mk-status-r svg:last-child{width:calc(var(--u)*23);height:calc(var(--u)*11)}
+.mk-ig-head{height:calc(var(--u)*30);display:flex;align-items:center;justify-content:space-between;padding:0 calc(var(--u)*14)}
+.mk-ig-head svg{width:calc(var(--u)*14);height:calc(var(--u)*14)}
+.mk-ig-head b{font-size:calc(var(--u)*14);font-weight:800}
+.mk-ig-prof{padding:calc(var(--u)*2) calc(var(--u)*14) 0}
+.mk-ig-row{display:flex;align-items:center;gap:calc(var(--u)*12)}
+.mk-ig-ring{
+  flex:none;width:calc(var(--u)*64);height:calc(var(--u)*64);border-radius:50%;padding:calc(var(--u)*2.5);
+  background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+}
+.mk-ig-ring div{
+  width:100%;height:100%;border-radius:50%;background:var(--panel-2);border:calc(var(--u)*2.5) solid #fff;
+  display:flex;align-items:center;justify-content:center;
+}
+.mk-ig-ring img{width:78%;height:78%;object-fit:contain}
+.mk-ig-stats{flex:1;display:flex;justify-content:space-between;gap:calc(var(--u)*2);text-align:center}
+.mk-ig-stats b{display:block;font-size:calc(var(--u)*15);font-weight:800;line-height:1.1}
+.mk-ig-stats span{font-size:calc(var(--u)*9);color:var(--ink-soft);white-space:nowrap}
+.mk-ig-name{font-size:calc(var(--u)*12.5);font-weight:800;margin-top:calc(var(--u)*8)}
+.mk-ig-cat{font-size:calc(var(--u)*10);color:var(--ink-faint);margin-top:calc(var(--u)*1)}
+.mk-ig-bio{font-size:calc(var(--u)*11);line-height:1.3;margin-top:calc(var(--u)*3)}
+.mk-ig-link{font-size:calc(var(--u)*11);font-weight:600;color:var(--navy-bright);margin-top:calc(var(--u)*2)}
+.mk-ig-btns{display:flex;gap:calc(var(--u)*5);margin:calc(var(--u)*9) 0 calc(var(--u)*9)}
+.mk-ig-btns .mk-btn{height:calc(var(--u)*27);font-size:calc(var(--u)*11.5);flex:1;border-radius:calc(var(--u)*7)}
+.mk-ig-btns .mk-btn--sq{flex:none;width:calc(var(--u)*30)}
+.mk-ig-tabs{display:flex;border-top:calc(var(--u)*1) solid var(--line)}
+.mk-ig-tabs > span{
+  flex:1;height:calc(var(--u)*30);display:flex;align-items:center;justify-content:center;color:var(--ink-faint);
+  border-top:calc(var(--u)*1.5) solid transparent;margin-top:calc(var(--u)*-1);
+}
+.mk-ig-tabs > span.is-on{color:var(--ink);border-top-color:var(--ink)}
+.mk-ig-tabs svg{width:calc(var(--u)*15);height:calc(var(--u)*15)}
+.mk-ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1.5)}
+.mk-tile{position:relative;aspect-ratio:1;overflow:hidden;background:var(--panel-2)}
+.mk-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.mk-tile--contain img{object-fit:contain;padding:14%}
+.mk-tile--dorado{background:var(--miplan-card-dorado)}
+.mk-tile--verde{background:var(--miplan-card-verde)}
+.mk-tile--lila{background:var(--miplan-card-lila)}
+
+/* ===== Ventana derecha abajo: dashboard de "Mi plan" ===== */
+.mk-dash{left:calc(var(--u)*704);top:calc(var(--u)*306);width:calc(var(--u)*282);transform:rotate(-1.2deg);z-index:4;border-radius:calc(var(--u)*12)}
+.mk-chrome{height:calc(var(--u)*26);background:#EFE7EC;display:flex;align-items:flex-end;gap:calc(var(--u)*10);padding:0 calc(var(--u)*10)}
+.mk-dots{display:flex;gap:calc(var(--u)*4.5);align-items:center;height:calc(var(--u)*20)}
+.mk-dots i{width:calc(var(--u)*6.5);height:calc(var(--u)*6.5);border-radius:50%;display:block}
+.mk-dots i:nth-child(1){background:#ec6a5e}
+.mk-dots i:nth-child(2){background:#f4bf4f}
+.mk-dots i:nth-child(3){background:#61c454}
+.mk-tab{
+  height:calc(var(--u)*20);padding:0 calc(var(--u)*12);background:#fff;border-radius:calc(var(--u)*7) calc(var(--u)*7) 0 0;
+  display:flex;align-items:center;gap:calc(var(--u)*5);font-size:calc(var(--u)*9.5);font-weight:600;
+}
+.mk-tab img{width:calc(var(--u)*10);height:calc(var(--u)*10);object-fit:contain}
+.mk-url{height:calc(var(--u)*24);padding:calc(var(--u)*4) calc(var(--u)*10);display:flex;align-items:center;border-bottom:calc(var(--u)*1) solid var(--line)}
+.mk-url div{
+  flex:1;height:100%;border-radius:calc(var(--u)*9);background:var(--panel);padding:0 calc(var(--u)*9);
+  display:flex;align-items:center;gap:calc(var(--u)*5);font-size:calc(var(--u)*9);color:var(--ink-soft);
+}
+.mk-url svg{width:calc(var(--u)*8);height:calc(var(--u)*8)}
+.mk-dash-body{padding:calc(var(--u)*11) calc(var(--u)*12) calc(var(--u)*12)}
+.mk-dash-title{font-family:var(--font-d);font-weight:800;font-size:calc(var(--u)*15);line-height:1.15;margin-bottom:calc(var(--u)*9)}
+.mk-dash-row{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*8)}
+.mk-mini{
+  border:calc(var(--u)*1) solid var(--panel-line);border-radius:calc(var(--u)*9);padding:calc(var(--u)*8) calc(var(--u)*8) calc(var(--u)*7);background:#fff;
+  min-height:calc(var(--u)*98);
+}
+.mk-mini-label{font-size:calc(var(--u)*9.5);font-weight:700;text-align:center;color:var(--ink)}
+/* .imc-gauge (css/styles.css) trae max-width:220px y margin-bottom:-8px en
+   px reales: no escalan con la maqueta y subían la aguja sobre el número. */
+.mk-mini .imc-gauge{max-width:none;margin:calc(var(--u)*3) 0 0}
+.mk-mini .imc-gauge svg{width:100%;height:auto}
+.mk-mini-num{font-family:var(--font-d);font-weight:800;font-size:calc(var(--u)*19);text-align:center;line-height:1;margin-top:calc(var(--u)*4)}
+.mk-mini-cat{font-size:calc(var(--u)*9);font-weight:700;text-align:center;color:var(--green);margin-top:calc(var(--u)*3)}
+.mk-mini--obj{display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center}
+.mk-mini--obj img{width:calc(var(--u)*46);height:calc(var(--u)*46);object-fit:contain}
+.mk-mini--obj p{font-size:calc(var(--u)*9.5);line-height:1.25;color:var(--ink-soft)}
+.mk-mini--obj p b{color:var(--ink)}
+.mk-bars{margin-top:calc(var(--u)*9);display:flex;flex-direction:column;gap:calc(var(--u)*6)}
+.mk-bar{display:grid;grid-template-columns:calc(var(--u)*44) 1fr calc(var(--u)*24);gap:calc(var(--u)*7);align-items:center;font-size:calc(var(--u)*9.5)}
+.mk-bar span:first-child{font-weight:600}
+.mk-bar span:last-child{text-align:right;color:var(--ink-soft);font-weight:600}
+.mk-bar-track{height:calc(var(--u)*7);border-radius:calc(var(--u)*4);background:var(--panel-line);overflow:hidden}
+.mk-bar-track i{display:block;height:100%;border-radius:calc(var(--u)*4)}
+</style>
+</head>
+<body class="mk-body">
+
+<header class="mk-head">
+  <h1>Collage de redes en HTML/CSS</h1>
+  <p>Maqueta para comparar contra la imagen generada por IA. Todo es texto y vectores reales, así que no se pixela al agrandarlo. Los números y nombres son de ejemplo. Probá los tamaños:</p>
+  <div class="mk-sizes" role="group" aria-label="Ancho del collage">
+    <button type="button" data-w="560px">560 px</button>
+    <button type="button" data-w="760px">760 px</button>
+    <button type="button" data-w="970px" aria-pressed="true">970 px</button>
+    <button type="button" data-w="100%">Ancho completo</button>
+  </div>
+</header>
+
+<main class="mk-stagewrap">
+  <div class="collage" id="collage" aria-hidden="true">
+    <div class="stage">
+
+      <!-- ===== TikTok (izquierda) ===== -->
+      <article class="mk-card mk-tiktok">
+        <div class="mk-tt-top">
+          <div class="mk-tt-avatar"><img src="../img/sinaptix-icon.png" alt=""></div>
+          <div class="mk-tt-handle">@sinaptix</div>
+          <div class="mk-tt-stats">
+            <div><b>24</b><span>Siguiendo</span></div>
+            <div><b>8,2 K</b><span>Seguidores</span></div>
+            <div><b>61 K</b><span>Me gusta</span></div>
+          </div>
+          <div class="mk-tt-btns">
+            <span class="mk-btn mk-btn--primary">Seguir</span>
+            <span class="mk-btn mk-btn--sq"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="mk-tt-bio">Neuroalimentación aplicada</div>
+        </div>
+        <div class="mk-tabs">
+          <span class="is-on"><svg viewBox="0 0 24 24" fill="none"><path d="M5 5v14M12 5v14M19 5v14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><path d="M5 11V9a3 3 0 0 1 3-3h10m0 0-3-3m3 3-3 3M19 13v2a3 3 0 0 1-3 3H6m0 0 3 3m-3-3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+        </div>
+        <div class="mk-tt-grid">
+          <div class="mk-cover"><img src="../img/imagenes-frutas/fruta-arandanos.webp" alt=""><span class="mk-cover-cap">Desayuno para el foco</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>12,4 K</span></div>
+          <div class="mk-cover"><img src="../img/imagenes-frutas/fruta-nuez.webp" alt=""><span class="mk-cover-cap">Snack con omega-3</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>18,3 K</span></div>
+          <div class="mk-cover"><img src="../img/hero-cerebro-nutricion.webp" alt=""><span class="mk-cover-cap">Plan en 3 min</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>31,7 K</span></div>
+          <div class="mk-cover"><img src="../img/imagenes-frutas/fruta-fresa.webp" alt=""><span class="mk-cover-cap">Antioxidantes</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>9,8 K</span></div>
+          <div class="mk-cover"><img src="../img/imagenes-frutas/fruta-uvas.webp" alt=""><span class="mk-cover-cap">Memoria y estudio</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>14,1 K</span></div>
+          <div class="mk-cover"><img src="../img/imagenes-frutas/fruta-cereza.webp" alt=""><span class="mk-cover-cap">Cena y buen sueño</span><span class="mk-cover-views"><svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z" fill="currentColor"/></svg>20,8 K</span></div>
+        </div>
+      </article>
+
+      <!-- ===== Correo (derecha, arriba) ===== -->
+      <article class="mk-card mk-mail">
+        <div class="mk-mail-title">hola@sinaptix.com</div>
+        <div class="mk-mail-body">
+          <div class="mk-mail-side">
+            <div class="mk-compose"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17l-1 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Redactar</div>
+            <div class="mk-mail-nav">
+              <span class="is-on">Recibidos <b>3</b></span>
+              <span>Destacados</span>
+              <span>Enviados</span>
+              <span>Borradores</span>
+            </div>
+          </div>
+          <div class="mk-mail-list">
+            <div class="mk-mail-row is-head"><i></i><span class="who">Remitente</span><span class="sub">Asunto</span><span class="when"></span></div>
+            <div class="mk-mail-row is-unread"><i></i><span class="who">SINAPTIX</span><span class="sub">Tu plan ya está listo</span><span class="when">12 sep</span></div>
+            <div class="mk-mail-row is-unread"><i></i><span class="who">Consulta</span><span class="sub">Mejorar mi concentración</span><span class="when">11 sep</span></div>
+            <div class="mk-mail-row is-unread"><i></i><span class="who">Consulta</span><span class="sub">Primera consulta sin costo</span><span class="when">10 sep</span></div>
+            <div class="mk-mail-row"><i></i><span class="who">SINAPTIX</span><span class="sub">Bienvenido/a a SINAPTIX</span><span class="when">9 sep</span></div>
+            <div class="mk-mail-row"><i></i><span class="who">Seguimiento</span><span class="sub">Reevaluación de tu plan</span><span class="when">3 sep</span></div>
+            <div class="mk-mail-row"><i></i><span class="who">SINAPTIX</span><span class="sub">Recetas para tu día tipo</span><span class="when">30 ago</span></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===== Teléfono: perfil de Instagram (centro) ===== -->
+      <div class="mk-phone">
+        <div class="mk-screen">
+          <div class="mk-notch"></div>
+          <div class="mk-status">
+            <span>9:41</span>
+            <span class="mk-status-r">
+              <svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+              <svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.2" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="19" height="8" rx="2" fill="currentColor"/><rect x="23.6" y="4" width="2" height="4" rx="1" fill="currentColor" opacity=".45"/></svg>
+            </span>
+          </div>
+          <div class="mk-ig-head">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <b>sinaptix.neuro</b>
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+          </div>
+          <div class="mk-ig-prof">
+            <div class="mk-ig-row">
+              <div class="mk-ig-ring"><div><img src="../img/sinaptix-icon.png" alt=""></div></div>
+              <div class="mk-ig-stats">
+                <div><b>48</b><span>Publicaciones</span></div>
+                <div><b>2,4 K</b><span>Seguidores</span></div>
+                <div><b>312</b><span>Seguidos</span></div>
+              </div>
+            </div>
+            <div class="mk-ig-name">SINAPTIX</div>
+            <div class="mk-ig-cat">Nutrición y bienestar</div>
+            <div class="mk-ig-bio">Neuroalimentación aplicada.<br>Enfoque, memoria y energía desde tu plato.<br>Tu plan personalizado en menos de 3 min.</div>
+            <div class="mk-ig-link">sinaptix.com</div>
+            <div class="mk-ig-btns">
+              <span class="mk-btn mk-btn--primary" style="width:auto">Seguir</span>
+              <span class="mk-btn">Mensaje</span>
+              <span class="mk-btn mk-btn--sq"><svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+          <div class="mk-ig-tabs">
+            <span class="is-on"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="1.7"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16" stroke="currentColor" stroke-width="1.5"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="4" stroke="currentColor" stroke-width="1.7"/><path d="M10 9.2v5.6l4.6-2.8-4.6-2.8Z" fill="currentColor"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="10.5" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M7.5 18c.8-2.2 2.6-3.2 4.5-3.2s3.7 1 4.5 3.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+          </div>
+          <div class="mk-ig-grid">
+            <div class="mk-tile"><img src="../img/imagenes-frutas/fruta-arandanos.webp" alt=""></div>
+            <div class="mk-tile"><img src="../img/decoraciones-neurona/cerebro-mi-plan.webp" alt=""></div>
+            <div class="mk-tile"><img src="../img/imagenes-frutas/fruta-nuez.webp" alt=""></div>
+            <div class="mk-tile mk-tile--contain mk-tile--dorado"><img src="../img/generadas-cutout/huevo.webp" alt=""></div>
+            <div class="mk-tile"><img src="../img/hero-cerebro-nutricion.webp" alt=""></div>
+            <div class="mk-tile mk-tile--contain mk-tile--verde"><img src="../img/generadas-cutout/remolacha.webp" alt=""></div>
+            <div class="mk-tile"><img src="../img/imagenes-frutas/fruta-fresa.webp" alt=""></div>
+            <div class="mk-tile mk-tile--contain mk-tile--lila"><img src="../img/generadas-cutout/te.webp" alt=""></div>
+            <div class="mk-tile"><img src="../img/imagenes-frutas/fruta-uvas.webp" alt=""></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Dashboard de "Mi plan" (derecha, abajo) ===== -->
+      <article class="mk-card mk-dash">
+        <div class="mk-chrome">
+          <span class="mk-dots"><i></i><i></i><i></i></span>
+          <span class="mk-tab"><img src="../img/sinaptix-icon.png" alt="">SINAPTIX · Mi plan</span>
+        </div>
+        <div class="mk-url"><div><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2.4"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="2.4"/></svg>sinaptix.com/mi-plan</div></div>
+        <div class="mk-dash-body">
+          <div class="mk-dash-title">Tu progreso con SINAPTIX</div>
+          <div class="mk-dash-row">
+            <div class="mk-mini">
+              <div class="mk-mini-label">Medidor de IMC</div>
+              <div class="imc-gauge" id="mkGauge" aria-hidden="true"></div>
+              <div class="mk-mini-num">24,5</div>
+              <div class="mk-mini-cat">Saludable</div>
+            </div>
+            <div class="mk-mini mk-mini--obj">
+              <div class="mk-mini-label">Objetivo cognitivo</div>
+              <img src="../img/ilustraciones-mi-plan/objetivo-cerebro.png" alt="">
+              <p><b>Enfoque</b><br>atención sostenida</p>
+            </div>
+          </div>
+          <div class="mk-bars">
+            <div class="mk-bar"><span>Foco</span><div class="mk-bar-track"><i style="width:72%;background:var(--purple)"></i></div><span>72%</span></div>
+            <div class="mk-bar"><span>Memoria</span><div class="mk-bar-track"><i style="width:58%;background:var(--gold)"></i></div><span>58%</span></div>
+            <div class="mk-bar"><span>Energía</span><div class="mk-bar-track"><i style="width:81%;background:var(--green)"></i></div><span>81%</span></div>
+            <div class="mk-bar"><span>Calma</span><div class="mk-bar-track"><i style="width:64%;background:var(--navy-bright)"></i></div><span>64%</span></div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</main>
+
+<!-- Mismas funciones que usan "Mi plan" y Método para dibujar el medidor. -->
+<script src="../js/nutricion-planes.js"></script>
+<script>
+(function(){
+  /* Medidor de IMC: mismas funciones y clases (.imc-*) que renderMethodImc()
+     en js/script.js. Se omiten las marcas numeradas (15/20/…/40): a este
+     tamaño no se leerían. El viewBox se recorta al arco + aguja. */
+  var host = document.getElementById('mkGauge');
+  if(host && typeof imcGaugeAgujaDeg === 'function'){
+    var imc = 24.5;
+    var deg = imcGaugeAgujaDeg(imc);
+    var marcador = imcGaugeMarkerPos(imc);
+    var info = imcCategoria(imc);
+    host.innerHTML =
+      '<svg viewBox="8 16 204 109">'+
+        imcGaugeGradientDefsHtml()+
+        (typeof imcGaugeTrackHtml === 'function' ? imcGaugeTrackHtml() : '')+
+        '<path class="imc-zone imc-zone-bajo" d="M25 115 A 85 85 0 0 1 33.09 78.81"/>'+
+        '<path class="imc-zone imc-zone-saludable" d="M33.09 78.81 A 85 85 0 0 1 83.73 34.16"/>'+
+        '<path class="imc-zone imc-zone-sobrepeso" d="M83.73 34.16 A 85 85 0 0 1 136.27 34.16"/>'+
+        '<path class="imc-zone imc-zone-obesidad" d="M136.27 34.16 A 85 85 0 0 1 195 115"/>'+
+        '<circle class="imc-gauge-marker-glow imc-gauge-marker-glow-'+info.zona+'" cx="'+marcador.x+'" cy="'+marcador.y+'" r="10"/>'+
+        '<circle class="imc-gauge-marker" cx="'+marcador.x+'" cy="'+marcador.y+'" r="4"/>'+
+        '<line class="imc-aguja" x1="110" y1="115" x2="110" y2="45" transform="rotate('+deg.toFixed(2)+' 110 115)"/>'+
+        '<circle class="imc-pivote-outer" cx="110" cy="115" r="8.5"/>'+
+        '<circle class="imc-pivote" cx="110" cy="115" r="4.5"/>'+
+      '</svg>';
+  }
+
+  /* Botones de tamaño: solo para mirar la maqueta a distintos anchos. */
+  var collage = document.getElementById('collage');
+  var btns = document.querySelectorAll('.mk-sizes button');
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      collage.style.width = b.getAttribute('data-w');
+      btns.forEach(function(o){ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

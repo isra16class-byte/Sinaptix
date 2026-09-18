@@ -11,6 +11,55 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Maqueta del collage de redes en HTML/CSS (aparte, NO integrada)
+
+El usuario preguntó por qué el collage de `#lam-06` se veía con "esos
+efectos" (texto deformado, caras pintadas, bordes sucios). Diagnóstico,
+mirando el asset a resolución nativa: los defectos ya venían en
+`img/generadas-cutout/collage-redes-miplan.webp` (imagen generada por IA:
+texto ilegible tipo "Neuroalimenristion and brote cognitive", caras de
+las miniaturas de TikTok con manchas blancas, recorte por distancia de
+color con borde grisáceo/punteado) y al agrandarla (~970px sobre un
+archivo de 1162px, más el escalado de Windows 125–150%) se notaban más.
+Pidió que se armara el collage con código, **aparte y sin integrar**, para
+verlo antes de decidir.
+
+- **Archivo nuevo, único cambio**: `docs/mockup-collage-redes.html`. No
+  se tocó `index.html` ni `css/styles.css`; el collage de IA sigue siendo
+  el que está en el sitio. Misma convención que
+  `docs/mockup-pdf-mi-plan.html` (documentación visual, no se carga
+  desde ninguna página).
+- **Contenido**: 4 piezas — perfil de TikTok (izquierda), teléfono con
+  perfil de Instagram (centro), bandeja de correo con
+  `hola@sinaptix.com` como título (derecha arriba) y ventana de navegador
+  con el dashboard de "Mi plan" (derecha abajo). Sin caras: las portadas
+  y la grilla usan las fotos y ilustraciones que ya están en `img/`
+  (`imagenes-frutas/`, `generadas-cutout/`, `hero-cerebro-nutricion.webp`,
+  `cerebro-mi-plan.webp`, `sinaptix-icon.png`).
+- **Escala solo**: `.collage` es un container (`container-type:inline-size`)
+  y todas las medidas salen de `--u` = 1/1000 del ancho
+  (`calc(100cqw/1000)`), incluido el texto. Cambiar el ancho de `.collage`
+  reescala todo sin media queries. La página trae botones para verlo a
+  560 / 760 / 970 px / ancho completo. Verificado con Playwright a esos
+  tamaños y a 390px de viewport: sin scroll horizontal y con ninguna pieza
+  fuera de la caja a 560/970/1100px.
+- **Medidor de IMC real**: se dibuja con las mismas funciones que Método y
+  "Mi plan" (`imcGaugeAgujaDeg`, `imcGaugeMarkerPos`,
+  `imcGaugeGradientDefsHtml`, `imcGaugeTrackHtml`), cargando
+  `js/nutricion-planes.js`. Sin las marcas numeradas (a ese tamaño no se
+  leen).
+- ⚠️ **Datos de ejemplo inventados**: seguidores, publicaciones, vistas,
+  remitentes/asuntos del correo, IMC 24,5 y las barras. Un sitio con
+  métricas de redes falsas puede jugar en contra: poner las reales o
+  sacarlas antes de integrar.
+- **Gotcha encontrado**: `.imc-gauge` (`css/styles.css`) trae
+  `max-width:220px` y `margin:0 auto -8px` en px reales. Dentro de un
+  layout que escala con `--u` no escalan y el `-8px` subía la aguja sobre
+  el número; se neutraliza solo dentro de `.mk-mini`.
+- **Límite conocido**: por debajo de ~500px de ancho el texto más chico
+  (9–10 unidades) choca con el tamaño mínimo de fuente del navegador y
+  deja de escalar proporcionalmente; el layout no se rompe.
+
 ## 2026-09-18 — `#lam-06` Conócenos: collage reposicionado y reescalado (970px a 1567px)
 
 Sesión de ajuste fino sobre el collage de redes, hecha en varios turnos

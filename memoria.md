@@ -183,9 +183,11 @@ próximos pasos).
   y `scripts/separar-iconos-vision.py` (reproducen por código los assets
   de Visión, ver sección Visión).
 - `docs/` — documentación visual que no se publica como parte del sitio.
-  Hoy solo `docs/mockup-pdf-mi-plan.html`: la maqueta aprobada del PDF de
+  Hoy: `docs/mockup-pdf-mi-plan.html` (la maqueta aprobada del PDF de
   "Mi plan", para poder mirar y discutir el diseño en el navegador sin
-  generar un PDF. No se carga desde ninguna página.
+  generar un PDF) y `docs/mockup-collage-redes.html` (alternativa en
+  HTML/CSS al collage de IA de Conócenos, **no integrada**, ver "Estado
+  actual del diseño"). Ninguna se carga desde una página del sitio.
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests
@@ -801,6 +803,23 @@ próximos pasos).
     mobile queda bien centrado debajo de las tarjetas de redes sin
     chocar con el nav fijo. Falta la confirmación de siempre sobre un
     deploy real (ver "Pendientes conocidos").
+  - **Alternativa en HTML/CSS (maqueta, sesión 2026-09-18, NO integrada)**:
+    `docs/mockup-collage-redes.html`. Motivo: el `.webp` de IA trae texto
+    deformado, caras pintadas y bordes sucios del recorte, y se nota más
+    al agrandarlo. La maqueta arma las mismas 4 piezas (TikTok, teléfono
+    con Instagram, correo, dashboard de "Mi plan") con texto y vectores
+    reales. Se escala con `container-type:inline-size` + `--u` =
+    `calc(100cqw/1000)`: cambiar el ancho de `.collage` reescala todo. El
+    medidor de IMC usa las funciones reales de `js/nutricion-planes.js`.
+    ⚠️ Los números (seguidores, vistas, correos, IMC, barras) son de
+    ejemplo y hay que poner reales o quitarlos. ⚠️ `.imc-gauge` trae
+    `max-width:220px` y `margin-bottom:-8px` en px reales: se neutralizan
+    en `.mk-mini` para que no rompan el escalado. **Falta que el usuario
+    la vea y decida**; si aprueba, integrar reemplazando el `<img
+    class="conocenos-collage-img">` por ese markup (prefijo `mk-` a
+    `css/styles.css`, quitar los botones de tamaño y `float`/`drop-shadow`
+    del `<img>` viejo se puede llevar al contenedor) y borrar el `.webp`
+    si ya nada lo usa. Detalle en `changelog.md`.
 
 ## Pendientes conocidos
 
@@ -819,6 +838,10 @@ próximos pasos).
 > `file://` directo (sitio estático, no hace falta servidor) y sacar
 > screenshots de las secciones en cuestión a distintos anchos.
 
+- **Collage de redes — decidir entre imagen de IA y maqueta HTML/CSS**:
+  ver "Estado actual del diseño" → "Alternativa en HTML/CSS". Esperando
+  que el usuario mire `docs/mockup-collage-redes.html` y diga si se
+  integra o se descarta.
 - **Collage de redes en `#lam-06` "Conócenos" — verificar en un deploy
   real**: ver "Estado actual del diseño" → bullet "Collage de redes" para
   el detalle de la implementación. Se verificó visualmente en este mismo
