@@ -1411,25 +1411,46 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 /* ---------- 06 CONTACTO ---------- */
 .contact-wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:70px}
 @media(max-width:900px){.contact-wrap{grid-template-columns:1fr;gap:50px}}
+.contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
+.contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:600;color:var(--purple)}
+.contact-trust-item svg{width:16px;height:16px;flex:none}
+.big-email-row{display:flex;align-items:center;gap:12px}
 .big-email{
   font-family:var(--font-d);font-size:clamp(24px,4vw,40px);color:var(--ink);font-weight:800;
   display:inline-block;border-bottom:1px solid var(--panel-line);padding-bottom:10px;
   transition:border-color .25s ease,color .25s ease;
 }
 .big-email:hover{border-color:var(--purple);color:var(--purple)}
-.social-list{display:flex;flex-direction:column;margin-top:34px}
-.social-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 0;border-top:1px solid var(--panel-line);
-  font-family:var(--font-m);font-size:14.5px;font-weight:500;
+.copy-email-btn{
+  flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--panel-line);
+  background:var(--paper);color:var(--purple);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:border-color .2s,background .2s;position:relative;margin-bottom:10px;
 }
-.social-row:last-child{border-bottom:1px solid var(--panel-line)}
-.social-row .l{display:flex;align-items:center;gap:14px}
-.social-row svg{width:18px;height:18px;color:var(--purple)}
-.social-row .h{color:var(--panel-text);transition:color .2s}
-.social-row:hover .h{color:var(--ink)}
-.arrow{transition:transform .2s ease}
-.social-row:hover .arrow{transform:translateX(4px)}
+.copy-email-btn:hover{border-color:var(--purple);background:var(--panel-2)}
+.copy-email-btn svg{width:16px;height:16px}
+.copy-email-btn::after{
+  content:"Copiado ✓";position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
+  background:var(--ink);color:#fff;font-family:var(--font-m);font-size:11px;font-weight:600;
+  padding:5px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.copy-email-btn.is-copied::after{opacity:1;transform:translateX(-50%) translateY(0)}
+.social-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:34px}
+@media(max-width:480px){.social-cards{grid-template-columns:1fr}}
+.social-card{
+  display:flex;flex-direction:column;gap:8px;padding:16px 18px;
+  background:var(--paper);border:1px solid var(--panel-line);border-radius:var(--radius);
+  transition:border-color .2s,transform .2s;
+}
+.social-card:hover{border-color:var(--purple);transform:translateY(-2px)}
+.social-card-icon{
+  width:34px;height:34px;border-radius:50%;background:var(--panel-2);color:var(--purple);
+  display:flex;align-items:center;justify-content:center;
+}
+.social-card-icon svg{width:17px;height:17px}
+.social-card-name{font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--ink)}
+.social-card-handle{font-size:13px;color:var(--panel-text)}
+.social-card:hover .arrow{transform:translateX(4px);display:inline-block}
+.arrow{transition:transform .2s ease;display:inline-block}
 
 .contact-form{display:flex;flex-direction:column;gap:14px;background:var(--paper);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px}
 .contact-form input,.contact-form textarea{

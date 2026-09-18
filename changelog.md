@@ -11,6 +11,30 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Contacto: franja de confianza, botón copiar correo y redes como tarjetas
+
+Rediseño de `#lam-06` (Contacto), a partir de una lluvia de ideas
+propuesta al usuario (5 opciones) de la que se combinaron 3:
+
+- **Franja de confianza** (`.contact-trust`): 2 ítems cortos con ícono
+  ("Respondemos en menos de 24h", "Primera consulta sin costo") arriba
+  del email, en `--purple`.
+- **Botón "copiar correo"** (`.copy-email-btn`, junto a `.big-email`):
+  círculo con ícono de copiar; usa `navigator.clipboard.writeText` (con
+  fallback si no está disponible) y muestra un tooltip "Copiado ✓" vía
+  `::after` + clase `.is-copied` (handler en `js/script.js`, ~1.6s).
+- **Redes sociales como tarjetas** (`.social-cards`/`.social-card`,
+  grid 2x2, 1 columna en mobile ≤480px): reemplaza la lista de filas
+  anterior (`.social-list`/`.social-row`, eliminada). Cada tarjeta tiene
+  ícono en círculo (`.social-card-icon`, mismo tratamiento que
+  `.quote-avatar`/íconos de Beneficios), nombre en negrita y
+  handle/dato con flecha. Mismos 4 links/íconos de antes (Instagram,
+  Facebook, TikTok, Teléfono), sin cambios de contenido.
+- El formulario (`.contact-form`) y su lógica de envío por `mailto:` no
+  cambiaron.
+- Verificado con Playwright en 1440px y 390px, incluido el click real
+  del botón de copiar (aparece el tooltip).
+
 ## 2026-09-17 (quinta tanda) — Beneficios: "Para quién es" vuelve a ser lista + calificación real en testimonios
 
 Dos ajustes a pedido del usuario sobre el rediseño de la tanda anterior:

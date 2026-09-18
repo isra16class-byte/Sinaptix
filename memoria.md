@@ -441,6 +441,15 @@ próximos pasos).
   (`.quote-mark`, esquina inferior derecha, recortada con
   `overflow:hidden`).
 
+- **Contacto (`#lam-06`)**: sobre `.contact-wrap` (columna izquierda +
+  `.contact-form`), la columna izquierda tiene ahora: franja de
+  confianza (`.contact-trust`, 2 ítems con ícono en `--purple`) →
+  `.big-email` con botón circular de copiar al lado (`.copy-email-btn`,
+  `navigator.clipboard`, tooltip "Copiado ✓" por CSS) → redes sociales
+  como grid de tarjetas (`.social-cards`/`.social-card`, 2x2 desktop/1
+  col ≤480px, ícono en círculo + nombre + handle), ya no lista de filas.
+  El formulario y su envío por `mailto:` (`js/script.js`) no cambiaron.
+
 ## Pendientes conocidos
 
 - **Visión — sesión 2 (mobile + limpieza)**: falta decidir y construir el

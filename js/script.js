@@ -162,6 +162,23 @@
     if(methodGaugesSection) methodGaugesSection.scrollIntoView({behavior:'smooth', block:'center'});
   });
 
+  // Botón "copiar correo" en Contacto
+  const copyEmailBtn = document.querySelector('.copy-email-btn');
+  if(copyEmailBtn){
+    copyEmailBtn.addEventListener('click', function(){
+      const email = this.dataset.email || 'hola@sinaptix.com';
+      const done = () => {
+        this.classList.add('is-copied');
+        setTimeout(() => this.classList.remove('is-copied'), 1600);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(email).then(done).catch(done);
+      } else {
+        done();
+      }
+    });
+  }
+
   // Formulario de contacto: envía un correo real a hola@sinaptix.com
   document.getElementById('formContacto').addEventListener('submit', function(e){
     e.preventDefault();
