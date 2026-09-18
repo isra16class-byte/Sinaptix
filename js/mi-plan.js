@@ -165,6 +165,10 @@ if(window.netlifyIdentity){
           }
         }
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
+        // Botón "Descargar mi plan en PDF" (js/mi-plan-pdf.js): solo tiene
+        // sentido con un plan ya generado, mismo criterio que el resto del
+        // contenido condicional de esta pantalla.
+        if(typeof nutriPdfActualizarBoton === 'function') nutriPdfActualizarBoton(true);
         // Anillo de progreso de la tarjeta "Objetivo cognitivo" (rediseño
         // visual, ver memoria.md): mismo criterio que el de Antropometría.
         const objetivoRingEl = document.getElementById('miPlanObjetivoRing');
@@ -176,6 +180,7 @@ if(window.netlifyIdentity){
       const miPlanAjustesElVacio = document.getElementById('miPlanAjustes');
       if(miPlanAjustesElVacio) miPlanAjustesElVacio.classList.add('hidden');
       if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');
+      if(typeof nutriPdfActualizarBoton === 'function') nutriPdfActualizarBoton(false);
     }
   }
 

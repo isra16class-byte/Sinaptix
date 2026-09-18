@@ -274,6 +274,11 @@
             <p class="miplan-cierre-session" id="miPlanEmail"></p>
             <div class="btn-row miplan-cierre-btns">
               <button type="button" class="btn btn-solid" id="btnAbrirNutricionMiPlan">Generar mi plan</button>
+              <!-- Solo visible cuando ya hay un plan guardado (lo muestra
+                   nutriPdfActualizarBoton() desde pintarMiPlan, js/mi-plan.js,
+                   con el mismo criterio de .hidden que el resto del
+                   contenido condicional al plan). -->
+              <button type="button" class="btn btn-ghost hidden" id="btnDescargarPdf">Descargar mi plan en PDF</button>
               <button type="button" class="btn btn-ghost" id="btnLogout">Cerrar sesión</button>
             </div>
           </div>
@@ -634,6 +639,10 @@
 <script src="js/nutricion-planes.js"></script>
 <script src="js/nutricion-wizard.js"></script>
 <script src="js/plan-sync.js"></script>
+<!-- Botón "Descargar mi plan en PDF". Este archivo NO carga jsPDF: solo
+     define el botón y el modelo de datos. jsPDF se baja del CDN recién al
+     primer click (lazy), así que no afecta la carga inicial de la página. -->
+<script src="js/mi-plan-pdf.js"></script>
 <script src="js/mi-plan.js"></script>
 </body>
 </html>

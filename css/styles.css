@@ -967,6 +967,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-cierre-session{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin:0}
 .miplan-cierre-btns{flex-direction:row}
 .miplan-cierre-btns .btn{flex:1;text-align:center}
+/* "Descargar mi plan en PDF" va en su propia fila, a todo el ancho de la
+   tarjeta: es la columna angosta del grid y, compartiendo fila con
+   "Generar mi plan", la etiqueta se partía en 3 renglones. */
+.miplan-cierre-btns #btnDescargarPdf{flex:1 0 100%}
 @media(max-width:900px){
   .miplan-grid,.miplan-detalle-grid{grid-template-columns:1fr}
 }
@@ -1200,6 +1204,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   border:none;cursor:pointer;font-family:var(--font-m);
 }
 .miplan-auth-submit[disabled]{opacity:.6;pointer-events:none}
+/* Mismo criterio visual que el submit de auth de arriba, para el botón
+   "Descargar mi plan en PDF" mientras se baja jsPDF y se arma el
+   documento (ver js/mi-plan-pdf.js). */
+#btnDescargarPdf[disabled]{opacity:.6;pointer-events:none}
 
 /* Candado ilustrado (variante A): SVG inline, trazo fino sin relleno,
    mismo criterio que el resto de esta pantalla — no existe un asset de

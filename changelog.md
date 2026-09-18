@@ -11,6 +11,139 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — "Descargar mi plan en PDF": generación vectorial client-side con jsPDF
+
+Se agrega un botón **"Descargar mi plan en PDF"** (`#btnDescargarPdf`) en la
+tarjeta "Cierre" de `mi-plan.html`, que genera un documento A4 con el plan
+completo, con el mismo aspecto que la referencia visual aprobada
+(`docs/mockup-pdf-mi-plan.html`).
+
+### Cómo se genera
+
+100% en el navegador de quien hace click: no pasa por Netlify Functions, no
+genera cargos y no depende del backend. **Nada de html2canvas ni captura de
+pantalla**: el documento entero se dibuja con primitivas vectoriales de jsPDF
+3.0.1 (texto, `rect`/`roundedRect`, líneas, `triangle`, y polígonos para los
+sectores de la dona). Sale con texto seleccionable y buscable, nítido a
+cualquier zoom, y pesa ~138 KB contra el ~1 MB que daría una captura.
+
+jsPDF se carga por `<script>` desde cdnjs **recién al primer click** (lazy
+load), así que la carga inicial de `mi-plan.html` no cambia en nada. La
+versión va fijada (3.0.1, no `latest`) para que el test pueda servir el mismo
+bundle local. El logo real (`img/sinaptix-icon.png`) se embebe con
+`addImage()` tras un `fetch` + `FileReader`; si ese fetch falla (offline, 404)
+el PDF igual se genera, con un nodo dibujado a mano como fallback.
+
+### De dónde salen los datos
+
+Del mismo plan resuelto que ya usa `nutriBuildResumenHTML`: las 3 claves de
+`localStorage` (`sinaptix_objetivo`, `sinaptix_antropometria`,
+`sinaptix_reevaluacion`) más las funciones puras de `js/nutricion-planes.js`
+(`nutriResolverObjetivo`, `nutriConstruirAjustes`, `nutriConstruirAvisos`,
+`gaugeComputeAreas`, `gaugeColorForPercent`, `imcCategoria`). No se creó
+ninguna fuente de datos nueva. `nutriPdfModelo()` concentra toda esa
+resolución en una función pura (sin DOM, red ni `localStorage`), y el dibujo
+vive aparte — por eso se puede testear el contenido sin navegador.
+
+### Bug encontrado en el camino: `const` no se cuelga de `window`
+
+La primera versión buscaba las dependencias en `window` y el PDF salía vacío.
+Causa: `nutricion-planes.js` declara `NUTRI_PLANES` con `const` en el tope de
+un `<script>` clásico, y los `const`/`let` de nivel superior **no** quedan
+como propiedades de `window` (a diferencia de las `function`, que sí). Se
+resuelve por identificador léxico —visible entre scripts del mismo
+documento— con `typeof` para que en Node no explote. Ver `depsPorDefecto()`.
+
+### Estructura del documento
+
+Encabezado con logo + "Preparado para {nombre}" + fecha → **panel destacado
+de objetivo** (fondo lila, barra de acento morada, nombre del plan en
+display + enfoque) → fila de 2 tarjetas: **barras de foco/memoria/energía/
+calma con marca de meta** punteada (y marca del valor anterior si hubo
+reevaluación) y **barra de IMC por zonas** con los umbrales OMS y puntero →
+**estrategia nutricional** (chips de nutrientes clave + cajas Priorizar/
+Moderar de alto igualado) → **día tipo: timeline numerado + gráfico de dona
+con leyenda** → **ajustes** → **avisos** con color según nivel
+(`alto`/`moderado`) → **panel legal** → pie con "Página X de Y".
+
+Paginación propia: `ctx.espacio(h)` reserva alto y abre página nueva con un
+encabezado compacto, y los títulos de sección reservan también el alto del
+bloque que viene abajo, para que nunca quede un título colgado al pie de una
+página con su contenido en la siguiente. Con el caso más cargado (6
+prioridades, 6 ajustes, 5 avisos) el documento sale en 2 páginas.
+
+### Decisiones tomadas en la sesión (sin consultar, por pedido explícito)
+
+- **Tipografía: Times + Helvetica, no Fraunces + Inter.** jsPDF solo trae las
+  14 fuentes estándar del formato PDF; embeber las reales como TTF base64
+  sumaba ~300 KB solo para esta feature. Se conserva el par
+  serif-display / sans-cuerpo del sitio. Paleta, jerarquía y layout sí son
+  idénticos. Como esas fuentes usan WinAnsi, `pdfTextoSeguro()` normaliza los
+  símbolos que no cubren (— → “ ” … ✓) y **desescapa** el HTML que
+  `nutriConstruirAjustes` escapaba para `innerHTML` (si no, el texto libre de
+  la encuesta se vería con `&amp;` literal en el PDF).
+- **Meta de las barras: 80% fijo**, igual para las 4 áreas. No sale de la
+  encuesta; va rotulada como sugerida en el propio documento.
+- **Reparto de la dona: 30/10/35/25** (Desayuno/Snack/Almuerzo/Cena), también
+  orientativo y rotulado como tal. Hay un test que falla si algún plan
+  estrena un momento nuevo sin su entrada en `REPARTO`.
+- **El botón va en su propia fila** dentro de `.miplan-cierre-btns`: la
+  tarjeta "Cierre" es la columna angosta del grid y, compartiendo fila con
+  "Generar mi plan", la etiqueta se partía en 3 renglones.
+- **Sin SRI en el `<script>` de cdnjs**: no se pudo verificar desde el
+  entorno de trabajo que el archivo del CDN sea byte a byte el de npm, y un
+  hash equivocado rompe la feature en silencio. Queda anotado como pendiente.
+- **`NUTRI_PLANES` pasa a exportarse** desde `js/nutricion-planes.js` (antes
+  quedaba fuera a propósito) para que el test pueda comparar el modelo del
+  PDF contra el contenido real de los planes. Su contenido sigue sin
+  testearse: es dato editorial, no cálculo.
+
+### El mockup de referencia
+
+El HTML que mandó el usuario venía con una dirección distinta a la descrita
+(anillos radiales y un bloque de QR, en vez del timeline + dona que pedía el
+texto) y con varios detalles sin terminar. Se rehízo como
+`docs/mockup-pdf-mi-plan.html`: misma paleta y tipografía del sitio, logo
+real, y los bloques que efectivamente se construyeron. El QR de "verificación
+digital" se descartó — no hay nada contra qué validar, era decorativo. Los
+anillos radiales se reemplazaron por las barras con meta, que muestran el
+mismo dato pero permiten marcar el objetivo y la comparación con la
+reevaluación. Ese archivo es documentación: no se carga desde ninguna página
+del sitio.
+
+### Tests
+
+- `tests/mi-plan-pdf.test.js` — 21 tests del modelo de datos. Comparan contra
+  las funciones de `nutricion-planes.js` en vez de contra valores escritos a
+  mano, para que el PDF no se quede atrás en silencio si esas cambian.
+- `tests/mi-plan-pdf.e2e.test.mjs` — 4 subtests de Playwright con
+  `netlifyIdentity` mockeado: el botón aparece con sesión + plan, no aparece
+  sin plan, el click descarga `mi-plan-sinaptix.pdf`, y el contenido del PDF
+  coincide con los datos del plan (se infla el buffer que devuelve jsPDF
+  **antes** de la descarga con `zlib` y se leen los literales de texto, sin
+  herramientas externas). También verifica el lazy load.
+- Playwright y jsPDF **no** se agregaron a `package.json` (el sitio no tiene
+  build step y Netlify los instalaría en cada deploy): si faltan, el e2e se
+  saltea con un mensaje en vez de fallar.
+- Suite completa: **80 tests, 80 pass**.
+
+### Archivos tocados
+
+- `js/mi-plan-pdf.js` (nuevo)
+- `docs/mockup-pdf-mi-plan.html` (nuevo)
+- `tests/mi-plan-pdf.test.js` (nuevo), `tests/mi-plan-pdf.e2e.test.mjs` (nuevo)
+- `mi-plan.html` — botón + `<script>`
+- `js/mi-plan.js` — muestra/oculta el botón desde `pintarMiPlan`
+- `js/nutricion-planes.js` — exporta `NUTRI_PLANES`
+- `css/styles.css` — estado `[disabled]` y fila propia del botón
+
+### Pendiente
+
+Verificar contra un deploy real que el `<script>` de cdnjs carga sin
+problemas de CSP y cómo se ve el documento en visores reales
+(Acrobat/Preview/Android), no solo rasterizado con `pdftoppm`. Ver
+`memoria.md` → "Pendientes conocidos".
+
 ## 2026-09-18 — Imagen del Hero: PNG de 1.2 MB → WebP de 232 KB (carga lenta al entrar)
 
 El usuario preguntó por qué la imagen grande del cerebro del Hero

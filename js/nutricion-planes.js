@@ -673,6 +673,12 @@ function nutriBuildBarChartHTML(objetivo, reeval){
 // texto, no cálculo.
 if(typeof module !== 'undefined' && module.exports){
   module.exports = {
+    // NUTRI_PLANES se exporta desde la sesión del PDF de "Mi plan"
+    // (tests/mi-plan-pdf.test.js necesita el contenido real de los planes
+    // para verificar que el modelo del PDF sale del mismo lugar que el
+    // dashboard, no de una copia). Sigue sin testearse su contenido en sí:
+    // es dato editorial, no cálculo.
+    NUTRI_PLANES,
     nutriResolverObjetivo,
     nutriConstruirAjustes,
     nutriConstruirAvisos,
