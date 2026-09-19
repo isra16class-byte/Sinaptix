@@ -11,6 +11,32 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — README.md y ESTRUCTURA-DEL-CODIGO.txt puestos al día
+
+Ambos documentos describían una versión vieja del sitio (sin backend, sin
+`mi-plan.html`, sin wizard de 8 pasos, sin PDF, sin tests, con un
+`#formContacto` que ya no existe, secciones "lam-01 a lam-06" en vez de
+"lam-01 a lam-07"). Se reescribieron completos a partir del código actual y
+de `memoria.md`, sin agregar contenido nuevo — solo documentación, sin
+cambios de código.
+
+- **`README.md`**: árbol de archivos actualizado (`mi-plan.html`,
+  `js/nutricion-wizard.js`, `js/mi-plan-pdf.js`, `js/nav-menu.js`,
+  `js/plan-sync.js`, `netlify/`, `tests/`, `scripts/`, `docs/`,
+  `historico/`). Sección "Funcionalidad actual" reescrita: wizard de 8
+  pasos que genera el plan al instante (ya no `mailto:`), "Mi plan" con
+  login/registro propios y dashboard, descarga en PDF. Sección "Tests"
+  nueva. "Próximos pasos" actualizado con los puntos ya resueltos (login
+  propio, PDF) y el punto de verificación real consolidado.
+- **`ESTRUCTURA-DEL-CODIGO.txt`**: reescrito completo — árbol de archivos,
+  las 7 secciones de `index.html` (antes 6) más `mi-plan.html` como página
+  aparte, orden de carga real de los 8 archivos `.js` con sus dependencias,
+  flujo del wizard/PDF/reevaluación, las 3 keys de `localStorage` vigentes
+  (antes documentaba solo 2, sin `sinaptix_reevaluacion`), Netlify
+  Functions/base de datos, y la sección de tests.
+- **Tests**: `npm test` sigue en 85/86 pass (mismo skip de siempre). Sin
+  cambios de código, solo documentación.
+
 ## 2026-09-19 — Placeholders del wizard: ejemplo en vez de repetir el label
 
 El usuario notó que en el wizard de nutrición (`#formNutricion`, 8 pasos,

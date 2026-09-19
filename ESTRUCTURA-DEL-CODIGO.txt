@@ -1,239 +1,270 @@
 SINAPTIX — ESTRUCTURA Y FLUJO DEL CODIGO
 ==========================================
-(Referencia técnica de qué hace cada archivo y cada módulo del sitio)
+(Referencia técnica de qué hace cada archivo y cada módulo del sitio.
+Para el detalle fino de decisiones de diseño y el historial de por qué
+algo quedó así, ver memoria.md / changelog.md / historico/.)
 
 
 1. VISION GENERAL
 ------------------
-Es un sitio de una sola página (single-page), 100% estático (HTML/CSS/JS
-puro, sin framework ni build step). No hay backend propio: los formularios
-mandan correos vía "mailto:" y, desde que se integró Netlify Identity, hay
-login de usuarios con datos que hoy se guardan solo en el localStorage del
-navegador (no en una base de datos — ver limitación al final).
+Landing de una sola página (index.html) + una página propia para "Mi
+plan" (mi-plan.html), 100% estático (HTML/CSS/JS puro, sin framework ni
+build step propio). No hay servidor de aplicación: solo Netlify
+Functions (una sola función serverless) para persistir "Mi plan" en una
+base de datos asociada a la cuenta del usuario. El login/registro es
+propio (formularios a medida) sobre Netlify Identity.
 
-Árbol de archivos:
+Árbol de archivos (resumen; ver README.md para el árbol completo con
+comentarios):
 
-  index.html                 Todo el markup de la página (una sola)
-  css/styles.css              Todos los estilos
-  js/script.js                 Toda la lógica de interacción
-  img/
-    sinaptix-icon.png          Ícono / favicon / logo chico del nav
-    sinaptix-badge.png         Logo grande (badge) del hero
-  svg/
-    deco-circles-vision.svg     Decoración de fondo, sección 02 (Visión)
-    deco-leaf-beneficios.svg    Decoración de fondo, sección 05 (Beneficios)
-    deco-dots-contacto.svg      Decoración de fondo, sección 06 (Contacto)
-    signal-wave.svg             Ilustración de onda, sección 04 (Pilares)
-  netlify.toml                Config de build/deploy en Netlify
-  README.md                    Documentación general del proyecto
-  ESTRUCTURA-DEL-CODIGO.txt    Este archivo
+  index.html                     Landing principal, secciones lam-01..lam-07
+  mi-plan.html                   Página propia de "Mi plan" (login + dashboard)
+  css/styles.css                 Todos los estilos (un solo archivo)
+  js/
+    script.js                    Lógica de index.html
+    mi-plan.js                   Lógica de mi-plan.html
+    nutricion-planes.js          Funciones puras (planes/IMC/gauges), compartido
+    nutricion-wizard.js          Motor del wizard de 8 pasos, compartido
+    mi-plan-pdf.js               Generación del PDF con jsPDF
+    nav-menu.js                  Menú hamburguesa mobile, compartido
+    plan-sync.js                 Sincronización localStorage <-> backend
+  netlify/
+    functions/plan.mjs           Netlify Function: GET/POST de "Mi plan"
+    functions/plan-validacion.mjs  Validación de tipos (sin deps de Identity/DB)
+    database/migrations/         Esquema SQL de la tabla mi_plan
+  tests/                         Tests unitarios (node --test) + 1 e2e (Playwright)
+  img/, svg/                     Assets: logos, íconos, decoraciones, ilustraciones
+  scripts/                       Scripts Python que regeneran algunos assets por código
+  docs/                          Mockups de referencia (no se publican en el sitio)
+  netlify.toml                   Config de build/deploy/functions en Netlify
+  package.json                   Declara @netlify/database y @netlify/identity
+  README.md                      Documentación general del proyecto
+  ESTRUCTURA-DEL-CODIGO.txt      Este archivo
+  memoria.md / changelog.md      Memoria de trabajo entre sesiones
 
 
 2. INDEX.HTML — SECCIONES DE LA PAGINA
 ----------------------------------------
-Cada sección tiene un id "lam-0X" (por "lámina X") y corresponde a un nodo
-del riel de navegación lateral (la línea vertical con puntos, a la izquierda,
-visible solo en desktop >900px).
+Cada sección tiene un id "lam-0X" (por "lámina X").
 
-  <nav>                    Barra superior fija: logo, links de anclas
-                            (#lam-02..#lam-06) y botones de sesión:
-                              - #btnLogin  ("Iniciar sesión" / nombre de
-                                usuario / "Mi cuenta" según haya sesión)
-                              - #btnAcceder ("Acceder", se oculta con
-                                sesión iniciada; sin sesión hace scroll
-                                a la sección de contacto)
+  <nav>                     Barra superior fija: logo, links de anclas
+                             (#lam-02..#lam-06), botones de sesión
+                             (#btnMiPlanNav / #btnLogin / #btnAcceder,
+                             todos apuntan a mi-plan.html) y, solo en
+                             mobile (<=720px), botón hamburguesa
+                             (#navToggle) que abre #navMenu con las
+                             mismas 5 secciones.
 
-  #lam-01 (HERO)            Titular principal, botones "Solicitar
-                            asesoría" / "Ver el método", e ilustración
-                            SVG animada de "sinapsis".
+  #lam-01 (HERO)             Titular principal, botones "Solicitar
+                              asesoría" (-> #lam-07) / "Ver el método"
+                              (-> #lam-03), e ilustración animada.
 
-  #lam-02 (MANIFIESTO)      Texto de la visión de la marca + grid de
-                            4 estadísticas (stat-box).
+  #lam-02 (VISION)            Manifiesto de la marca + estadísticas.
 
-  #lam-03 (METODO)          Timeline de 4 fases del método, y 2 botones
-                            que abren modales:
-                              - #btnNutricion       -> abre #modalNutricion
-                              - #btnAntropometria   -> abre #modalAntropometria
+  #lam-03 (METODO)            Timeline de 4 fases, y 2 botones que abren
+                               modales:
+                                 - #btnNutricion      -> #modalNutricion
+                                   (formulario #formNutricion, wizard)
+                                 - #btnAntropometria  -> #modalAntropometria
+                                   (formulario #formAntro)
 
-  #lam-04 (PILARES)         4 tarjetas (pillar) con los pilares
-                            nutricionales, más la ilustración
-                            signal-wave.svg.
+  #lam-04 (PILARES)           4 tarjetas con los pilares nutricionales.
 
-  #lam-05 (BENEFICIOS)      Lista de a quién está dirigido el servicio
-                            + 2 tarjetas de testimonios (quote-card).
-                            (No tiene botones.)
+  #lam-05 (BENEFICIOS)        A quién está dirigido el servicio +
+                               tarjetas de testimonios.
 
-  #lam-06 (CONTACTO)        Datos de contacto, redes sociales, y el
-                            formulario #formContacto. Incluye el footer
-                            del sitio.
+  #lam-06 (CONOCENOS)         Datos de contacto y redes sociales
+                               (antes se llamaba "Contacto"; ya no tiene
+                               un formulario propio, ver lam-07).
 
-  #miPlan (MI PLAN)         Sección agregada para usuarios con sesión
-                            iniciada (ver punto 4). Oculta por defecto
-                            con la clase ".hidden". Muestra:
-                              - #miPlanEmail      correo del usuario
-                              - #miPlanImc        último IMC guardado
-                              - #miPlanImcLab     etiqueta del IMC (o
-                                                  el placeholder si no
-                                                  hay datos aún)
-                              - #miPlanObjetivo   objetivo cognitivo
-                                                  elegido
-                              - #btnLogout        botón "Cerrar sesión"
+  #lam-07 (CIERRE)             Mini-hero final centrado (CTA
+                                "Descubrir mi plan personalizado" ->
+                                abre #modalNutricion) + footer del sitio.
 
-  #modalNutricion           Modal con el formulario #formNutricion
-                            (objetivo cognitivo + correo).
+  #modalNutricion              Modal con el formulario #formNutricion:
+                                wizard de 8 pasos (ver punto 4B) que
+                                termina generando el plan de
+                                neuroalimentación.
 
-  #modalAntropometria        Modal con el formulario #formAntro
-                            (peso, talla, edad, sexo).
+  #modalAntropometria           Modal con el formulario #formAntro
+                                (peso, talla, edad, sexo -> calcula IMC).
+
+  #modalReevaluacion             Modal con el formulario
+                                #formReevaluacion (4 preguntas de
+                                percepción: estrés, fatiga, concentración,
+                                olvidos) para comparar contra la encuesta
+                                original. Se abre desde "Mi plan"
+                                (dashboard) y también desde acá si hay
+                                sesión iniciada.
 
 
-3. CSS/STYLES.CSS — BLOQUES PRINCIPALES
------------------------------------------
-El archivo está organizado en bloques comentados, en este orden:
+3. MI-PLAN.HTML — ESTRUCTURA
+--------------------------------
+Página separada (no sección de index.html), con su propio <nav>
+(incluye #navBack "< Inicio" hacia index.html, solo en mobile).
 
-  :root                    Variables de color/tipografía (--paper, --ink,
-                            --green, --gold, --navy-bright, --panel-*,
-                            fuentes --font-d/--font-b/--font-m).
+  #miPlanSinSesion            Estado sin sesión: login/registro/
+                                recuperación de contraseña propios
+                                (formLoginMiPlan / formRegistroMiPlan /
+                                formRecuperarMiPlan / formNuevaPassMiPlan),
+                                NO el widget de Netlify Identity.
 
-  Reset básico + .wrap      Reglas generales (*, body, a, ::selection) y
-                            el contenedor centrado .wrap.
-
-  NAV                       Barra superior fija y sus botones
-                            (.nav-btn, .nav-btn-ghost, .nav-btn-solid).
-
-  RAIL                      El riel lateral de navegación con los puntos
-                            (.rail, .rail-dot, .rail-node), oculto en
-                            móvil (<900px).
-
-  HERO                      Estilos de la sección 01, incluida la
-                            animación SVG de sinapsis.
-
-  02 MANIFIESTO             Grid de estadísticas (.stat-grid, .stat-box).
-
-  03 PROCESO                Timeline del método (.timeline, .tl-item).
-
-  04 PILARES                Grid de pilares (.pillar-grid, .pillar).
-
-  05 BENEFICIOS             Lista de a quién va dirigido (.ben-list) y
-                            tarjetas de testimonios (.quote-card).
-
-  06 CONTACTO               Formulario de contacto, lista de redes
-                            (.social-row), botón grande de email
-                            (.big-email) y footer.
-
-  MODALES                   Overlay y tarjeta de los modales
-                            (.modal-overlay, .modal-card, .modal-input),
-                            y el botón de cerrar (.modal-close).
-
-  Botones genéricos (.btn)  Usados en varias secciones:
-                              .btn-solid  fondo dorado, texto oscuro
-                              .btn-ghost  borde blanco, fondo transparente
-                                          (fix reciente: antes no tenía
-                                          background explícito, así que
-                                          en elementos <button> el
-                                          navegador le ponía un fondo
-                                          gris/blanco por defecto,
-                                          dejando el texto blanco
-                                          invisible encima).
-
-  .hidden                   Utilidad genérica (display:none !important)
-                            usada para ocultar #miPlan y #btnAcceder
-                            según el estado de sesión.
+  #miPlanConSesion             Estado con sesión (dashboard):
+                                 - Tarjeta "Datos clave": IMC (medidor)
+                                   y objetivo cognitivo.
+                                 - Tarjeta "Detalle del plan": nutrientes
+                                   clave, alimentos a priorizar/moderar,
+                                   ajustes y avisos.
+                                 - Gráfico de barras Foco/Memoria/
+                                   Energía/Calma (#miPlanBarras), con
+                                   botón "Actualizar" que abre
+                                   #modalReevaluacion.
+                                 - Tarjeta "Cierre": botones "Generar mi
+                                   plan" (si no hay plan aún),
+                                   "Descargar mi plan en PDF"
+                                   (#btnDescargarPdf) y "Cerrar sesión".
+                                 - Encuesta de nutrición inline (mismo
+                                   #formNutricion / wizard de 8 pasos que
+                                   el modal de index.html, pero no en
+                                   modal chico) para cuando todavía no
+                                   hay plan generado.
 
 
-4. JS/SCRIPT.JS — FLUJO DE EJECUCION
---------------------------------------
-El script se ejecuta de arriba a abajo apenas carga la página (no hay
-"DOMContentLoaded" explícito; el <script> está al final del <body>, así
-que el DOM ya existe). El flujo, en orden:
+4. JS — FLUJO POR ARCHIVO
+----------------------------
+Orden de carga en <script> (importa, hay dependencias entre archivos):
 
-  A) NETLIFY IDENTITY (login/logout)
-     - Si el widget de Identity está cargado (window.netlifyIdentity):
-       - netlifyIdentity.init() arranca el widget.
-       - setLoginButton(user): cambia el texto de #btnLogin y muestra u
-         oculta #btnAcceder según si "user" existe.
-       - pintarMiPlan(user): lee "sinaptix_antropometria" y
-         "sinaptix_objetivo" de localStorage y llena los campos de
-         #miPlan (si no hay datos, deja los placeholders del HTML).
-       - mostrarMiPlan(user) / ocultarMiPlan(): agregan o quitan la
-         clase .hidden de #miPlan.
-       - Click en #btnLogout -> netlifyIdentity.logout().
-       - Click en #btnLogin -> si ya hay sesión abre el panel de cuenta
-         ('user'); si no, abre el modal de login ('login'), que también
-         permite registrarse (Sign up) desde el mismo modal.
-       - Eventos escuchados del widget:
-           'init'   -> se dispara al cargar la página; sincroniza el
-                       estado visual con la sesión que ya existiera.
-           'login'  -> actualiza botón, pinta y muestra "Mi plan",
-                       cierra el modal.
-           'logout' -> vuelve todo al estado sin sesión.
+  1. js/nav-menu.js            Sin dependencias.
+  2. js/nutricion-planes.js    Base: NUTRI_PLANES, NUTRI_RANGOS, cálculo
+                                puro (objetivo, ajustes/avisos, IMC,
+                                gauges, validación). Se declara con
+                                `const` de nivel superior en un <script>
+                                clásico (NO queda colgado de `window`).
+  3. js/nutricion-wizard.js    Motor de navegación/validación de los 8
+                                pasos de #formNutricion. Depende del 2.
+  4. js/plan-sync.js           Sincroniza localStorage <-> backend.
+                                Depende del 3.
+  5a. js/mi-plan-pdf.js        (Solo mi-plan.html) Genera el PDF.
+                                Depende del 2. Se carga antes de mi-plan.js.
+  5b. js/script.js             (Solo index.html) o
+      js/mi-plan.js             (Solo mi-plan.html) Lógica específica de
+                                cada página, último en cargar.
 
-  B) MODALES GENERICOS
-     - openModal(id) / closeModal(el): agregan/quitan la clase .open y
-       bloquean/desbloquean el scroll del body.
-     - #btnNutricion abre #modalNutricion; #btnAntropometria abre
-       #modalAntropometria.
-     - Cualquier elemento con [data-close] cierra el modal donde esté.
-     - Click fuera de la tarjeta del modal (en el overlay) lo cierra.
-     - Tecla Escape cierra cualquier modal abierto.
+  A) NETLIFY IDENTITY (solo index.html, js/script.js)
+     - netlifyIdentity.init() arranca el widget SOLO para saber si hay
+       sesión (no abre el modal de login del widget): cambia qué botón
+       del nav se muestra (#btnMiPlanNav si hay sesión, #btnLogin /
+       #btnAcceder si no). El login real vive en mi-plan.html.
+
+  B) WIZARD DE 8 PASOS (js/nutricion-wizard.js + js/script.js/mi-plan.js)
+     - Pasos: 1 Objetivo y contacto, 2 Datos personales y
+       antropométricos, 3 Rutina y exigencia mental, 4 Hábitos
+       alimentarios, 5 Salud/alergias/restricciones, 6 Percepción
+       actual, 7 Preferencias y cierre, 8 Resultado (el plan generado).
+     - Al terminar: guarda {objetivo, email, fecha, ...detalle completo}
+       en localStorage bajo "sinaptix_objetivo", sincroniza con el
+       backend si hay sesión (js/plan-sync.js), y muestra el resultado
+       ahí mismo (ya no manda ningún correo).
 
   C) FORMULARIO #formAntro (datos antropométricos)
-     - Valida peso (1-400kg), talla (1-250cm), edad (1-120) y sexo.
-     - Si algo es inválido, muestra el error en #antroResultado y corta
-       la ejecución (return) sin enviar nada.
-     - Si todo es válido: calcula IMC = peso / (talla_m)^2 y una
-       categoría textual (bajo peso / peso saludable / sobrepeso /
-       obesidad).
-     - Guarda el resultado en localStorage bajo la key
-       "sinaptix_antropometria" (usado luego por "Mi plan").
-     - Arma un mailto: con los datos y redirige el navegador a él
-       (esto abre el cliente de correo del usuario).
+     - Valida peso/talla/edad/sexo. Calcula IMC = peso / (talla_m)^2 y
+       una categoría (bajo peso / saludable / sobrepeso / obesidad).
+     - Guarda el resultado en localStorage bajo "sinaptix_antropometria"
+       y sincroniza con el backend si hay sesión.
 
-  D) FORMULARIO #formContacto
-     - Toma nombre, email y mensaje, arma un mailto: y redirige.
-     - Cambia el texto del botón a "Abriendo tu correo…".
+  D) FORMULARIO #formReevaluacion
+     - Guarda {estres, fatiga, concentracion, olvidos, fecha} en
+       localStorage bajo "sinaptix_reevaluacion" (sincroniza con el
+       backend si hay sesión). Se usa para la comparación "antes/
+       después" en los anillos de progreso y en el PDF.
 
-  E) FORMULARIO #formNutricion
-     - Toma el objetivo cognitivo elegido y el email.
-     - Guarda {objetivo, email, fecha} en localStorage bajo la key
-       "sinaptix_objetivo" (usado luego por "Mi plan").
-     - Arma un mailto: y redirige.
+  E) "MI PLAN" (js/mi-plan.js, solo mi-plan.html)
+     - Login/registro/recuperación de contraseña propios (formularios a
+       medida sobre gotrue/netlifyIdentity, no el widget visual).
+     - pintarMiPlan(): lee las 3 keys de localStorage y arma todo el
+       dashboard (IMC, objetivo, barras, detalle del plan, chips de
+       nutrientes, botón de PDF).
+     - Delegación de eventos sobre el contenido que se re-pinta en cada
+       actualización (por ejemplo el botón "Actualizar" del gráfico de
+       barras).
 
-  F) REVEAL ON SCROLL
-     - Usa IntersectionObserver sobre todos los elementos .reveal que
-       no tengan ya la clase .in.
-     - Cuando un elemento entra en el viewport (15% visible), le agrega
-       la clase .in (dispara la animación de aparición vía CSS) y deja
-       de observarlo.
+  F) PDF DE "MI PLAN" (js/mi-plan-pdf.js)
+     - Botón #btnDescargarPdf. jsPDF 3.0.1 se inyecta por <script> desde
+       cdnjs recién al primer click (lazy load, no afecta la carga
+       inicial).
+     - Documento 100% vectorial (texto + primitivas de jsPDF: rect,
+       líneas, anillos), sin html2canvas: texto seleccionable/buscable.
+     - Usa el mismo plan resuelto que el dashboard (mismas funciones de
+       js/nutricion-planes.js), para no divergir en los números.
 
-  G) RAIL PROGRESS (riel lateral)
-     - onScroll(): calcula qué tan avanzado está el scroll de la página
-       (0 a 1) y mueve #railDot verticalmente en esa proporción.
-     - Además determina qué <section> está más cerca del centro de la
-       pantalla y le pone la clase .active al .rail-node
-       correspondiente (resaltando el punto/label activo del riel).
-     - Se llama en cada evento de scroll (con requestAnimationFrame
-       para no sobrecargar) y una vez al cargar la página.
+  G) REVEAL ON SCROLL / RAIL / PROGRESO
+     - IntersectionObserver sobre los elementos .reveal: al entrar en
+       viewport agrega la clase .in (dispara la animación CSS).
+     - Barra de progreso de scroll en el nav (#scrollProgress).
 
 
 5. NETLIFY.TOML
 -----------------
 Configuración de despliegue:
-  - publish = "."        el sitio se sirve desde la raíz del repo
-  - command = ""          no hay build step (sitio ya está "compilado")
-  - NODE_VERSION = "20"   versión de Node usada por Netlify si llegara a
-                          hacer falta en el futuro (por ejemplo, cuando
-                          se agreguen Netlify Functions)
+  - publish = "."             el sitio se sirve desde la raíz del repo
+  - command = ""               no hay build step propio
+  - NODE_VERSION = "20"        versión de Node para las Netlify Functions
+  - [functions] directory = "netlify/functions", node_bundler = "esbuild"
 
 
-6. LOCALSTORAGE — KEYS USADAS HOY
+6. NETLIFY FUNCTIONS Y BASE DE DATOS
+----------------------------------------
+  netlify/functions/plan.mjs        GET/POST de los 3 bloques de datos
+                                     de "Mi plan" contra Netlify Database
+                                     (Postgres). Formato MODERNO (`export
+                                     default`, Web Request/Response) — el
+                                     formato clásico (`exports.handler`)
+                                     no inyecta la connection string.
+                                     Verifica la sesión con getUser() de
+                                     @netlify/identity (header
+                                     Authorization).
+  netlify/functions/plan-validacion.mjs
+                                     TIPOS_VALIDOS / esTipoValido(), sin
+                                     imports de @netlify/identity ni
+                                     @netlify/database, para poder
+                                     testearlo aparte (tests/plan-validacion.test.mjs).
+  netlify/database/migrations/      Esquema de la tabla mi_plan. Se
+                                     aplica automáticamente en cada
+                                     build/deploy (no hay que provisionar
+                                     nada a mano en el dashboard).
+
+
+7. LOCALSTORAGE — KEYS USADAS HOY
 ------------------------------------
-  sinaptix_antropometria   { peso, tallaCm, edad, sexo, imc, fecha }
-  sinaptix_objetivo         { objetivo, email, fecha }
+  sinaptix_antropometria    { peso, tallaCm, edad, sexo, imc, fecha }
+  sinaptix_objetivo          { objetivo, email, fecha, ...detalle
+                              completo de la encuesta de 8 pasos }
+  sinaptix_reevaluacion      { estres, fatiga, concentracion, olvidos,
+                              fecha }
 
-Estas keys viven solo en el navegador donde se llenó el formulario. Si
-el mismo usuario inicia sesión desde otro dispositivo o navegador, "Mi
-plan" no va a mostrar estos datos porque no existen ahí. Esa es la
-limitación que se resuelve en la siguiente fase del proyecto,
-agregando Netlify Database + Netlify Functions para que estos datos se
-guarden asociados a la cuenta del usuario (JWT) en vez de solo al
-navegador local. Ver README.md, sección "Próximos pasos".
+Estas 3 keys son la única fuente que lee el resto del sitio para pintar
+la pantalla (dashboard de "Mi plan", PDF, anillos de progreso). Cuando
+hay sesión iniciada, cada guardado se sincroniza también con el
+servidor vía js/plan-sync.js (ver punto 6): localStorage sigue siendo
+la fuente de lectura local/caché, pero el servidor "manda" al mezclar
+datos entre dispositivos. Ver README.md, sección "Backend de Mi plan".
+
+
+8. TESTS
+----------
+  npm test                    = node --test (sin pasarle tests/ como
+                               argumento, o lo toma como módulo y falla)
+
+  tests/nutricion-planes.test.js      Cálculo puro (plan, IMC, gauges,
+                                       validación de rango/nombre).
+  tests/plan-validacion.test.mjs      esTipoValido() de plan-validacion.mjs.
+  tests/mi-plan-pdf.test.js           Modelo de datos del PDF (compara
+                                       contra las mismas funciones que
+                                       usa el dashboard).
+  tests/mi-plan-pdf.e2e.test.mjs      E2E con Playwright sobre el botón
+                                       de descarga. Playwright y jsPDF
+                                       NO están en package.json a
+                                       propósito: si faltan, se saltea.
+
+Diseño/layout no tiene suite fija (se verifica con Playwright ad hoc en
+cada patch de UI). No hay CI: correr los tests es manual.
