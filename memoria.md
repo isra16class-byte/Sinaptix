@@ -1000,29 +1000,53 @@ próximos pasos).
     confirmado por elección múltiple, no fue posición ni las frutas en
     sí.
 
-- **Conócenos (`#lam-06`, antes "Contacto", sesión 2026-09-18)**: el
-  usuario no quiere responder correos a mano; la acción principal del
-  sitio para "empezar" ya no es este formulario, es el wizard de
-  nutrición (ver bullet "Cierre" abajo). Esta sección se redujo a solo
-  información de contacto pasivo: eyebrow "Conócenos", título "Conócenos
-  <span class="title-mark">de cerca</span>", un párrafo corto, y sobre
-  `.contact-info` (antes `.contact-wrap`, ya no es grid de 2 columnas —
-  `max-width:640px`, una sola columna): franja de confianza
-  (`.contact-trust`, 2 ítems con ícono en `--purple`) → `.big-email` con
-  botón circular de copiar al lado (`.copy-email-btn`,
-  `navigator.clipboard`, tooltip "Copiado ✓" por CSS) → redes sociales
-  como **columna** de 3 tarjetas (`.social-cards`/`.social-card`,
-  Instagram, TikTok y Teléfono — **Facebook se sacó**, sesión
-  2026-09-18); cada tarjeta es una fila: ícono en círculo a la izquierda,
-  nombre + handle apilados a la derecha. **Se sacó el
-  `<form id="formContacto">`** (nombre/correo/mensaje + envío por
-  `mailto:` en `js/script.js`) — ya no existe en el sitio.
+- **Conócenos (`#lam-06`, antes "Contacto", sesión 2026-09-18, retocada
+  2026-09-19)**: el usuario no quiere responder correos a mano; la acción
+  principal del sitio para "empezar" ya no es este formulario, es el
+  wizard de nutrición (ver bullet "Cierre" abajo). Esta sección se redujo
+  a solo información de contacto pasivo: eyebrow "Conócenos", título
+  "Conócenos <span class="title-mark">de cerca</span>", un párrafo corto,
+  y sobre `.contact-info` (antes `.contact-wrap`, ya no es grid de 2
+  columnas — `max-width:640px`, una sola columna): franja de confianza
+  (`.contact-trust`, 2 ítems con ícono en `--purple`) → redes sociales
+  como **columna de 4 tarjetas** (`.social-cards`/`.social-card`: Correo,
+  Instagram, TikTok, Teléfono). **Se sacó el `<form id="formContacto">`**
+  (nombre/correo/mensaje + envío por `mailto:` en `js/script.js`) — ya no
+  existe en el sitio.
+  - ⚠️ **El correo ya NO es el `.big-email` grande con botón de copiar al
+    lado** (sesión 2026-09-19, pedido explícito del usuario: "para que
+    sean 4 tarjetas"). Pasó a ser la primera tarjeta de `.social-cards`,
+    con la misma estructura que Instagram/TikTok/Teléfono (ícono círculo +
+    nombre "Correo" + `hola@sinaptix.com` como handle, todo el `<a
+    href="mailto:...">` clickeable). Se sacó el botón `.copy-email-btn`
+    (círculo con `navigator.clipboard` y tooltip "Copiado ✓"): no encajaba
+    dentro de una tarjeta que ya es un `<a>` completo — anidar un
+    `<button>` interactivo dentro de un `<a>` interactivo es HTML
+    inválido y complica los clicks. El `mailto:` de la tarjeta sigue
+    abriendo el cliente de correo, que es la función principal; se perdió
+    el "copiar al portapapeles" como conveniencia menor. Si se quiere de
+    vuelta, la forma correcta es un ícono de copiar chico *dentro* del
+    texto del handle, no un botón separado a nivel de tarjeta.
+    `.big-email`/`.big-email-row`/`.copy-email-btn` se sacaron del CSS
+    (`css/styles.css`) y el listener de `js/script.js` (quedó solo un
+    comentario explicando por qué no está más).
+  - ⚠️ **Los 2 mensajes de `.contact-trust` cambiaron** (mismo pedido):
+    eran "Respondemos en menos de 24h" y "Primera consulta sin costo" —
+    esta última no describía bien el producto real (no hay "consultas"
+    pagas de por medio, es un generador de plan automático y gratuito vía
+    el wizard). Pasaron a "Tu plan, 100% gratis" y "Tus datos quedan
+    protegidos" (relevante porque el wizard pide datos de salud:
+    antropometría, condiciones médicas). El usuario pidió el cambio sin
+    especificar el reemplazo ("cambiale ... por otra cosa"); se le
+    preguntó el motivo antes de inventar copy nuevo, y con esa respuesta
+    ("quiero otro mensaje de confianza, decime cuál") se propuso este par
+    y se implementó directo, ofreciendo swap si no conforma.
   - **Color de marca por red** (`.social-card-icon`): Instagram y TikTok
     llevan su color/degradado oficial + ícono blanco
     (`.social-card-icon--instagram/--tiktok`, clases
-    modificadoras sobre el círculo base). Teléfono queda con el círculo
-    genérico `--panel-2`/ícono `--purple` de siempre (no es red social,
-    no tiene color de marca que aplicar).
+    modificadoras sobre el círculo base). Teléfono y Correo quedan con el
+    círculo genérico `--panel-2`/ícono `--purple` de siempre (ninguno de
+    los 2 es una red social, ninguno tiene color de marca que aplicar).
 - **Cierre (`#lam-07`, sección nueva, sesión 2026-09-18)**: mini-hero de
   cierre al final del sitio, reemplaza al panel `.contact-cta` descartado
   (ver "Pendientes conocidos" → Descartado) como forma de empujar el

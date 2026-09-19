@@ -11,6 +11,65 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Conócenos: el correo pasa a ser una 4ta tarjeta, nuevos mensajes de confianza
+
+El usuario pidió 2 cambios en la sección "Conócenos" (contacto pasivo):
+que el email grande (`.big-email`) se convierta en una tarjeta más,
+igual que Instagram/TikTok/Teléfono ("para que sean 4 tarjetas"), y que
+los 2 mensajes de confianza de arriba ("Respondemos en menos de 24h" /
+"Primera consulta sin costo") se reemplacen por otra cosa.
+
+### Correo como 4ta tarjeta
+
+Se sacó `.big-email-row` (el email grande + botón circular de copiar al
+lado) y se agregó "Correo" como primera tarjeta de `.social-cards`,
+misma estructura exacta que las otras 3: ícono en círculo, nombre
+"Correo", handle "hola@sinaptix.com", flecha. El `<a href="mailto:...">`
+de la tarjeta sigue abriendo el cliente de correo.
+
+Se sacó el botón "copiar al portapapeles" (`.copy-email-btn`,
+`navigator.clipboard`, tooltip "Copiado ✓"): no tiene un lugar limpio
+donde ir dentro de una tarjeta que ya es un `<a>` completo — anidar un
+`<button>` dentro de un `<a>` es HTML inválido y complica los clicks. Se
+sacó el CSS (`.big-email`/`.big-email-row`/`.copy-email-btn`) y el
+listener en `js/script.js` (queda solo un comentario explicando por qué
+no está más). Es un caso donde la fidelidad al mockup del usuario
+(mismo patrón de tarjeta que las otras 3) entra en tensión con una
+conveniencia menor que tenía la versión anterior (copiar sin abrir el
+cliente de correo) — se priorizó la consistencia visual que pidió
+explícitamente el usuario.
+
+### Mensajes de confianza
+
+El pedido no especificaba el reemplazo ("cambiale ... por otra cosa"),
+así que antes de inventar copy nuevo se preguntó el motivo. Respuesta:
+"quiero otro mensaje de confianza, decime cuál". Se notó que "Primera
+consulta sin costo" no describe bien el producto real (no hay
+"consultas" pagas — es un generador de plan automático y gratuito vía
+el wizard de nutrición), y se propuso un par que sí es cierto sobre el
+producto:
+
+- "Tu plan, 100% gratis" (antes: "Respondemos en menos de 24h")
+- "Tus datos quedan protegidos" (antes: "Primera consulta sin costo";
+  relevante porque el wizard pide datos de salud — antropometría,
+  condiciones médicas)
+
+Implementado directo con este par, con la salvedad de que se puede
+cambiar si no conforma.
+
+### Verificación
+
+Capturado con Playwright contra un server local — las 4 tarjetas quedan
+parejas (mismo alto, mismo patrón ícono+nombre+handle+flecha) y los 2
+mensajes nuevos se ven arriba con sus íconos. Suite completa: 90/90 (sin
+tests que dependieran del markup anterior).
+
+### Archivos tocados
+
+`index.html` (sección `#lam-06`), `css/styles.css` (se saca CSS
+huérfano de `.big-email`/`.copy-email-btn`), `js/script.js` (se saca el
+listener huérfano), `memoria.md`, `changelog.md`.
+
 ## 2026-09-19 — PDF de "Mi plan": rediseño completo a pedido del usuario ("tal cual" su referencia)
 
 El usuario rechazó las 2 vueltas de diseño anteriores ("sigue sin

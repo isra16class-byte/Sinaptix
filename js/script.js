@@ -169,22 +169,10 @@
     if(methodGaugesSection) methodGaugesSection.scrollIntoView({behavior:'smooth', block:'center'});
   });
 
-  // Botón "copiar correo" en Contacto
-  const copyEmailBtn = document.querySelector('.copy-email-btn');
-  if(copyEmailBtn){
-    copyEmailBtn.addEventListener('click', function(){
-      const email = this.dataset.email || 'hola@sinaptix.com';
-      const done = () => {
-        this.classList.add('is-copied');
-        setTimeout(() => this.classList.remove('is-copied'), 1600);
-      };
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(email).then(done).catch(done);
-      } else {
-        done();
-      }
-    });
-  }
+  // Nota: el botón "copiar correo" (.copy-email-btn) que vivía acá se
+  // sacó cuando el email grande pasó a ser una 4ta tarjeta en
+  // .social-cards (sesión 2026-09-19, pedido del usuario). El mailto:
+  // de la tarjeta sigue abriendo el cliente de correo igual que antes.
 
   // ===================== Encuesta de nutrición especializada (wizard) =====================
   // El motor del wizard (navegación entre pasos, validación, recolección de

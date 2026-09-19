@@ -2102,26 +2102,6 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
 .contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:600;color:var(--purple)}
 .contact-trust-item svg{width:16px;height:16px;flex:none}
-.big-email-row{display:flex;align-items:center;gap:12px}
-.big-email{
-  font-family:var(--font-d);font-size:clamp(24px,4vw,40px);color:var(--ink);font-weight:800;
-  display:inline-block;border-bottom:1px solid var(--panel-line);padding-bottom:10px;
-  transition:border-color .25s ease,color .25s ease;
-}
-.big-email:hover{border-color:var(--purple);color:var(--purple)}
-.copy-email-btn{
-  flex:none;width:36px;height:36px;border-radius:50%;border:1px solid var(--panel-line);
-  background:var(--paper);color:var(--purple);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:border-color .2s,background .2s;position:relative;margin-bottom:10px;
-}
-.copy-email-btn:hover{border-color:var(--purple);background:var(--panel-2)}
-.copy-email-btn svg{width:16px;height:16px}
-.copy-email-btn::after{
-  content:"Copiado ✓";position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);
-  background:var(--ink);color:#fff;font-family:var(--font-m);font-size:11px;font-weight:600;
-  padding:5px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
-}
-.copy-email-btn.is-copied::after{opacity:1;transform:translateX(-50%) translateY(0)}
 /* Una sola columna (pedido del usuario, 2026-09-18; antes grilla 2x2).
    En columna, la tarjeta vertical vieja (ícono arriba, nombre, handle)
    quedaba muy alta y ancha, así que cada tarjeta pasa a fila: ícono a la
