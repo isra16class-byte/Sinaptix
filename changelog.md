@@ -11,6 +11,33 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-07` Cierre: pie con degradado lila de abajo hacia arriba
+
+Pedido del usuario: "que la parte final de la web esté como moradito
+difuminado hasta donde dice © 2026 SINAPTIX — Neuroalimentación aplicada /
+Contenido informativo… (de abajo hacia arriba)", con "el mismo color de las
+otras secciones que tienen el color morado". Confirmó tras ver las capturas.
+
+- **`css/styles.css`** (junto a `#lam-07 footer{text-align:left}`):
+  `#lam-07::before` a todo el ancho, `bottom:0`, `z-index:0`,
+  `pointer-events:none`, con `linear-gradient(0deg, var(--panel) 0,
+  rgba(247,241,245,.6) 45%, rgba(247,241,245,0) 100%)`. Color = `--panel`
+  (`#F7F1F5`), el mismo lavanda de las secciones moradas. Altura por la
+  variable local `--closing-foot-h`: `175px` (desktop) y `205px` en
+  `≤900px`, donde el pie se parte en 2 filas.
+- **Medido** (Playwright, con Caveat/Fraunces/Inter locales): la línea
+  superior del pie está a 157px del borde inferior en desktop (1425/1911/
+  1100px), 187px a 800px y 167px a 390px; el texto del pie queda dentro del
+  tinte en los 4 anchos. Sin cambios de `scrollWidth` (1632 a 1425px, 2118
+  a 1911px, 390px sin desborde) — el sobreancho previo es el del collage.
+- No se tocó HTML ni JS. Las frutas no se ven afectadas: la más baja queda
+  bastante arriba de la franja (`top:63%`) y el `::before` va a `z-index:0`
+  detrás del `.wrap`.
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-07` Cierre: 6 frutas chicas alrededor del texto
 
 Pedido del usuario (con captura de la sección): "quiero que le pongas

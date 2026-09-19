@@ -788,6 +788,24 @@ próximos pasos).
     Primer intento (frutas a ~20% del borde, pegadas al texto) descartado:
     el usuario las pidió más lejos; a 800px se pisaban con el botón y el
     subtítulo.
+  - **Pie con degradado lila (sesión 2026-09-18)**: pedido del usuario,
+    "la parte final de la web como moradito difuminado, de abajo hacia
+    arriba, hasta donde dice © 2026 SINAPTIX…", "mismo color de las otras
+    secciones que tienen el color morado". Es `#lam-07::before`
+    (`css/styles.css`, junto a `#lam-07 footer{text-align:left}`): franja
+    a todo el ancho pegada al borde inferior de la sección
+    (`linear-gradient(0deg,var(--panel) 0, rgba(247,241,245,.6) 45%, …0
+    100%)`, `--panel` = el lavanda de Visión/Método/Beneficios/Conócenos,
+    no un morado nuevo), `z-index:0` detrás del `.wrap` y de las frutas.
+    Altura `--closing-foot-h`: `175px` desktop, `205px` en `≤900px` (el pie
+    se parte en 2 filas). Medido con Playwright: la línea superior del pie
+    queda a 157px del borde inferior en desktop, 187px a 800px y 167px a
+    390px (`padding-bottom` de la sección baja a 70px en `≤720px`), así el
+    texto del pie queda dentro del tinte con ~15–20px de margen. Si se
+    cambia el `padding-bottom` de `#lam-07` o el texto/estructura del
+    `<footer>`, hay que re-medir y ajustar solo `--closing-foot-h`. Se hizo
+    en un pseudo-elemento de la sección y no en el `<footer>` porque este
+    vive dentro de `.wrap` (1180px) y no llega a los bordes.
 - **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18, integrado
   en HTML/CSS propio)**: nueva columna derecha con una composición tipo
   "app showcase" — perfil de TikTok, teléfono con Instagram, correo y

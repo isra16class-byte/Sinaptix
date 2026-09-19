@@ -1887,6 +1887,28 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 @media(prefers-reduced-motion:reduce){.closing-arrow{animation:none}}
 .closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:17px}
 #lam-07 footer{text-align:left}
+/* Sesión 2026-09-18 (pedido: "la parte final de la web como moradito
+   difuminado, de abajo hacia arriba, hasta donde dice © 2026 SINAPTIX…"):
+   franja lila que nace en el borde inferior de la página y se desvanece
+   hacia arriba hasta la altura del pie (© 2026 / "Contenido informativo…").
+   Color = `--panel` (#F7F1F5), el mismo lavanda de las secciones moradas
+   (Visión, Método, Beneficios, Conócenos) — no un morado nuevo. Es un
+   pseudo-elemento de la sección a todo el ancho (el `<footer>` vive dentro
+   de `.wrap` de 1180px, no sirve para sangrar a los bordes), con
+   `z-index:0` para quedar detrás del `.wrap` (z-index 1) y por debajo de
+   las frutas (que van antes en el DOM). Altura = pie + `padding-bottom` de
+   la sección, medida con Playwright: la línea superior del pie queda a
+   157px del borde inferior (desktop), 187px (≤900px, el pie se parte en 2
+   filas) y 167px (≤720px, `padding-bottom:70px`); `--closing-foot-h` deja
+   ~15–20px de margen sobre esa línea para que el texto quede dentro del
+   tinte. Ajustar solo ese valor si se cambia el padding o el texto del pie. */
+#lam-07{--closing-foot-h:175px}
+@media(max-width:900px){#lam-07{--closing-foot-h:205px}}
+#lam-07::before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:var(--closing-foot-h);
+  z-index:0;pointer-events:none;
+  background:linear-gradient(0deg,var(--panel) 0,rgba(247,241,245,.6) 45%,rgba(247,241,245,0) 100%);
+}
 
 footer{
   border-top:1px solid var(--panel-line);
