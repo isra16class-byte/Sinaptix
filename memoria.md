@@ -982,11 +982,16 @@ próximos pasos).
 
 - **Beneficios (`#lam-05`, "Para quién es")**: fondo `--panel` (lavanda
   claro, heredado de `section.dark`). Los 4 destinatarios son una lista
-  vertical (`.ben-audience-grid`/`.ben-audience-item`, flex) con ícono de
-  línea propio a la izquierda del texto (`svg/icon-maletin.svg`,
-  `icon-graduacion.svg`, `icon-equipo.svg`, `icon-reloj-fatiga.svg` —
-  stroke `currentColor`, creados para esto, no existía ese estilo en el
-  repo). Las 2 `.quote-card` de testimonios tienen: 5 estrellas
+  vertical (`.ben-audience-grid`/`.ben-audience-item`, flex) con ícono
+  propio a la izquierda del texto. **Desde 2026-09-19 son ilustraciones 3D
+  a color** (generadas con Gemini sobre fondo verde chroma y recortadas con
+  `scripts/recortar-iconos-audiencia.py`): `img/Iconos/icon-maletin.webp`,
+  `icon-graduacion.webp`, `icon-equipo.webp`, `icon-reloj-fatiga.webp`
+  (256×256, alfa real, sin destellos sueltos salvo las gotas/líneas del
+  cronómetro). Tamaños en variables sobre `.ben-audience-grid`:
+  `--aud-icon:56px` y `--aud-text:18px` (48px/17px en ≤520px) — para subir
+  el texto basta cambiar esas dos. Los `svg/icon-*.svg` de línea morada
+  (stroke `currentColor`) quedaron sin uso, no se borraron. Las 2 `.quote-card` de testimonios tienen: 5 estrellas
   (`.quote-stars`, SVG inline; las llenas llevan clase `.is-filled` →
   `fill:var(--gold)` — M.R. 4/5, J.S. 5/5, calificación fija en el
   markup, no dinámica) + badge "Verified Client" con ícono escudo-check

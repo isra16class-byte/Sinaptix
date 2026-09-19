@@ -1833,10 +1833,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .ben-list{list-style:none;display:flex;flex-direction:column;gap:18px}
 .ben-list li{display:flex;gap:16px;align-items:flex-start;font-size:16px;color:var(--panel-text)}
 .ben-list svg{flex:none;width:20px;height:20px;margin-top:2px;color:var(--purple)}
-.ben-audience-grid{display:flex;flex-direction:column;gap:18px}
-.ben-audience-item{display:flex;align-items:center;gap:16px}
-.ben-audience-icon{flex:none;width:26px;height:26px;color:var(--purple)}
-.ben-audience-item p{font-size:16px;line-height:1.4;color:var(--panel-text);margin:0}
+/* Íconos 3D a color (Gemini, recortados con scripts/recortar-iconos-audiencia.py)
+   en vez de los .svg de línea morada (2026-09-19). Tamaño del ícono y del
+   texto en variables para poder subir el texto sin tocar el resto. */
+.ben-audience-grid{--aud-icon:56px;--aud-text:18px;display:flex;flex-direction:column;gap:20px}
+.ben-audience-item{display:flex;align-items:center;gap:18px}
+.ben-audience-icon{flex:none;width:var(--aud-icon);height:var(--aud-icon);object-fit:contain;
+  filter:drop-shadow(0 3px 6px rgba(38,22,31,.16))}
+.ben-audience-item p{font-size:var(--aud-text);line-height:1.4;color:var(--panel-text);margin:0}
+@media(max-width:520px){.ben-audience-grid{--aud-icon:48px;--aud-text:17px}}
 .quote-card{
   position:relative;overflow:hidden;
   border:1px solid var(--panel-line);padding:24px 26px;margin-bottom:16px;

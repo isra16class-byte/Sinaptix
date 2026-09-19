@@ -11,6 +11,32 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Beneficios: íconos 3D a color en "Para quién es"
+
+Pedido del usuario: íconos más coloridos y más visuales para la lista de
+destinatarios (`.ben-audience-item`), porque va a agrandar el texto. Se
+armaron prompts para Gemini (primero versión plana, que salió "muy simple";
+después versión 3D tipo clay con detalles) y el usuario subió los 4 JPG.
+
+- Mapa: maletín naranja → `icon-maletin`; birrete + diploma →
+  `icon-graduacion`; 3 personas conectadas → `icon-equipo`; cronómetro con
+  gotas → `icon-reloj-fatiga`.
+- `scripts/recortar-iconos-audiencia.py`: chroma key por dominancia de
+  verde (`g − max(r,b)`), despill, se descartan motas chicas (los destellos
+  dorados, que a ~50px son ruido; en el cronómetro se conservan gotas y
+  líneas de movimiento), recorte al contenido, lienzo cuadrado 256×256,
+  `.webp` con alfa. Verde residual: <100 px por ícono, sin aro visible
+  sobre fondo blanco ni oscuro.
+- `index.html`: los 4 `<img class="ben-audience-icon">` apuntan a
+  `img/Iconos/*.webp` (56×56, `loading="lazy"`).
+- CSS: `--aud-icon:56px` / `--aud-text:18px` (antes 26px / 16px), gap 20px,
+  `drop-shadow` suave; ≤520px 48px/17px. Se subió el texto de 16 a 18px
+  para que no quede chico junto a íconos de 56px; el usuario dijo que
+  piensa agrandarlo, así que queda en una variable.
+- Verificado con Playwright a 1440px y 390px. Nota: `scrollWidth` a 1440px
+  da ~1640 con y sin este cambio (decoraciones fuera de pantalla,
+  preexistente).
+
 ## 2026-09-19 — Pilares: recorte limpio de los 4 íconos (sin restos del fondo original)
 
 Al sacar el círculo rosado se vieron restos del fondo original alrededor
