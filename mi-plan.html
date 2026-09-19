@@ -50,6 +50,26 @@
   <img aria-hidden="true" class="deco deco-scribble" src="svg/deco-espiga.svg" alt="" style="right:-25px;top:90px;width:56px;height:230px;transform:rotate(24deg)">
   <img aria-hidden="true" class="deco deco-scribble" src="svg/deco-espiga.svg" alt="" style="left:-15px;bottom:-25px;width:50px;height:205px;transform:rotate(-30deg)">
   <img aria-hidden="true" class="deco deco-scribble" src="svg/deco-espiga.svg" alt="" style="right:-15px;bottom:-20px;width:48px;height:196px;transform:rotate(20deg)">
+  <!-- Frutas extra solo para el dashboard (sesión 2026-09-18, pedido del
+       usuario: "poné más frutas por esta parte, sin tapar las tarjetas" +
+       "que sean solo de Mi plan, no del login"): 4 más, repartidas en los
+       márgenes laterales libres (x < 162 y x > 1262 a 1440px, hasta donde
+       llegan las tarjetas) y a distintas alturas para no chocar con las que
+       ya estaban (kiwi, naranja, palta, almendras) ni con las espigas.
+       Se marcan con `.deco-solo-sesion`: la regla `#miPlan:has(
+       #miPlanSinSesion:not(.hidden)) .deco-solo-sesion{display:none}` de
+       css/styles.css las esconde cuando la pantalla muestra el login.
+       Quedan a nivel de sección (no dentro de `#miPlanConSesion`) a
+       propósito: así su `top/left/right` sigue midiéndose contra `#miPlan`
+       (que sí es full-bleed) y las frutas cuelgan del borde de la ventana
+       como el resto; dentro de `.wrap` (position:relative) quedaban metidas
+       hacia adentro, pegadas a las tarjetas. Van antes de `.wrap` en el DOM
+       para que las tarjetas (position:relative) pinten encima. Se ocultan en
+       mobile igual que el resto de `.deco-fruit`. -->
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion" src="svg/deco-blob-berries.svg" alt="" style="left:-35px;top:60px;width:125px;transform:rotate(-6deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d2" src="svg/deco-blob-walnut.svg" alt="" style="left:-25px;top:640px;width:120px;transform:rotate(10deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d3" src="svg/deco-blob-orange.svg" alt="" style="right:-30px;top:340px;width:135px;transform:rotate(7deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d2" src="svg/deco-blob-berries.svg" alt="" style="right:-25px;top:900px;width:125px;transform:rotate(-9deg)">
   <div class="wrap">
 
     <!-- Estado: sin sesión iniciada (visita directa a mi-plan.html, o recién cerró sesión).
@@ -130,6 +150,7 @@
 
     <!-- Estado: con sesión iniciada -->
     <div id="miPlanConSesion" class="hidden">
+
       <!-- Título dentro de una tarjeta ancha y baja, con íconos de línea
            (svg/icon-titlecard-*.svg, mismo trazo/color que el cerebro de
            "Objetivo cognitivo") a los lados, creciendo hacia el título.

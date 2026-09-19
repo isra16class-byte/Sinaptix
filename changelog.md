@@ -11,6 +11,61 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — "Mi plan": título más grande, 4 frutas solo con sesión y cerebro del login más a la izquierda
+
+Tres pedidos del usuario en la misma sesión, todos sobre `mi-plan.html`.
+
+- **Título de `.miplan-titlecard` más grande sin mover nada** (pedido: "el
+  título de Tu progreso con SINAPTIX más grande sin mover nada más, ni las
+  tarjetas ni los íconos"): en `css/styles.css`,
+  `#miPlanConSesion .sec-head-center .lam-title` pasa de
+  `font-size:clamp(30px,3.9vw,42px)` a `clamp(32px,4.35vw,48px)` (42 → 48px
+  en desktop) y se le fija `line-height:clamp(34.5px,4.485vw,48.3px)`, que
+  es exactamente el alto de caja que daba `1.15 ×` el tamaño anterior. Así
+  la caja del `<h2>` mide lo mismo que antes en cualquier ancho y no empuja
+  hacia abajo la tarjeta ni el resto del panel. Medido a 1440×900: caja del
+  título 48px (igual), tarjeta 122px de alto / top 92 (igual), `.miplan-grid`
+  en 282 (igual), e íconos con el mismo tamaño y misma altura (46·60·76 y
+  76·60·46, tops 130·123·115) — lo único que cambia es que el título pasa de
+  395px a 451px de ancho, así que los 6 íconos se reparten el espacio que
+  queda (se corren ~10-20px en horizontal, sin cambiar de tamaño).
+- **Fondo de esa tarjeta: lila probado y RECHAZADO**. A pedido del usuario
+  ("poné la tarjeta del título del color de la tarjeta de cierre") se puso
+  `background:var(--miplan-card-lila)` (#EFE1EC, el sólido de
+  `#miPlan .miplan-cierre`); su respuesta fue "no me gustó". Se le mostraron
+  3 opciones con vista previa (blanco `--paper`, crema dorado `#FDF4EA`
+  —la recomendada, hace juego con el círculo dorado de "SINAPTIX"— y
+  morado de marca `#4B2E45` con texto claro e íconos aclarados) y **quedó
+  sin decidir**: el archivo vuelve al gradiente
+  `linear-gradient(135deg,#FFFFFF 0%,var(--paper-2) 55%,#F5EAF2 100%)` de
+  siempre, con un comentario en la regla que deja constancia de la prueba
+  descartada.
+- **4 frutas nuevas, solo para el dashboard** (pedido: "poné más frutas por
+  esta parte, sin tapar las tarjetas" y, al verlas en el login, "que sean
+  solo de Mi plan, no del login"): en `mi-plan.html`, 4 `deco-fruit` más
+  (berries arriba a la izquierda, walnut a media altura a la izquierda,
+  orange arriba a la derecha, berries abajo a la derecha) en los márgenes
+  laterales libres, con `left`/`right` negativos para que cuelguen del borde
+  de la ventana como el resto. Llevan la clase `.deco-solo-sesion` y
+  `css/styles.css` agrega `#miPlan:has(#miPlanSinSesion:not(.hidden))
+  .deco-solo-sesion{display:none}` (mismo uso de `:has()` que ya había en 3
+  reglas del archivo): se ven con sesión iniciada y desaparecen en la
+  pantalla de login. **No se pusieron dentro de `#miPlanConSesion`**: ahí el
+  marco de referencia pasa a ser `.wrap` (`position:relative`) y quedaban
+  122px metidas hacia adentro, pegadas a las tarjetas; a nivel de sección
+  siguen colgando del borde. Verificado a 1440/1200/1000/900/780px: 0
+  solapes con las tarjetas y, con el login visible, las 4 en `display:none`.
+- **Cerebro del login 100px más a la izquierda** (pedido: "movés el cerebro
+  del login más hacia la izquierda"): `.miplan-locked-brain.is-right` pasa
+  de `right:-300px` a `right:-200px`. Medido a 1440: de `1002..1562` a
+  `902..1462`, mismo tamaño (560px) y misma altura; la parte que ahora cae
+  detrás de la tarjeta de login queda oculta (la tarjeta tiene fondo sólido
+  y pinta encima).
+- `npm test`: 85 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — Íconos de la tarjeta de título de "Mi plan" (calco de referencias)
 
 El usuario mandó 6 imágenes de referencia (line-art generado con Gemini:

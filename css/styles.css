@@ -808,6 +808,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    acá sin necesidad. Se recorta solo en este contexto (no se toca
    `section`/`footer` en general, así que index.html sigue igual). */
 #miPlan{padding:88px 0 40px;min-height:100vh;box-sizing:border-box;overflow:hidden}
+/* Las 4 frutas extra de "Mi plan" (sesión 2026-09-18) se muestran SOLO con
+   sesión iniciada: cuando la pantalla muestra el login, `#miPlanSinSesion`
+   está visible (sin `.hidden`) y esta regla esconde las marcadas con
+   `.deco-solo-sesion`. Se usa `:has()` como en el resto del archivo
+   (`#miPlanCierreUser:has(...)`, `.stat-box:has(...)`); el marcado de las
+   frutas va a nivel de `#miPlan` para que sigan colgando del borde de la
+   ventana (dentro de `.wrap`, que es `position:relative`, quedaban metidas
+   hacia adentro). Ver mi-plan.html para el detalle de cada posición. */
+#miPlan:has(#miPlanSinSesion:not(.hidden)) .deco-solo-sesion{display:none}
 #miPlan footer{margin-top:28px}
 /* margin-top/bottom en vez de shorthand `margin`: shorthand pisaba
    margin-left/right a 0, cancelando el `margin:auto` que centra el
@@ -833,7 +842,16 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    (a este tamaño más chico, el corte 600 de `Caveat` se leía débil/poco
    definido; 700 sostiene mejor los trazos finos del script). */
 #miPlanConSesion .sec-head-center .lam-title{
-  font-size:clamp(30px,3.9vw,42px);font-weight:700;
+  font-size:clamp(32px,4.35vw,48px);font-weight:700;
+  /* Sesión 2026-09-18 (pedido del usuario: "el título más grande sin mover
+     nada más, ni las tarjetas ni los íconos"): el `font-size` sube (42 →
+     48px en desktop) pero la caja de línea se deja EXACTAMENTE en los
+     valores del tamaño anterior (1.15 × `clamp(30px,3.9vw,42px)` =
+     `clamp(34.5px,4.485vw,48.3px)`). Así el `<h2>` ocupa el mismo alto que
+     antes en cualquier ancho y no empuja hacia abajo la tarjeta ni el
+     resto del panel; el texto grande respira dentro del `padding:22px` de
+     `.miplan-titlecard` (nada se recorta: `line-height` no recorta). */
+  line-height:clamp(34.5px,4.485vw,48.3px);
 }
 #miPlan .miplan-subhead{margin-bottom:12px}
 #miPlan .stat-box,
@@ -1049,6 +1067,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .miplan-titlecard{
   display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,44px);
   padding:22px 28px;margin:4px 0 26px;
+  /* Fondo: se probó un sólido `--miplan-card-lila` (el mismo de la tarjeta
+     de Cierre, sesión 2026-09-18) y el usuario lo rechazó ("no me gustó,
+     ¿qué otro color me recomendás?"); queda pendiente elegir un
+     reemplazo, así que por ahora se deja el gradiente de siempre. */
   background:linear-gradient(135deg,#FFFFFF 0%,var(--paper-2) 55%,#F5EAF2 100%);
   border:1px solid rgba(113,75,103,.16);border-radius:22px;
   box-shadow:0 16px 34px -20px rgba(75,46,69,.32);
@@ -1229,7 +1251,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   opacity:.92;
 }
 .miplan-locked-brain.is-right{
-  right:-300px;top:-30px;
+  /* Sesión 2026-09-18 (pedido del usuario: "movés el cerebro del login más
+     hacia la izquierda"): `right` pasa de `-300px` a `-200px`, o sea el
+     cerebro se corre 100px a la izquierda (su borde derecho queda 200px
+     pasado el borde derecho de `.miplan-locked`, antes 300px). */
+  right:-200px;top:-30px;
   width:clamp(420px,48vw,560px);
 }
 @media(max-width:900px){.miplan-locked-brain{display:none}}

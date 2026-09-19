@@ -251,6 +251,17 @@ próximos pasos).
   terciario (Cerrar sesión). ⚠️ Sus íconos son `::before` con `mask`, NO
   `<svg>` en el HTML: `js/mi-plan-pdf.js` cambia `btn.textContent` y borraría
   un `<svg>` hijo.
+  - **Tamaño del título (sesión 2026-09-18)**:
+    `#miPlanConSesion .sec-head-center .lam-title` →
+    `font-size:clamp(32px,4.35vw,48px)` (42 → 48px en desktop) con
+    `line-height:clamp(34.5px,4.485vw,48.3px)`, exactamente el alto de caja
+    del tamaño anterior: el título se ve más grande sin empujar la tarjeta
+    ni el resto del panel hacia abajo (verificado: tarjeta 122px de alto /
+    top 92 y `.miplan-grid` en 282, igual que antes).
+  - **Fondo**: el sólido lila (`--miplan-card-lila`, el de la tarjeta de
+    Cierre) se probó y el usuario lo **rechazó**; queda el gradiente de
+    siempre y la decisión pendiente (opción recomendada: crema `#FDF4EA`).
+    Ver "Pendientes conocidos".
   - **Íconos de los lados (sesión 2026-09-19, 2ª ronda)**: los 6 íconos
     glossy/3D de `img/Iconos/` (esferas degradadas) se reemplazaron por 6
     SVG de línea nuevos, `svg/icon-titlecard-{berries,grain,walnut,citrus,
@@ -606,9 +617,23 @@ próximos pasos).
   formularios propios de login/registro (ver punto siguiente) y "Volver
   al sitio" como link de texto. Detrás, 1 ilustración grande de cerebro
   (`img/decoraciones-neurona/cerebro-mi-plan.webp`, sangrando por el
-  borde derecho, oculta en mobile `<900px`) + 3 `deco-fruit` reusadas
-  (aguacate/kiwi/almendras). `#miPlan{min-height:100vh;overflow:hidden}`
-  para evitar franja blanca bajo el footer.
+  borde derecho con `right:-200px` — 100px más a la izquierda que el
+  `-300px` original, a pedido del usuario el 2026-09-18; oculta en mobile
+  `<900px`) + 3 `deco-fruit` reusadas (aguacate/kiwi/almendras).
+  `#miPlan{min-height:100vh;overflow:hidden}` para evitar franja blanca
+  bajo el footer.
+- **Decoraciones de `#miPlan` (sesión 2026-09-18)**: 8 a nivel de sección
+  (se ven en los dos estados: kiwi, naranja, palta, almendras, 3 espigas y
+  los círculos) + 4 frutas marcadas **`.deco-solo-sesion`** (berries arriba
+  a la izquierda, walnut a media altura a la izquierda, orange arriba a la
+  derecha, berries abajo a la derecha) que se muestran **solo con sesión
+  iniciada**, vía `#miPlan:has(#miPlanSinSesion:not(.hidden))
+  .deco-solo-sesion{display:none}`. Las 4 de sesión quedan a nivel de
+  sección (no dentro de `#miPlanConSesion`) para que su `top/left/right`
+  siga midiéndose contra `#miPlan` (full-bleed) y cuelguen del borde de la
+  ventana: dentro de `.wrap` (`position:relative`) quedaban 122px metidas
+  hacia adentro, pegadas a las tarjetas. Verificado 0 solapes con las
+  tarjetas a 1440/1200/1000/900/780px.
 - **"Mi plan" — login/registro propios** (`.miplan-auth`, reemplazan al
   widget nativo de Netlify Identity): 2 pestañas
   (`#tabLoginMiPlan`/`#tabRegistroMiPlan`) + recuperación de contraseña
@@ -1065,6 +1090,16 @@ próximos pasos).
 > `file://` directo (sitio estático, no hace falta servidor) y sacar
 > screenshots de las secciones en cuestión a distintos anchos.
 
+- **Color de la tarjeta del título de "Mi plan" (`.miplan-titlecard`) —
+  sin decidir (sesión 2026-09-18)**: el usuario pidió el color de la
+  tarjeta de Cierre (lila `--miplan-card-lila`) y después lo rechazó ("no
+  me gustó"). Quedó **con el gradiente original** y 3 opciones propuestas
+  con vista previa ya mostrada: (a) blanco `--paper`, (b) **crema dorado
+  `#FDF4EA` (la recomendada**: hace juego con el círculo dorado de
+  "SINAPTIX" y no compite con las 3 tarjetas de color de abajo), (c)
+  morado de marca `#4B2E45` — esta última obliga a poner el texto en claro
+  y aclarar los 6 íconos de línea (son `<img>` SVG con `#4B2E45` horneado,
+  sobre oscuro se pierden). Falta que el usuario elija.
 - **Collage de redes — decidir entre imagen de IA y maqueta HTML/CSS**:
   ver "Estado actual del diseño" → "Alternativa en HTML/CSS". Esperando
   que el usuario mire `docs/mockup-collage-redes.html` y diga si se
