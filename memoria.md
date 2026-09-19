@@ -242,6 +242,52 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Formulario del wizard: campos alineados y botones sin desborde
+  (`#formNutricion`, `.modal-row`, `.nutri-nav`, sesión 2026-09-19)**: el
+  usuario mandó capturas a 390px (modal de `index.html` y encuesta inline
+  de `mi-plan.html`): campos escalonados entre columnas, `*` solo en una
+  línea, selects con el texto cortado y "Guardar mi plan" saliéndose del
+  card. Causas y arreglo (todo en `css/styles.css`, sección ENCUESTA):
+  - `.modal-row` usaba `1fr 1fr` (= `minmax(auto,1fr)`, la columna no baja
+    del contenido de un `<select>` largo) → ahora
+    `repeat(2,minmax(0,1fr))` + `min-width:0` en hijos/`.nutri-group`/
+    `.modal-input`. `align-items:end` deja los controles en la misma línea
+    aunque una etiqueta ocupe 2 líneas y la de al lado 1.
+  - El `*` (`.req`) quedaba huérfano porque había un espacio antes del
+    `<span>`: en las 23 etiquetas de `index.html` y `mi-plan.html` ahora es
+    `&nbsp;<span class="req">` (pegado a la última palabra).
+  - **≤560px**: cada campo del wizard va en su propia fila
+    (`.nutri-step .modal-row:not(#nutriAntroInputs)`; Peso/Talla siguen de
+    a dos por ser números cortos). 560px = ancho máximo del card
+    (`.modal-card-wide`), por debajo ocupa toda la pantalla. También
+    `.modal-overlay{padding:14px}` y `.modal-card{padding:30px 22px}` (+44px
+    útiles; afecta a todos los modales en ≤560px).
+  - **Botones** (`.nutri-nav`): los `<button class="btn-solid">`
+    mostraban el borde nativo del navegador (bisel oscuro) porque
+    `.btn-solid` se escribió para `<a>` → `.nutri-nav .btn-solid{border:
+    1.5px solid transparent}` (misma altura que el ghost). `.hidden` es
+    `display:none !important`, así que `#nutriBack.hidden{visibility:
+    hidden}` nunca funcionó ("Siguiente" quedaba a la izquierda en el paso
+    1): se sacó y ahora `justify-content:flex-end` + `#nutriBack{margin-
+    right:auto}`. En ≤560px Siguiente/Guardar (`flex:1 1 auto`) ocupan el
+    ancho que sobra y `.btn` baja a `padding:14px 18px`: no desbordan
+    aunque el texto crezca.
+  - ⚠️ El mismo borde nativo sigue en los OTROS `<button class="btn
+    btn-solid">` fuera de `.nutri-nav` (CTA del hero, `#btnNutricionCierre`,
+    submit de los modales de antropometría/reevaluación): no se tocaron
+    por estar fuera del pedido; arreglo global posible con
+    `button.btn-solid{border:1.5px solid transparent;cursor:pointer}`.
+  - Verificado con Playwright + Chromium, con las fuentes reales (Inter/
+    Fraunces/Caveat servidas localmente: sin ellas los anchos no coinciden
+    con el teléfono y NO se reproducía el desborde) a 320/360/390/480/560/
+    600/900/1440px, pasos 1/2/4/5/7/8 del modal y 1/4 de la encuesta
+    inline (con `netlifyIdentity` mockeado): 0 desbordes, 0 textos
+    cortados, 0 asteriscos huérfanos, controles de cada fila de 2 columnas
+    alineados. Contra el código anterior el mismo script sí detectaba los
+    problemas (`nutriSubmit` +14px a 390px). Desktop 1440px sin cambios
+    visibles salvo −1px de alto de los botones sólidos (borde nativo →
+    1.5px). `npm test` en verde.
+
 - **Timeline "Cómo trabajamos" más chico en mobile (`.tl-*`, `#lam-03`,
   sesión 2026-09-19)**: el usuario mandó una captura a 390px pidiendo
   achicar el flujo de 4 pasos (lo vio grande: círculo de 56px, título

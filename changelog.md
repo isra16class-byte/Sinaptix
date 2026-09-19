@@ -11,6 +11,63 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Wizard de nutrición: campos alineados y botones sin desborde en mobile
+
+El usuario mandó 3 capturas: el modal de `index.html` a 390px en un
+teléfono real ("Guardar mi plan" cortado contra el borde derecho; el `*`
+de "Correo electrónico" solo en una segunda línea, empujando ese campo
+más abajo que "Nombre"; placeholder "Correo elect…" cortado) y la
+encuesta inline de `mi-plan.html` en el navegador de VS Code a 390px (los
+`<select>` de a dos escalonados cuando una etiqueta ocupa 2 líneas, texto
+cortado en "Ultraprocesados…" / "Tiempo para coc…"). Pidió que los
+campos no se desordenen y ajustar los botones para que no desborden.
+
+- **Reproducción antes de tocar nada**: Playwright/Chromium con las fuentes
+  reales (Inter, Fraunces, Caveat de `@fontsource`, servidas localmente
+  vía `page.route`; sin ellas el fallback es más angosto y el desborde no
+  aparecía) y Identity mockeado. Medición por script (desborde contra el
+  padding del card, alineación de controles por fila, ancho del texto de
+  cada select/placeholder vs. ancho útil, `*` huérfano) a varios anchos.
+  Antes: `nutriSubmit` +14px fuera del card a 390px (+44px a 360px),
+  desalineo de 20px en la fila Ultraprocesados/Tiempo, 9 textos de select
+  cortados a 360px, asteriscos huérfanos en 4 etiquetas.
+- **Causas**: (1) `.modal-row{grid-template-columns:1fr 1fr}` no deja
+  achicar la columna por debajo del contenido del `<select>`; (2) sin
+  alineación común entre columnas, etiquetas de 1 y 2 líneas escalonan los
+  controles; (3) espacio normal antes de `<span class="req">` → `*`
+  huérfano; (4) `<button class="btn-solid">` con el borde nativo del
+  navegador (sumaba ancho y se veía el bisel oscuro; ya se había corregido
+  a mano solo en los botones de Cierre de `mi-plan`); (5)
+  `#nutriBack.hidden{visibility:hidden}` inútil porque `.hidden` es
+  `display:none !important`; (6) `.btn` con `padding:15px 30px` y
+  `flex:none` sin poder achicarse.
+- **Fix** (`css/styles.css` + `index.html`/`mi-plan.html`): detalle en
+  `memoria.md` → "Formulario del wizard: campos alineados y botones sin
+  desborde". Resumen: `.modal-row` con `minmax(0,1fr)` y `align-items:end`;
+  `&nbsp;` antes de los 23 `.req` de etiquetas; en ≤560px una columna por
+  campo (salvo Peso/Talla) y menos padding de overlay/card; `.nutri-nav`
+  con `justify-content:flex-end`, `#nutriBack{margin-right:auto}`, borde
+  transparente de 1.5px en los sólidos y botón principal `flex:1 1 auto`
+  en mobile.
+- **Alternativa considerada y no elegida**: mantener 2 columnas en mobile
+  acortando los placeholders de los selects ("Ultraprocesados / azúcar" →
+  "Elegí"). Se descartó por cambiar copy en las dos páginas y porque
+  igual queda muy justo a 360px; si el usuario prefiere el formulario más
+  compacto, se puede volver atrás cambiando el selector de
+  `@media(max-width:560px)` (o subiendo la excepción de `#nutriAntroInputs`
+  a otras filas).
+- **No tocado (fuera de pedido)**: el mismo borde nativo en los demás
+  `<button class="btn btn-solid">` del sitio (hero, Cierre, modales de
+  antropometría/reevaluación), y el badge "Powered by Netlify" que se ve
+  flotando sobre el modal en las capturas del teléfono (no es del código
+  del repo: lo inyecta Netlify en el deploy).
+- **Verificación**: 320/360/390/480/560/600/900/1440px; pasos 1/2/4/5/7/8
+  del modal y 1/4 de la encuesta inline: 0 desbordes/cortados/huérfanos,
+  filas alineadas. Desktop sin cambios visibles salvo −1px de alto de los
+  botones sólidos del wizard. `npm test`: 85 pasan, 1 salteado (el e2e del
+  PDF, sin jsPDF instalado). Falta la confirmación de siempre sobre el
+  teléfono real / deploy.
+
 ## 2026-09-19 — Timeline "Cómo trabajamos" (Método) más chico en mobile
 
 El usuario mandó una captura real a 390px del flujo de 4 pasos

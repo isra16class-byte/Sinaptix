@@ -2411,13 +2411,24 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
 .modal-card h3{font-size:23px;margin:14px 0 10px;max-width:none}
 .modal-text{color:var(--ink-soft);font-size:14.5px;margin-bottom:24px;text-align:left}
 .modal-form{display:flex;flex-direction:column;gap:12px}
-.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* Filas de 2 columnas de los formularios (wizard de nutrición + modales).
+   Sesión 2026-09-19 (captura del usuario a 390px, campos desordenados):
+   - `1fr` a secas es `minmax(auto,1fr)`: la columna no baja del ancho
+     mínimo del contenido, y un <select> con una opción larga ("Ultraprocesados
+     / azúcar añadida") la estira y se sale del card. `minmax(0,1fr)` + `min-width:0`
+     en los hijos deja que la columna se achique de verdad.
+   - `align-items:end`: si la etiqueta de una columna ocupa 2 líneas y la
+     de al lado 1, los controles quedan en la MISMA línea (antes el de la
+     etiqueta corta subía y las dos barras quedaban escalonadas). */
+.modal-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:end}
+.modal-row > *{min-width:0}
 .modal-input{
   background:var(--paper-2);border:1px solid var(--line);color:var(--ink);
   padding:13px 15px;font-family:var(--font-b);font-size:14.5px;border-radius:var(--radius-sm);
   outline:none;transition:border-color .2s;width:100%;
 }
 .modal-input:focus{border-color:var(--purple)}
+.modal-input{min-width:0;max-width:100%}
 .modal-result{
   font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--green);
   display:none;padding-top:4px;
@@ -2446,7 +2457,7 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
 .nutri-step.active{display:flex}
 .nutri-legend{font-family:var(--font-m);font-size:12.5px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.03em;padding:0;margin-bottom:2px}
 
-.nutri-group{display:flex;flex-direction:column;gap:6px}
+.nutri-group{display:flex;flex-direction:column;gap:6px;min-width:0}
 .nutri-field-label{font-family:var(--font-m);font-size:12.5px;font-weight:600;color:var(--ink-soft)}
 .nutri-hint{font-family:var(--font-m);font-size:12px;color:var(--ink-faint);margin:-4px 0 2px}
 .nutri-antro-resumen{margin:-4px 0 14px}
@@ -2476,9 +2487,41 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
 }
 .nutri-error.show{display:block}
 
-.nutri-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
-.nutri-nav .btn{flex:none}
-#nutriBack.hidden{visibility:hidden}
+/* Botones Atrás / Siguiente / Guardar (sesión 2026-09-19).
+   Problemas que tenía (captura del usuario a 390px): (1) "Guardar mi plan"
+   se salía del card: `.btn` trae padding 15px 30px y `flex:none` impedía
+   achicarlo; (2) los <button class="btn-solid"> conservaban el borde
+   nativo del navegador (bisel oscuro abajo/derecha) porque .btn-solid se
+   escribió para <a> y no trae `border`; (3) `#nutriBack.hidden{visibility:
+   hidden}` nunca funcionó — `.hidden` es `display:none !important` — así que
+   en el paso 1 "Siguiente" quedaba solo y pegado a la izquierda.
+   Ahora: el grupo va alineado a la derecha, "Atrás" se despega con
+   `margin-right:auto`, y en mobile el botón principal ocupa el ancho que
+   sobra (nunca desborda, aunque el texto sea largo). */
+.nutri-nav{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:6px}
+.nutri-nav .btn{flex:none;cursor:pointer;line-height:1.2}
+.nutri-nav .btn-solid{border:1.5px solid transparent}
+.nutri-nav #nutriBack{margin-right:auto}
+
+/* Wizard en pantallas angostas (≤560px, sesión 2026-09-19).
+   Con 2 columnas cada campo queda de ~110-150px y los <select> cortan su
+   texto ("Ultraprocesados / azúcar", "Tiempo para cocinar") además de
+   escalonarse cuando la etiqueta ocupa 2 líneas. En ≤560px (el card del
+   modal llega a 560px de ancho, por debajo de eso ocupa toda la pantalla)
+   cada campo va en su propia fila. Única excepción: Peso/Talla
+   (`#nutriAntroInputs`), que son números cortos y sí entran de a dos.
+   Solo aplica dentro de `.nutri-step`: el modal de antropometría/otros
+   forms sueltos siguen con su grilla de 2 columnas de siempre.
+   También se recorta el aire del modal (overlay 24→14px y card 34→22px
+   de padding lateral) para ganar ~44px de ancho útil, y los botones se
+   reparten el ancho: Atrás a su ancho natural y el principal ocupa el resto. */
+@media(max-width:560px){
+  .nutri-step .modal-row:not(#nutriAntroInputs){grid-template-columns:minmax(0,1fr)}
+  .modal-overlay{padding:14px}
+  .modal-card{padding:30px 22px}
+  .nutri-nav .btn{padding:14px 18px}
+  .nutri-nav #nutriNext,.nutri-nav #nutriSubmit{flex:1 1 auto;min-width:0;justify-content:center}
+}
 
 .nutri-summary{
   background:var(--panel);border-radius:var(--radius-sm);
