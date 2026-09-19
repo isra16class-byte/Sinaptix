@@ -11,6 +11,58 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: el pulso pasa por detrás de los íconos y toma su color real (no el de los datos)
+
+Dos ajustes pedidos por el usuario sobre la entrada anterior de hoy mismo,
+después de aplicar el patch y mirarlo: (1) que la energía no se dibuje
+encima de los íconos sino "como si saliera" de ellos — sin mover nada de
+posición — y (2) que el color sea el exacto de cada ícono, porque los que
+había elegido (los mismos que usan las `.stat-annot` para cada dato) no
+salían como correspondía.
+
+- **Por detrás de los íconos (`index.html`)**: el `<svg class="vision-
+  energy">` estaba después de `.vision-icons` en el DOM, así que pintaba
+  encima (mismo apilamiento absoluto, gana el que va después). Se movió
+  antes: ahora el orden dentro de `.vision-art` es `vision-brain-bg` →
+  `svg.vision-energy` → `.vision-icons` → `.stat-annotations`. No se tocó
+  ninguna posición/medida — es puro orden de pintado. Funciona porque los
+  4 `.webp` de los íconos son recortes con transparencia real (no un
+  cuadrado blanco opaco: se confirmó con Pillow, los 4 tienen zonas
+  `alpha<200` de sobra), así que el pulso se ve tapado justo donde pasa
+  "dentro" del dibujo de cada ícono y asoma en el resto — el efecto de
+  "sale del ícono" que se pidió.
+- **Color exacto de cada ícono (`css/styles.css`, `js/script.js`)**: se
+  reemplazaron los 4 colores (antes `--gold`/`--purple`/`--navy-bright`/
+  `--green`, los de las `.stat-annot`) por el color real muestreado de
+  cada `.webp` con Python/Pillow — promedio ponderado en HSV de los
+  píxeles saturados de cada imagen (se descartó fondo/sombras planas; en
+  el cerebro además se aisló el arco naranja del tejido cerebral, que es
+  un tono de piel sin relación con "el color" del ícono):
+  - dorado (arco del cerebro): `#AD653F` (era `#C1703B` — cercano, el arco
+    real es un poco más apagado/marrón)
+  - morado (red neuronal): `#8A5C86` (era `#714B67` — el real es más
+    violeta y menos rosado/marrón)
+  - azul (bustos): `#1355A5` (era `#3B6EA5` — el que más se notaba: el
+    ícono es un azul bastante más saturado/profundo que `--navy-bright`)
+  - verde (calendario): `#599E71` (era `#2E7D5B` — el real es más claro,
+    tipo menta/vidrio)
+  - Cambiaron en 3 lugares que tienen que quedar en sync: el
+    `initial-value` del `@property --ve-c`, el fallback `--ve-c` fijo en
+    `.vision-energy`, y el `@keyframes veColor` estático (resguardo si el
+    JS no llega a inyectar el suyo) — los tres en `css/styles.css`. Más
+    el `COLOR` que arma `js/script.js` para el `<style
+    id="veColorKeyframes">` que se inyecta en runtime (ver entrada
+    anterior de hoy para cómo funciona ese cálculo, no cambió, solo los 4
+    hex).
+- **Verificado con Playwright**: sin errores de consola/página; orden del
+  DOM confirmado (`svg.vision-energy` antes de `.vision-icons`);
+  keyframes inyectados con los hex nuevos; 6 capturas a lo largo de un
+  ciclo a 1440px muestran el pulso entrando/saliendo por detrás de cada
+  ícono con su color real (se nota sobre todo en el azul, mucho más
+  parecido al ícono ahora). Sin regresión en mobile (`.vision-energy`
+  sigue `display:none` a 390px). `npm test`: 85/86 (el de siempre se
+  saltea a propósito).
+
 ## 2026-09-19 — Visión: el pulso cambia de color al pasar por cada ícono
 
 Pedido del usuario, sobre la entrada anterior de este changelog: "puedes hacer

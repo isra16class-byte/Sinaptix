@@ -3,7 +3,7 @@
    property de color no se anima gradual: salta de golpe en cada keyframe
    en vez de ir mezclando tonos. Va a nivel de hoja (no dentro de un
    @media) porque los navegadores no soportan @property anidado. */
-@property --ve-c{syntax:'<color>';inherits:true;initial-value:#C1703B}
+@property --ve-c{syntax:'<color>';inherits:true;initial-value:#AD653F}
 
 .sr-only{
   position:absolute;
@@ -507,11 +507,12 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    la pone el IntersectionObserver de script.js).
 
    **Color por ícono (sesión 2026-09-19, 2ª ronda)**: el pulso toma el color
-   del ícono que está tocando (dorado del cerebro, morado de la neurona,
-   azul de los bustos, verde del calendario — mismos `--gold`/`--purple`/
-   `--navy-bright`/`--green` que usan las 4 `.stat-annot`, para que sea el
-   mismo código de color que ya lee la persona en los datos). El motor es
-   `--ve-c`, un custom property de tipo `<color>` (de ahí el `@property` al
+   real de cada ícono (muestreado de los propios .webp con Python/Pillow —
+   promedio ponderado de los píxeles saturados de cada imagen, filtrando
+   fondo/sombras planas — no los `--gold`/`--purple`/`--navy-bright`/
+   `--green` de datos que usan las 4 `.stat-annot`: se probaron primero y no
+   coincidían con el color real de los íconos, sobre todo el azul de los
+   bustos, mucho más saturado que `--navy-bright`). El motor es `--ve-c`, un custom property de tipo `<color>` (de ahí el `@property` al
    principio de este archivo, necesario para que interpole en vez de saltar
    de golpe) animado con `@keyframes veColor` — el `0%`/`100%` quedan fijos
    acá (dorado, por ser el primer/último tramo), pero los 3 puntos
@@ -530,15 +531,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    estática, siempre el violeta original. */
 .vision-energy{display:none}
 @keyframes veColor{
-  0%{--ve-c:#C1703B}
-  25%{--ve-c:#714B67}
-  50%{--ve-c:#3B6EA5}
-  75%{--ve-c:#2E7D5B}
-  100%{--ve-c:#C1703B}
+  0%{--ve-c:#AD653F}
+  25%{--ve-c:#8A5C86}
+  50%{--ve-c:#1355A5}
+  75%{--ve-c:#599E71}
+  100%{--ve-c:#AD653F}
 }
 @media(min-width:901px){
   .vision-energy{
-    --ve-T:7s;--ve-rail-c:#8B4FCB;--ve-c:#C1703B;
+    --ve-T:7s;--ve-rail-c:#8B4FCB;--ve-c:#AD653F;
     display:block;position:absolute;inset:0;width:100%;height:100%;
     overflow:visible;pointer-events:none
   }

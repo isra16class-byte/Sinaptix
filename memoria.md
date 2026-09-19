@@ -829,13 +829,17 @@ próximos pasos).
     más abajo). Con `top:76%` verde y azul comparten línea superior. Sin cambios en mobile (`≤900px`, siguen
     ocultos).
   - **Energía morada que recorre los 4 íconos (`.vision-energy`, sesión
-    2026-09-19)**: dos pulsos de luz violeta (a media vuelta uno del otro)
+    2026-09-19)**: dos pulsos de luz (a media vuelta uno del otro)
     dan vueltas en sentido horario por un rectángulo redondeado que pasa por
     el centro de cerebro → neurona → acompañamiento → calendario (el
     recorrido lo dibujó el usuario sobre una captura). Es un `<svg>`
-    absoluto dentro de `.vision-art` (después de `.vision-brain-bg`, **encima
-    de los íconos**), con 9 `<path>` por pulso (halo con `feGaussianBlur`, 6
-    capas de cola que se desvanecen, cuerpo, núcleo claro) animados con
+    absoluto dentro de `.vision-art` (después de `.vision-brain-bg`, **por
+    detrás de `.vision-icons`** — así que el pulso queda tapado por cada
+    ícono justo donde el trazado le pasa "por dentro", da el efecto de que
+    la energía sale de ahí; funciona porque los 4 `.webp` son recortes con
+    transparencia real, no un cuadrado opaco), con 9 `<path>` por pulso
+    (halo con `feGaussianBlur`, 6 capas de cola que se desvanecen, cuerpo,
+    núcleo claro) animados con
     `stroke-dashoffset` (`@keyframes veRun`, 7 s por vuelta = `--ve-T`).
     **Sin coordenadas en el CSS ni en el HTML**: el `d` del trazado lo arma
     una IIFE al final de `js/script.js` midiendo los 4 `.vision-icon`
@@ -847,13 +851,19 @@ próximos pasos).
     por `IntersectionObserver`). ⚠️ El `<path>` necesita `pathLength="100"` y el
     período de `stroke-dasharray` tiene que sumar 100 (ej. `12 88`) para que
     el pulso cruce la costura del trazado sin cortarse. Detalle y
-    alternativas (por detrás de los íconos, destello de cada ícono al pasar
-    la energía) en el changelog.
+    alternativas (destello de cada ícono al pasar la energía) en el
+    changelog.
     - **Color por ícono (2ª ronda, misma sesión)**: el pulso ya no es
-      violeta fijo — toma el color del dato al que se acerca (dorado
-      `--gold #C1703B` en el cerebro, morado `--purple #714B67` en la
-      neurona, azul `--navy-bright #3B6EA5` en los bustos, verde `--green
-      #2E7D5B` en el calendario), mismos colores que las 4 `.stat-annot`.
+      violeta fijo — toma el color del ícono al que se acerca. **Ojo:**
+      no son los `--gold`/`--purple`/`--navy-bright`/`--green` de las
+      `.stat-annot` (se probó primero así y no coincidía con el color
+      real de cada imagen, sobre todo el azul) — son colores muestreados
+      directo de los `.webp` con Python/Pillow (promedio ponderado en
+      HSV, descartando fondo/piel): dorado `#AD653F` (arco del cerebro),
+      morado `#8A5C86` (red neuronal), azul `#1355A5` (bustos), verde
+      `#599E71` (calendario). Si en algún momento se vuelven a tocar los
+      íconos (otra imagen, otro recorte), estos 4 hex habría que
+      re-muestrearlos, ya no van a coincidir solos.
       Motor: un solo custom property `--ve-c` (registrado con `@property`
       al principio de `css/styles.css`, tipo `<color>`, para que interpole
       en vez de saltar de golpe) animado por `@keyframes veColor`; cada
@@ -864,8 +874,8 @@ próximos pasos).
       `<path>` del riel con `getPointAtLength` porque los 4 íconos no
       están a igual distancia entre sí) y se inyectan en un `<style
       id="veColorKeyframes">` en el `<head>`; si esa medición falla, el
-      `@keyframes veColor` fijo del CSS (25/50/75 parejo) sirve de
-      resguardo. `.ve-rail` (el riel de fondo) no cambia de color, queda
+      `@keyframes veColor` fijo del CSS (25/50/75 parejo, mismos 4 hex)
+      sirve de resguardo. `.ve-rail` (el riel de fondo) no cambia de color, queda
       fijo en el violeta original vía `--ve-rail-c`. Detalle de por qué no
       hizo falta leer `--ve-T` desde JS (y el bug de regex que evitó) en
       el changelog.
@@ -1299,16 +1309,20 @@ próximos pasos).
 - **Verificación visual real pendiente** (implementado y revisado a
   mano/con Playwright local, pero no confirmado en un navegador real
   sobre el deploy) en varios frentes:
-  - **Color por ícono del pulso de Visión** (`--ve-c`, sesión 2026-09-19,
-    2ª ronda): verificado con Playwright/Chromium en este entorno (6
-    capturas a lo largo de un ciclo a 1440px, sin errores de consola,
-    keyframes inyectados con los valores esperados). Es la primera vez
-    que el sitio usa `@property` y `color-mix()` — a diferencia del resto
-    de "pendientes" de esta lista, acá conviene confirmar explícitamente
-    que el navegador real soporta ambas features (son relativamente
-    nuevas) y no solo que "se ve bien": si `@property` no corre, el pulso
-    se queda en un solo color fijo (el `initial-value`, dorado) en vez de
-    romperse, así que un fallo ahí sería silencioso.
+  - **Color por ícono del pulso de Visión y orden detrás de los íconos**
+    (`--ve-c`, sesión 2026-09-19, 3ª ronda — reemplaza la nota de la 2ª
+    ronda de esta misma lista, que usaba los colores de las `.stat-annot`
+    en vez de los reales): verificado con Playwright/Chromium en este
+    entorno — orden del DOM confirmado (`svg` antes de `.vision-icons`,
+    se ve el pulso tapado por cada ícono), 6 capturas a lo largo de un
+    ciclo a 1440px con los 4 colores nuevos (muestreados de los `.webp`),
+    sin errores de consola, keyframes inyectados con los valores
+    esperados. Sigue siendo la primera vez que el sitio usa `@property` y
+    `color-mix()` — conviene confirmar explícitamente que el navegador
+    real soporta ambas features (son relativamente nuevas) y no solo que
+    "se ve bien": si `@property` no corre, el pulso se queda en un solo
+    color fijo (el `initial-value`, dorado) en vez de romperse, así que
+    un fallo ahí sería silencioso.
   - **`#lam-07` (Cierre)**: ✅ **verificado visualmente** en la 2ª pasada
     del 2026-09-18, ya con browser disponible (escritorio 1440px +
     móvil 390px, sin desborde horizontal). Confirmado: que el deco se ve

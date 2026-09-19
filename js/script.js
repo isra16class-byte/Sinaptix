@@ -853,10 +853,11 @@
   if(!svg) return;
   const icon = k => art.querySelector('.vision-icon--'+k);
   const claves = ['dorado','morado','azul','verde']; // TL, TR, BR, BL
-  // Mismos colores que usan las 4 .stat-annot para cada dato (--gold,
-  // --purple, --navy-bright, --green en css/styles.css), así el pulso
-  // "toca" cada ícono con el color que ya representa a ese dato.
-  const COLOR = {dorado:'#C1703B', morado:'#714B67', azul:'#3B6EA5', verde:'#2E7D5B'};
+  // Color real de cada ícono (muestreado de los .webp, no los --gold/
+  // --purple/--navy-bright/--green de datos que usan las .stat-annot: se
+  // probaron primero y no coincidían, sobre todo el azul, bastante más
+  // saturado en el ícono real de lo que sale --navy-bright).
+  const COLOR = {dorado:'#AD653F', morado:'#8A5C86', azul:'#1355A5', verde:'#599E71'};
   let estiloColor = null; // <style> con los % reales, se crea la 1ª vez
 
   // Da la posición (0–100, como pathLength="100") del punto del trazado más
