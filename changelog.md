@@ -11,6 +11,47 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Mi plan: etiquetas "Qué cambió desde tu diagnóstico" en la tarjeta Antropometría
+
+El usuario aprobó los chips de nutrientes y detectó un efecto lateral: al
+reevaluar (ej. actualizar Foco) la tarjeta naranja "Tu estado actual" crece
+unos 125 px (cada barra suma su línea "Antes: …" y aparece el pie
+"Diagnóstico inicial → Última actualización") y la verde queda con un hueco
+de casi 150 px entre la leyenda del IMC y los chips. De las opciones
+(párrafo informativo, etiquetas, o evitar que la naranja crezca) eligió
+**etiquetas informativas con lo que cambió desde el diagnóstico**.
+
+- **`nutriCambiosDesdeDiagnostico(objetivo, reeval)`**
+  (`js/nutricion-planes.js`, exportada para tests): compara la encuesta
+  inicial contra `sinaptix_reevaluacion` con el mismo cálculo que el gráfico
+  de barras y `gaugeDeltaHtml` (`gaugeComputeAreas` → % → diferencia en
+  puntos), así las etiquetas y la tarjeta naranja dicen siempre el mismo
+  número. Devuelve `[]` sin reevaluación. Por área: `antesPct`,
+  `despuesPct`, `delta`, `estado` (`sube`/`baja`/`igual`) y `texto` listo
+  para el chip (`+20`, `−20` con signo menos real, `=`).
+- **Markup** (`mi-plan.html`): `#miPlanCambios` (`.miplan-cambios`, oculto
+  por defecto) con título + `#miPlanCambiosChips`, entre la leyenda del IMC
+  y `#miPlanNutrientes`. El título reusa `.miplan-nutri-title`.
+- **Wiring** (`js/mi-plan.js`, `pintarMiPlan`): la lectura de
+  `sinaptix_reevaluacion` se subió un nivel (antes vivía dentro del `if` del
+  gráfico) para compartirla con las etiquetas. Cada chip lleva un `title`
+  con el detalle ("Foco: de 20% a 40% (+20 pts)").
+- **CSS** (`css/styles.css`): mismas reglas de chip que los nutrientes
+  (selectores compartidos), con el delta en `--green` / `#B3261E` /
+  `--ink-faint`, los mismos colores de `gaugeDeltaHtml`. Quedan pegadas
+  debajo de la leyenda; el hueco que reparte el alto pasa a estar entre ellas
+  y los nutrientes (~40 px en vez de ~150 px).
+- ⚠️ **En 1 columna (≤900px, mismo corte que `.miplan-grid`) las etiquetas se
+  ocultan a propósito**: ahí las tarjetas van apiladas, no hay hueco que
+  llenar y repetirían las barras que quedan justo debajo. No es un bug.
+- **Tests**: 4 nuevos en `tests/nutricion-planes.test.js` (sin reevaluación
+  → `[]`, sin encuesta → `[]`, mejora/igual/empeora en el orden de las
+  barras, y coincidencia con `gaugeDeltaHtml`). Suite: 85 pasan.
+- **Verificado con Playwright** (Chromium local, `netlifyIdentity`
+  mockeado) en 1600, 1280 y 390px con reevaluación que mejora, mixta
+  (sube/baja/igual) y sin cambios, y sin reevaluación (no aparecen). Sin
+  errores de consola; las dos columnas quedan de igual alto en desktop.
+
 ## 2026-09-18 — Mi plan: chips de "Nutrientes clave de tu plan" en la tarjeta Antropometría
 
 El usuario marcó (con captura) que la tarjeta verde de "Antropometría" queda

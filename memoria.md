@@ -242,6 +242,18 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Etiquetas "Qué cambió desde tu diagnóstico" en la tarjeta Antropometría
+  (`mi-plan.html`, sesión 2026-09-19)**: solo con reevaluación guardada
+  (`sinaptix_reevaluacion`), `#miPlanCambios` → `#miPlanCambiosChips`
+  (`.miplan-cambios`/`.miplan-cambios-chip`), debajo de la leyenda del IMC y
+  arriba de los chips de nutrientes. Sale de `nutriCambiosDesdeDiagnostico`
+  (`js/nutricion-planes.js`), que reusa el cálculo de las barras
+  (`gaugeComputeAreas` → %) para no divergir de la tarjeta naranja. Existe
+  porque al reevaluar la naranja crece (líneas "Antes: …") y a la verde le
+  sobraba alto. **Se ocultan en ≤900px** (1 columna): no hay hueco y
+  repetirían las barras. Alternativa considerada y no elegida (por ahora):
+  que la naranja no crezca, con una marca del valor anterior sobre la barra
+  y el "+20" al lado del %.
 - **Chips de nutrientes clave en la tarjeta Antropometría (`mi-plan.html`,
   sesión 2026-09-18)**: al pie de la tarjeta verde, `#miPlanNutrientes` →
   `#miPlanNutrientesChips` (`.miplan-nutri`/`.miplan-nutri-chip`), anclado
