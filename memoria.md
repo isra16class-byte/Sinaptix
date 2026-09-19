@@ -242,6 +242,11 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Nota bajo las etiquetas de cambios (`.miplan-cambios-nota`, sesión
+  2026-09-19)**: texto fijo de ~2 líneas dentro de `#miPlanCambios` que
+  explica que 20 puntos = un nivel de la respuesta. Ocupa el hueco que
+  sobraba en la tarjeta verde; si se alarga, la fila de "Datos clave" se
+  estira. Hereda la condición de las etiquetas (reevaluación y >900px).
 - **Etiquetas "Qué cambió desde tu diagnóstico" en la tarjeta Antropometría
   (`mi-plan.html`, sesión 2026-09-19)**: solo con reevaluación guardada
   (`sinaptix_reevaluacion`), `#miPlanCambios` → `#miPlanCambiosChips`

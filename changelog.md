@@ -11,6 +11,36 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Mi plan: nota explicativa bajo las etiquetas de cambios
+
+El usuario vio en su navegador las etiquetas "Qué cambió desde tu
+diagnóstico" (patch anterior) y notó que aún sobraba un poco de espacio en la
+tarjeta verde; propuso un párrafo informativo.
+
+- **`mi-plan.html`**: `<p class="miplan-cambios-nota">` dentro de
+  `#miPlanCambios`, debajo de las etiquetas: "Compara tu última
+  actualización con tu diagnóstico inicial. Cada 20 puntos equivalen a un
+  nivel de tu respuesta en esa área."
+- **Por qué ese texto y no un resumen tipo "Mejoraste 2 de 4 áreas"**: el
+  usuario ya había señalado que las etiquetas repiten lo de la tarjeta
+  naranja; un resumen repetiría de nuevo. Esto responde la duda natural que
+  deja el chip ("¿+20 de qué?"): 1 nivel de la escala 1-5 de la encuesta =
+  20 pts en el % (`gaugeComputeAreas`).
+- **Condición**: vive dentro de `.miplan-cambios`, así que hereda "solo con
+  reevaluación y solo en 2 columnas (>900px)". Sin reevaluación la tarjeta
+  queda como antes.
+- **CSS** (`css/styles.css`): `.miplan-cambios-nota`, 12px, `--ink-soft`,
+  line-height 1.4. ⚠️ El texto está dimensionado para ocupar ~2 líneas: con
+  las tipografías reales (Inter/Fraunces) entra en el hueco y la fila apenas
+  crece ~1px; si se alarga o se agranda la fuente, la fila vuelve a
+  estirarse (la tarjeta "Objetivo cognitivo" absorbe la diferencia). Revisar
+  al editarlo.
+- Texto fijo: no requiere tests nuevos. Suite: 85 pasan.
+- **Verificado con Playwright** con Inter/Fraunces/Caveat reales cargadas
+  (paquetes `@fontsource`) a 1600, 1280 y 1000px: la nota ocupa 2 líneas y
+  las dos columnas quedan de igual alto; en móvil y sin reevaluación no
+  aparece.
+
 ## 2026-09-19 — Mi plan: etiquetas "Qué cambió desde tu diagnóstico" en la tarjeta Antropometría
 
 El usuario aprobó los chips de nutrientes y detectó un efecto lateral: al
