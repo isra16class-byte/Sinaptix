@@ -552,7 +552,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
      desvanecerse). Sin `--ph` acá: los 2 pulsos aparecen/desaparecen a la
      vez, no alternados — es la energía en conjunto la que se prende y
      apaga, no cada cometa por separado. */
-  .ve-pulse{animation:veFade var(--ve-fadeT) ease-in-out infinite}
+  .ve-pulse{
+    animation:veFade var(--ve-fadeT) ease-in-out infinite;
+    /* medio ciclo de diferencia entre los 2 pulsos (usa el mismo --ph que ya
+       los separa en el recorrido: 0 y .5) para que no aparezcan/desaparezcan
+       juntos — mientras uno se apaga, el otro ya está por prenderse */
+    animation-delay:calc(var(--ph,0) * var(--ve-fadeT))
+  }
   .ve-p{
     fill:none;stroke-linecap:round;stroke-linejoin:round;
     animation:veRun var(--ve-T) linear infinite, veColor var(--ve-T) linear infinite;

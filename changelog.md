@@ -11,6 +11,25 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: los 2 pulsos aparecen alternados, no juntos
+
+Pedido del usuario sobre el fundido recién agregado: "puedes hacer que
+primero aparezca 1 y luego la otra?". Un solo cambio, mismo archivo:
+
+- **`css/styles.css`**: `.ve-pulse` suma `animation-delay:calc(var(--ph,0)
+  * var(--ve-fadeT))` — usa el mismo `--ph` (0 y `.5`) que ya separaba a
+  los 2 pulsos en el recorrido, ahora también para el fundido: medio
+  ciclo (4s de 8s) de diferencia entre uno y otro. Antes los 2 aparecían
+  y desaparecían exactamente a la vez (mismo `@keyframes veFade`, sin
+  delay); ahora, mientras uno se apaga el otro está por prenderse. No es
+  una alternancia estrictamente excluyente (con ~5s visible de 8s hay un
+  margen donde algo de los dos se llega a ver a la vez, sobre todo
+  durante los fundidos), pero ya no están sincronizados.
+- Verificado con Playwright, leyendo `getComputedStyle(...).opacity` de
+  cada `.ve-pulse` segundo a segundo (no solo capturas): confirmado un
+  momento con pulso 1 en `opacity:0` y pulso 2 en `opacity:1`, y otro
+  exactamente al revés. Sin regresión en mobile. `npm test`: 85/86.
+
 ## 2026-09-19 — Visión: el pulso aparece y desaparece (ciclo de 8s, fundido suave)
 
 Pedido del usuario: "puedes hacer que aparezca y desparezca en un cierto
