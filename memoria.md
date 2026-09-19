@@ -242,6 +242,16 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Decoración solo del login (`mi-plan.html`, sesión 2026-09-19)**: clase
+  `.deco-solo-login` (espejo de `.deco-solo-sesion`; oculta con
+  `#miPlan:has(#miPlanSinSesion.hidden)`). 5 espigas (`svg/deco-espiga.svg`)
+  en un manojo en el margen izquierdo (grande/mediana/chica) + 2 chicas
+  arriba, y 2 frutas nuevas creadas para esto: `svg/deco-blob-strawberry.svg`
+  (frutilla) y `svg/deco-blob-grapes.svg` (uva), mismo estilo que los demás
+  `deco-blob-*` (200×200, disco translúcido + degradados radiales). Frutilla y
+  uva llevan `.deco-solo-login--cerca` y se ocultan en ≤1180px (se meterían
+  detrás de la tarjeta). Posiciones en px desde arriba, elegidas para no
+  pisar naranja/aguacate/almendras/kiwi. Detalle y medidas en el changelog.
 - **Botón "Actualizar" en "Tu estado actual" + frutas solo con plan
   (`mi-plan.html`, sesión 2026-09-19)**:
   - `#btnActualizarEstado` (`.bar-chart-refresh`) vive en el encabezado de

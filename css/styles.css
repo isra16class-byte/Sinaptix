@@ -833,6 +833,17 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #miPlan.has-plan .deco-solo-plan{display:block}
 }
 #miPlan:has(#miPlanSinSesion:not(.hidden)) .deco-solo-plan{display:none}
+/* Decoración SOLO del login (sesión 2026-09-19): espigas extra + frutilla y
+   uva. Espejo de `.deco-solo-sesion`: visibles mientras `#miPlanSinSesion`
+   NO está `.hidden`, ocultas si lo está (con sesión, o encuesta inline).
+   No fuerzan `display`, así que en ≤720px siguen ocultas por las reglas
+   generales de `.deco-scribble`/`.deco-fruit`. */
+#miPlan:has(#miPlanSinSesion.hidden) .deco-solo-login{display:none}
+/* Frutilla y uva del login van pegadas al lado de la tarjeta (medido: la
+   tarjeta empieza en x=(ancho-416)/2): con ventanas de ≤1180px empezarían a
+   meterse detrás de ella, así que ahí se ocultan. Las espigas quedan (son
+   línea fina y viven en el margen del borde). */
+@media(max-width:1180px){.deco-solo-login--cerca{display:none}}
 #miPlan footer{margin-top:28px}
 /* margin-top/bottom en vez de shorthand `margin`: shorthand pisaba
    margin-left/right a 0, cancelando el `margin:auto` que centra el

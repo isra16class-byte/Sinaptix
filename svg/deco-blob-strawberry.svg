@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+  <path d="M46,9 C81,-9 134,1 163,33 C192,64 188,117 158,147 C129,177 72,185 38,162 C7,140 -6,94 9,59 C17,38 25,21 46,9 Z" fill="#C2385A" opacity=".14"/>
+  <defs>
+    <radialGradient id="stBody" cx="35%" cy="28%" r="80%">
+      <stop offset="0" stop-color="#F4695F"/>
+      <stop offset=".55" stop-color="#DC3E4A"/>
+      <stop offset="1" stop-color="#B5233B"/>
+    </radialGradient>
+    <linearGradient id="stLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6DBB6A"/>
+      <stop offset="1" stop-color="#2E7D5B"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="153" rx="36" ry="8" fill="#26161F" opacity=".08"/>
+  <g transform="translate(0,2)">
+    <!-- cuerpo: forma de corazón redondeado, punta hacia abajo -->
+    <path d="M100 58 C78 52 52 62 51 90 C50 116 74 143 100 156 C126 143 150 116 149 90 C148 62 122 52 100 58 Z" fill="url(#stBody)"/>
+    <!-- semillas -->
+    <g fill="#FCE9A6" opacity=".95">
+      <ellipse cx="76" cy="80" rx="1.9" ry="3" transform="rotate(-18 76 80)"/>
+      <ellipse cx="100" cy="76" rx="1.9" ry="3"/>
+      <ellipse cx="124" cy="80" rx="1.9" ry="3" transform="rotate(18 124 80)"/>
+      <ellipse cx="66" cy="99" rx="1.9" ry="3" transform="rotate(-24 66 99)"/>
+      <ellipse cx="88" cy="95" rx="1.9" ry="3" transform="rotate(-8 88 95)"/>
+      <ellipse cx="112" cy="95" rx="1.9" ry="3" transform="rotate(8 112 95)"/>
+      <ellipse cx="134" cy="99" rx="1.9" ry="3" transform="rotate(24 134 99)"/>
+      <ellipse cx="77" cy="116" rx="1.9" ry="3" transform="rotate(-20 77 116)"/>
+      <ellipse cx="100" cy="112" rx="1.9" ry="3"/>
+      <ellipse cx="123" cy="116" rx="1.9" ry="3" transform="rotate(20 123 116)"/>
+      <ellipse cx="89" cy="132" rx="1.9" ry="3" transform="rotate(-12 89 132)"/>
+      <ellipse cx="111" cy="132" rx="1.9" ry="3" transform="rotate(12 111 132)"/>
+    </g>
+    <!-- brillo -->
+    <path d="M62 78c2-9 9-15 17-17" stroke="#FFD9D2" stroke-width="3.2" stroke-linecap="round" opacity=".6"/>
+    <!-- cáliz: hojitas verdes + tallo -->
+    <g fill="url(#stLeaf)">
+      <path d="M100 62 C88 56 70 58 62 68 C76 68 88 70 100 66 Z"/>
+      <path d="M100 62 C112 56 130 58 138 68 C124 68 112 70 100 66 Z"/>
+      <path d="M100 64 C92 62 84 70 80 80 C90 76 97 74 100 68 Z"/>
+      <path d="M100 64 C108 62 116 70 120 80 C110 76 103 74 100 68 Z"/>
+      <path d="M100 60 C97 66 98 72 100 76 C102 72 103 66 100 60 Z"/>
+    </g>
+    <path d="M100 60 C100 50 103 44 109 39" stroke="#2E7D5B" stroke-width="4.4" stroke-linecap="round"/>
+  </g>
+</svg>

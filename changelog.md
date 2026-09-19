@@ -11,6 +11,57 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Login de "Mi plan": más espigas (sobre todo a la izquierda) + frutilla y uva
+
+Pedido del usuario sobre la pantalla de login (`#miPlanSinSesion`): "más de
+estos" (`svg/deco-espiga.svg`), "más del lado izquierdo, grandes y
+pequeñas", y "otras frutas como frutilla y uva".
+
+- **Assets nuevos**: `svg/deco-blob-strawberry.svg` y
+  `svg/deco-blob-grapes.svg` (no existían frutilla ni uva en el repo).
+  Dibujados a mano en el mismo lenguaje que el resto de `deco-blob-*.svg`
+  (viewBox 200×200, disco orgánico translúcido de fondo, degradados
+  radiales para volumen, elipse de sombra; 2,0 y 3,6 KB). Frutilla:
+  cuerpo rojo con semillas crema, cáliz verde y brillo. Uva: racimo de 15
+  granos en 3 tonos de violeta con brillos, tallo y una hoja. Los `id` de
+  gradientes están prefijados (`st*`, `gp*`) para no chocar si algún día se
+  inlinean.
+- **`mi-plan.html`** (a nivel de sección, full-bleed, junto a las demás
+  decoraciones), todas con la clase nueva **`.deco-solo-login`**:
+  - **5 espigas** (`svg/deco-espiga.svg`, la de las esquinas): un manojo en
+    el margen izquierdo entre la naranja y las almendras (grande 86×353,
+    mediana 60×246, chica 40×164, con distinta inclinación, la base de la
+    grande justo sobre las almendras) + 2 chicas sueltas arriba a la
+    izquierda (36×148 y 28×115).
+  - **Frutilla** (112px) y **uva** (122px) entre el manojo y la tarjeta.
+- **`css/styles.css`**: `#miPlan:has(#miPlanSinSesion.hidden)
+  .deco-solo-login{display:none}` — espejo exacto de `.deco-solo-sesion`
+  (visibles mientras el login está a la vista; ocultas con sesión y con la
+  encuesta inline). No fuerzan `display`, así que en ≤720px siguen ocultas
+  por las reglas generales de `.deco-scribble`/`.deco-fruit`.
+  - Frutilla y uva llevan además `.deco-solo-login--cerca` y se ocultan en
+    **≤1180px**: la tarjeta empieza en x=(ancho−416)/2 y por debajo de eso
+    se metían detrás de ella (medido: uva 48px a 1100px, frutilla 46px a
+    1000px, hasta 138px a 780px). Las espigas no: son línea fina y viven en
+    el margen (a 780px la mediana toca 19px de la tarjeta, sin efecto visible).
+- Las 3 espigas/2 frutas existentes de las esquinas y las 4
+  `.deco-solo-sesion` no se tocaron; las posiciones de arriba se eligieron
+  para no pisar naranja (y=250–365), aguacate ni almendras/kiwi de abajo.
+  `top` en px medido desde arriba (donde está la tarjeta), así el manojo
+  se mantiene en su sitio aunque la sección crezca (pestaña "Registrarme",
+  monitores altos).
+- **Verificado** con Playwright/Chromium (sesión mockeada, fuentes reales) a
+  1920/1600/1440/1280/1200/1100/1000/900/780/700/390px: 0 desborde
+  horizontal en todos; 0 solapes con la tarjeta desde 1200px hacia arriba;
+  ≤1180px se ocultan solo frutilla y uva; ≤720px se ocultan todas; con
+  sesión iniciada `.deco-solo-login` queda en `display:none` y
+  `.deco-solo-sesion` sigue visible; pestaña "Registrarme" sin problema.
+  Falta la confirmación de siempre sobre un navegador real/deploy.
+- `npm test`: 85 pass / 1 skipped (e2e del PDF), 0 fail.
+
+Actualiza memoria.md y changelog.md. Se aplica encima del patch
+"botón Actualizar + frutas solo con plan" de esta misma fecha.
+
 ## 2026-09-19 — "Mi plan": botón "Actualizar" en "Tu estado actual" + frutas nuevas solo con el plan cargado
 
 Dos pedidos del usuario (con capturas de `mi-plan.html` con sesión y plan

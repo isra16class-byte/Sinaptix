@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+  <path d="M43,8 C79,-9 133,1 163,34 C192,66 189,118 158,148 C128,177 71,185 37,162 C6,140 -6,94 9,59 C17,38 22,20 43,8 Z" fill="#7B55A0" opacity=".15"/>
+  <defs>
+    <radialGradient id="gpA" cx="35%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#A67BC6"/>
+      <stop offset="1" stop-color="#5A3480"/>
+    </radialGradient>
+    <radialGradient id="gpB" cx="35%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#9468B8"/>
+      <stop offset="1" stop-color="#4A2A6E"/>
+    </radialGradient>
+    <radialGradient id="gpC" cx="35%" cy="30%" r="78%">
+      <stop offset="0" stop-color="#B98DCB"/>
+      <stop offset="1" stop-color="#6A3F8C"/>
+    </radialGradient>
+    <linearGradient id="gpLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7CC36F"/>
+      <stop offset="1" stop-color="#2E7D5B"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="158" rx="30" ry="7" fill="#26161F" opacity=".08"/>
+  <g transform="translate(100 104) scale(.86) translate(-100 -104)">
+    <!-- racimo: filas de arriba (más anchas) hacia la punta -->
+    <g>
+      <circle cx="58" cy="70" r="12.5" fill="url(#gpB)"/>
+      <circle cx="80" cy="66" r="12.5" fill="url(#gpA)"/>
+      <circle cx="102" cy="68" r="12.5" fill="url(#gpC)"/>
+      <circle cx="124" cy="66" r="12.5" fill="url(#gpA)"/>
+      <circle cx="145" cy="71" r="12.5" fill="url(#gpB)"/>
+      <circle cx="68" cy="91" r="12.5" fill="url(#gpA)"/>
+      <circle cx="90" cy="89" r="12.5" fill="url(#gpB)"/>
+      <circle cx="112" cy="90" r="12.5" fill="url(#gpC)"/>
+      <circle cx="134" cy="92" r="12.5" fill="url(#gpA)"/>
+      <circle cx="79" cy="112" r="12.5" fill="url(#gpC)"/>
+      <circle cx="101" cy="110" r="12.5" fill="url(#gpA)"/>
+      <circle cx="123" cy="113" r="12.5" fill="url(#gpB)"/>
+      <circle cx="90" cy="133" r="12.5" fill="url(#gpB)"/>
+      <circle cx="112" cy="134" r="12.5" fill="url(#gpC)"/>
+      <circle cx="101" cy="154" r="12.5" fill="url(#gpA)"/>
+    </g>
+    <!-- brillos -->
+    <g fill="#fff" opacity=".38">
+      <ellipse cx="53" cy="65" rx="3.4" ry="2.2" transform="rotate(-35 53 65)"/>
+      <ellipse cx="75" cy="61" rx="3.4" ry="2.2" transform="rotate(-35 75 61)"/>
+      <ellipse cx="97" cy="63" rx="3.4" ry="2.2" transform="rotate(-35 97 63)"/>
+      <ellipse cx="119" cy="61" rx="3.4" ry="2.2" transform="rotate(-35 119 61)"/>
+      <ellipse cx="140" cy="66" rx="3.4" ry="2.2" transform="rotate(-35 140 66)"/>
+      <ellipse cx="63" cy="86" rx="3.4" ry="2.2" transform="rotate(-35 63 86)"/>
+      <ellipse cx="85" cy="84" rx="3.4" ry="2.2" transform="rotate(-35 85 84)"/>
+      <ellipse cx="107" cy="85" rx="3.4" ry="2.2" transform="rotate(-35 107 85)"/>
+      <ellipse cx="129" cy="87" rx="3.4" ry="2.2" transform="rotate(-35 129 87)"/>
+      <ellipse cx="74" cy="107" rx="3.4" ry="2.2" transform="rotate(-35 74 107)"/>
+      <ellipse cx="96" cy="105" rx="3.4" ry="2.2" transform="rotate(-35 96 105)"/>
+      <ellipse cx="118" cy="108" rx="3.4" ry="2.2" transform="rotate(-35 118 108)"/>
+      <ellipse cx="85" cy="128" rx="3.4" ry="2.2" transform="rotate(-35 85 128)"/>
+      <ellipse cx="107" cy="129" rx="3.4" ry="2.2" transform="rotate(-35 107 129)"/>
+      <ellipse cx="96" cy="149" rx="3.4" ry="2.2" transform="rotate(-35 96 149)"/>
+    </g>
+    <!-- tallo + hoja -->
+    <path d="M102 56 C102 46 106 40 112 35" stroke="#6B4F2A" stroke-width="4.4" stroke-linecap="round"/>
+    <path d="M110 40 C122 24 148 26 155 44 C138 54 118 54 110 40 Z" fill="url(#gpLeaf)"/>
+    <path d="M113 42 C126 38 140 40 150 44" stroke="#DDF2CC" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>
+  </g>
+</svg>
