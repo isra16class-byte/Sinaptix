@@ -2100,7 +2100,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .mk-bar-track{height:calc(var(--u)*7);border-radius:calc(var(--u)*4);background:var(--panel-line);overflow:hidden}
 .mk-bar-track i{display:block;height:100%;border-radius:calc(var(--u)*4)}
 .contact-trust{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:24px}
-.contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:600;color:var(--purple)}
+.contact-trust-item{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-m);font-size:13px;font-weight:800;color:var(--purple)}
 .contact-trust-item svg{width:16px;height:16px;flex:none}
 /* Una sola columna (pedido del usuario, 2026-09-18; antes grilla 2x2).
    En columna, la tarjeta vertical vieja (ícono arriba, nombre, handle)
@@ -2127,6 +2127,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   background:linear-gradient(135deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);color:#fff;
 }
 .social-card-icon--tiktok{background:#010101;color:#fff}
+/* Correo: azul tipo app de Mail (sobre de relleno blanco, solapa del mismo azul).
+   Teléfono: verde tipo app de Teléfono (auricular blanco relleno). */
+.social-card-icon--mail{background:linear-gradient(135deg,#5AC8FA,#1A7CF5);color:#fff;--mail-fold:#1A7CF5}
+.social-card-icon--phone{background:linear-gradient(135deg,#4CD964,#1FA84A);color:#fff}
+.social-card-icon--mail svg,.social-card-icon--phone svg{width:19px;height:19px}
 .social-card-name{grid-area:name;font-family:var(--font-m);font-size:14px;font-weight:700;color:var(--ink)}
 .social-card-handle{grid-area:handle;font-size:13px;color:var(--panel-text)}
 .social-card:hover .arrow{transform:translateX(4px);display:inline-block}

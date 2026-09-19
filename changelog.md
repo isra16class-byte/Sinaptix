@@ -11,6 +11,26 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Conócenos: íconos de Correo y Teléfono con forma y color propios, mensajes en negrita
+
+Pedido del usuario (a partir de una captura de la sección): que los
+íconos de Correo y Teléfono se vean "bien, con su forma y color
+respectivo", y que "Tu plan, 100% gratis" / "Tus datos quedan
+protegidos" (`.contact-trust-item`) vayan en negrita.
+
+- **Correo** (`.social-card-icon--mail`): círculo con degradado azul
+  (`#5AC8FA→#1A7CF5`), sobre blanco relleno y solapa en el mismo azul
+  (variable `--mail-fold`), como la app de Mail. Antes: sobre de trazo
+  fino en morado sobre `--panel-2`.
+- **Teléfono** (`.social-card-icon--phone`): círculo con degradado verde
+  (`#4CD964→#1FA84A`) y auricular blanco relleno (path de Feather,
+  `fill` en vez de `stroke`). Antes: auricular de trazo fino en morado.
+- Ambos íconos pasan a 19px (los de trazo eran 17px) para que el relleno
+  no se vea chico dentro del círculo de 38px.
+- **Negrita**: `.contact-trust-item` de `font-weight:600` a `800`.
+- Verificado con Playwright/Chromium a 1440px (captura mostrada al
+  usuario). Sin verificar en mobile ni en un deploy real.
+
 ## 2026-09-19 — Conócenos: el correo pasa a ser una 4ta tarjeta, nuevos mensajes de confianza
 
 El usuario pidió 2 cambios en la sección "Conócenos" (contacto pasivo):

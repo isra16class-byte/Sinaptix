@@ -1047,6 +1047,14 @@ próximos pasos).
     modificadoras sobre el círculo base). Teléfono y Correo quedan con el
     círculo genérico `--panel-2`/ícono `--purple` de siempre (ninguno de
     los 2 es una red social, ninguno tiene color de marca que aplicar).
+    **Actualizado 2026-09-19 (2ª pasada)**: a pedido del usuario Correo y
+    Teléfono también llevan color propio, estilo apps nativas:
+    `.social-card-icon--mail` (degradado azul `#5AC8FA→#1A7CF5`, sobre
+    blanco relleno con solapa del azul vía `--mail-fold`) y
+    `.social-card-icon--phone` (degradado verde `#4CD964→#1FA84A`,
+    auricular blanco relleno). Ambos SVG son de relleno (`fill`), no de
+    trazo, y 19px en vez de 17px.
+  - **`.contact-trust-item` en negrita** (`font-weight:800`, antes 600).
 - **Cierre (`#lam-07`, sección nueva, sesión 2026-09-18)**: mini-hero de
   cierre al final del sitio, reemplaza al panel `.contact-cta` descartado
   (ver "Pendientes conocidos" → Descartado) como forma de empujar el
