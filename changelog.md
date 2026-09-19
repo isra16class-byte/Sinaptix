@@ -217,6 +217,72 @@ Tres pedidos del usuario en la misma sesión, todos sobre `mi-plan.html`.
 
 Actualiza memoria.md y changelog.md.
 
+## 2026-09-19 — Ajustes de decoración: Pilares sin la onda azul, uva en lugar de la hoja, login sin uva/almendras y collage más chico
+
+Tanda de pedidos del usuario, todos de decoración/espaciado, sin tocar
+contenido ni lógica.
+
+- **Pilares (`#lam-04`) — fuera la "raya celeste"**: pedido "quitá esa raya
+  celeste que está abajo del título Cuatro frentes de trabajo". Era el
+  bloque `.signal-wave` (`svg/signal-wave.svg`, onda con trazo `#3B6EA5` =
+  `--navy-bright`). Se borró del `index.html`. Ocupaba **90px** de alto
+  (44 de imagen + `margin:6px` arriba + `40px` abajo), así que ese espacio
+  se conserva con una regla nueva, `#lam-04 .lam-text-center{margin-top:74px}`
+  (el párrafo tenía `margin:-16px auto 44px`; −16 + 90 = 74): verificado que
+  el párrafo y las 4 tarjetas quedan **exactamente** donde estaban
+  (párrafo en y=363, `.pillar-grid` en y=479). Sin esa compensación el
+  párrafo subía y se superponía al rayón morado bajo el título (comprobado
+  antes de agregarla). El asset sigue en uso en el Hero (`index.html`,
+  `.deco` de `#lam-01`) y las reglas `.signal-wave{...}` quedan huérfanas
+  en `css/styles.css` (no se borran, mismo criterio que el resto del repo).
+- **Pilares — la hoja de la derecha pasa a ser el racimo de uva**: pedido
+  "reemplazá la hoja que está al lado derecho por el racimo de uva" y
+  después "hacelo más grande". La hoja fina
+  (`svg/deco-leaf-beneficios.svg`, `right:70px;top:225px;width:60px`,
+  `opacity:.6`, `rotate(-8deg)`) se reemplazó por
+  `svg/deco-blob-grapes.svg` en el mismo lugar y con los mismos valores, y
+  después se subió el ancho a **110px** (con 60px se veía chico al lado de
+  la naranja de 110 y la granada de 180). Verificado que no se solapa con
+  el título, el párrafo ni las 4 tarjetas (caja final 110×110). La hoja
+  sigue en uso en Beneficios (`#lam-05`) y el asset de la uva, que había
+  quedado sin uso al sacarla del login, vuelve a usarse.
+- **Pilares — fuera el huevo**: pedido "en la parte izquierda quitale el
+  huevo". Se borró el `.deco-fruit` de abajo a la izquierda
+  (`img/generadas-cutout/huevo.webp`, `left:20px;bottom:-30px`). El asset
+  sigue en uso en el collage de Conócenos (`#lam-06`). No se movió nada
+  más (los decos son absolutos: `.pillar-grid` quedó en y=479).
+- **Login de "Mi plan" — fuera la uva y las almendras**: pedido "quitá la
+  fruta que está arriba del kiwi y también el racimo de uvas (las frutas
+  están del lado izquierdo)". Se borraron del `index.html`: la uva
+  (`svg/deco-blob-grapes.svg`, `deco-solo-login--cerca`, `left:238px;
+  top:580px`) y las almendras del margen izquierdo
+  (`svg/deco-blob-almonds.svg`, `left:-20px;bottom:180px`), que era la
+  fruta que quedaba justo arriba del kiwi. Verificado: 0 uvas y 0
+  almendras sueltas en el DOM; la columna izquierda queda con las espigas,
+  la naranja arriba, la frutilla y el kiwi abajo. Sigue estando la otra
+  almendra (`.miplan-locked-fruit is-almonds`, pegada a la esquina
+  inferior izquierda de la tarjeta, no arriba del kiwi) — se le avisó al
+  usuario y quedó.
+- **Login de "Mi plan" — tarjeta más chica "en conjunto"**: pedido "hacé
+  más pequeña la tarjeta de inicio de sesión (en conjunto)".
+  `.miplan-locked-card` lleva ahora **`zoom:.9`**: encoge la tarjeta
+  completa (texto, campos, botones y espaciados) en una sola proporción.
+  Se usó `zoom` y no `transform:scale` porque la tarjeta lleva `.reveal` y
+  `.reveal.in{transform:translateY(0)}` pisa cualquier `transform` (mismo
+  caso que `.conocenos-collage`). Medido a 1440px: ~414×660 visibles en vez
+  de 460×733, centrada y con todos los internos proporcionales.
+- **Conócenos (`#lam-06`) — collage un poco más chico**: pedido "hacé un
+  poquito más chico el collage". `--collage-bleed` pasa de
+  `clamp(0px,calc((100vw - 1180px)/2 + 100px),280px)` a
+  `clamp(0px,calc((100vw - 1180px)/2 + 70px),250px)`. Medido a 1440×900:
+  **866×525 → 836×507** y, al encoger desde el sangrado, el collage entra
+  completo (ya se ven enteras las tarjetas "hola@sinaptix.com" y "Tu
+  progreso con SINAPTIX", que antes quedaban cortadas por el borde).
+- `npm test`: 85 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — Íconos de la tarjeta de título de "Mi plan" (calco de referencias)
 
 El usuario mandó 6 imágenes de referencia (line-art generado con Gemini:

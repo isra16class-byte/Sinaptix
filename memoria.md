@@ -248,10 +248,19 @@ próximos pasos).
   en un manojo en el margen izquierdo (grande/mediana/chica) + 2 chicas
   arriba, y 2 frutas nuevas creadas para esto: `svg/deco-blob-strawberry.svg`
   (frutilla) y `svg/deco-blob-grapes.svg` (uva), mismo estilo que los demás
-  `deco-blob-*` (200×200, disco translúcido + degradados radiales). Frutilla y
-  uva llevan `.deco-solo-login--cerca` y se ocultan en ≤1180px (se meterían
-  detrás de la tarjeta). Posiciones en px desde arriba, elegidas para no
-  pisar naranja/aguacate/almendras/kiwi. Detalle y medidas en el changelog.
+  `deco-blob-*` (200×200, disco translúcido + degradados radiales). La
+  frutilla lleva `.deco-solo-login--cerca` y se oculta en ≤1180px (se
+  metería detrás de la tarjeta). Posiciones en px desde arriba, elegidas
+  para no pisar naranja/aguacate/almendras/kiwi. Detalle y medidas en el
+  changelog.
+  - **Bajas del 2026-09-19** (pedido del usuario, sobre la pantalla de
+    login): se quitaron la **uva** (`svg/deco-blob-grapes.svg`, estaba en
+    `left:238px;top:580px`) y las **almendras del margen izquierdo**
+    (`svg/deco-blob-almonds.svg`, `left:-20px;bottom:180px`), que era la
+    fruta que quedaba justo arriba del kiwi. La uva se reusó después en
+    Pilares (ver `#lam-04`) y las almendras siguen usándose en la tarjeta
+    del login (`.miplan-locked-fruit is-almonds`), así que ningún asset
+    quedó huérfano.
 - **Botón "Actualizar" en "Tu estado actual" + frutas solo con plan
   (`mi-plan.html`, sesión 2026-09-19)**:
   - `#btnActualizarEstado` (`.bar-chart-refresh`) vive en el encabezado de
@@ -523,21 +532,40 @@ próximos pasos).
   `<img class="deco deco-scribble">` suelto cerca del título (los otros 6
   que estaban dispersos se sacaron a pedido del usuario), más
   `.title-scribble` y `.title-mark` — 3 trazos totales pegados al título.
+  **La onda azul que venía debajo del título se borró el 2026-09-19**
+  (pedido del usuario: "quitá esa raya celeste que está abajo del título").
+  Era el bloque `.signal-wave` (`svg/signal-wave.svg`, trazo `#3B6EA5`,
+  `margin:6px 0 40px` + `opacity:.6`), que ocupaba **90px** de alto (44 de
+  imagen + 6 arriba + 40 abajo). Ese espacio lo conserva ahora el párrafo
+  de la sección con `#lam-04 .lam-text-center{margin-top:74px}`
+  (`.lam-text-center` es `margin:-16px auto 44px`, así que −16 + 90 = 74):
+  así, al sacar la raya, el párrafo y las 4 tarjetas quedan **en el mismo
+  lugar** que antes y el párrafo no pisa el rayón morado del título (sin
+  ese ajuste se subía y se superponía al trazo). El asset sigue en uso en
+  el Hero y las reglas `.signal-wave{...}` quedan sin uso (no se borraron).
   **Frutas/alimentos grandes difuminados de fondo (sesión 2026-09-17)**:
-  antes la sección solo tenía 1 `.deco-fruit` (aguacate). Ahora tiene 6,
+  antes la sección solo tenía 1 `.deco-fruit` (aguacate). Hoy tiene 4,
   todas `.deco-fruit` (ocultas en mobile `<720px` por la regla general,
   con la animación float de siempre):
-  - 4 en las esquinas del `<section>`, grandes (150–230px) y con
+  - 3 en las esquinas del `<section>`, grandes (150–230px) y con
     opacidad baja (.4–.5) para leerse como fondo difuminado, no como
     protagonistas: aguacate (`svg/deco-blob-avocado.svg`, arriba-izq.),
-    granada (`img/generadas-cutout/granada.webp`, arriba-der.), huevo
-    (`img/generadas-cutout/huevo.webp`, abajo-izq.) y té
+    granada (`img/generadas-cutout/granada.webp`, arriba-der.) y té
     (`img/generadas-cutout/te.webp`, abajo-der.) — mismo criterio visual
-    que ya usan Beneficios/Contacto.
+    que ya usan Beneficios/Contacto. **El huevo**
+    (`img/generadas-cutout/huevo.webp`, abajo-izq.) **se borró el
+    2026-09-19** a pedido del usuario ("en la parte izquierda quitale el
+    huevo"); el asset sigue en uso en el collage de Conócenos.
   - 2 más chicas y más opacas (.6–.9, se leen más nítidas, no son
     "fondo") forman un cluster junto a la granada, a la derecha del
-    título, a pedido explícito del usuario con una imagen de referencia:
-    una hoja fina (`svg/deco-leaf-beneficios.svg`) y una naranja
+    título, a pedido explícito del usuario con una imagen de referencia.
+    Ese cluster era una hoja fina (`svg/deco-leaf-beneficios.svg`)
+    + una naranja; **el 2026-09-19 el usuario pidió "reemplazá la hoja
+    de la derecha por el racimo de uva" y después "hacelo más grande"**,
+    así que hoy es el racimo (`svg/deco-blob-grapes.svg`, `right:70px;
+    top:225px`, `opacity:.6`, `rotate(-8deg)`) a **110px** de ancho
+    (primero quedó en los 60px que tenía la hoja y se veía chico al lado
+    de los otros blobs) + la naranja
     (`svg/deco-blob-orange.svg` — este asset ya traía su propio halo/blob
     suave detrás del gajo, es el mismo efecto de "círculo detrás de la
     fruta" que pedía la referencia, no se agregó CSS nuevo para eso).
@@ -648,7 +676,12 @@ próximos pasos).
     en este entorno para captura/Playwright) — ver "Pendientes
     conocidos".
 - **"Mi plan" — estado sin sesión** (`#miPlanSinSesion`, `.miplan-locked`):
-  tarjeta blanca centrada (`.miplan-locked-card`) con candado SVG a mano,
+  tarjeta blanca centrada (`.miplan-locked-card`, con **`zoom:.9`** desde el
+  2026-09-19 a pedido del usuario — "más pequeña en conjunto": encoge
+  tarjeta + campos + botones + espaciados en una sola proporción. Se usa
+  `zoom` y no `transform:scale` porque la tarjeta lleva `.reveal`, cuyo
+  `.reveal.in{transform:translateY(0)}` pisa cualquier `transform`. Medidas
+  visibles: ~414×660 en vez de 460×733 a 1440px) con candado SVG a mano,
   formularios propios de login/registro (ver punto siguiente) y "Volver
   al sitio" como link de texto. Detrás, 1 ilustración grande de cerebro
   (`img/decoraciones-neurona/cerebro-mi-plan.webp`, sangrando por el
@@ -1017,13 +1050,17 @@ próximos pasos).
     (`grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)`, colapsa a 1
     columna en `≤900px`). Tamaño/posición del wrapper: sangrado a la
     derecha con `--collage-bleed` =
-    `clamp(0px,calc((100vw - 1180px)/2 + 100px),280px)` (offset base
-    `+100px`, tope `280px`; bajado desde `+140px/340px` el 2026-09-18 a
-    pedido del usuario: "un poco más pequeño"), `left:20px` en desktop,
+    `clamp(0px,calc((100vw - 1180px)/2 + 70px),250px)` (offset base
+    `+70px`, tope `250px`; bajado desde `+100px/280px` el 2026-09-19 con
+    "un poquito más pequeño", y antes desde `+140px/340px` el 2026-09-18),
+    `left:20px` en desktop,
     `left:0` + `max-width:560px` centrado en `≤900px`. Como todas las
     medidas internas salen de `100cqw`, bajar el sangrado encoge todo el
-    collage en proporción: **~866px × 525px** a 1425px de ventana (antes
-    906px × 550px), con el borde izquierdo en el mismo lugar. Ver
+    collage en proporción: **~836px × 507px** a 1440px (antes 866×525, y
+    906×550 antes de eso), con el borde izquierdo en el mismo lugar. Con
+    el valor actual, a 1440px el collage entra completo (se ven las
+    tarjetas "hola@sinaptix.com" y "Tu progreso con SINAPTIX" de la
+    derecha). Ver
     `css/styles.css` para el detalle de esas reglas, no repetido acá.
   - **`.collage`** (antes `.conocenos-collage-img`): `container-type:
     inline-size`, `width:100%`, `aspect-ratio:1162/705`, con la animación
@@ -1139,10 +1176,11 @@ próximos pasos).
   - Ajuste fino del 2026-09-18 (ver changelog): verificado en el
     navegador integrado de VS Code sobre Live Server a
     1000/1100/1280/1366/1440/1567/1920px (versión imagen, ~970px de ancho
-    a 1567px) y a 1425px (versión HTML/CSS, ~866px con `--collage-bleed`
-    en `+100px/280px`). En el deploy real conviene mirar sobre todo el
-    borde derecho: el collage se sale de pantalla ~87–88px (corte
-    aceptado por el usuario) y en ventanas de ~1000px `.contact-info`
+    a 1567px) y a 1440px (versión HTML/CSS, ~836px con `--collage-bleed`
+    en `+70px/250px`). En el deploy real conviene mirar sobre todo el
+    borde derecho, aunque con el valor actual ya no queda cortado a
+    1440px (antes se salía ~87–88px de pantalla, corte aceptado por el
+    usuario) y en ventanas de ~1000px `.contact-info`
     desborda su columna 113px (el email grande + botón de copiar) —
     desborde preexistente, sin tocar.
 
