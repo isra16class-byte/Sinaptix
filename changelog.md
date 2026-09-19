@@ -11,6 +11,20 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Pilares: íconos sin el fondo rosado y más grandes
+
+Pedido del usuario: quitar el fondo rosado de los íconos de las 4 tarjetas
+y ajustar el tamaño para que queden bien.
+
+- `.pillar-icon-circle`: se saca `background:var(--panel-2)` y
+  `border-radius:50%`; pasa de 60×60 a 56×56 (solo contenedor).
+- `.pillar-icon-img`: 32px → 56px (sin el círculo, a 32px se veían
+  diminutos; las imágenes son de 256px, así que 56px sale nítido) +
+  `drop-shadow(0 4px 8px rgba(38,22,31,.18))` para que las esferas no
+  floten planas sobre el blanco.
+- `width/height` de los 4 `<img>` en `index.html`: 32 → 56.
+- Verificado con Playwright a 1440px.
+
 ## 2026-09-19 — Pilares: rayitas finas tipo cuadro sinóptico entre el párrafo y las tarjetas
 
 Pedido del usuario (con captura de `#lam-04`): "rayitas finas saliendo de

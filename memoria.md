@@ -571,6 +571,12 @@ próximos pasos).
   `.pillar` a `position:relative`. En hover la bajada se acorta 4px para
   seguir pegada a la barra. Oculto en ≤900px (con 2/1 columnas no hay una
   barra única). Ver changelog.
+  **Íconos de las tarjetas sin círculo rosado (2026-09-19)**:
+  `.pillar-icon-circle` ya no tiene fondo `--panel-2` ni `border-radius`
+  (queda solo como contenedor flex de 56×56); `.pillar-icon-img` pasó de
+  32px a 56px (las esferas de `img/Iconos/icon-*.webp` son de 256px y
+  ocupan todo su cuadro) y suma un `drop-shadow` suave. Los `width/height`
+  del `<img>` en `index.html` se actualizaron a 56.
   **Frutas/alimentos grandes difuminados de fondo (sesión 2026-09-17)**:
   antes la sección solo tenía 1 `.deco-fruit` (aguacate). Hoy tiene 4,
   todas `.deco-fruit` (ocultas en mobile `<720px` por la regla general,

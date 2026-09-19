@@ -1805,10 +1805,12 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 .pillar:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent}
 .pillar-icon-circle{
-  width:60px;height:60px;border-radius:50%;background:var(--panel-2);
-  display:flex;align-items:center;justify-content:center;flex:none;
+  width:56px;height:56px;display:flex;align-items:center;justify-content:center;flex:none;
 }
-.pillar-icon-img{width:32px;height:32px;object-fit:contain}
+/* Sin el círculo rosado (--panel-2) de atrás (pedido del usuario,
+   2026-09-19): el ícono (esfera de 256px, ocupa todo su cuadro) pasa de
+   32px a 56px para no quedar chico sin el fondo. */
+.pillar-icon-img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(38,22,31,.18))}
 .pillar h3{font-size:18px;font-weight:700}
 .pillar p{font-size:14.5px;color:var(--ink-soft)}
 
