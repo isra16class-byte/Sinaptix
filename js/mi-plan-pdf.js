@@ -511,10 +511,30 @@
   // Panel destacado del objetivo.
   function dibujarObjetivo(ctx, m){
     const doc = ctx.doc;
-    fuente(doc, F_CUERPO, 'normal', 8.2);
+    fuente(doc, F_CUERPO, 'normal', 8);
     const enfoque = m.planes[0].enfoque;
-    const lineas = doc.splitTextToSize(enfoque, CW - 16);
-    const alto = 17.5 + altoTexto(doc, lineas) + 4;
+    const lineasEnfoque = doc.splitTextToSize(enfoque, CW - 16);
+    const lhEnfoque = 8 * 0.3528 * 1.25;
+
+    // El título puede venir largo cuando el objetivo resuelve en varios
+    // planes a la vez ("Foco y Concentración + Reducir Fatiga Mental +
+    // ..."), y a una sola línea se salía del panel. Se prueba a 12,5pt; si
+    // no entra en 2 líneas, se reintenta más chico antes de dejarlo pasar.
+    let tituloTam = 12.5;
+    let lineasTitulo = [];
+    for(let intento = 0; intento < 3; intento++){
+      fuente(doc, F_TITULO, 'bold', tituloTam);
+      lineasTitulo = doc.splitTextToSize(m.objetivoTitulo, CW - 14);
+      if(lineasTitulo.length <= 2) break;
+      tituloTam -= 1.5;
+    }
+    const lhTitulo = tituloTam * 0.3528 * 1.15;
+
+    // Acumulador explícito de alto: rótulo + N líneas de título + M líneas
+    // de enfoque + paddings. Antes eran fórmulas fijas que no contemplaban
+    // un título en 2 líneas; ahora el panel crece con el contenido real.
+    const padSup = 5.8, padEntre = 2.2, padInf = 3.5;
+    const alto = padSup + lineasTitulo.length * lhTitulo + padEntre + lineasEnfoque.length * lhEnfoque + padInf;
 
     ctx.espacio(alto);
     const y = ctx.y;
@@ -528,20 +548,28 @@
     setFill(doc, C.acento);
     doc.rect(M, y, 1.2, alto, 'F');
 
-    const x = M + 8;
-    fuente(doc, F_CUERPO, 'bold', 6.8);
+    const x = M + 7;
+    fuente(doc, F_CUERPO, 'bold', 6.6);
     setText(doc, C.acento);
-    doc.text('OBJETIVO COGNITIVO PRINCIPAL', x, y + 7.2);
+    doc.text('OBJETIVO COGNITIVO PRINCIPAL', x, y + 3.6);
 
-    fuente(doc, F_TITULO, 'bold', 13.5);
+    let yy = y + padSup + lhTitulo * 0.78;
+    fuente(doc, F_TITULO, 'bold', tituloTam);
     setText(doc, C.marca);
-    doc.text(m.objetivoTitulo, x, y + 14.4);
+    lineasTitulo.forEach(function(linea){
+      doc.text(linea, x, yy);
+      yy += lhTitulo;
+    });
 
-    fuente(doc, F_CUERPO, 'normal', 8.2);
+    yy += padEntre - lhTitulo + lhEnfoque * 0.78;
+    fuente(doc, F_CUERPO, 'normal', 8);
     setText(doc, C.inkSoft);
-    parrafo(doc, enfoque, x, y + 16.4, CW - 16);
+    lineasEnfoque.forEach(function(linea){
+      doc.text(linea, x, yy);
+      yy += lhEnfoque;
+    });
 
-    ctx.y = y + alto + 6;
+    ctx.y = y + alto + 5;
   }
 
   // Tarjeta blanca con borde + título chico en versalitas.
@@ -559,40 +587,41 @@
   }
 
   // Barras de estado con marca de meta.
+  const BARRA_ROW_H = 6.4; // antes 8.6: la fila no necesita tanto aire vertical
   function dibujarBarras(ctx, m, x, y, w){
     const doc = ctx.doc;
-    const alto = 13 + m.barras.length * 8.6 + 6;
+    const alto = 10.5 + m.barras.length * BARRA_ROW_H + 5;
     tarjeta(doc, x, y, w, alto, 'TU ESTADO ACTUAL');
 
     const xLabel = x + 5;
     const xTrack = x + 29;
     const trackW = w - 29 - 5 - 12;
-    let yy = y + 15.5;
+    let yy = y + 12.5;
 
     m.barras.forEach(function(b){
-      fuente(doc, F_CUERPO, b.destacada ? 'bold' : 'normal', 8);
+      fuente(doc, F_CUERPO, b.destacada ? 'bold' : 'normal', 7.8);
       setText(doc, b.destacada ? C.marca : C.inkSoft);
-      doc.text(b.label, xLabel + (b.destacada ? 2.4 : 0), yy + 2);
+      doc.text(b.label, xLabel + (b.destacada ? 2.4 : 0), yy + 1.8);
       if(b.destacada){
         setFill(doc, C.acento);
-        doc.circle(xLabel + 0.7, yy + 1.3, 0.7, 'F');
+        doc.circle(xLabel + 0.7, yy + 1.1, 0.7, 'F');
       }
 
       // Riel
       setFill(doc, C.panel2);
-      doc.roundedRect(xTrack, yy, trackW, 2.4, 1.2, 1.2, 'F');
+      doc.roundedRect(xTrack, yy, trackW, 2.2, 1.1, 1.1, 'F');
       // Relleno
-      const wFill = Math.max(2.4, trackW * b.pct / 100);
+      const wFill = Math.max(2.2, trackW * b.pct / 100);
       setFill(doc, b.color);
-      doc.roundedRect(xTrack, yy, wFill, 2.4, 1.2, 1.2, 'F');
+      doc.roundedRect(xTrack, yy, wFill, 2.2, 1.1, 1.1, 'F');
 
       // Marca de "antes" (solo si hubo reevaluación): tramo oscuro fino
       // sobre el riel, en la posición del valor anterior.
       if(b.antesPct != null){
         const xa = xTrack + trackW * b.antesPct / 100;
         setDraw(doc, C.marca);
-        doc.setLineWidth(0.35);
-        doc.line(xa, yy - 0.8, xa, yy + 3.2);
+        doc.setLineWidth(0.3);
+        doc.line(xa, yy - 0.7, xa, yy + 2.9);
       }
 
       // Marca de meta
@@ -600,23 +629,23 @@
       setDraw(doc, C.inkFaint);
       doc.setLineWidth(0.3);
       doc.setLineDashPattern([0.6, 0.6], 0);
-      doc.line(xm, yy - 1.2, xm, yy + 3.6);
+      doc.line(xm, yy - 1, xm, yy + 3.2);
       doc.setLineDashPattern([], 0);
 
-      fuente(doc, F_CUERPO, 'bold', 8);
+      fuente(doc, F_CUERPO, 'bold', 7.8);
       setText(doc, C.ink);
-      doc.text(b.pct + '%', x + w - 5, yy + 2, {align:'right'});
+      doc.text(b.pct + '%', x + w - 5, yy + 1.8, {align:'right'});
 
-      yy += 8.6;
+      yy += BARRA_ROW_H;
     });
 
     // Leyenda de la tarjeta
-    fuente(doc, F_CUERPO, 'normal', 6.8);
+    fuente(doc, F_CUERPO, 'normal', 6.6);
     setText(doc, C.inkFaint);
     const leyenda = m.barras[0].antesPct != null
       ? 'Línea punteada: meta sugerida (' + m.metaPct + '%). Línea llena: valor de la encuesta inicial.'
       : 'Línea punteada: meta sugerida (' + m.metaPct + '%) para cada área.';
-    doc.text(doc.splitTextToSize(leyenda, w - 10), x + 5, yy + 1.2);
+    doc.text(doc.splitTextToSize(leyenda, w - 10), x + 5, yy + 0.8);
 
     return alto;
   }
@@ -636,34 +665,34 @@
     const info = m.imc;
     // Número grande + categoría
     const valor = info.imc.toFixed(1);
-    fuente(doc, F_TITULO, 'bold', 19);
+    fuente(doc, F_TITULO, 'bold', 16);
     setText(doc, C.ink);
-    doc.text(valor, x + 5, y + 20.5);
-    const xUnidad = x + 5 + doc.getTextWidth(valor) + 1.8;
+    doc.text(valor, x + 5, y + 15.6);
+    const xUnidad = x + 5 + doc.getTextWidth(valor) + 1.6;
     // El ² no está garantizado en las fuentes estándar del PDF: se dibuja
     // como un "2" más chico y elevado en vez de confiar en el glifo.
-    fuente(doc, F_CUERPO, 'normal', 7);
+    fuente(doc, F_CUERPO, 'normal', 6.6);
     setText(doc, C.inkFaint);
-    doc.text('kg/m', xUnidad, y + 20.5);
+    doc.text('kg/m', xUnidad, y + 15.6);
     const xSup = xUnidad + doc.getTextWidth('kg/m');
-    fuente(doc, F_CUERPO, 'normal', 4.6);
-    doc.text('2', xSup, y + 18.6);
+    fuente(doc, F_CUERPO, 'normal', 4.4);
+    doc.text('2', xSup, y + 13.9);
 
     const colorZona = info.zona === 'saludable' ? RAMPA[2] : (info.zona === 'obesidad' ? RAMPA[0] : RAMPA[1]);
     const etiqueta = info.cat.charAt(0).toUpperCase() + info.cat.slice(1);
     // Píldora de contorno, no maciza: en un bloque tan chico el relleno
     // sólido se comía visualmente al número del IMC, que es el dato.
-    fuente(doc, F_CUERPO, 'bold', 7);
-    const pillW = doc.getTextWidth(etiqueta) + 6;
+    fuente(doc, F_CUERPO, 'bold', 6.8);
+    const pillW = doc.getTextWidth(etiqueta) + 5.5;
     setDraw(doc, colorZona);
     doc.setLineWidth(0.3);
-    doc.roundedRect(x + w - 5 - pillW, y + 15.4, pillW, 5.4, 2.7, 2.7, 'D');
+    doc.roundedRect(x + w - 5 - pillW, y + 11.4, pillW, 5, 2.5, 2.5, 'D');
     setText(doc, colorZona);
-    doc.text(etiqueta, x + w - 5 - pillW / 2, y + 19, {align:'center'});
+    doc.text(etiqueta, x + w - 5 - pillW / 2, y + 14.7, {align:'center'});
 
     // Barra segmentada 15–40 con los umbrales OMS (18.5 / 25 / 30), los
     // mismos que usa imcCategoria() y el medidor del dashboard.
-    const bx = x + 5, bw = w - 10, by = y + 29, bh = 2.4;
+    const bx = x + 5, bw = w - 10, by = y + 21.4, bh = 2.2;
     const MIN = 15, MAX = 40;
     const cortes = [
       {hasta: 18.5, color: RAMPA[1]},
@@ -691,26 +720,26 @@
     // Puntero del valor real (recortado al rango visible del gráfico)
     const v = Math.max(MIN, Math.min(MAX, info.imc));
     const px = bx + bw * (v - MIN) / (MAX - MIN);
-    triangulo(doc, px, by - 2.2, 2.8, 2.2, C.marca);
+    triangulo(doc, px, by - 2, 2.6, 2, C.marca);
 
-    fuente(doc, F_CUERPO, 'normal', 6.4);
+    fuente(doc, F_CUERPO, 'normal', 6.2);
     setText(doc, C.inkFaint);
-    doc.text('15', bx, by + bh + 3.6);
-    doc.text('18,5', bx + bw * 3.5 / 25, by + bh + 3.6, {align:'center'});
-    doc.text('25', bx + bw * 10 / 25, by + bh + 3.6, {align:'center'});
-    doc.text('30', bx + bw * 15 / 25, by + bh + 3.6, {align:'center'});
-    doc.text('40', bx + bw, by + bh + 3.6, {align:'right'});
+    doc.text('15', bx, by + bh + 3);
+    doc.text('18,5', bx + bw * 3.5 / 25, by + bh + 3, {align:'center'});
+    doc.text('25', bx + bw * 10 / 25, by + bh + 3, {align:'center'});
+    doc.text('30', bx + bw * 15 / 25, by + bh + 3, {align:'center'});
+    doc.text('40', bx + bw, by + bh + 3, {align:'right'});
 
-    let yy = by + bh + 9;
-    fuente(doc, F_CUERPO, 'normal', 7.2);
+    let yy = by + bh + 7.4;
+    fuente(doc, F_CUERPO, 'normal', 7);
     setText(doc, C.inkSoft);
     if(info.peso && info.tallaCm){
       doc.text(info.peso + ' kg · ' + info.tallaCm + ' cm', x + 5, yy);
-      yy += 4;
+      yy += 3.8;
     }
     if(info.rango){
       setText(doc, C.inkFaint);
-      fuente(doc, F_CUERPO, 'normal', 6.8);
+      fuente(doc, F_CUERPO, 'normal', 6.6);
       doc.text('Peso saludable estimado: ' + info.rango.min + '-' + info.rango.max + ' kg', x + 5, yy);
     }
   }
@@ -982,7 +1011,7 @@
 
     // Fila de métricas: barras (izquierda) + IMC (derecha).
     const wIzq = 108, wDer = CW - wIzq - 4;
-    const altoFila = 13 + m.barras.length * 8.6 + 6;
+    const altoFila = 10.5 + m.barras.length * BARRA_ROW_H + 5;
     ctx.espacio(altoFila);
     const yFila = ctx.y;
     dibujarBarras(ctx, m, M, yFila, wIzq);

@@ -324,6 +324,28 @@ próximos pasos).
     del sitio, que sobre esta paleta se ven embarrados). Es el mismo
     criterio, distintos tonos: si cambia el criterio de color del
     dashboard, revisar también acá.
+  - **Tarjetas de arriba más compactas (sesión 2026-09-18, 2da ronda)**:
+    el usuario marcó que las 2 tarjetas superiores (barras de estado e
+    IMC) y el panel de objetivo se veían "estiradas hacia abajo" — mucho
+    aire vacío al pie. La causa era el alto de cada fila/bloque fijo,
+    mayor del que el contenido necesitaba. Se recalculó todo con un
+    ritmo vertical más apretado: filas de barras de 8,6 → **6,4 mm**
+    (`BARRA_ROW_H`), tarjeta de 4 barras de ~53 → **~41 mm**, y el bloque
+    de IMC reescrito con offsets propios para esa altura (antes tenía
+    ~9-13 mm de aire muerto al pie). El panel de objetivo se reescribió
+    para calcular su alto sumando exactamente lo que ocupan sus líneas de
+    texto (rótulo + N líneas de título + M líneas de enfoque + paddings
+    fijos chicos) en vez de una fórmula con aire fijo de sobra.
+    - De paso se corrigió un bug que ya existía antes de esta ronda: con
+      un objetivo que resuelve en varios planes a la vez ("Foco y
+      Concentración + Reducir Fatiga Mental + ..."), el título a una sola
+      línea se salía del panel por la derecha (medido: ~200 mm de texto
+      contra ~166 mm disponibles). Ahora el título prueba a 12,5pt, si no
+      entra en 2 líneas baja de a 1,5pt, y el alto del panel crece con la
+      cantidad real de líneas.
+    - Con esto, los casos sin antropometría y con reevaluación (1 solo
+      plan) pasan de 2 a **1 página**; el caso más cargado (4 planes
+      combinados) sigue en 3.
   - **Trazo fino, no grueso**: barras de 2,4 mm (antes 3,4), anillo de la
     dona de 4,5 mm de grosor (antes 7,5), bordes de 0,25 mm, filetes de
     color a sangre de 1 mm contra el borde de cada caja, círculos del

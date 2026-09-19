@@ -70,18 +70,18 @@ body{margin:0;padding:24px;background:#CBCFD6;font-family:'Inter',sans-serif;col
 .regla{height:.35mm;background:var(--marca);margin:1mm 0 6mm}
 
 /* ---------- Panel de objetivo ---------- */
-.objetivo{background:var(--acento-suave);border:.25mm solid var(--panel-2);border-radius:1.5mm;padding:7mm 8mm 6mm;position:relative;overflow:hidden;margin-bottom:6mm}
+.objetivo{background:var(--acento-suave);border:.25mm solid var(--panel-2);border-radius:1.5mm;padding:5mm 7mm 4.5mm;position:relative;overflow:hidden;margin-bottom:5mm}
 .objetivo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1.2mm;background:var(--acento)}
-.objetivo .rotulo{font-size:7.2pt;font-weight:700;color:var(--acento);letter-spacing:.06em;margin-bottom:3mm}
-.objetivo h1{font-family:'Fraunces',serif;font-weight:800;font-size:13.5pt;color:var(--marca);margin:0 0 2mm}
+.objetivo .rotulo{font-size:6.6pt;font-weight:700;color:var(--acento);letter-spacing:.06em;margin-bottom:2mm}
+.objetivo h1{font-family:'Fraunces',serif;font-weight:800;font-size:12.5pt;color:var(--marca);margin:0 0 1.6mm}
 .objetivo p{margin:0;font-size:8.2pt;color:var(--ink-soft);line-height:1.35}
 
 /* ---------- Tarjetas de métricas ---------- */
-.metricas{display:grid;grid-template-columns:108mm 1fr;gap:4mm;margin-bottom:5mm}
-.tarjeta{border:.25mm solid var(--line);border-radius:1.5mm;padding:3.5mm 5mm 5mm}
+.metricas{display:grid;grid-template-columns:108mm 1fr;gap:4mm;margin-bottom:4mm;align-items:stretch}
+.tarjeta{border:.25mm solid var(--line);border-radius:1.5mm;padding:3mm 4.5mm 3.5mm}
 .tarjeta h2{font-size:7pt;font-weight:700;color:var(--marca);letter-spacing:.06em;margin:0 0 2.2mm;padding-bottom:2.2mm;border-bottom:.2mm solid var(--line)}
 
-.barra{display:grid;grid-template-columns:24mm 1fr 12mm;align-items:center;height:8.6mm}
+.barra{display:grid;grid-template-columns:24mm 1fr 12mm;align-items:center;height:6.4mm}
 .barra .etq{font-size:8.2pt;color:var(--ink-soft)}
 .barra.destacada .etq{font-weight:700;color:var(--marca);position:relative}
 .barra.destacada .etq::before{content:"";position:absolute;left:-2.8mm;top:50%;transform:translateY(-50%);width:1.6mm;height:1.6mm;border-radius:50%;background:var(--acento)}
@@ -91,10 +91,10 @@ body{margin:0;padding:24px;background:#CBCFD6;font-family:'Inter',sans-serif;col
 .barra .pct{font-size:8.2pt;font-weight:700;text-align:right}
 .leyenda{font-size:6.8pt;color:var(--ink-faint);margin-top:2mm}
 
-.imc-num{font-family:'Fraunces',serif;font-weight:800;font-size:19pt;line-height:1}
+.imc-num{font-family:'Fraunces',serif;font-weight:800;font-size:15pt;line-height:1}
 .imc-unidad{font-size:7pt;color:var(--ink-faint)}
 .imc-unidad sup{font-size:4.6pt}
-.imc-fila{display:flex;align-items:center;justify-content:space-between;margin:3mm 0 5mm}
+.imc-fila{display:flex;align-items:center;justify-content:space-between;margin:1.5mm 0 3mm}
 .pill{border-radius:2.7mm;padding:1mm 3mm;font-size:7pt;font-weight:700;border:.3mm solid currentColor}
 .imc-barra{display:flex;height:2.4mm;position:relative}
 .imc-barra span{display:block}
@@ -103,8 +103,8 @@ body{margin:0;padding:24px;background:#CBCFD6;font-family:'Inter',sans-serif;col
 .puntero{position:absolute;top:-2.2mm;transform:translateX(-50%);width:0;height:0;
   border-left:1.4mm solid transparent;border-right:1.4mm solid transparent;border-top:2.2mm solid var(--marca)}
 .escala{display:flex;justify-content:space-between;font-size:6.4pt;color:var(--ink-faint);margin-top:1.5mm}
-.imc-dato{font-size:7.4pt;color:var(--ink-soft);margin-top:3mm}
-.imc-rango{font-size:7pt;color:var(--ink-faint);margin-top:1mm}
+.imc-dato{font-size:7pt;color:var(--ink-soft);margin-top:2.2mm}
+.imc-rango{font-size:6.6pt;color:var(--ink-faint);margin-top:0.8mm}
 
 /* ---------- Títulos de sección ---------- */
 .seccion{display:flex;align-items:baseline;gap:2.2mm;margin:0 0 1.5mm;padding-bottom:1.6mm;border-bottom:.45mm solid var(--marca)}

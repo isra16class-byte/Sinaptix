@@ -11,6 +11,61 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — PDF de "Mi plan": tarjetas de arriba más compactas (2da vuelta)
+
+El usuario volvió a revisar el PDF (ya con la paleta neutra de la vuelta
+anterior) y marcó que las gráficas de la parte de arriba "se seguían
+viendo estiradas hacia abajo" y pidió achicar también el panel de
+OBJETIVO COGNITIVO PRINCIPAL.
+
+### Causa
+
+Las tarjetas de barras/IMC y el panel de objetivo tenían alto fijo mayor
+del que su contenido necesitaba: filas de barra de 8,6 mm cuando 6,4 mm
+alcanzan, y el bloque de IMC con offsets pensados para una tarjeta más
+alta, dejando ~9-13 mm de aire muerto al pie. El panel de objetivo sumaba
+17,5+4 mm de aire fijo además del texto.
+
+### Cambios
+
+- `BARRA_ROW_H` (nueva constante): 8,6 → **6,4 mm** por fila. La tarjeta de
+  4 barras pasa de ~53 a **~41 mm** de alto.
+- Bloque de IMC (`dibujarImc`) reescrito con offsets propios para la nueva
+  altura: número de 19 → 16pt, barra segmentada de 2,4 → 2,2 mm, gaps entre
+  elementos recalculados para no dejar aire al pie.
+- Panel de objetivo (`dibujarObjetivo`) reescrito: el alto ahora se calcula
+  sumando lo que ocupan sus líneas de texto reales (rótulo + título +
+  enfoque + paddings fijos chicos), no una fórmula con aire de sobra.
+
+### Bug encontrado de paso: título largo se salía del panel
+
+Con un objetivo que resuelve en varios planes ("Foco y Concentración +
+Reducir Fatiga Mental + Sostener Memoria de Trabajo + Manejo de Estrés
+Mental"), el título a una sola línea medía ~200 mm contra ~166 mm
+disponibles — se salía del panel por la derecha. No era nuevo de esta
+sesión, pero al reescribir la función se corrigió: el título prueba a
+12,5pt: si no entra en 2 líneas, baja de a 1,5pt hasta que entra (o hasta 3
+intentos), y el alto del panel crece con la cantidad real de líneas del
+título, no con un número fijo.
+
+### Resultado
+
+Los casos con un solo plan (sin antropometría, o con reevaluación) pasan de
+2 a **1 página**. El caso más cargado (objetivo combinado en 4 planes)
+sigue en 3, ahora con el título del panel legible en 2 líneas en vez de
+cortado contra el borde.
+
+`docs/mockup-pdf-mi-plan.html` se actualizó a la misma densidad. No se
+tocó el modelo de datos, solo el dibujo — la suite de tests no cambia por
+esto (quedó en 90/90 tras el `npm i` + `npm test` de verificación previos a
+este commit; los 10 tests de más que 80→90 son de otras sesiones que
+trabajaron el repo en paralelo, no de este cambio).
+
+### Archivos tocados
+
+`js/mi-plan-pdf.js`, `docs/mockup-pdf-mi-plan.html`, `memoria.md`,
+`changelog.md`.
+
 ## 2026-09-19 — Mi plan: título en tarjeta con íconos y botones de Cierre rediseñados
 
 El usuario (con capturas y un boceto propio) pidió dos cosas: que los 3
