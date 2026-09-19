@@ -11,6 +11,73 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: energía morada que recorre el centro de los 4 íconos
+
+Pedido del usuario (con captura donde dibujó un rectángulo negro uniendo el
+centro de los 4 íconos): "una animación de especie de energía morada [que]
+pase por el centro de los íconos en forma cuadrada, más o menos el recorrido
+que te envié".
+
+- **Qué se ve**: dos pulsos de luz violeta (cabeza brillante con núcleo claro
+  y cola que se desvanece), a media vuelta uno del otro, girando en sentido
+  horario por un rectángulo de esquinas redondeadas (r=26px) que pasa por
+  cerebro (arriba izq.) → neurona (arriba der.) → acompañamiento (abajo der.)
+  → calendario (abajo izq.). Una vuelta = 7 s (`--ve-T`, una sola variable).
+  Además hay un riel punteado muy tenue (`.ve-rail`, opacidad .28) para que el
+  recorrido se lea aun cuando el pulso está lejos.
+- **`index.html`**: `<svg class="vision-energy">` dentro de `.vision-art`,
+  entre `.vision-brain-bg` y `.stat-annotations`. Por pulso, 9 `<path
+  pathLength="100">`: `ve-glow` (halo, con `filter="url(#veBlur)"`),
+  `ve-t1…t6` (cola), `ve-body`, `ve-core`.
+- **`css/styles.css`**: bloque nuevo antes de `#lam-02 .stat-box`. Todo con
+  `dasharray` de período 100 y `@keyframes veRun` (`stroke-dashoffset` 0 →
+  -100). La "cabeza" de las 9 capas coincide por `animation-delay:
+  calc(T * (fase − 1 + L/100))`, así que cada capa puede tener su propio
+  largo `L`. Solo `min-width:901px`; `display:none` con
+  `prefers-reduced-motion`.
+- **`js/script.js`**: IIFE al final. Mide los 4 `.vision-icon--*`, arma el
+  `d` (rectángulo por el promedio de los centros de cada columna/fila),
+  setea `viewBox` = tamaño de `.vision-art` y el `d` en todos los `<path>`.
+  `ResizeObserver` sobre `.vision-art` y los 4 íconos (cubre resize y la
+  carga tardía de las imágenes, que recién ahí tienen alto). Un
+  `IntersectionObserver` agrega `.is-paused` cuando la sección no se ve.
+- **Decisiones**:
+  - **Recorrido medido por JS, no en coordenadas fijas**: en las últimas
+    sesiones los íconos se movieron varias veces (`--vision-pares-shift`,
+    `--vision-bajos-shift`, anchos). Con coordenadas escritas a mano el
+    rectángulo se habría desalineado en el siguiente ajuste.
+  - **Primera versión descartada**: la cola armada con 3 tramos quedaba
+    escalonada (se veían los cortes, tipo tubo de neón por segmentos). Se
+    pasó a 6 capas de opacidad baja (.07→.17, opacidad acumulada ~.07 en la
+    punta de la cola a ~.5 junto al cuerpo) y el degradado salió continuo.
+  - **Encima de los íconos** (no por detrás): así la energía se ve entrar por
+    el centro de cada uno y doblar ahí, como en el dibujo del usuario. Pasa
+    justo por el hilo de luz de los bustos y por el brote del calendario. Si
+    tapa demasiado, mandarla por detrás es cambiar el orden en el DOM
+    (poner el `<svg>` antes de `.vision-icons`); con el cristal translúcido
+    del calendario se vería igual.
+  - Colores más vivos que `--purple` (`#8B4FCB`/`#A46CE3`/`#F4EAFF`): es
+    energía, no texto, y `#714B67` se veía apagado como luz.
+  - **No se hizo** (queda a pedido): que cada ícono "se encienda" un instante
+    cuando la energía pasa por su centro.
+  - **Costura del trazado**: para que el pulso cruce el punto donde empieza y
+    termina el `<path>` sin cortarse, el `stroke-dasharray` tiene que sumar
+    exactamente el `pathLength` (100). Con un gap mayor el pulso desaparecía
+    en la costura y reaparecía por la cola.
+- **Verificado** con Playwright/Chromium: 8 frames por vuelta a 1440/1920/
+  1100px (recorrido por los 4 centros, sin cortes en las esquinas ni en la
+  costura), video de 9 s a 1440px, sin errores de JS, oculto a ≤900px (JS ni
+  traza) y con `prefers-reduced-motion`, `is-paused` alterna bien al entrar
+  y salir de pantalla. Ojo: en headless los `IntersectionObserver` solo
+  entregan con frames renderizados (una primera medición dio invertido por
+  eso). El desborde horizontal de 207px que reporta el documento es **el
+  mismo sin y con este cambio** (medido contra HEAD): preexistente. Falta la
+  confirmación de siempre en un navegador real, sobre todo fluidez en
+  equipos lentos y Safari (filtro SVG `feGaussianBlur` sobre un trazo animado).
+- `npm test`: 85 pass / 1 skipped (e2e del PDF), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — Visión: íconos nuevos para "1:1" (bustos) y "4–6" (calendario)
 
 Pedido del usuario sobre `#lam-02` (con captura): cambiar los íconos

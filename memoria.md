@@ -144,7 +144,7 @@ próximos pasos).
 - `css/styles.css` — toda la hoja de estilos (paleta, tipografía, layout).
 - `js/script.js` — lógica específica de `index.html` (wizard modal de
   nutrición, formularios, Netlify Identity, anillos de progreso de
-  Método).
+  Método, y al final una IIFE que traza la energía morada de Visión).
 - `js/mi-plan.js` — lógica propia de `mi-plan.html` (login/registro/
   recuperación de contraseña propios, init de Identity, pintar el plan,
   logout, encuesta inline).
@@ -828,6 +828,29 @@ próximos pasos).
     2026-09-19 (ver el bullet de `--vision-pares-shift`/`--vision-bajos-shift`
     más abajo). Con `top:76%` verde y azul comparten línea superior. Sin cambios en mobile (`≤900px`, siguen
     ocultos).
+  - **Energía morada que recorre los 4 íconos (`.vision-energy`, sesión
+    2026-09-19)**: dos pulsos de luz violeta (a media vuelta uno del otro)
+    dan vueltas en sentido horario por un rectángulo redondeado que pasa por
+    el centro de cerebro → neurona → acompañamiento → calendario (el
+    recorrido lo dibujó el usuario sobre una captura). Es un `<svg>`
+    absoluto dentro de `.vision-art` (después de `.vision-brain-bg`, **encima
+    de los íconos**), con 9 `<path>` por pulso (halo con `feGaussianBlur`, 6
+    capas de cola que se desvanecen, cuerpo, núcleo claro) animados con
+    `stroke-dashoffset` (`@keyframes veRun`, 7 s por vuelta = `--ve-T`).
+    **Sin coordenadas en el CSS ni en el HTML**: el `d` del trazado lo arma
+    una IIFE al final de `js/script.js` midiendo los 4 `.vision-icon`
+    (`getBoundingClientRect`, esquinas = promedio de los centros de cada
+    fila/columna) y se recalcula con `ResizeObserver` (resize y carga tardía
+    de las imágenes). **Si se mueven los íconos, el recorrido los sigue solo.**
+    Solo ≥901px (igual que los íconos), oculto con
+    `prefers-reduced-motion`, y pausado fuera de pantalla (clase `is-paused`
+    por `IntersectionObserver`). Colores: `--ve-mid #8B4FCB`, `--ve-glow
+    #A46CE3`, `--ve-core #F4EAFF` (más vivos que `--purple` a propósito: es
+    "energía", no texto). ⚠️ El `<path>` necesita `pathLength="100"` y el
+    período de `stroke-dasharray` tiene que sumar 100 (ej. `12 88`) para que
+    el pulso cruce la costura del trazado sin cortarse. Detalle y
+    alternativas (por detrás de los íconos, destello de cada ícono al pasar
+    la energía) en el changelog.
   - **Los 4 datos ya no son tarjetas** (`.stat-box`, descartado): son 4
     `.stat-annot` (punto de color + número Fraunces + etiqueta corta) con
     posición libre en porcentaje dentro de `.vision-art` (contenedor

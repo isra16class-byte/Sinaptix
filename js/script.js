@@ -840,3 +840,53 @@
   }
   document.addEventListener('scroll', ()=>window.requestAnimationFrame(onScroll));
   onScroll();
+
+// Energía morada de Visión (#lam-02): arma el recorrido del pulso midiendo
+// los 4 íconos. El trazado es un rectángulo redondeado que pasa por el centro
+// de cada uno (cerebro → neurona → acompañamiento → calendario, en sentido
+// horario). Se recalcula con ResizeObserver (cubre resize de ventana y la
+// carga tardía de las imágenes, que recién ahí tienen alto). Si se mueven los
+// íconos por CSS no hay que tocar nada acá. Estilos/animación: css/styles.css.
+(function(){
+  const art = document.querySelector('#lam-02 .vision-art');
+  const svg = art && art.querySelector('.vision-energy');
+  if(!svg) return;
+  const icon = k => art.querySelector('.vision-icon--'+k);
+  const claves = ['dorado','morado','azul','verde']; // TL, TR, BR, BL
+  function trazar(){
+    const a = art.getBoundingClientRect();
+    if(!a.width || !a.height) return;
+    const c = {};
+    for(const k of claves){
+      const el = icon(k); if(!el) return;
+      const r = el.getBoundingClientRect();
+      if(!r.width || !r.height) return; // imagen todavía sin cargar
+      c[k] = {x:r.left - a.left + r.width/2, y:r.top - a.top + r.height/2};
+    }
+    const x1=(c.dorado.x+c.verde.x)/2, x2=(c.morado.x+c.azul.x)/2;
+    const y1=(c.dorado.y+c.morado.y)/2, y2=(c.verde.y+c.azul.y)/2;
+    const r = Math.max(0, Math.min(26, (x2-x1)/4, (y2-y1)/4));
+    const f = n => n.toFixed(1);
+    const d = 'M'+f(x1+r)+' '+f(y1)+' H'+f(x2-r)+' Q'+f(x2)+' '+f(y1)+' '+f(x2)+' '+f(y1+r)
+      +' V'+f(y2-r)+' Q'+f(x2)+' '+f(y2)+' '+f(x2-r)+' '+f(y2)
+      +' H'+f(x1+r)+' Q'+f(x1)+' '+f(y2)+' '+f(x1)+' '+f(y2-r)
+      +' V'+f(y1+r)+' Q'+f(x1)+' '+f(y1)+' '+f(x1+r)+' '+f(y1)+' Z';
+    svg.setAttribute('viewBox','0 0 '+f(a.width)+' '+f(a.height));
+    svg.querySelectorAll('path').forEach(p=>p.setAttribute('d', d));
+  }
+  trazar();
+  if('ResizeObserver' in window){
+    const ro = new ResizeObserver(trazar);
+    ro.observe(art);
+    claves.forEach(k=>{ const el=icon(k); if(el) ro.observe(el); });
+  } else {
+    window.addEventListener('resize', trazar);
+    window.addEventListener('load', trazar);
+  }
+  // Pausa la animación cuando la sección no se ve (ahorra repintado).
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es=>{
+      svg.classList.toggle('is-paused', !es[0].isIntersecting);
+    }).observe(art);
+  }
+})();

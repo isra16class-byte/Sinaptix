@@ -485,6 +485,50 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   .vision-icon--azul{left:68%;top:calc(76% + var(--vision-pares-shift) + var(--vision-bajos-shift));width:32%}
 }
 
+/* Energía morada que recorre los centros de los 4 íconos de Visión (sesión
+   2026-09-19). `.vision-energy` es un <svg> absoluto que cubre `.vision-art`;
+   su recorrido (un rectángulo redondeado que une los centros de los 4
+   `.vision-icon`) lo calcula `js/script.js` midiendo los íconos, así que no
+   hay coordenadas acá: si se mueven los íconos, el recorrido los sigue.
+   Cada pulso son 9 <path> con el mismo trazado y `pathLength="100"`: un halo
+   difuminado, 6 tramos de cola cada vez más cortos y opacos, el cuerpo y un
+   núcleo claro. Todos comparten la "cabeza" (ver `animation-delay`) y se
+   desplazan con `stroke-dashoffset` 0 → -100 (ciclo exacto = 1 vuelta, sin
+   salto en la costura). Hay 2 pulsos a media vuelta (`--ph`). Solo desktop
+   (mismos ≥901px que los íconos) y sin movimiento con
+   `prefers-reduced-motion`. Se pausa fuera de pantalla (clase `is-paused`,
+   la pone el IntersectionObserver de script.js). */
+.vision-energy{display:none}
+@media(min-width:901px){
+  .vision-energy{
+    --ve-T:7s;--ve-mid:#8B4FCB;--ve-glow:#A46CE3;--ve-core:#F4EAFF;
+    display:block;position:absolute;inset:0;width:100%;height:100%;
+    overflow:visible;pointer-events:none
+  }
+  .ve-rail{fill:none;stroke:var(--ve-mid);stroke-width:1.2;stroke-dasharray:1 7;stroke-linecap:round;opacity:.28}
+  .ve-p{
+    fill:none;stroke-linecap:round;stroke-linejoin:round;
+    animation:veRun var(--ve-T) linear infinite;
+    /* cabeza común: delay = T·(fase − 1 + L/100), L = largo del tramo */
+    animation-delay:calc(var(--ve-T) * (var(--ph,0) - 1 + var(--L) / 100))
+  }
+  .ve-glow{--L:12;stroke-dasharray:12 88;stroke:var(--ve-glow);stroke-width:16;opacity:.45}
+  /* cola: 6 capas apiladas, cada una más corta, más gruesa y más opaca que la
+     anterior; la opacidad acumulada sube de ~.07 en la punta de la cola a
+     ~.5 junto al cuerpo, sin escalones visibles */
+  .ve-t1{--L:36;stroke-dasharray:36 64;stroke:var(--ve-mid);stroke-width:2.2;opacity:.07}
+  .ve-t2{--L:30;stroke-dasharray:30 70;stroke:var(--ve-mid);stroke-width:2.6;opacity:.09}
+  .ve-t3{--L:25;stroke-dasharray:25 75;stroke:var(--ve-mid);stroke-width:3;opacity:.10}
+  .ve-t4{--L:20;stroke-dasharray:20 80;stroke:var(--ve-mid);stroke-width:3.4;opacity:.12}
+  .ve-t5{--L:15;stroke-dasharray:15 85;stroke:var(--ve-mid);stroke-width:3.8;opacity:.14}
+  .ve-t6{--L:11;stroke-dasharray:11 89;stroke:var(--ve-mid);stroke-width:4.2;opacity:.17}
+  .ve-body{--L:6;stroke-dasharray:6 94;stroke:var(--ve-glow);stroke-width:5;opacity:.85}
+  .ve-core{--L:2.6;stroke-dasharray:2.6 97.4;stroke:var(--ve-core);stroke-width:2.2}
+  .vision-energy.is-paused .ve-p{animation-play-state:paused}
+}
+@keyframes veRun{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+@media(prefers-reduced-motion:reduce){.vision-energy{display:none}}
+
 #lam-02 .stat-box{
   background:rgba(255,255,255,.72);
   border:1px solid var(--purple);
