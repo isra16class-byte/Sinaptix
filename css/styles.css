@@ -181,6 +181,16 @@ section.tight{padding:100px 0}
      usuario, 2026-09-19). 88px = mismo valor que ya usa `#miPlan` para
      este mismo nav compartido. */
   .hero.dark{padding-top:88px}
+  /* Espacio entre Hero y Visión (sesión 2026-09-19): con `hero-foot`
+     oculto (`@media(max-width:720px){.hero-foot{display:none}}`), la
+     imagen queda seguida del padding-bottom heredado de la regla
+     genérica `section{padding:...}` (70px ≤720px / 110px 721-900px) más
+     el padding-top de `#lam-02` (90px/130px, misma regla genérica) — se
+     suman a ~160-240px de blanco, reportado por el usuario con una
+     captura real (390px) como demasiado espacio entre la sección 1 y 2.
+     Se recorta solo acá, sin tocar el padding genérico de `section`
+     (lo usan todas las demás secciones, no hay queja sobre esas). */
+  .hero.dark{padding-bottom:30px}
 }
 .hero h1{
   font-family:var(--font-hand);
@@ -409,6 +419,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    esta sección — el resto del sitio sigue con align-items:start (varias
    secciones dependen de que sus columnas arranquen alineadas arriba). */
 #lam-02 .split{align-items:center;gap:130px}
+@media(max-width:900px){
+  /* Recorta el padding-top genérico de `section` (90px ≤720px / 130px
+     721-900px) solo para esta sección: es la mitad del hueco que el
+     usuario reportó entre Hero y Visión en mobile (ver
+     `.hero.dark{padding-bottom:...}` más arriba, misma sesión
+     2026-09-19). El resto de las secciones sigue con el padding
+     genérico, no hay queja sobre esas. */
+  #lam-02{padding-top:50px}
+}
 .vision-stats-col{margin-top:0}
 @media(max-width:900px){
   /* Antes 90px: era el hueco pensado para las tarjetas grandes que tenía

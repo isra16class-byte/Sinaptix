@@ -242,6 +242,22 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Espacio Hero→Visión en mobile (`.hero.dark`/`#lam-02`, sesión
+  2026-09-19)**: con `.hero-foot` oculto (`≤720px`), la imagen del hero
+  quedaba seguida del `padding-bottom` genérico de `section` (70/110px
+  según breakpoint) + el `padding-top` genérico de `#lam-02` (90/130px)
+  — hasta 215px de blanco medido con Playwright a 390px, reportado por
+  el usuario con una captura real como demasiado espacio entre la
+  sección 1 y 2. Se recorta **solo** para este par de secciones, dentro
+  de `@media(max-width:900px)`: `.hero.dark{padding-bottom:30px}` y
+  `#lam-02{padding-top:50px}` (nuevo, con ID así que no interfiere con
+  el `padding` genérico de `section` que siguen usando todas las demás).
+  Gap resultante medido: 135px (antes 215px). El resto de las
+  transiciones entre secciones sigue con el padding genérico sin tocar.
+  Verificado con Playwright a 390px (gap medido + captura) y comparado
+  el hero de desktop 1440px contra la captura de antes del cambio, sin
+  diferencias (el override vive solo dentro del media query mobile).
+
 - **Visión — grilla mobile de las 4 `.stat-annot` (`#lam-02`, sesión
   2026-09-19)**: resuelve el pendiente que ya estaba anotado como "sesión
   2 mobile" (ver más abajo, en pendientes). El usuario mandó una captura

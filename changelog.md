@@ -11,6 +11,36 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Hero→Visión: menos espacio en blanco entre la sección 1 y 2 en mobile
+
+El usuario mandó una captura real (390px, navegador propio, no
+DevTools) donde después de la imagen del hero hay un salto de blanco
+grande antes de que empiece "Nuestra visión". Pidió reducirlo un poco,
+sin tocar el escritorio.
+
+- **Causa medida con Playwright** (`getBoundingClientRect`, no solo
+  lectura de CSS): con `.hero-foot` oculto (`@media(max-width:720px)`),
+  el hueco entre el borde de la imagen y el título de Visión medía
+  **215px** a 390px, y salía de sumar dos paddings genéricos que no
+  tienen relación entre sí: el `padding-bottom` de `section{padding:130px
+  0 110px}` (110px, o 70px si ≤720px) que le queda a `.hero.dark` sin
+  overridear, más el `padding-top` de esa misma regla genérica que le
+  toca a `#lam-02` (130px/90px) al no tener ninguna clase/ID propio que
+  la override. Ninguna de las dos partes es un bug en sí (todas las
+  secciones usan ese padding), pero juntas en este punto se notan de
+  más porque no hay contenido (`hero-foot`) que las separe visualmente.
+- **Fix, solo dentro de `@media(max-width:900px)`, dos líneas nuevas**:
+  - `.hero.dark{padding-bottom:30px}` (mismo bloque donde ya vivía el
+    `padding-top:88px` del fix del nav de la sesión anterior).
+  - `#lam-02{padding-top:50px}` (nuevo — con selector de ID, no toca el
+    `padding` genérico de `section` que usan el resto de las secciones,
+    ninguna tuvo queja).
+- Gap resultante: **135px** (antes 215px), medido de nuevo con
+  Playwright. Verificado también a 1440px (desktop) comparando contra
+  la captura de antes del cambio — sin diferencias, el override vive
+  solo dentro del media query mobile.
+- `npm test` sigue en verde (86 tests) — cambio puramente de CSS.
+
 ## 2026-09-19 — Visión: grilla mobile de las 4 estadísticas (se veía "muy simple")
 
 El usuario mandó una captura a 390px de `#lam-02`: sin
