@@ -2500,6 +2500,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    conjunto respecto de los valores base del sitio; el botón se sobreescribe
    acá para no tocar `.btn` global. */
 .closing-btn{font-size:16.5px;padding:17px 35px}
+/* Botón de cierre más chico en mobile (sesión 2026-09-19, pedido del
+   usuario). Solo ≤720px: el escritorio queda con el tamaño de arriba. */
+@media(max-width:720px){
+  .closing-btn{font-size:14.5px;padding:13px 26px}
+}
 .closing-arrow{
   display:block;margin:22px auto 0;width:30px;height:30px;color:var(--closing-teal);
   animation:closing-arrow-bounce 1.8s ease-in-out infinite;
