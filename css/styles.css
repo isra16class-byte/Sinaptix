@@ -1836,7 +1836,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 /* Íconos 3D a color (Gemini, recortados con scripts/recortar-iconos-audiencia.py)
    en vez de los .svg de línea morada (2026-09-19). Tamaño del ícono y del
    texto en variables para poder subir el texto sin tocar el resto. */
-.ben-audience-grid{--aud-icon:56px;--aud-text:18px;display:flex;flex-direction:column;gap:20px}
+.ben-audience-grid{--aud-icon:56px;--aud-text:18px;display:flex;flex-direction:column;gap:20px;margin-top:52px}
 .ben-audience-item{display:flex;align-items:center;gap:18px}
 .ben-audience-icon{flex:none;width:var(--aud-icon);height:var(--aud-icon);object-fit:contain;
   filter:drop-shadow(0 3px 6px rgba(38,22,31,.16))}
@@ -1862,9 +1862,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .quote-card p{font-size:15.5px;color:var(--ink);margin-bottom:18px;position:relative;z-index:1}
 .quote-card-author{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
 .quote-avatar{
-  flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:var(--panel-2);color:var(--purple);font-family:var(--font-m);font-weight:700;font-size:13px;
+  position:relative;overflow:hidden;
+  flex:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--panel-2);color:var(--purple);font-family:var(--font-m);font-weight:700;font-size:14px;
+  box-shadow:0 0 0 2px var(--paper),0 4px 12px rgba(38,22,31,.16);
 }
+/* Foto de perfil (2026-09-19): `img/testimonios/{mr,js}.webp` va encima de
+   las iniciales; si el archivo no existe/no carga, el `onerror` del <img> la
+   saca y quedan las iniciales de siempre (no se ve el ícono de imagen rota). */
+.quote-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .quote-author-info{display:flex;flex-direction:column;font-size:12.5px;color:var(--ink-soft)}
 .quote-author-info strong{font-family:var(--font-m);font-size:14px;color:var(--ink);font-weight:700}
 .quote-mark{
@@ -1872,8 +1878,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   color:var(--panel-2);z-index:0;pointer-events:none;user-select:none;
 }
 .ben-quotes{position:relative}
+/* Tarjetas un poco más abajo (2026-09-19, pedido del usuario): en 2 columnas
+   arrancaban a la altura del eyebrow "Para quién es"; ahora alinean más o
+   menos con el título. Solo desktop: en 1 columna ya van debajo de la lista. */
+@media(min-width:901px){.ben-quotes{margin-top:64px}}
 .quote-card-wrap{position:relative}
-.ben-quote-fruit{filter:none}
+/* `.ben-quote-fruit` (baya, kiwi y almendras pegadas a las esquinas de las
+   tarjetas) se sacó del HTML el 2026-09-19: ninguna fruta va sobre las
+   tarjetas de comentarios. */
 
 /* ---------- 06 CONOCENOS (antes "Contacto") ---------- */
 /* .contact-wrap era grid de 2 columnas (info + .contact-form). El

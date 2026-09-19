@@ -11,6 +11,27 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Beneficios: avatares con foto, tarjetas más abajo, sin frutas sobre ellas, más aire bajo el título
+
+Pedido del usuario, 4 cosas en "Para quién es" (`#lam-05`):
+
+1. **Foto de perfil en las 2 tarjetas de comentarios.** `.quote-avatar`
+   (42→56px, aro blanco + sombra) ahora lleva un `<img>` encima de las
+   iniciales, con `object-fit:cover`. Rutas: `img/testimonios/mr.webp` y
+   `img/testimonios/js.webp`. `onerror="this.remove()"` = si no existe el
+   archivo quedan las iniciales, sin ícono de imagen rota. **Las fotos no
+   se incluyeron**: este entorno no puede hacer ni conseguir retratos de
+   forma legítima; se pasaron 2 prompts para Gemini (o el usuario puede
+   usar fotos reales de los clientes con permiso). Probado con una imagen
+   temporal (ya borrada): círculo, recorte y aro se ven bien.
+2. **Tarjetas más abajo**: `.ben-quotes{margin-top:64px}` en ≥901px.
+3. **Ninguna fruta sobre las tarjetas**: se sacaron del HTML las 3
+   `.ben-quote-fruit` (arándanos, kiwi, almendras). Medido con Playwright
+   a 1000/1200/1366/1440/1680/1920px: ninguna `.deco` visible se solapa
+   con `.quote-card` (la naranja de la esquina queda afuera).
+4. **Más aire entre el título y los 4 ítems**: `margin-top` 26px (inline)
+   → 52px en `.ben-audience-grid` (CSS).
+
 ## 2026-09-19 — Beneficios: íconos 3D a color en "Para quién es"
 
 Pedido del usuario: íconos más coloridos y más visuales para la lista de

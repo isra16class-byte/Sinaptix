@@ -996,7 +996,7 @@ próximos pasos).
   `fill:var(--gold)` — M.R. 4/5, J.S. 5/5, calificación fija en el
   markup, no dinámica) + badge "Verified Client" con ícono escudo-check
   arriba; texto sin cursiva ni comillas propias; avatar circular con
-  iniciales + nombre en negrita/rol en línea aparte
+  iniciales o foto + nombre en negrita/rol en línea aparte
   (`.quote-card-author`); comilla grande decorativa de fondo
   (`.quote-mark`, esquina inferior derecha, recortada con
   `overflow:hidden`).
@@ -1009,25 +1009,25 @@ próximos pasos).
     granada) se noten difuminadas detrás de las 2 tarjetas de
     testimonios sin perder legibilidad del texto. No se tocó tamaño/
     posición/opacidad de las frutas — ya coinciden con la referencia.
-  - **3 frutas chicas "saliendo" de las tarjetas** (mismo pedido,
-    ajuste siguiente): cada `.quote-card` ahora tiene su propio
-    `.quote-card-wrap` (`position:relative`) en vez de un solo
-    contenedor para las 2 — así cada fruta se ancla a la esquina real
-    de SU tarjeta (`top`/`bottom`/`left`/`right` en px negativos) sin
-    depender de adivinar la altura total. Arándanos
-    (`svg/deco-blob-berries.svg`, 78px) en la esquina superior derecha
-    de la 1ª tarjeta; kiwi (`svg/deco-blob-kiwi.svg`, 66px) en la
-    superior izquierda de la 2ª; almendras
-    (`svg/deco-blob-almonds.svg`, 80px) en la inferior derecha de la
-    2ª. Overlap ajustado para que la mayor parte quede tapada por el
-    vidrio (`top`/`right`/etc en solo -14/-16px, no como el intento
-    anterior que dejaba más afuera que adentro) y **sin el
-    `drop-shadow`** de `.deco-fruit` (`.ben-quote-fruit{filter:none}`)
-    — ese filtro es justo lo que las hacía ver como stickers sueltos
-    flotando encima en vez de saliendo de la tarjeta. Feedback del
-    usuario tras la 1ª versión (grande pero "como stickers sueltos"):
-    confirmado por elección múltiple, no fue posición ni las frutas en
-    sí.
+  - **Sin frutas sobre las tarjetas (2026-09-19, pedido del usuario)**:
+    las 3 frutas chicas que "salían" de las esquinas de las tarjetas
+    (arándanos, kiwi, almendras, clase `.ben-quote-fruit`) **se sacaron del
+    HTML**, y no hay ninguna otra `.deco` que toque `.quote-card` (medido
+    con Playwright de 1000 a 1920px: 0 solapes). Si en algún momento se
+    quiere volver a poner una fruta cerca, mantenerla fuera del rectángulo
+    de las tarjetas. Los assets siguen en uso en otras secciones.
+    `.quote-card-wrap` se mantiene (contenedor de cada tarjeta).
+  - **Avatares con foto (2026-09-19)**: `.quote-avatar` pasó de 42px a
+    56px, con aro blanco + sombra; contiene `<span class="quote-avatar-ini">`
+    (iniciales) y un `<img>` encima (`img/testimonios/mr.webp` y `js.webp`,
+    `object-fit:cover`). Si la foto no existe o no carga, el `onerror` saca
+    el `<img>` y quedan las iniciales. **Las fotos todavía no están en el
+    repo** (ver changelog: se generan con Gemini o se usan fotos reales de
+    clientes con su permiso).
+  - **Layout (2026-09-19)**: en ≥901px `.ben-quotes` baja 64px
+    (`margin-top`) para alinear con el título en vez del eyebrow, y
+    `.ben-audience-grid` tiene 52px de aire bajo el título (antes 26px
+    inline; ahora en CSS).
 
 - **Conócenos (`#lam-06`, antes "Contacto", sesión 2026-09-18, retocada
   2026-09-19)**: el usuario no quiere responder correos a mano; la acción
