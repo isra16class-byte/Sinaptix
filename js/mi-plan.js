@@ -145,7 +145,7 @@ if(window.netlifyIdentity){
           if(r) reeval = JSON.parse(r);
         }catch(err){ /* dato corrupto: se ignora, se muestra sin comparación */ }
         if(o.encuesta && miPlanBarrasEl && typeof nutriBuildBarChartHTML === 'function'){
-          miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o, reeval);
+          miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o, reeval, {conBotonActualizar: true});
           miPlanBarrasEl.classList.remove('hidden');
         }
         if(miPlanDetalleEl && o.encuesta && typeof nutriBuildResumenHTML === 'function'){
@@ -219,6 +219,20 @@ if(window.netlifyIdentity){
       if(miPlanAjustesElVacio) miPlanAjustesElVacio.classList.add('hidden');
       if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');
       if(typeof nutriPdfActualizarBoton === 'function') nutriPdfActualizarBoton(false);
+    }
+
+    // `.has-plan` en #miPlan (sesión 2026-09-19): con el plan cargado la
+    // pantalla se alarga bastante (el detalle suma ~800px) y los márgenes
+    // de esa zona quedaban sin frutas. Las `.deco-solo-plan` (frutas
+    // distintas a las de siempre, ver mi-plan.html y css/styles.css) se
+    // muestran solo con esta clase. Se decide por lo que REALMENTE quedó
+    // visible (el detalle del plan), no por la mera existencia de la clave
+    // en localStorage: con datos corruptos el detalle no se pinta y no
+    // hay nada largo que decorar.
+    const miPlanSeccionEl = document.getElementById('miPlan');
+    if(miPlanSeccionEl){
+      miPlanSeccionEl.classList.toggle('has-plan',
+        !!(miPlanDetalleEl && !miPlanDetalleEl.classList.contains('hidden')));
     }
   }
 
@@ -661,6 +675,94 @@ if(window.netlifyIdentity){
         if(conSesionEl) conSesionEl.classList.remove('hidden');
         const user = netlifyIdentity.currentUser();
         if(user) pintarMiPlan(user);
+      }, 900);
+    });
+  }
+
+  // ===================== Actualizar "Tu estado actual" =====================
+  // Reevaluación de 4 preguntas (estrés, fatiga, concentración, olvidos): la
+  // misma de "Método" en index.html y la misma clave de guardado
+  // (`sinaptix_reevaluacion`), así que lo que se responde acá también se ve
+  // allá y viceversa. En esta página no se carga js/script.js, por eso el
+  // abrir/cerrar del modal vive acá. El botón (#btnActualizarEstado) se
+  // vuelve a crear en cada pintarMiPlan (innerHTML), de ahí el click
+  // delegado sobre #miPlanBarras, que es un contenedor fijo.
+  const modalReeval = document.getElementById('modalReevaluacion');
+  const formReeval = document.getElementById('formReevaluacion');
+  const miPlanBarrasFijoEl = document.getElementById('miPlanBarras');
+  let reevalCierreTimer = null;
+
+  function abrirModalReeval(){
+    if(!modalReeval) return;
+    if(reevalCierreTimer){ clearTimeout(reevalCierreTimer); reevalCierreTimer = null; }
+    if(formReeval) formReeval.reset();
+    const res = document.getElementById('reevalResultado');
+    if(res){ res.style.display = 'none'; res.textContent = ''; }
+    modalReeval.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function cerrarModalReeval(){
+    if(!modalReeval || !modalReeval.classList.contains('open')) return;
+    modalReeval.classList.remove('open');
+    document.body.style.overflow = '';
+    // El botón se re-crea al repintar: se busca de nuevo para devolverle el foco.
+    const btn = document.getElementById('btnActualizarEstado');
+    if(btn) btn.focus({preventScroll: true});
+  }
+
+  if(miPlanBarrasFijoEl){
+    miPlanBarrasFijoEl.addEventListener('click', function(e){
+      if(e.target.closest('#btnActualizarEstado')) abrirModalReeval();
+    });
+  }
+  if(modalReeval){
+    modalReeval.querySelectorAll('[data-close]').forEach(function(b){
+      b.addEventListener('click', cerrarModalReeval);
+    });
+    modalReeval.addEventListener('click', function(e){
+      if(e.target === modalReeval) cerrarModalReeval();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') cerrarModalReeval();
+    });
+  }
+  if(formReeval){
+    formReeval.addEventListener('submit', function(e){
+      e.preventDefault();
+      const res = document.getElementById('reevalResultado');
+      const estres = parseInt(nutriGetRadio('reevalEstres')||'0', 10);
+      const fatiga = parseInt(nutriGetRadio('reevalFatiga')||'0', 10);
+      const concentracion = parseInt(nutriGetRadio('reevalConcentracion')||'0', 10);
+      const olvidos = parseInt(nutriGetRadio('reevalOlvidos')||'0', 10);
+
+      if(!estres || !fatiga || !concentracion || !olvidos){
+        res.style.display = 'block';
+        res.style.color = '#B3261E';
+        res.textContent = 'Respondé las 4 preguntas para poder comparar tu progreso.';
+        return;
+      }
+
+      const datosReeval = {estres, fatiga, concentracion, olvidos, fecha: new Date().toISOString()};
+      localStorage.setItem('sinaptix_reevaluacion', JSON.stringify(datosReeval));
+      // A esta pantalla solo se llega con sesión, así que siempre hay a dónde
+      // sincronizar (ver js/plan-sync.js).
+      if(typeof planSyncGuardar === 'function') planSyncGuardar('reevaluacion', datosReeval);
+
+      res.style.display = 'block';
+      res.style.color = '';
+      res.textContent = 'Actualización guardada. Así se ve tu progreso. ✓';
+
+      // Se repinta ya (detrás del velo del modal) para que al cerrarlo el
+      // cambio ya esté a la vista: barras nuevas, comparación "Antes: …" y
+      // las etiquetas "Qué cambió desde tu diagnóstico".
+      const user = netlifyIdentity.currentUser();
+      if(user) pintarMiPlan(user);
+
+      reevalCierreTimer = setTimeout(function(){
+        reevalCierreTimer = null;
+        cerrarModalReeval();
+        const card = document.getElementById('miPlanBarras');
+        if(card) card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
       }, 900);
     });
   }

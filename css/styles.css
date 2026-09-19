@@ -817,6 +817,22 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    ventana (dentro de `.wrap`, que es `position:relative`, quedaban metidas
    hacia adentro). Ver mi-plan.html para el detalle de cada posición. */
 #miPlan:has(#miPlanSinSesion:not(.hidden)) .deco-solo-sesion{display:none}
+/* Frutas que aparecen SOLO cuando el plan ya está cargado (sesión
+   2026-09-19). Con el plan, "Detalle del plan de nutrición" alarga la
+   pantalla ~800px y los márgenes de esa zona quedaban sin nada. Son
+   distintas a las de siempre (granada, remolacha, té, espinaca, chocolate,
+   de img/generadas-cutout/) para no repetir kiwi/naranja/palta/etc.
+   `.has-plan` lo pone pintarMiPlan() (js/mi-plan.js) según si el detalle
+   quedó visible. Ocultas por defecto: sin plan la pantalla es corta y con
+   las frutas de siempre alcanza. La regla de mobile va aparte porque esta
+   `display:block` (más específica) le ganaría al `display:none` de
+   `.deco-fruit` en ≤720px; y con el login a la vista se esconden igual
+   que las `.deco-solo-sesion`. */
+.deco-solo-plan{display:none}
+@media(min-width:721px){
+  #miPlan.has-plan .deco-solo-plan{display:block}
+}
+#miPlan:has(#miPlanSinSesion:not(.hidden)) .deco-solo-plan{display:none}
 #miPlan footer{margin-top:28px}
 /* margin-top/bottom en vez de shorthand `margin`: shorthand pisaba
    margin-left/right a 0, cancelando el `margin:auto` que centra el
@@ -2188,6 +2204,31 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
   padding:26px;
 }
 .bar-chart-title{font-family:var(--font-d);font-size:17px;font-weight:800;color:var(--ink);margin:0 0 4px}
+/* Encabezado de "Tu estado actual": título a la izquierda y, con
+   nutriBuildBarChartHTML(..., {conBotonActualizar:true}) (mi-plan.html), el
+   botón "Actualizar" a la derecha (sesión 2026-09-19). Vive acá arriba, en la
+   propia tarjeta, porque la acción cambia justo estos 4 valores y así no
+   suma una fila más ni empuja las barras hacia abajo. `.bar-chart-head` sin
+   botón se comporta como el título suelto de antes (mismo margen). */
+.bar-chart-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 4px}
+.bar-chart-head .bar-chart-title{margin:0}
+.bar-chart-refresh{
+  display:inline-flex;align-items:center;gap:7px;flex:none;
+  font-family:var(--font-m);font-size:12.5px;font-weight:700;line-height:1;letter-spacing:.01em;
+  color:var(--purple-dark);background:rgba(255,255,255,.7);
+  border:1px solid rgba(75,46,69,.24);border-radius:var(--radius-pill);
+  padding:8px 15px 8px 12px;cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease;
+}
+.bar-chart-refresh svg{
+  width:14px;height:14px;flex:none;fill:none;stroke:currentColor;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .45s ease;
+}
+.bar-chart-refresh:hover{background:#fff;border-color:var(--purple);color:var(--purple);box-shadow:0 4px 14px rgba(75,46,69,.12)}
+.bar-chart-refresh:hover svg{transform:rotate(180deg)}
+.bar-chart-refresh:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.bar-chart-refresh svg{transition:none}.bar-chart-refresh:hover svg{transform:none}}
 .bar-chart-text{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin-bottom:20px}
 .bar-item{margin-bottom:14px}
 .bar-item:last-child{margin-bottom:0}

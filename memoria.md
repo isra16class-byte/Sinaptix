@@ -242,6 +242,28 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Botón "Actualizar" en "Tu estado actual" + frutas solo con plan
+  (`mi-plan.html`, sesión 2026-09-19)**:
+  - `#btnActualizarEstado` (`.bar-chart-refresh`) vive en el encabezado de
+    `#miPlanBarras` (`.bar-chart-head`), a la derecha del título. Lo genera
+    `nutriBuildBarChartHTML(objetivo, reeval, {conBotonActualizar:true})`
+    (`js/nutricion-planes.js`; opt-in, único llamador `pintarMiPlan`). Como
+    el HTML se recrea en cada repintado, el click está **delegado** sobre
+    `#miPlanBarras` (`js/mi-plan.js`). Abre `#modalReevaluacion`
+    (`mi-plan.html`): las mismas 4 preguntas que la reevaluación de Método,
+    misma clave `sinaptix_reevaluacion` + `planSyncGuardar('reevaluacion')`
+    (un dato compartido entre ambas pantallas y el PDF). Esta página no
+    carga `js/script.js`, así que abrir/cerrar del modal (×, click fuera,
+    Esc, foco de vuelta al botón) vive en `js/mi-plan.js`. Al guardar se
+    repinta `pintarMiPlan` y cierra a los 900 ms.
+  - **Frutas `.deco-solo-plan`** (remolacha, té, granada, espinaca,
+    chocolate; `img/generadas-cutout/`): solo con plan cargado. `pintarMiPlan`
+    pone `.has-plan` en `#miPlan` si el detalle quedó visible; CSS:
+    `.deco-solo-plan{display:none}` + `@media(min-width:721px){#miPlan.has-plan
+    .deco-solo-plan{display:block}}` + oculta con el login a la vista. `top`
+    en % de la altura de la sección. Asomadas detrás de las tarjetas entre
+    1200 y 780px, igual que las `.deco-solo-sesion`. Ver changelog para
+    alternativas no aplicadas (disco pastel detrás, ocultar ≤1200px).
 - **Título en tarjeta y botones de Cierre (`mi-plan.html`, sesión
   2026-09-19)**: "Tu progreso con SINAPTIX" vive en `.miplan-titlecard`
   (ancha y baja, pareja con `.miplan-grid`, 3 íconos por lado creciendo

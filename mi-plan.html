@@ -70,6 +70,21 @@
   <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d2" src="svg/deco-blob-walnut.svg" alt="" style="left:-25px;top:640px;width:120px;transform:rotate(10deg)">
   <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d3" src="svg/deco-blob-orange.svg" alt="" style="right:-30px;top:340px;width:135px;transform:rotate(7deg)">
   <img aria-hidden="true" class="deco deco-fruit deco-solo-sesion d2" src="svg/deco-blob-berries.svg" alt="" style="right:-25px;top:900px;width:125px;transform:rotate(-9deg)">
+  <!-- Frutas/alimentos que aparecen SOLO con el plan ya cargado (sesión
+       2026-09-19, pedido del usuario: la parte de abajo, con el detalle del
+       plan, quedaba sin frutas y se veía pelada, y que "no estén tan
+       repetidas"). Assets distintos a los de arriba: granada, remolacha, té,
+       espinaca y chocolate (img/generadas-cutout/). `.deco-solo-plan` las
+       oculta hasta que pintarMiPlan() pone `.has-plan` en #miPlan (ver
+       css/styles.css). El `top` va en % de la altura de la sección (no en px)
+       para que se repartan parejo tanto con un plan corto como con uno largo;
+       cuelgan del borde de la ventana igual que el resto. Como las de arriba,
+       van antes de `.wrap` para que las tarjetas pinten encima. -->
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-plan d2" src="img/generadas-cutout/remolacha.webp" alt="" loading="lazy" decoding="async" style="left:-30px;top:44%;width:118px;transform:rotate(-8deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-plan d3" src="img/generadas-cutout/te.webp" alt="" loading="lazy" decoding="async" style="left:-28px;top:63%;width:112px;transform:rotate(7deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-plan" src="img/generadas-cutout/granada.webp" alt="" loading="lazy" decoding="async" style="right:-32px;top:58%;width:122px;transform:rotate(10deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-plan d2" src="img/generadas-cutout/espinaca.webp" alt="" loading="lazy" decoding="async" style="right:-30px;top:72%;width:128px;transform:rotate(-9deg)">
+  <img aria-hidden="true" class="deco deco-fruit deco-solo-plan d3" src="img/generadas-cutout/chocolate.webp" alt="" loading="lazy" decoding="async" style="right:-34px;top:84%;width:128px;transform:rotate(6deg)">
   <div class="wrap">
 
     <!-- Estado: sin sesión iniciada (visita directa a mi-plan.html, o recién cerró sesión).
@@ -679,6 +694,66 @@
     </footer>
   </div>
 </section>
+
+<!-- Actualizar "Tu estado actual" (sesión 2026-09-19): las mismas 4 preguntas de
+     la reevaluación de "Método" (index.html, #modalReevaluacion) — mismos ids
+     de campos y misma clave de guardado (`sinaptix_reevaluacion`), así que
+     el dato se comparte entre ambas pantallas. Se abre desde el botón
+     #btnActualizarEstado de la tarjeta de barras (lo pinta
+     nutriBuildBarChartHTML con `conBotonActualizar`) y abrir/cerrar lo
+     maneja js/mi-plan.js (en esta página no se carga js/script.js). -->
+<div class="modal-overlay" id="modalReevaluacion" role="dialog" aria-modal="true" aria-labelledby="reevalTitulo">
+  <div class="modal-card">
+    <button type="button" class="modal-close" data-close aria-label="Cerrar">×</button>
+    <span class="eyebrow" style="color:var(--purple)">Actualizar mi estado</span>
+    <h3 id="reevalTitulo">¿Cómo estás ahora?</h3>
+    <p class="modal-text">Respondé estas 4 preguntas de nuevo para comparar cómo estás hoy contra tu diagnóstico inicial en «Tu estado actual».</p>
+    <form class="modal-form" id="formReevaluacion">
+      <div class="nutri-group">
+        <span class="nutri-field-label">Nivel de estrés percibido</span>
+        <div class="scale-row" data-scale="reevalEstres">
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalEstres" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Fatiga mental durante el día</span>
+        <div class="scale-row" data-scale="reevalFatiga">
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalFatiga" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Dificultad para concentrarte</span>
+        <div class="scale-row" data-scale="reevalConcentracion">
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalConcentracion" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <div class="nutri-group">
+        <span class="nutri-field-label">Olvidos o dificultad para retener información</span>
+        <div class="scale-row" data-scale="reevalOlvidos">
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="1" required><span>1</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="2"><span>2</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="3"><span>3</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="4"><span>4</span></label>
+          <label class="scale-opt"><input type="radio" name="reevalOlvidos" value="5"><span>5</span></label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-solid" style="align-self:flex-start;margin-top:4px">Guardar actualización</button>
+      <p class="modal-result" id="reevalResultado"></p>
+    </form>
+  </div>
+</div>
 
 <script src="js/nutricion-planes.js"></script>
 <script src="js/nutricion-wizard.js"></script>

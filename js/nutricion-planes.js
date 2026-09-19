@@ -673,7 +673,7 @@ function gaugeDeltaHtml(antesPct, despuesPct){
 // comparación "antes: X% (+/- N pts)" — mismo criterio visual que ya usan
 // los anillos de progreso de "Método" (`gaugeDeltaHtml`), para que la
 // experiencia sea consistente entre ambas pantallas.
-function nutriBuildBarChartHTML(objetivo, reeval){
+function nutriBuildBarChartHTML(objetivo, reeval, opciones){
   const encuesta = objetivo && objetivo.encuesta;
   if(!encuesta) return '';
   const antes = gaugeComputeAreas(encuesta);
@@ -684,7 +684,20 @@ function nutriBuildBarChartHTML(objetivo, reeval){
     {key:'energia', label:'Energía'},
     {key:'calma', label:'Calma'}
   ];
-  let html = '<h4 class="bar-chart-title">Tu estado actual</h4>'+
+  // Botón "Actualizar" (solo si quien llama lo pide con
+  // `{conBotonActualizar:true}`): abre la reevaluación de 4 preguntas. Es
+  // opt-in porque este HTML solo tiene sentido con un handler de click
+  // conectado (mi-plan.js lo delega sobre #miPlanBarras); sin él sería un
+  // botón muerto.
+  const conBoton = !!(opciones && opciones.conBotonActualizar);
+  const botonActualizar = conBoton
+    ? '<button type="button" class="bar-chart-refresh" id="btnActualizarEstado" aria-label="Actualizar mi estado actual">'+
+        '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 11a8 8 0 0 0-14.3-4.6M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.3 4.6M20 20v-4h-4"/></svg>'+
+        '<span>Actualizar</span></button>'
+    : '';
+  let html = '<div class="bar-chart-head">'+
+      '<h4 class="bar-chart-title">Tu estado actual</h4>'+botonActualizar+
+    '</div>'+
     '<p class="bar-chart-text">Según lo que respondiste en la encuesta — foco, memoria, energía y calma, de 0 a 100.</p>';
   items.forEach(function(item){
     const antesPct = Math.round((antes[item.key]/5)*100);

@@ -11,6 +11,84 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — "Mi plan": botón "Actualizar" en "Tu estado actual" + frutas nuevas solo con el plan cargado
+
+Dos pedidos del usuario (con capturas de `mi-plan.html` con sesión y plan
+cargado), ambos sobre esa pantalla.
+
+- **Botón "Actualizar" en la tarjeta "Tu estado actual"** (`#miPlanBarras`).
+  El usuario dejó a criterio de quién implementaba si iba en la tarjeta de
+  arriba (Objetivo cognitivo) o en la propia de barras. Se puso **en el
+  encabezado de la propia tarjeta, a la derecha del título**: la acción
+  cambia justo esos 4 valores (foco/memoria/energía/calma), queda a la vista
+  sin sumar una fila ni empujar las barras, y no se duplica con el "Generar
+  mi plan" de la tarjeta Cierre (que rehace la encuesta completa; esto es el
+  chequeo corto de 4 preguntas). Pastilla blanca translúcida con borde
+  morado suave, ícono de flechas circulares que gira 180° al hover
+  (respeta `prefers-reduced-motion`) y `:focus-visible`.
+  - `js/nutricion-planes.js`: `nutriBuildBarChartHTML(objetivo, reeval,
+    opciones)` — tercer parámetro **opt-in** `{conBotonActualizar:true}`;
+    el título pasa a `.bar-chart-head` (flex). Sin la opción el HTML es el
+    de antes salvo por el contenedor del título (no hay botón muerto donde
+    no hay handler). Único llamador: `pintarMiPlan()` en `js/mi-plan.js`.
+  - **Modal de reevaluación en `mi-plan.html`** (`#modalReevaluacion`):
+    copia de las mismas 4 preguntas de `index.html` (mismos `name`
+    `reevalEstres/-Fatiga/-Concentracion/-Olvidos`, mismos ids
+    `#formReevaluacion`/`#reevalResultado`), texto adaptado ("…contra tu
+    diagnóstico inicial en «Tu estado actual»"). **Mismo dato**:
+    `sinaptix_reevaluacion` + `planSyncGuardar('reevaluacion', …)`, así lo
+    que se responde acá también se ve en los anillos de Método y en el PDF.
+  - `js/mi-plan.js`: como esta página no carga `js/script.js`, el
+    abrir/cerrar del modal vive acá (botón ×, click fuera, Esc; devuelve el
+    foco al botón). El botón se recrea en cada `pintarMiPlan` (`innerHTML`),
+    por eso el click es **delegado** sobre `#miPlanBarras` (contenedor
+    fijo). Al guardar se repinta enseguida (detrás del velo del modal): barras
+    nuevas, líneas "Antes: …" y etiquetas "Qué cambió desde tu diagnóstico"; el
+    modal se cierra a los 900 ms como el de Método.
+  - `css/styles.css`: `.bar-chart-head`, `.bar-chart-refresh`.
+- **Frutas nuevas que aparecen SOLO con el plan cargado** (pedido: con el
+  plan, la parte de abajo — el detalle — quedaba sin frutas y se veía
+  pelada; "que no estén tan repetidas"; "mientras tanto que no aparezcan").
+  Con plan la sección mide ~1800px (sin plan ~1080) y las frutas de siempre
+  terminaban cerca de los 1000px. 5 nuevas, todas de
+  `img/generadas-cutout/` (ninguna repite kiwi/naranja/palta/almendras/
+  arándanos/nuez): **remolacha** y **té** a la izquierda, **granada**,
+  **espinaca** y **chocolate** a la derecha, en `mi-plan.html` con clase
+  `.deco-solo-plan`. `top` en **% de la altura de la sección** (no px) para
+  que se repartan parejo con un plan corto o largo.
+  - `pintarMiPlan()` pone `.has-plan` en `#miPlan` según si el **detalle del
+    plan quedó realmente visible** (no por existir la clave en
+    localStorage: con datos corruptos no hay nada largo que decorar).
+  - `css/styles.css`: `.deco-solo-plan{display:none}` por defecto; se
+    muestran con `#miPlan.has-plan` **dentro de `@media(min-width:721px)`**
+    (una `display:block` más específica le ganaría al `display:none` de
+    `.deco-fruit` en mobile); con el login visible se ocultan igual que
+    `.deco-solo-sesion`. `loading="lazy"` + `display:none` ⇒ sin plan ni
+    siquiera se descargan los 5 webp (~190 KB).
+  - Entre 1200 y 780px se asoman por detrás de las tarjetas (solape de
+    ~45–65px), **igual que las 4 `.deco-solo-sesion` que ya existían**
+    (medido: mismos valores). Se dejó así por coherencia; si molesta, se
+    puede ocultar `.deco-solo-plan` en `≤1200px` con una línea.
+  - Estilo: son recortes con `drop-shadow` (mismo tratamiento que Pilares/
+    Beneficios), a diferencia de las frutas de arriba que traen un disco
+    pastel detrás. Alternativa no aplicada: ponerles un disco suave detrás
+    para unificar.
+- **Verificado** con Playwright/Chromium (sesión mockeada, fuentes reales
+  Inter/Fraunces/Caveat de `@fontsource`): botón visible con y sin
+  reevaluación previa; flujo completo (abrir → error al enviar vacío → Esc →
+  click fuera → responder 4 → guardar → `localStorage` → barras, deltas y
+  chips actualizados → el botón sigue funcionando tras el repintado → 2ª
+  apertura con el formulario limpio); frutas: 5 visibles con plan a 1440px,
+  ocultas sin plan, sin sesión y a 390px; 0 desborde horizontal a 1440/1280/
+  1200/1100/1000/900/780/700/390px. **No se probó** completar la encuesta de
+  8 pasos de punta a punta para ver aparecer las frutas en caliente (usa el
+  mismo `pintarMiPlan`, verificado en las dos ramas al cargar). Falta la
+  confirmación de siempre sobre un navegador real/deploy.
+- `npm test`: 85 pass / 1 skipped (e2e del PDF, Playwright no instalado
+  en el repo), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — "Mi plan": fondo crema elegido para la tarjeta del título
 
 Cierra la decisión que había quedado abierta en la entrada anterior (el
