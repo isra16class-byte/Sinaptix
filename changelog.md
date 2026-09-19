@@ -11,6 +11,28 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — "Mi plan": fondo crema elegido para la tarjeta del título
+
+Cierra la decisión que había quedado abierta en la entrada anterior (el
+lila se probó y se rechazó). El usuario avisó que esperaba la crema que
+se le había mostrado en la vista previa y pidió que se aplicara.
+
+- **`css/styles.css`**: `.miplan-titlecard` pasa del gradiente
+  `linear-gradient(135deg,#FFFFFF 0%,var(--paper-2) 55%,#F5EAF2 100%)` a
+  **`background:#FDF4EA`** (crema dorado, la opción recomendada de las 3
+  que se mostraron con vista previa: blanco `--paper`, crema `#FDF4EA` y
+  morado de marca `#4B2E45`). Sigue haciendo juego con el círculo dorado
+  de "SINAPTIX" y no compite con las 3 tarjetas de color de abajo (verde,
+  dorado, lila). Borde, radio y sombra sin cambios.
+- **Verificado** en el navegador integrado a 1440×900 con la sesión
+  simulada: fondo computado `rgb(253, 244, 234)`, `background-image:none`,
+  tarjeta en 122px de alto / top 92 (igual que antes) y título en 48px
+  dentro de su caja de 48px.
+- `npm test`: 85 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — "Mi plan": título más grande, 4 frutas solo con sesión y cerebro del login más a la izquierda
 
 Tres pedidos del usuario en la misma sesión, todos sobre `mi-plan.html`.

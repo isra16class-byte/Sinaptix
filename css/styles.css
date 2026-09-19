@@ -1068,10 +1068,11 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,44px);
   padding:22px 28px;margin:4px 0 26px;
   /* Fondo: se probó un sólido `--miplan-card-lila` (el mismo de la tarjeta
-     de Cierre, sesión 2026-09-18) y el usuario lo rechazó ("no me gustó,
-     ¿qué otro color me recomendás?"); queda pendiente elegir un
-     reemplazo, así que por ahora se deja el gradiente de siempre. */
-  background:linear-gradient(135deg,#FFFFFF 0%,var(--paper-2) 55%,#F5EAF2 100%);
+     de Cierre, sesión 2026-09-18) y el usuario lo rechazó ("no me gustó");
+     entre las 3 opciones que se le mostraron con vista previa eligió la
+     **crema dorado `#FDF4EA`** (hace juego con el círculo dorado de
+     "SINAPTIX" y no compite con las 3 tarjetas de color de abajo). */
+  background:#FDF4EA;
   border:1px solid rgba(113,75,103,.16);border-radius:22px;
   box-shadow:0 16px 34px -20px rgba(75,46,69,.32);
 }

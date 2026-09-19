@@ -258,10 +258,13 @@ próximos pasos).
     del tamaño anterior: el título se ve más grande sin empujar la tarjeta
     ni el resto del panel hacia abajo (verificado: tarjeta 122px de alto /
     top 92 y `.miplan-grid` en 282, igual que antes).
-  - **Fondo**: el sólido lila (`--miplan-card-lila`, el de la tarjeta de
-    Cierre) se probó y el usuario lo **rechazó**; queda el gradiente de
-    siempre y la decisión pendiente (opción recomendada: crema `#FDF4EA`).
-    Ver "Pendientes conocidos".
+  - **Fondo (crema, elegido el 2026-09-18)**: el sólido lila
+    (`--miplan-card-lila`, el de la tarjeta de Cierre) se probó y el usuario
+    lo **rechazó** ("no me gustó"); entre las 3 opciones que se le mostraron
+    con vista previa eligió la **crema dorado `#FDF4EA`**, que es el
+    `background` actual de `.miplan-titlecard` (antes: gradiente
+    blanco/lavanda). Hace juego con el círculo dorado de "SINAPTIX" y no
+    compite con las 3 tarjetas de color de abajo.
   - **Íconos de los lados (sesión 2026-09-19, 2ª ronda)**: los 6 íconos
     glossy/3D de `img/Iconos/` (esferas degradadas) se reemplazaron por 6
     SVG de línea nuevos, `svg/icon-titlecard-{berries,grain,walnut,citrus,
@@ -1090,16 +1093,6 @@ próximos pasos).
 > `file://` directo (sitio estático, no hace falta servidor) y sacar
 > screenshots de las secciones en cuestión a distintos anchos.
 
-- **Color de la tarjeta del título de "Mi plan" (`.miplan-titlecard`) —
-  sin decidir (sesión 2026-09-18)**: el usuario pidió el color de la
-  tarjeta de Cierre (lila `--miplan-card-lila`) y después lo rechazó ("no
-  me gustó"). Quedó **con el gradiente original** y 3 opciones propuestas
-  con vista previa ya mostrada: (a) blanco `--paper`, (b) **crema dorado
-  `#FDF4EA` (la recomendada**: hace juego con el círculo dorado de
-  "SINAPTIX" y no compite con las 3 tarjetas de color de abajo), (c)
-  morado de marca `#4B2E45` — esta última obliga a poner el texto en claro
-  y aclarar los 6 íconos de línea (son `<img>` SVG con `#4B2E45` horneado,
-  sobre oscuro se pierden). Falta que el usuario elija.
 - **Collage de redes — decidir entre imagen de IA y maqueta HTML/CSS**:
   ver "Estado actual del diseño" → "Alternativa en HTML/CSS". Esperando
   que el usuario mire `docs/mockup-collage-redes.html` y diga si se
