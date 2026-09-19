@@ -11,6 +11,28 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Pilares: recorte limpio de los 4 íconos (sin restos del fondo original)
+
+Al sacar el círculo rosado se vieron restos del fondo original alrededor
+de las esferas. El usuario ofreció regenerarlas con otra IA; se probó
+primero arreglarlas por código y quedaron bien, así que no hizo falta.
+
+Causa: los .webp (256×256) tenían un **tablero de ajedrez gris** (la
+"transparencia" de un editor, horneada como píxeles) en un aro de ~8px
+en la parte de abajo y un halo semitransparente alrededor.
+
+Solución (`scripts/limpiar-iconos-pilares.py`, reproducible):
+1. Máscara de la esfera por **croma** (max−min de canales > 28) y alfa
+   opaco: el tablero es gris, la esfera es de color.
+2. Círculo ajustado con RANSAC sobre el contorno (un ajuste normal salía
+   sesgado por el tablero); r≈114 sobre 128.
+3. Color de afuera del núcleo extendido desde adentro; alfa nuevo con
+   antialias por supersampling y radio −2.5px.
+- `.pillar-icon-img` suma `margin-left:-3px` (la esfera ya no llega al
+  borde de su cuadro; así el disco alinea con el texto).
+- Verificado sobre fondo blanco y oscuro y dentro de la página a 1440px
+  @2x. Originales sin limpiar quedan solo en git (commit anterior).
+
 ## 2026-09-19 — Pilares: íconos sin el fondo rosado y más grandes
 
 Pedido del usuario: quitar el fondo rosado de los íconos de las 4 tarjetas

@@ -1809,8 +1809,10 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 /* Sin el círculo rosado (--panel-2) de atrás (pedido del usuario,
    2026-09-19): el ícono (esfera de 256px, ocupa todo su cuadro) pasa de
-   32px a 56px para no quedar chico sin el fondo. */
-.pillar-icon-img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(38,22,31,.18))}
+   32px a 56px para no quedar chico sin el fondo. `margin-left:-3px`
+   compensa el margen transparente de la imagen (la esfera mide r≈114 de
+   128) para que el borde del disco alinee con el texto de la tarjeta. */
+.pillar-icon-img{width:56px;height:56px;object-fit:contain;margin-left:-3px;filter:drop-shadow(0 4px 8px rgba(38,22,31,.18))}
 .pillar h3{font-size:18px;font-weight:700}
 .pillar p{font-size:14.5px;color:var(--ink-soft)}
 

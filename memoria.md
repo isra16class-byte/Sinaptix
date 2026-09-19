@@ -577,6 +577,15 @@ próximos pasos).
   32px a 56px (las esferas de `img/Iconos/icon-*.webp` son de 256px y
   ocupan todo su cuadro) y suma un `drop-shadow` suave. Los `width/height`
   del `<img>` en `index.html` se actualizaron a 56.
+  **Recorte limpio de los 4 íconos (2026-09-19)**: los `img/Iconos/icon-
+  {omega3,antioxidantes,complejo-b,hidratacion}.webp` traían un tablero de
+  ajedrez gris horneado (fondo transparente "falso") pegado al borde,
+  sobre todo abajo. Se limpiaron por código con
+  `scripts/limpiar-iconos-pilares.py` (separa la esfera por croma, ajusta
+  el círculo con RANSAC, alfa antialiasado, r−2.5px). El script
+  **sobrescribe los .webp**: si se regeneran los originales (ej. con IA),
+  correrlo de nuevo sobre ellos. `.pillar-icon-img` suma `margin-left:-3px`
+  para alinear el borde del disco con el texto.
   **Frutas/alimentos grandes difuminados de fondo (sesión 2026-09-17)**:
   antes la sección solo tenía 1 `.deco-fruit` (aguacate). Hoy tiene 4,
   todas `.deco-fruit` (ocultas en mobile `<720px` por la regla general,
