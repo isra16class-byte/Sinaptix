@@ -11,6 +11,44 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Íconos de la tarjeta de título de "Mi plan"
+
+El usuario mandó una captura del dashboard y pidió cambiar los 6 íconos
+de `.miplan-titlecard` ("Tu progreso con SINAPTIX"): eran esferas
+glossy/3D degradadas y no le gustaban. Pidió algo tipo "dashboard" o
+como el cerebro de la tarjeta "Objetivo cognitivo", y sugirió que
+podían ser frutas con ese mismo estilo.
+
+### Cambios
+
+- 6 SVG nuevos, `svg/icon-titlecard-{berries,grain,walnut,citrus,drop,
+  neuron}.svg`: un solo trazo sin relleno, color horneado
+  `#4B2E45` (no `currentColor`, son `<img>` y no heredan CSS de la
+  página) — mismo criterio visual que
+  `img/ilustraciones-mi-plan/objetivo-cerebro.png`. Diseñados y
+  probados primero de forma aislada con Playwright a los tamaños reales
+  de uso (30–76px) antes de integrarlos, para asegurar que se leyeran
+  bien también en el extremo chico.
+- `mi-plan.html`: los 6 `<img>` de `.miplan-titlecard-icons` pasan de
+  `img/Iconos/icon-*.webp` a los SVG nuevos, mismo mapeo de significado
+  que antes y mismo orden/tamaños (ya los fija el CSS por `nth-child`):
+  antioxidantes→arándanos, complejo B→espiga, omega 3→nuez (además se
+  parece a un cerebro chico), energía cerebral→cítrico en corte,
+  hidratación→gota, neuronas→neurona.
+- `css/styles.css`: se saca `filter:drop-shadow(...)` de
+  `.miplan-titlecard-icons img` — le daba volumen a las esferas viejas,
+  no corresponde con íconos de línea plana (el cerebro vecino tampoco
+  lleva sombra).
+- Se borran `img/Iconos/icon-energia-cerebral.webp` e
+  `icon-neuronas.webp` (sin otra referencia en el repo).
+  `icon-antioxidantes/-complejo-b/-omega3/-hidratacion.webp` no se
+  tocan: siguen en uso en las tarjetas `.pillar` de `#lam-04`.
+- Verificado con Playwright (disponible esta sesión) contra el HTML
+  real: la tarjeta completa a 1400px se ve cohesiva con el resto del
+  dashboard (mismo estilo que el cerebro de "Objetivo cognitivo" y los
+  íconos de línea de "Cierre"). Falta la confirmación de siempre sobre
+  un navegador real/deploy.
+
 ## 2026-09-18 — PDF de "Mi plan": tarjetas de arriba más compactas (2da vuelta)
 
 El usuario volvió a revisar el PDF (ya con la paleta neutra de la vuelta

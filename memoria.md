@@ -244,13 +244,34 @@ próximos pasos).
 
 - **Título en tarjeta y botones de Cierre (`mi-plan.html`, sesión
   2026-09-19)**: "Tu progreso con SINAPTIX" vive en `.miplan-titlecard`
-  (ancha y baja, pareja con `.miplan-grid`, 3 íconos de `img/Iconos/` por
-  lado creciendo hacia el título; se ocultan en ≤760px). Se descartó la
-  variante que sobresale (ver changelog para reactivarla en una línea). Los 3
-  botones de Cierre tienen jerarquía: principal (Generar), secundario (PDF) y
+  (ancha y baja, pareja con `.miplan-grid`, 3 íconos por lado creciendo
+  hacia el título; se ocultan en ≤760px). Se descartó la variante que
+  sobresale (ver changelog para reactivarla en una línea). Los 3 botones de
+  Cierre tienen jerarquía: principal (Generar), secundario (PDF) y
   terciario (Cerrar sesión). ⚠️ Sus íconos son `::before` con `mask`, NO
   `<svg>` en el HTML: `js/mi-plan-pdf.js` cambia `btn.textContent` y borraría
   un `<svg>` hijo.
+  - **Íconos de los lados (sesión 2026-09-19, 2ª ronda)**: los 6 íconos
+    glossy/3D de `img/Iconos/` (esferas degradadas) se reemplazaron por 6
+    SVG de línea nuevos, `svg/icon-titlecard-{berries,grain,walnut,citrus,
+    drop,neuron}.svg` — mismo criterio visual que el cerebro de "Objetivo
+    cognitivo" (`img/ilustraciones-mi-plan/objetivo-cerebro.png`): un solo
+    trazo sin relleno, color fijo `#4B2E45` (`--purple-dark`) horneado
+    adentro del propio SVG (no `currentColor`: son `<img>`, no heredan CSS
+    de la página). Mapeo 1 a 1 con el significado anterior: arándanos
+    (antioxidantes), espiga (complejo B), nuez (omega 3 — además se parece
+    a un cerebro chico, buen guiño), cítrico en corte (energía cerebral),
+    gota (hidratación), neurona (neuronas) — mismo orden/tamaños que ya
+    fijaba el CSS (`is-left`/`is-right`, `nth-child`). Se sacó el
+    `filter:drop-shadow(...)` de `.miplan-titlecard-icons img` (pensado
+    para dar volumen a las esferas; con íconos de línea plana no
+    correspondía, igual que el cerebro de al lado no lleva sombra).
+    Se borraron `img/Iconos/icon-energia-cerebral.webp` e
+    `icon-neuronas.webp` (quedaron sin otra referencia en el repo);
+    `icon-antioxidantes/-complejo-b/-omega3/-hidratacion.webp` **no** se
+    tocaron, siguen en uso en las tarjetas `.pillar` de `#lam-04`.
+    Verificado con Playwright a los tamaños reales (30–76px) antes de
+    integrar: los 6 se leen bien incluso en el extremo chico.
 - **Nota bajo las etiquetas de cambios (`.miplan-cambios-nota`, sesión
   2026-09-19)**: texto fijo de ~2 líneas dentro de `#miPlanCambios` que
   explica que 20 puntos = un nivel de la respuesta. Ocupa el hueco que
