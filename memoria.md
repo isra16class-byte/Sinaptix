@@ -272,6 +272,46 @@ próximos pasos).
     tocaron, siguen en uso en las tarjetas `.pillar` de `#lam-04`.
     Verificado con Playwright a los tamaños reales (30–76px) antes de
     integrar: los 6 se leen bien incluso en el extremo chico.
+  - **Íconos de los lados (sesión 2026-09-19, 3ª ronda — calco de
+    referencias del usuario)**: el usuario mandó 6 imágenes de
+    referencia (line-art generado con Gemini, JPG) y pidió calcarlas
+    para reemplazar los 6 SVG geométricos hechos a mano de la ronda
+    anterior por trazos fieles a esas referencias. Mismo mapeo de
+    significado y mismos nombres de archivo (se sobrescriben los 6,
+    `svg/icon-titlecard-{berries,grain,walnut,citrus,drop,neuron}.svg`),
+    así que no hace falta tocar `mi-plan.html` ni `css/styles.css`.
+    - **Pipeline de vectorizado** (no versionado en `scripts/`, las 6
+      imágenes de referencia eran adjuntos del usuario y no quedaron en
+      el repo): Pillow (`ImageFilter.MedianFilter` para limpiar ruido
+      JPEG antes de binarizar, recorte al bounding box del contenido
+      con ~4% de margen, reescalado a 600px de lado mayor,
+      `ImageFilter.MinFilter(5)` para engrosar el trazo fino de las
+      referencias y que pese similar al resto del set, threshold final)
+      → `potrace -s --turdsize 40 --alphamax 1.3 --opttolerance 1.2`
+      (paquete `potrace` de apt, instalado en el entorno de trabajo) →
+      recentrado del `<path>` resultante dentro de un `viewBox="0 0 300
+      300"` (contenido a ~220 unidades, mismo margen que ya usaba el
+      resto del set) → recoloreado del `fill` de negro a `#4B2E45`.
+      Son `<path>` rellenos (no `stroke`), a diferencia de los SVG a
+      mano del resto del sitio que son `stroke` sin relleno — da igual
+      visualmente para un ícono estático sin hover, y es justamente lo
+      que hace potrace al vectorizar un dibujo de líneas (rellena el
+      área que ocupaba la tinta).
+    - **Peso**: subieron de ~600 bytes cada uno (geometría a mano) a
+      3.8–9.8 KB (calco real, más nodos de curva) — 40 KB los 6 juntos.
+      Se probó primero a 800px de lado mayor (~95 KB los 6) y se bajó a
+      600px sin pérdida visible al tamaño real de uso (30–76px): mismo
+      criterio de "no inflar peso de más" que ya se aplicó con el WebP
+      del Hero, pero en este caso no hay margen para bajar mucho más
+      sin perder detalle real de las referencias (el cerebro/nuez y el
+      cítrico son los que más pesan, por la cantidad de curvas finas).
+    - Verificado con Playwright: los 6 aislados a 300×300 contra las
+      referencias originales (mismo trazo, proporciones y detalle) y la
+      tarjeta real de `mi-plan.html` con sesión mockeada a 1440px y
+      390px — a 1440px los 6 se integran con la misma jerarquía de
+      tamaños de siempre; a 390px siguen ocultos por la regla `≤760px`
+      ya existente, sin cambios ahí. Falta la confirmación de siempre
+      sobre un navegador real/deploy.
 - **Nota bajo las etiquetas de cambios (`.miplan-cambios-nota`, sesión
   2026-09-19)**: texto fijo de ~2 líneas dentro de `#miPlanCambios` que
   explica que 20 puntos = un nivel de la respuesta. Ocupa el hueco que

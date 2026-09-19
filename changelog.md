@@ -11,6 +11,42 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Íconos de la tarjeta de título de "Mi plan" (calco de referencias)
+
+El usuario mandó 6 imágenes de referencia (line-art generado con Gemini:
+cerebro tipo nuez, espiga, arándanos, neurona, gota, cítrico en corte) y
+pidió calcarlas para convertirlas en íconos SVG y reemplazar los 6 que
+ya estaban en `.miplan-titlecard` ("Tu progreso con SINAPTIX").
+
+### Cambios
+
+- Se sobrescriben los mismos 6 archivos de la ronda anterior,
+  `svg/icon-titlecard-{berries,grain,walnut,citrus,drop,neuron}.svg`,
+  con un calco real de las 6 imágenes del usuario en vez de la
+  geometría simplificada hecha a mano. Mismo mapeo de significado y
+  mismo nombre de archivo que antes, así que no hace falta tocar
+  `mi-plan.html` ni `css/styles.css`.
+- **Pipeline**: Pillow para limpiar ruido JPEG (filtro de mediana),
+  recortar al contenido, engrosar el trazo fino de las referencias
+  (`MinFilter`, para que el peso visual del trazo quede parejo con el
+  resto del set) y binarizar → `potrace` (paquete de apt, instalado en
+  el entorno de trabajo) para vectorizar → recentrado en
+  `viewBox="0 0 300 300"` (mismo margen que ya usaba el resto del set)
+  y recoloreado a `#4B2E45`. Quedan como `<path>` con relleno (lo que
+  arma potrace al vectorizar un dibujo de líneas), no como `stroke` sin
+  relleno como el resto del set hecho a mano — no se nota la
+  diferencia en un ícono estático sin hover.
+- Peso: subieron de ~600 bytes cada uno a 3.8–9.8 KB (40 KB los 6
+  juntos) por ser un calco real con más nodos de curva, no geometría
+  simplificada. Se probó primero a mayor resolución de trabajo (~95 KB
+  los 6) y se bajó sin pérdida visible al tamaño real de uso
+  (30–76px).
+- Verificado con Playwright: los 6 aislados a 300×300 contra las
+  referencias originales, y la tarjeta real de `mi-plan.html` con
+  sesión mockeada a 1440px y 390px (en mobile los íconos siguen
+  ocultos por la regla `≤760px` ya existente, sin cambios ahí). Falta
+  la confirmación de siempre sobre un navegador real/deploy.
+
 ## 2026-09-19 — Íconos de la tarjeta de título de "Mi plan"
 
 El usuario mandó una captura del dashboard y pidió cambiar los 6 íconos
