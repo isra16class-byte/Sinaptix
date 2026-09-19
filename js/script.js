@@ -425,9 +425,9 @@
       const logro = bestDelta > 0
         ? 'Tu mayor avance: <strong>'+best.label.toLowerCase()+'</strong> pasó de '+best.antesPct+'% a '+best.despuesPct+'% (+'+bestDelta+' pts). '
         : '';
-      texto = logro+worst.label+' sigue en '+worstPct+'% — va a ser el foco de la próxima fase.';
+      texto = logro+worst.label+' sigue en '+worstPct+'%, va a ser el foco de la próxima fase.';
     } else {
-      texto = 'Tu área con más margen de mejora hoy es <strong>'+worst.label.toLowerCase()+'</strong> ('+worstPct+'%) — probá enfocar ahí las próximas dos semanas.';
+      texto = 'Tu área con más margen de mejora hoy es <strong>'+worst.label.toLowerCase()+'</strong> ('+worstPct+'%): probá enfocar ahí las próximas dos semanas.';
     }
     return '<div class="gauge-insight">'+
       '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
@@ -589,10 +589,10 @@
   // previa).
   function methodImcInsightHtml(zona){
     const textos = {
-      bajo: 'Tu IMC está en zona de bajo peso — sumar calorías de calidad puede ayudar a sostener tu energía mental durante el día.',
-      saludable: 'Tu IMC está en rango saludable — buen punto de partida para sostener tu rendimiento cognitivo.',
-      sobrepeso: 'Tu IMC está en sobrepeso — un plan de neuroalimentación puede ayudarte a acercarlo al rango saludable.',
-      obesidad: 'Tu IMC está en rango de obesidad — vale la pena acompañarlo con seguimiento profesional además del plan de nutrición.'
+      bajo: 'Tu IMC está en zona de bajo peso. Sumar calorías de calidad puede ayudar a sostener tu energía mental durante el día.',
+      saludable: 'Tu IMC está en rango saludable, buen punto de partida para sostener tu rendimiento cognitivo.',
+      sobrepeso: 'Tu IMC está en sobrepeso. Un plan de neuroalimentación puede ayudarte a acercarlo al rango saludable.',
+      obesidad: 'Tu IMC está en rango de obesidad. Vale la pena acompañarlo con seguimiento profesional además del plan de nutrición.'
     };
     return '<div class="gauge-insight">'+
       '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2c.6.4 1 1.1 1 1.8h4c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'+

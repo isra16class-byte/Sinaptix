@@ -11,6 +11,38 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Sacar rayas em-dash del texto dirigido al usuario
+
+El usuario pidió ubicar todas las rayas "—" (típicas de redacción de IA) en
+texto visible del sitio y decidir cuáles sacar.
+
+- **Criterio acordado**: se dejan las rayas en textos tipo branding/tagline
+  (título de pestaña, badges del hero, pie de página — patrón "Marca —
+  descripción", no se lee como IA) y en el placeholder `—` de IMC/Objetivo
+  vacíos en `mi-plan.html` (es un símbolo de "sin dato", no prosa). Se sacan
+  de toda oración completa dirigida al usuario (avisos, mensajes del wizard,
+  insights del dashboard), reemplazando por punto, coma o dos puntos según
+  cómo se leyera mejor cada frase.
+- **Cambios** (12 frases en total, sin tocar el mensaje en sí, solo la
+  puntuación):
+  - `js/nutricion-planes.js`: los 4 `avisos.push(...)` (sueño+estrés,
+    estrés+fatiga, cafeína moderada, ultraprocesados moderados) y el texto
+    bajo el gráfico de barras ("Según lo que respondiste en la encuesta...").
+  - `js/nutricion-wizard.js`: resumen de antropometría ya registrada, resumen
+    de "vas a guardar el plan con los datos de tu cuenta", mensaje de error
+    de rango inválido.
+  - `js/script.js`: los 2 textos de "área con más margen de mejora" en
+    `methodInsightHtml` y los 4 insights de zona de IMC (bajo/saludable/
+    sobrepeso/obesidad) en `methodImcInsightHtml`.
+- **No tocado** (a propósito, ver criterio arriba): `<title>` de `index.html`/
+  `mi-plan.html`, badges `SINAPTIX® — Asesoría...`/`Guayaquil, Ecuador — ...`
+  del hero, `© 2026 SINAPTIX — ...` del pie (ambas páginas), y los
+  placeholders `—` de `#miPlanImc`/`#miPlanObjetivo`.
+- **Tests**: `npm test` sigue en 85/86 pass (el 1 skip es el e2e de PDF, sin
+  Playwright/jsPDF instalados en este entorno, como siempre — ver sección
+  "Tests" en `memoria.md`). No se agregaron tests nuevos: son cambios de
+  copy/puntuación, no de lógica.
+
 ## 2026-09-19 — Nav mobile: botón "Inicio", menú hamburguesa y barra más alta
 
 El usuario mandó una captura de `mi-plan.html` en el teléfono: no había forma

@@ -75,7 +75,7 @@ function resetNutriWizard(){
       // gaugeFechaCorta vive en js/nutricion-planes.js (cargado antes que
       // este script) — es un formateador de fecha genérico, no específico
       // de los anillos/gráfico, así que se reutiliza acá también.
-      antroResumenTextoEl.textContent = 'Ya tenemos tu peso y talla registrados ('+gaugeFechaCorta(d.fecha)+') — '+d.peso+' kg, '+d.tallaCm+' cm.';
+      antroResumenTextoEl.textContent = 'Ya tenemos tu peso y talla registrados ('+gaugeFechaCorta(d.fecha)+'): '+d.peso+' kg, '+d.tallaCm+' cm.';
     }
     if(antroInputsEl) antroInputsEl.classList.add('hidden');
     if(antroResumenEl) antroResumenEl.classList.remove('hidden');
@@ -108,7 +108,7 @@ function resetNutriWizard(){
   }
   if(currentUser && emailSesion && nombreSesion){
     if(contactoResumenTextoEl){
-      contactoResumenTextoEl.textContent = 'Vas a guardar el plan con los datos de tu cuenta — '+nombreSesion+' ('+emailSesion+').';
+      contactoResumenTextoEl.textContent = 'Vas a guardar el plan con los datos de tu cuenta: '+nombreSesion+' ('+emailSesion+').';
     }
     if(contactoInputsEl) contactoInputsEl.classList.add('hidden');
     if(contactoResumenEl) contactoResumenEl.classList.remove('hidden');
@@ -153,7 +153,7 @@ function nutriValidateStep(n){
     // campo tiene un valor, solo que fuera de rango.
     const v = invalid.validity;
     if(v.rangeUnderflow || v.rangeOverflow){
-      nutriErrorEl.textContent = 'Uno de los valores de este paso está fuera del rango permitido — revisalo antes de continuar.';
+      nutriErrorEl.textContent = 'Uno de los valores de este paso está fuera del rango permitido. Revisalo antes de continuar.';
     } else if(v.patternMismatch || v.tooShort){
       nutriErrorEl.textContent = 'El nombre tiene que tener al menos 2 caracteres e incluir alguna letra.';
     } else {
