@@ -188,9 +188,12 @@ próximos pasos).
 - `docs/` — documentación visual que no se publica como parte del sitio.
   Hoy: `docs/mockup-pdf-mi-plan.html` (la maqueta aprobada del PDF de
   "Mi plan", para poder mirar y discutir el diseño en el navegador sin
-  generar un PDF) y `docs/mockup-collage-redes.html` (alternativa en
-  HTML/CSS al collage de IA de Conócenos, **no integrada**, ver "Estado
-  actual del diseño"). Ninguna se carga desde una página del sitio.
+  generar un PDF) y `docs/mockup-collage-redes.html` (la maqueta original
+  del collage de redes de Conócenos; el collage **ya está integrado** en
+  `index.html`/`css/styles.css` desde el 2026-09-18, reemplazando la
+  imagen de IA anterior — este archivo queda solo como referencia/banco de
+  pruebas para futuros ajustes, ver "Estado actual del diseño" → bullet
+  "Collage de redes"). Ninguna se carga desde una página del sitio.
 - `tests/` — tests unitarios (ver sección "Tests" abajo).
 
 ## Tests
@@ -1552,10 +1555,6 @@ próximos pasos).
 > `file://` directo (sitio estático, no hace falta servidor) y sacar
 > screenshots de las secciones en cuestión a distintos anchos.
 
-- **Collage de redes — decidir entre imagen de IA y maqueta HTML/CSS**:
-  ver "Estado actual del diseño" → "Alternativa en HTML/CSS". Esperando
-  que el usuario mire `docs/mockup-collage-redes.html` y diga si se
-  integra o se descarta.
 - **Collage de redes en `#lam-06` "Conócenos" — verificar en un deploy
   real**: ver "Estado actual del diseño" → bullet "Collage de redes" para
   el detalle de la implementación. Se verificó visualmente en este mismo

@@ -11,6 +11,32 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — README.md más corto + nota vieja del collage corregida en memoria.md
+
+El usuario pidió sacar del `README.md` las secciones "Flujo de
+contribución" y "Próximos pasos" (ya cubiertas/repetidas en `memoria.md`,
+que es la fuente de verdad para el flujo de trabajo de cada sesión) y
+también preguntó por una nota vieja sobre el collage de Conócenos que
+sonaba a "solo era para decidir, por el momento".
+
+- **`README.md`**: se sacaron las secciones "Flujo de contribución en este
+  repo" y "Próximos pasos (plan en curso)" completas. El README queda en:
+  descripción, estructura, funcionalidad, backend, tests, requisitos de
+  Netlify, desarrollo local y aviso legal.
+- **`memoria.md`**: 2 notas desactualizadas sobre el collage de redes de
+  `#lam-06` (arrastradas de antes de que se integrara, el 2026-09-18, y
+  nunca corregidas):
+  - En "Estructura de archivos", `docs/mockup-collage-redes.html` decía
+    ser una "alternativa... no integrada" — se corrigió: el collage **ya
+    está integrado** en `index.html`/`css/styles.css`, el mockup queda
+    solo como referencia/banco de pruebas.
+  - En "Pendientes conocidos" había un bullet suelto ("esperando que el
+    usuario mire el mockup y diga si se integra o se descarta") que
+    correspondía a la decisión ya tomada — se borró, queda solo el
+    pendiente real (verificar el collage integrado en un deploy real).
+- **Tests**: `npm test` sigue en 85/86 pass. Sin cambios de código, solo
+  documentación.
+
 ## 2026-09-19 — README.md y ESTRUCTURA-DEL-CODIGO.txt puestos al día
 
 Ambos documentos describían una versión vieja del sitio (sin backend, sin
