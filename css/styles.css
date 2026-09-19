@@ -979,12 +979,92 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    que se cierra (a pedido del usuario). Mismo id (#miPlanEmail) y misma
    lógica en js/mi-plan.js — solo cambió dónde vive el <p> en el HTML. */
 .miplan-cierre-session{font-family:var(--font-m);font-size:12.5px;color:var(--ink-soft);margin:0}
-.miplan-cierre-btns{flex-direction:row}
-.miplan-cierre-btns .btn{flex:1;text-align:center}
-/* "Descargar mi plan en PDF" va en su propia fila, a todo el ancho de la
-   tarjeta: es la columna angosta del grid y, compartiendo fila con
-   "Generar mi plan", la etiqueta se partía en 3 renglones. */
-.miplan-cierre-btns #btnDescargarPdf{flex:1 0 100%}
+/* Botones de Cierre (rediseño 2026-09-19, el usuario los veía "feos").
+   Qué estaba mal: los 3 son <button> nativos y .btn/.btn-solid se
+   escribieron para <a> (sin border:none), así que el sólido mostraba el
+   borde gris del navegador; el texto quedaba pegado a la izquierda
+   (.btn es inline-flex y text-align:center no centra en flex); y los 3
+   pesaban igual, sin jerarquía. Ahora: apilados a todo el ancho, texto
+   centrado con ícono, y 3 niveles — principal (Generar, morado degradado),
+   secundario (PDF, claro con borde) y terciario (Cerrar sesión, sin caja,
+   separado por una línea fina porque es la salida de la cuenta).
+   Los íconos van como ::before con `mask` y no como <svg> en el HTML a
+   propósito: js/mi-plan-pdf.js cambia btn.textContent ("Generando PDF…") y
+   eso borraría un <svg> hijo para siempre; un pseudo-elemento sobrevive.
+   Se pintan con currentColor, así cambian solos con hover/estado. */
+.miplan-cierre-btns{flex-direction:column;gap:10px;flex-wrap:nowrap}
+.miplan-cierre-btns .btn{
+  flex:none;width:100%;justify-content:center;text-align:center;gap:10px;
+  font-family:var(--font-m);font-size:14px;font-weight:600;line-height:1.2;
+  padding:13px 22px;border:1.5px solid transparent;cursor:pointer;
+}
+.miplan-cierre-btns .btn::before{
+  content:'';flex:none;width:18px;height:18px;background:currentColor;
+  -webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;
+}
+.miplan-cierre-btns .btn[disabled]{opacity:.65;cursor:progress;pointer-events:none}
+/* Principal */
+.miplan-cierre-btns #btnAbrirNutricionMiPlan{
+  --ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9L11 3z'/%3E%3Cpath d='M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z'/%3E%3C/svg%3E");
+  color:#fff;background:linear-gradient(135deg,var(--purple) 0%,var(--purple-dark) 100%);
+  box-shadow:0 10px 20px -10px rgba(75,46,69,.6),inset 0 1px 0 rgba(255,255,255,.16);
+}
+.miplan-cierre-btns #btnAbrirNutricionMiPlan:hover{
+  background:linear-gradient(135deg,#7d5573 0%,var(--purple-dark) 100%);
+  box-shadow:0 14px 24px -10px rgba(75,46,69,.65),inset 0 1px 0 rgba(255,255,255,.2);
+}
+/* Secundario */
+.miplan-cierre-btns #btnDescargarPdf{
+  --ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='M12 11.5v5.5M9.5 14.8l2.5 2.5 2.5-2.5'/%3E%3C/svg%3E");
+  color:var(--purple-dark);background:rgba(255,255,255,.72);border-color:rgba(113,75,103,.32);
+}
+.miplan-cierre-btns #btnDescargarPdf:hover{
+  color:var(--purple-dark);background:#fff;border-color:var(--purple);
+  box-shadow:0 10px 18px -12px rgba(75,46,69,.45);
+}
+/* Terciario */
+.miplan-cierre-btns #btnLogout{
+  --ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4'/%3E%3Cpath d='M16 17l5-5-5-5'/%3E%3Cpath d='M21 12H9'/%3E%3C/svg%3E");
+  position:relative;margin-top:10px;padding:11px 22px;font-size:13.5px;
+  color:var(--ink-soft);background:transparent;border-color:transparent;border-radius:var(--radius-pill);
+}
+/* Línea fina que separa la salida de la cuenta de las acciones del plan
+   (un box-shadow en un botón pill se curva; por eso va como ::after). */
+.miplan-cierre-btns #btnLogout::after{
+  content:'';position:absolute;left:10%;right:10%;top:-7px;height:1px;background:rgba(113,75,103,.18);
+}
+.miplan-cierre-btns #btnLogout:hover{
+  color:#B3261E;background:rgba(179,38,30,.07);border-color:transparent;transform:none;
+}
+
+/* Tarjeta del título "Tu progreso con SINAPTIX" (2026-09-19): ancha y baja,
+   pareja con el ancho de las 2 tarjetas de "Datos clave". Íconos de
+   img/Iconos/ (los mismos de Beneficios/Método) a cada lado, chicos →
+   grandes hacia el título como en el boceto del usuario. Conserva la clase
+   .sec-head-center para que sigan valiendo las reglas del <h2> de más
+   arriba (tamaño 30-42px, círculo dorado en "SINAPTIX"). Los 2 lados son
+   flex:1 1 0 para que el título quede centrado aunque los íconos no midan
+   lo mismo. Con id (#miPlanConSesion) el margin:0 del h2 le gana a
+   `#miPlanConSesion .sec-head-center .lam-title{margin-top:14px…}`. */
+.miplan-titlecard{
+  display:flex;align-items:center;justify-content:center;gap:clamp(14px,3vw,44px);
+  padding:22px 28px;margin:4px 0 26px;
+  background:linear-gradient(135deg,#FFFFFF 0%,var(--paper-2) 55%,#F5EAF2 100%);
+  border:1px solid rgba(113,75,103,.16);border-radius:22px;
+  box-shadow:0 16px 34px -20px rgba(75,46,69,.32);
+}
+#miPlanConSesion .miplan-titlecard .lam-title{margin:0;flex:none;max-width:none}
+/* space-evenly reparte los 3 íconos de cada lado a lo ancho (como en el
+   boceto del usuario) en vez de amontonarlos junto al título. */
+.miplan-titlecard-icons{display:flex;align-items:center;justify-content:space-evenly;gap:clamp(8px,1.5vw,20px);flex:1 1 0;min-width:0}
+.miplan-titlecard-icons img{display:block;flex:none;height:auto;filter:drop-shadow(0 6px 7px rgba(75,46,69,.2))}
+.miplan-titlecard-icons.is-left img:nth-child(1),.miplan-titlecard-icons.is-right img:nth-child(3){width:clamp(30px,3.4vw,46px)}
+.miplan-titlecard-icons.is-left img:nth-child(2),.miplan-titlecard-icons.is-right img:nth-child(2){width:clamp(38px,4.4vw,60px)}
+.miplan-titlecard-icons.is-left img:nth-child(3),.miplan-titlecard-icons.is-right img:nth-child(1){width:clamp(48px,5.4vw,76px)}
+@media(max-width:760px){
+  .miplan-titlecard-icons{display:none}
+  .miplan-titlecard{padding:18px 20px}
+}
 @media(max-width:900px){
   .miplan-grid,.miplan-detalle-grid{grid-template-columns:1fr}
 }
