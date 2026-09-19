@@ -11,6 +11,46 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — Mi plan: chips de "Nutrientes clave de tu plan" en la tarjeta Antropometría
+
+El usuario marcó (con captura) que la tarjeta verde de "Antropometría" queda
+con un espacio vacío al pie, y pidió llenarlo con algo propio de la
+neuroalimentación aplicada. De las opciones (etiquetas, texto, flujo de
+íconos) eligió **chips con los nutrientes clave**, calculados del plan
+resuelto y no fijos, para que aporten información real y cambien según la
+persona.
+
+- **`nutriNutrientesClave(d, max)`** (`js/nutricion-planes.js`, exportada
+  para tests): usa `nutriResolverObjetivo(d)` + `NUTRI_PLANES[..].nutrientes`,
+  la misma fuente que el detalle del plan y el PDF. Si el objetivo resuelve
+  en más de un plan ("No estoy seguro" con empate) intercala los nutrientes
+  de cada uno y quita repetidos (Hierro/Colina/Magnesio están en varios).
+- **`NUTRI_NUTRIENTE_CORTO`**: mapa de etiquetas cortas por texto exacto
+  ("Omega-3 (DHA)" → "Omega-3", "Hidratos de carbono de bajo índice
+  glucémico" → "Carbohidratos de bajo IG", etc.). Un nutriente sin entrada
+  en el mapa se muestra tal cual, así que agregar uno a un plan no rompe
+  nada. Los nombres completos siguen intactos en el detalle y el PDF.
+- **Markup** (`mi-plan.html`): `#miPlanNutrientes` (`.miplan-nutri`, oculto
+  por defecto) con título + `#miPlanNutrientesChips`, entre la leyenda del
+  IMC y el botón "Cargar datos antropométricos".
+- **Wiring** (`js/mi-plan.js`, `pintarMiPlan`): pinta los chips (máx. 5,
+  para que en la mayoría de los planes entren en una sola fila) cuando hay
+  plan guardado y los oculta si no lo hay.
+- **CSS** (`css/styles.css`): `margin-top:auto` ancla el bloque al fondo de
+  la tarjeta, que es justo el espacio sobrante. Chips claros con borde
+  verde fino. **Sin punto de color a propósito**: el punto verde ya
+  significa "Saludable" en la leyenda `.imc-legend` de más arriba. Si hay
+  plan pero no datos antropométricos, el botón queda pegado debajo de los
+  chips (`.miplan-nutri:not(.hidden) ~ .miplan-card-cta`).
+- **Tests**: 6 nuevos en `tests/nutricion-planes.test.js` (compara contra
+  `NUTRI_PLANES`, cambia por objetivo, intercalado sin repetidos, respeta
+  `max`, objetivo desconocido → `[]`, y ninguna etiqueta de ningún plan
+  pasa de 26 caracteres). Suite: 81 pasan.
+- **Verificado con Playwright** (Chromium local, `netlifyIdentity`
+  mockeado) en 1600, 1280 y 390px, con objetivo explícito, con empate, con
+  plan pero sin antropometría y sin plan. Sin errores de consola; las dos
+  columnas de `.miplan-grid` quedan de igual alto en desktop.
+
 ## 2026-09-18 — `#lam-07` Cierre: el lila del pie ahora llega a color pleno detrás del texto
 
 Reporte del usuario, con captura de su navegador, sobre el patch anterior

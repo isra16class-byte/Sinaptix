@@ -242,6 +242,19 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Chips de nutrientes clave en la tarjeta Antropometría (`mi-plan.html`,
+  sesión 2026-09-18)**: al pie de la tarjeta verde, `#miPlanNutrientes` →
+  `#miPlanNutrientesChips` (`.miplan-nutri`/`.miplan-nutri-chip`), anclado
+  con `margin-top:auto`. Sale de `nutriNutrientesClave(d, max)`
+  (`js/nutricion-planes.js`): mismo plan resuelto que el detalle y el PDF
+  (`nutriResolverObjetivo` + `NUTRI_PLANES[..].nutrientes`), con etiquetas
+  cortas de `NUTRI_NUTRIENTE_CORTO` (un nutriente sin entrada se muestra
+  tal cual). Con varios planes combinados intercala y quita repetidos;
+  `pintarMiPlan()` pide máx. 5 para que entren en una fila. Oculto sin
+  plan. **Sin punto de color en los chips**: el punto verde ya es
+  "Saludable" en la leyenda del IMC. Si se agrega un nutriente nuevo a un
+  plan, conviene sumarle etiqueta corta (hay un test que exige ≤26
+  caracteres por etiqueta).
 - **PDF de "Mi plan" (`js/mi-plan-pdf.js`, sesión 2026-09-18)**: botón
   "Descargar mi plan en PDF" (`#btnDescargarPdf`) en la tarjeta "Cierre",
   junto a "Generar mi plan" y "Cerrar sesión". Genera el documento 100% en
