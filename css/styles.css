@@ -1,3 +1,10 @@
+/* Habilita la interpolación suave de --ve-c (color del pulso de Visión,
+   ver más abajo "Energía morada..."). Sin este registro, un custom
+   property de color no se anima gradual: salta de golpe en cada keyframe
+   en vez de ir mezclando tonos. Va a nivel de hoja (no dentro de un
+   @media) porque los navegadores no soportan @property anidado. */
+@property --ve-c{syntax:'<color>';inherits:true;initial-value:#C1703B}
+
 .sr-only{
   position:absolute;
   width:1px;
@@ -497,33 +504,67 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    salto en la costura). Hay 2 pulsos a media vuelta (`--ph`). Solo desktop
    (mismos ≥901px que los íconos) y sin movimiento con
    `prefers-reduced-motion`. Se pausa fuera de pantalla (clase `is-paused`,
-   la pone el IntersectionObserver de script.js). */
+   la pone el IntersectionObserver de script.js).
+
+   **Color por ícono (sesión 2026-09-19, 2ª ronda)**: el pulso toma el color
+   del ícono que está tocando (dorado del cerebro, morado de la neurona,
+   azul de los bustos, verde del calendario — mismos `--gold`/`--purple`/
+   `--navy-bright`/`--green` que usan las 4 `.stat-annot`, para que sea el
+   mismo código de color que ya lee la persona en los datos). El motor es
+   `--ve-c`, un custom property de tipo `<color>` (de ahí el `@property` al
+   principio de este archivo, necesario para que interpole en vez de saltar
+   de golpe) animado con `@keyframes veColor` — el `0%`/`100%` quedan fijos
+   acá (dorado, por ser el primer/último tramo), pero los 3 puntos
+   intermedios (morado/azul/verde) **se inyectan en runtime** desde
+   `js/script.js` en un `<style id="veColorKeyframes">`, porque dependen de
+   qué fracción del perímetro le toca a cada ícono según su posición real
+   (no son siempre 25/50/75: los 4 íconos no están a igual distancia entre
+   sí). Si por lo que sea ese `<style>` no llegó a inyectarse (JS
+   deshabilitado, error), esta regla de acá queda como único `@keyframes
+   veColor` con morado/azul/verde a 25/50/75 — un reparto parejo que es
+   razonable de por sí y sirve de resguardo, se sobreescribe apenas corre
+   `trazar()`. Cada capa deriva su tono de `--ve-c` con `color-mix()`
+   (glow/cuerpo más claros, núcleo casi blanco) en vez de tener su propia
+   variable de color, así todas cambian juntas con un solo valor
+   animado. El riel de fondo (`.ve-rail`) no cambia de color: es la "pista"
+   estática, siempre el violeta original. */
 .vision-energy{display:none}
+@keyframes veColor{
+  0%{--ve-c:#C1703B}
+  25%{--ve-c:#714B67}
+  50%{--ve-c:#3B6EA5}
+  75%{--ve-c:#2E7D5B}
+  100%{--ve-c:#C1703B}
+}
 @media(min-width:901px){
   .vision-energy{
-    --ve-T:7s;--ve-mid:#8B4FCB;--ve-glow:#A46CE3;--ve-core:#F4EAFF;
+    --ve-T:7s;--ve-rail-c:#8B4FCB;--ve-c:#C1703B;
     display:block;position:absolute;inset:0;width:100%;height:100%;
     overflow:visible;pointer-events:none
   }
-  .ve-rail{fill:none;stroke:var(--ve-mid);stroke-width:1.2;stroke-dasharray:1 7;stroke-linecap:round;opacity:.28}
+  .ve-rail{fill:none;stroke:var(--ve-rail-c);stroke-width:1.2;stroke-dasharray:1 7;stroke-linecap:round;opacity:.28}
   .ve-p{
     fill:none;stroke-linecap:round;stroke-linejoin:round;
-    animation:veRun var(--ve-T) linear infinite;
-    /* cabeza común: delay = T·(fase − 1 + L/100), L = largo del tramo */
+    animation:veRun var(--ve-T) linear infinite, veColor var(--ve-T) linear infinite;
+    /* cabeza común: delay = T·(fase − 1 + L/100), L = largo del tramo. Se
+       repite para las 2 animaciones (posición y color) a propósito: con un
+       solo valor en animation-delay para 2 animaciones, CSS lo reutiliza
+       para ambas — así cada capa de la cola muestra el color que tenía la
+       cabeza cuando pasó por ahí, no el color actual de la cabeza. */
     animation-delay:calc(var(--ve-T) * (var(--ph,0) - 1 + var(--L) / 100))
   }
-  .ve-glow{--L:12;stroke-dasharray:12 88;stroke:var(--ve-glow);stroke-width:16;opacity:.45}
+  .ve-glow{--L:12;stroke-dasharray:12 88;stroke:color-mix(in srgb, var(--ve-c) 65%, white 35%);stroke-width:16;opacity:.45}
   /* cola: 6 capas apiladas, cada una más corta, más gruesa y más opaca que la
      anterior; la opacidad acumulada sube de ~.07 en la punta de la cola a
      ~.5 junto al cuerpo, sin escalones visibles */
-  .ve-t1{--L:36;stroke-dasharray:36 64;stroke:var(--ve-mid);stroke-width:2.2;opacity:.07}
-  .ve-t2{--L:30;stroke-dasharray:30 70;stroke:var(--ve-mid);stroke-width:2.6;opacity:.09}
-  .ve-t3{--L:25;stroke-dasharray:25 75;stroke:var(--ve-mid);stroke-width:3;opacity:.10}
-  .ve-t4{--L:20;stroke-dasharray:20 80;stroke:var(--ve-mid);stroke-width:3.4;opacity:.12}
-  .ve-t5{--L:15;stroke-dasharray:15 85;stroke:var(--ve-mid);stroke-width:3.8;opacity:.14}
-  .ve-t6{--L:11;stroke-dasharray:11 89;stroke:var(--ve-mid);stroke-width:4.2;opacity:.17}
-  .ve-body{--L:6;stroke-dasharray:6 94;stroke:var(--ve-glow);stroke-width:5;opacity:.85}
-  .ve-core{--L:2.6;stroke-dasharray:2.6 97.4;stroke:var(--ve-core);stroke-width:2.2}
+  .ve-t1{--L:36;stroke-dasharray:36 64;stroke:var(--ve-c);stroke-width:2.2;opacity:.07}
+  .ve-t2{--L:30;stroke-dasharray:30 70;stroke:var(--ve-c);stroke-width:2.6;opacity:.09}
+  .ve-t3{--L:25;stroke-dasharray:25 75;stroke:var(--ve-c);stroke-width:3;opacity:.10}
+  .ve-t4{--L:20;stroke-dasharray:20 80;stroke:var(--ve-c);stroke-width:3.4;opacity:.12}
+  .ve-t5{--L:15;stroke-dasharray:15 85;stroke:var(--ve-c);stroke-width:3.8;opacity:.14}
+  .ve-t6{--L:11;stroke-dasharray:11 89;stroke:var(--ve-c);stroke-width:4.2;opacity:.17}
+  .ve-body{--L:6;stroke-dasharray:6 94;stroke:color-mix(in srgb, var(--ve-c) 70%, white 30%);stroke-width:5;opacity:.85}
+  .ve-core{--L:2.6;stroke-dasharray:2.6 97.4;stroke:color-mix(in srgb, var(--ve-c) 15%, white 85%);stroke-width:2.2}
   .vision-energy.is-paused .ve-p{animation-play-state:paused}
 }
 @keyframes veRun{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}

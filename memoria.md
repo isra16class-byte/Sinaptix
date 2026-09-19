@@ -844,13 +844,31 @@ próximos pasos).
     de las imágenes). **Si se mueven los íconos, el recorrido los sigue solo.**
     Solo ≥901px (igual que los íconos), oculto con
     `prefers-reduced-motion`, y pausado fuera de pantalla (clase `is-paused`
-    por `IntersectionObserver`). Colores: `--ve-mid #8B4FCB`, `--ve-glow
-    #A46CE3`, `--ve-core #F4EAFF` (más vivos que `--purple` a propósito: es
-    "energía", no texto). ⚠️ El `<path>` necesita `pathLength="100"` y el
+    por `IntersectionObserver`). ⚠️ El `<path>` necesita `pathLength="100"` y el
     período de `stroke-dasharray` tiene que sumar 100 (ej. `12 88`) para que
     el pulso cruce la costura del trazado sin cortarse. Detalle y
     alternativas (por detrás de los íconos, destello de cada ícono al pasar
     la energía) en el changelog.
+    - **Color por ícono (2ª ronda, misma sesión)**: el pulso ya no es
+      violeta fijo — toma el color del dato al que se acerca (dorado
+      `--gold #C1703B` en el cerebro, morado `--purple #714B67` en la
+      neurona, azul `--navy-bright #3B6EA5` en los bustos, verde `--green
+      #2E7D5B` en el calendario), mismos colores que las 4 `.stat-annot`.
+      Motor: un solo custom property `--ve-c` (registrado con `@property`
+      al principio de `css/styles.css`, tipo `<color>`, para que interpole
+      en vez de saltar de golpe) animado por `@keyframes veColor`; cada
+      capa deriva su tono de `--ve-c` con `color-mix()` en vez de tener
+      color propio. Los 3 puntos intermedios del keyframe (morado/azul/
+      verde — dorado queda fijo en 0%/100%) **se calculan en runtime** en
+      la misma IIFE de `js/script.js` (`fraccionMasCercana`, muestrea el
+      `<path>` del riel con `getPointAtLength` porque los 4 íconos no
+      están a igual distancia entre sí) y se inyectan en un `<style
+      id="veColorKeyframes">` en el `<head>`; si esa medición falla, el
+      `@keyframes veColor` fijo del CSS (25/50/75 parejo) sirve de
+      resguardo. `.ve-rail` (el riel de fondo) no cambia de color, queda
+      fijo en el violeta original vía `--ve-rail-c`. Detalle de por qué no
+      hizo falta leer `--ve-T` desde JS (y el bug de regex que evitó) en
+      el changelog.
   - **Los 4 datos ya no son tarjetas** (`.stat-box`, descartado): son 4
     `.stat-annot` (punto de color + número Fraunces + etiqueta corta) con
     posición libre en porcentaje dentro de `.vision-art` (contenedor
@@ -1281,6 +1299,16 @@ próximos pasos).
 - **Verificación visual real pendiente** (implementado y revisado a
   mano/con Playwright local, pero no confirmado en un navegador real
   sobre el deploy) en varios frentes:
+  - **Color por ícono del pulso de Visión** (`--ve-c`, sesión 2026-09-19,
+    2ª ronda): verificado con Playwright/Chromium en este entorno (6
+    capturas a lo largo de un ciclo a 1440px, sin errores de consola,
+    keyframes inyectados con los valores esperados). Es la primera vez
+    que el sitio usa `@property` y `color-mix()` — a diferencia del resto
+    de "pendientes" de esta lista, acá conviene confirmar explícitamente
+    que el navegador real soporta ambas features (son relativamente
+    nuevas) y no solo que "se ve bien": si `@property` no corre, el pulso
+    se queda en un solo color fijo (el `initial-value`, dorado) en vez de
+    romperse, así que un fallo ahí sería silencioso.
   - **`#lam-07` (Cierre)**: ✅ **verificado visualmente** en la 2ª pasada
     del 2026-09-18, ya con browser disponible (escritorio 1440px +
     móvil 390px, sin desborde horizontal). Confirmado: que el deco se ve

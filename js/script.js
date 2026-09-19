@@ -853,6 +853,30 @@
   if(!svg) return;
   const icon = k => art.querySelector('.vision-icon--'+k);
   const claves = ['dorado','morado','azul','verde']; // TL, TR, BR, BL
+  // Mismos colores que usan las 4 .stat-annot para cada dato (--gold,
+  // --purple, --navy-bright, --green en css/styles.css), así el pulso
+  // "toca" cada ícono con el color que ya representa a ese dato.
+  const COLOR = {dorado:'#C1703B', morado:'#714B67', azul:'#3B6EA5', verde:'#2E7D5B'};
+  let estiloColor = null; // <style> con los % reales, se crea la 1ª vez
+
+  // Da la posición (0–100, como pathLength="100") del punto del trazado más
+  // cercano al centro de un ícono. Se muestrea el propio <path> en vez de
+  // asumir 25/50/75 parejo porque los 4 íconos no quedan a igual distancia
+  // entre sí (anchos e imágenes distintas) — con 240 muestras el error es
+  // inferior a medio punto porcentual, de sobra para una transición de color.
+  function fraccionMasCercana(path, total, punto){
+    let mejorPos = 0, mejorDist = Infinity;
+    const pasos = 240;
+    for(let i=0; i<=pasos; i++){
+      const len = total * i/pasos;
+      const p = path.getPointAtLength(len);
+      const dx = p.x - punto.x, dy = p.y - punto.y;
+      const dist = dx*dx + dy*dy;
+      if(dist < mejorDist){ mejorDist = dist; mejorPos = len; }
+    }
+    return total ? (mejorPos/total*100) : 0;
+  }
+
   function trazar(){
     const a = art.getBoundingClientRect();
     if(!a.width || !a.height) return;
@@ -873,6 +897,38 @@
       +' V'+f(y1+r)+' Q'+f(x1)+' '+f(y1)+' '+f(x1+r)+' '+f(y1)+' Z';
     svg.setAttribute('viewBox','0 0 '+f(a.width)+' '+f(a.height));
     svg.querySelectorAll('path').forEach(p=>p.setAttribute('d', d));
+
+    // Recorrido siempre en el mismo sentido que dibuja el trazado (dorado →
+    // morado → azul → verde → dorado), así que dorado queda fijo en 0%/100%
+    // (ver @keyframes veColor en css/styles.css) y acá solo hace falta medir
+    // dónde caen los otros 3 sobre ese recorrido.
+    const rail = svg.querySelector('.ve-rail');
+    let total = 0;
+    try{ total = rail && rail.getTotalLength ? rail.getTotalLength() : 0; }
+    catch(e){ total = 0; } // p. ej. SVG oculto (display:none) en algún navegador
+    if(!total) return; // sin recorrido medible, se queda con el 25/50/75 fijo del CSS
+    const pctMorado = fraccionMasCercana(rail, total, c.morado);
+    const pctAzul = fraccionMasCercana(rail, total, c.azul);
+    const pctVerde = fraccionMasCercana(rail, total, c.verde);
+    // Deben quedar en orden creciente y lejos de los extremos 0/100 (que ya
+    // son de dorado) — si algo salió raro (medidas todavía inestables), se
+    // deja el reparto parejo 25/50/75 fijo de css/styles.css en vez de
+    // inyectar valores que rompan la animación.
+    if(pctMorado > .5 && pctMorado < pctAzul - .5 && pctAzul < pctVerde - .5 && pctVerde < 99.5){
+      if(!estiloColor){
+        estiloColor = document.createElement('style');
+        estiloColor.id = 'veColorKeyframes';
+        document.head.appendChild(estiloColor);
+      }
+      const g = n => n.toFixed(1);
+      estiloColor.textContent = '@keyframes veColor{'
+        + '0%{--ve-c:'+COLOR.dorado+'}'
+        + g(pctMorado)+'%{--ve-c:'+COLOR.morado+'}'
+        + g(pctAzul)+'%{--ve-c:'+COLOR.azul+'}'
+        + g(pctVerde)+'%{--ve-c:'+COLOR.verde+'}'
+        + '100%{--ve-c:'+COLOR.dorado+'}'
+        + '}';
+    }
   }
   trazar();
   if('ResizeObserver' in window){

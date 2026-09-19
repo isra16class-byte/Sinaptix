@@ -11,6 +11,92 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: el pulso cambia de color al pasar por cada ícono
+
+Pedido del usuario, sobre la entrada anterior de este changelog: "puedes hacer
+que cambien de color cada que pasen por un icono, que agarre el color del
+icono medio lo toca". Sesión anterior había arrancado esto (colores
+elegidos: los mismos de las 4 `.stat-annot`) pero se cortó sin llegar a
+commitear nada — se retoma desde cero sobre lo que ya estaba en `main`.
+
+- **Qué se ve**: el pulso (antes un violeta fijo `#8B4FCB`/`#A46CE3`) ahora
+  va tomando el color del dato al que se acerca: dorado (`--gold`
+  `#C1703B`) en el cerebro, morado (`--purple` `#714B67`) en la neurona,
+  azul (`--navy-bright` `#3B6EA5`) en los bustos, verde (`--green`
+  `#2E7D5B`) en el calendario — mismos colores que ya usan las 4
+  `.stat-annot` para cada dato, para que sea el mismo código de color que
+  ya lee la persona en "20%"/"86B"/"1:1"/"4–6". El riel de fondo
+  (`.ve-rail`) no cambia: queda fijo en el violeta original, como pista
+  estática de referencia.
+  - Esto **reemplaza** la decisión de la entrada anterior ("colores más
+    vivos que `--purple`... `#714B67` se veía apagado como luz"): esa
+    lectura seguía siendo válida para un pulso de un solo color fijo, pero
+    con 4 colores turnándose el criterio cambia — acá `--purple` es una
+    parada más entre otras 3, no tiene que sostener solo el efecto de
+    "energía".
+- **`css/styles.css`**:
+  - `@property --ve-c{syntax:'<color>';inherits:true;initial-value:#C1703B}`
+    al principio del archivo (antes de `.sr-only`, no puede ir dentro de un
+    `@media`: los navegadores no soportan `@property` anidado). Es lo que
+    permite que el color interpole gradual en vez de saltar de golpe entre
+    paradas — sin este registro, un custom property de color no es
+    animable, cambia de golpe.
+  - `--ve-mid`/`--ve-glow`/`--ve-core` (colores fijos por capa) se
+    reemplazan por un solo `--ve-c` animado con `@keyframes veColor`, del
+    que cada capa deriva su tono con `color-mix()` (glow y cuerpo más
+    claros, núcleo casi blanco) — una sola variable anima las 8 capas del
+    pulso a la vez. El `@keyframes veColor` que queda escrito en el CSS
+    (fuera del `@media`, por si `.vision-energy` en algún momento se
+    habilita a otro ancho) tiene morado/azul/verde a 25/50/75 fijo — sirve
+    de resguardo si por lo que sea no llega a correr el JS que lo
+    sobreescribe (ver abajo), y de por sí es un reparto razonable.
+  - `.ve-rail` pasa a usar una variable propia `--ve-rail-c` (antes
+    reusaba `--ve-mid`), fija en el violeta original, para no engancharse
+    con el color animado del pulso.
+- **`js/script.js`**: en la misma IIFE de `trazar()` que ya medía los 4
+  íconos y armaba el `d` del recorrido:
+  - `fraccionMasCercana(path, total, punto)`: muestrea el `<path>` del
+    riel con `getPointAtLength` (240 pasos) y devuelve en qué punto del
+    recorrido (0–100, mismo sistema que `pathLength="100"`) cae el punto
+    más cercano a un centro de ícono dado. No se asumió 25/50/75 parejo
+    porque los 4 íconos no quedan a igual distancia entre sí (anchos e
+    imágenes distintas) — salió morado a 24.6%, azul a 47.5%, verde a
+    75.0% en la medición a 1440px, no muy lejos del reparto parejo pero
+    tampoco igual.
+  - Con esas 3 fracciones (dorado queda fijo en 0%/100%, por ser donde
+    arranca/cierra el trazado) arma un `@keyframes veColor` nuevo y lo
+    inyecta/actualiza en un `<style id="veColorKeyframes">` en el
+    `<head>` (se crea una sola vez, se reescribe el `textContent` en cada
+    `trazar()` — cubre resize, igual que el resto de la función). Si las
+    3 fracciones no salen en orden creciente y separadas (medición
+    inestable, capa sin layout todavía), no se inyecta nada y queda el
+    `@keyframes veColor` fijo 25/50/75 del CSS.
+  - `getTotalLength()` envuelto en `try/catch` por las dudas de que algún
+    navegador lo rechace con el SVG en `display:none` (mobile, ≤900px);
+    si falla o da 0, `trazar()` corta ahí y no toca los keyframes.
+  - **Evitado a propósito el bug de la sesión anterior**: se había armado
+    un regex para leer `--ve-T` desde JS que quedó con la barra doblada
+    (`\\d`) y "funcionaba de casualidad" por un valor de reserva de
+    7000 ms. Esta implementación no necesita leer `--ve-T` en ningún
+    momento: la sincronización entre la posición (`veRun`) y el color
+    (`veColor`) sale sola de que `.ve-p` anima ambos keyframes con el
+    mismo `animation-delay` (un solo valor en la lista se reutiliza para
+    las 2 animaciones, así cada capa de la cola muestra el color que
+    tenía la cabeza cuando pasó por ahí, no el color actual de la
+    cabeza — efecto de cola con degradé de color, no solo de opacidad).
+- **Verificado con Playwright/Chromium** (disponible esta sesión): sin
+  errores de consola ni de página; `#veColorKeyframes` se inyecta con los
+  valores esperados (24.6%/47.5%/75.0% a 1440px); 6 capturas de
+  `.vision-art` a lo largo de un ciclo completo (~7 s) muestran el pulso
+  pasando por dorado → morado → azul → verde en el orden y las zonas
+  correctas; a 390px `.vision-energy` sigue en `display:none` (sin
+  regresión de lo ya oculto en mobile) y sin errores de JS. `npm test`:
+  85/86 (el e2e de Playwright se saltea a propósito, como siempre — ver
+  "Tests" en memoria.md). Falta la confirmación de siempre sobre un
+  navegador real/deploy, en particular que `color-mix()` y `@property` se
+  vean bien (son las dos features más nuevas que usa esta entrada, sin
+  usarse antes en el sitio).
+
 ## 2026-09-19 — Visión: energía morada que recorre el centro de los 4 íconos
 
 Pedido del usuario (con captura donde dibujó un rectángulo negro uniendo el
