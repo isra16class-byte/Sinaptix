@@ -14,10 +14,10 @@ from scipy import ndimage as ndi
 
 # archivo original de Gemini -> ícono final
 MAPA = {
-    'Gemini_Generated_Image_alvz4halvz4halvz.jpg': 'icon-maletin',
-    'Gemini_Generated_Image_i4v3m3i4v3m3i4v3.jpg': 'icon-graduacion',
-    'Gemini_Generated_Image_swob3cswob3cswob.jpg': 'icon-equipo',
-    'Gemini_Generated_Image_w9fixqw9fixqw9fi.jpg': 'icon-reloj-fatiga',
+    'Gemini_Generated_Image_8i1rvd8i1rvd8i1r.jpg': 'icon-graduacion',
+    'Gemini_Generated_Image_w14bzrw14bzrw14b.jpg': 'icon-maletin',
+    'Gemini_Generated_Image_n187ggn187ggn187.jpg': 'icon-reloj-fatiga',
+    'Gemini_Generated_Image_esttlkesttlkestt.jpg': 'icon-equipo',
 }
 SALIDA = 'img/Iconos'
 TAM = 256

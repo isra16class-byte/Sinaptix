@@ -261,6 +261,22 @@ próximos pasos).
     Pilares (ver `#lam-04`) y las almendras siguen usándose en la tarjeta
     del login (`.miplan-locked-fruit is-almonds`), así que ningún asset
     quedó huérfano.
+- **Íconos 3D de "Para quién es" en morado/negro (`#lam-05`, sesión
+  2026-09-19)**: pedido del usuario tras ver la versión a color de la
+  ronda anterior — mismo estilo clay 3D isométrico, pero con la paleta
+  del sitio (`--purple-dark` `#4B2E45` para el cuerpo, negro para
+  agarres/detalles, un acento chico dorado/azul suave por ícono) en vez
+  de colores libres. Mismos 4 archivos, mismo mapeo de significado,
+  mismo pipeline: `scripts/recortar-iconos-audiencia.py` (chroma key por
+  dominancia de verde, fondo `#00FF00` en los JPG de Gemini) sobre
+  `img/Iconos/{icon-maletin,icon-graduacion,icon-equipo,
+  icon-reloj-fatiga}.webp` — se sobrescriben los mismos nombres, sin
+  tocar `index.html`/CSS. Verificado a mano (composición sobre blanco y
+  negro): recorte limpio, sin aro ni halo verde en ninguno de los 4.
+  **Sin verificar en navegador real**: no se pudo instalar Playwright en
+  esta sesión (sin red a los dominios de descarga del navegador). Las 4
+  imágenes de referencia de Gemini no quedaron versionadas en el repo
+  (igual que en la ronda anterior de estos mismos íconos).
 - **Botón "Actualizar" en "Tu estado actual" + frutas solo con plan
   (`mi-plan.html`, sesión 2026-09-19)**:
   - `#btnActualizarEstado` (`.bar-chart-refresh`) vive en el encabezado de
@@ -983,9 +999,12 @@ próximos pasos).
 - **Beneficios (`#lam-05`, "Para quién es")**: fondo `--panel` (lavanda
   claro, heredado de `section.dark`). Los 4 destinatarios son una lista
   vertical (`.ben-audience-grid`/`.ben-audience-item`, flex) con ícono
-  propio a la izquierda del texto. **Desde 2026-09-19 son ilustraciones 3D
-  a color** (generadas con Gemini sobre fondo verde chroma y recortadas con
-  `scripts/recortar-iconos-audiencia.py`): `img/Iconos/icon-maletin.webp`,
+  propio a la izquierda del texto. **Desde 2026-09-19 son ilustraciones 3D**
+  (generadas con Gemini sobre fondo verde chroma y recortadas con
+  `scripts/recortar-iconos-audiencia.py`) — primera ronda a color libre,
+  **reemplazada en la misma sesión** por una 2ª ronda en la paleta del
+  sitio (morado `--purple-dark`/negro, ver bullet "Íconos 3D de 'Para
+  quién es' en morado/negro" más arriba, que tiene el detalle): `img/Iconos/icon-maletin.webp`,
   `icon-graduacion.webp`, `icon-equipo.webp`, `icon-reloj-fatiga.webp`
   (256×256, alfa real, sin destellos sueltos salvo las gotas/líneas del
   cronómetro). Tamaños en variables sobre `.ben-audience-grid`:

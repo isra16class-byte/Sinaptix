@@ -11,6 +11,38 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Beneficios: íconos de "Para quién es" en morado/negro
+
+El usuario vio los 4 íconos 3D a color de la ronda anterior y pidió que
+usen la paleta del sitio en vez de colores libres: "morado y negro así
+como el título, pero podemos usar otros colores como para cositas
+pequeñas del ícono". Se armaron 4 prompts nuevos para Gemini (mismo
+estilo clay 3D isométrico, cuerpo en `--purple-dark` `#4B2E45`,
+agarres/detalles en negro, un acento chico dorado o azul suave por
+ícono, fondo verde puro `#00FF00` para poder recortarlos igual que la
+ronda anterior) y el usuario subió los 4 JPG.
+
+- `scripts/recortar-iconos-audiencia.py`: mismo pipeline sin cambios de
+  lógica, solo se actualizó `MAPA` con los nombres de archivo nuevos
+  (las imágenes de Gemini no quedan versionadas en el repo, igual que en
+  la ronda anterior).
+- Se sobrescriben los mismos 4 `img/Iconos/{icon-maletin,icon-graduacion,
+  icon-equipo,icon-reloj-fatiga}.webp` (256×256, alfa real) — sin cambios
+  en `index.html` ni `css/styles.css`, mismo mapeo de significado que
+  antes (maletín=profesionales, birrete=estudiantes, 3 personas=equipos,
+  cronómetro+gotas=fatiga).
+- Verificado a mano: composición de los 4 sobre fondo blanco y sobre
+  fondo oscuro (`#141414`), sin aro ni halo verde en ninguno. Peso final
+  12–15 KB cada uno (antes 11–19 KB, sin patrón claro de por qué varía —
+  depende del detalle de cada imagen fuente).
+- **No se pudo verificar en navegador real**: intento de instalar
+  Playwright en esta sesión falló por falta de red al dominio de
+  descarga del navegador (`deb.nodesource.com`, 403); no hay Playwright
+  ni ninguna otra sesión previa con browser instalado en este entorno.
+  Falta confirmar en el sitio real que el ícono del reloj se sigue
+  leyendo bien junto a las gotas ahora que todo el cuerpo es morado
+  oscuro (antes tenía más contraste de color entre partes).
+
 ## 2026-09-19 — Beneficios: fotos de perfil de los 2 testimonios
 
 El usuario generó los retratos con Gemini (a partir de los prompts del
