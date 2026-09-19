@@ -11,6 +11,36 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-07` Cierre: 6 frutas chicas alrededor del texto
+
+Pedido del usuario (con captura de la sección): "quiero que le pongas
+frutas pequeñas a esta sección como alrededor". Tras ver la primera
+versión, pidió "alejalas más del texto".
+
+- **`index.html`**: 6 `<img class="deco deco-fruit closing-fruit …">` como
+  primeros hijos de `<section id="lam-07">`, con comentario que explica el
+  criterio de posición. Kiwi (`-10°`, 96px) y naranja (`12°`, 108px) arriba;
+  palta (`-6°`, 100px) y almendras (`10°`, 84px) abajo, ancladas al centro
+  con `calc(50% ± Npx)` dentro de `max()`/`min()`; arándanos (100px) y
+  granada (90px) laterales en `%` (`left:3%` / `right:4%`, `top:28%`).
+- **`css/styles.css`** (junto a `.closing-deco`): `.closing-fruit--side`
+  se oculta en `≤1000px`; todas las `.closing-fruit` en `≤860px`. La regla
+  general `.deco-fruit` ya las oculta en `≤720px` (mobile sin frutas).
+- **Iteraciones** (mismo pedido): v1 frutas a ~9%/19% del borde y en las
+  esquinas, muy sueltas; v2 más cerca del texto (a ~20%), quedaban pegadas
+  y a 800px chocaban con el botón, el subtítulo y los destellos → se pasó a
+  anclar las 4 centrales al centro; v3 (final) más hacia afuera, a pedido.
+- **Verificación** (Playwright/Chromium con Caveat/Fraunces/Inter locales
+  inyectados, sin ellos el título se ve distinto y en 2 líneas): 1425,
+  1911, 1100 y 900px sin pisar texto, botón ni destellos, y sin cortes por
+  el borde; 390px sin frutas. El `scrollWidth` (1632 a 1425px, 2118 a
+  1911px) es idéntico con y sin las frutas: es el sobreancho previo del
+  collage de `#lam-06`, contenido por `overflow-x` de `body`.
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-02` Visión: los 4 pares ícono+texto subidos de forma uniforme
 
 Pedido del usuario: "subí un poco los 4 íconos con sus respectivos textos

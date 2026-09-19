@@ -758,6 +758,36 @@ próximos pasos).
     tiene que llevar al wizard, no a la info de contacto pasivo. El link
     "Contacto" del nav (`#lam-06`) no se tocó: sigue siendo correcto,
     ahí vive el email/redes.
+  - **6 frutas chicas alrededor (sesión 2026-09-18)**: pedido del usuario,
+    "frutas pequeñas como alrededor", y después "alejalas más del texto".
+    Son `<img class="deco deco-fruit closing-fruit …">` hijas directas de
+    `<section id="lam-07">` (antes de `.wrap`; mismo patrón que Pilares/
+    Beneficios: float, `z-index:0` detrás del texto, `.deco-fruit` ya las
+    oculta en `<720px`). Posiciones inline en `index.html`:
+    kiwi/naranja (arriba, a los lados de los destellos) y palta/almendras
+    (abajo, a los lados del botón) van **ancladas al centro** de la
+    sección (`calc(50% ± Npx)` envuelto en `max()`/`min()` para no
+    salirse del borde en anchos medianos), porque destellos, botón y
+    subtítulo también están centrados y así conservan la distancia a
+    cualquier ancho; arándanos y granada (`.closing-fruit--side`, a la
+    altura de "Potencia") van en `%` del viewport (`left:3%`/`right:4%`).
+    En `css/styles.css` (junto a `.closing-deco`): `.closing-fruit--side`
+    se oculta en `≤1000px` y todas `.closing-fruit` en `≤860px` (más
+    temprano que el `720px` general, porque antes chocaban con el botón,
+    el subtítulo o los destellos). Assets reusados: `svg/deco-blob-
+    {kiwi,orange,berries,avocado,almonds}.svg` + `img/generadas-cutout/
+    granada.webp`.
+    ⚠️ **Para verificar el layout hay que tener las fuentes reales**: sin
+    Caveat/Fraunces (Google Fonts no carga offline) el título cae a un
+    serif y pasa a 2 líneas, así que las posiciones "se ven bien" en un
+    layout que no es el de producción. En el entorno de trabajo se
+    instalaron `@fontsource/{caveat,fraunces,inter}` con npm en `/tmp` y
+    se inyectaron con `page.addStyleTag` (`@font-face` con `file://`) en
+    la prueba de Playwright. Con el título en 1 línea (Caveat real) el
+    resultado se midió a 1425/1911/1100/900px.
+    Primer intento (frutas a ~20% del borde, pegadas al texto) descartado:
+    el usuario las pidió más lejos; a 800px se pisaban con el botón y el
+    subtítulo.
 - **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18, integrado
   en HTML/CSS propio)**: nueva columna derecha con una composición tipo
   "app showcase" — perfil de TikTok, teléfono con Instagram, correo y

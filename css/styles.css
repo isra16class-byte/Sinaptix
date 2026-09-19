@@ -1855,6 +1855,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   --closing-teal:#00CEB3;
 }
 .closing-deco{position:relative;z-index:0;max-width:620px;margin:0 auto 4px}
+/* Frutas chicas alrededor de #lam-07 (sesión 2026-09-18). Posiciones inline
+   en index.html. Por debajo de 1000px el título ya ocupa casi todo el ancho
+   y las 2 laterales (%) chocan con el texto/destellos → se ocultan; por
+   debajo de 860px tampoco cabe ninguna sin pisar el botón o el subtítulo.
+   (`.deco-fruit` ya las oculta en <720px; esto es lo mismo, más temprano.) */
+@media(max-width:1000px){#lam-07 .closing-fruit--side{display:none}}
+@media(max-width:860px){#lam-07 .closing-fruit{display:none}}
 .closing-sparks{display:block;width:100%;height:auto}
 .closing-title{
   position:relative;z-index:1;
