@@ -803,7 +803,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
     /* filas 1 y 5 elásticas: centran el bloque de texto contra el ícono */
     grid-template-rows:minmax(0,1fr) auto auto auto minmax(0,1fr);
     column-gap:var(--gap);
-    padding:12px 0;
+    /* `padding-bottom` más grande desde 2026-09-19: el texto bajó 56px y
+       necesita ese aire extra antes del ícono de la anotación siguiente. */
+    padding:12px 0 40px;
   }
   #lam-02 .stat-annot-icon{
     display:block;position:relative;z-index:1;
@@ -813,6 +815,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   #lam-02 .stat-annot-deco{grid-column:2;grid-row:2;width:90px;height:36px;margin-bottom:4px;overflow:visible}
   #lam-02 .stat-annot-num{grid-column:2;grid-row:3;font-size:36px;line-height:1.15}
   #lam-02 .stat-annot-lab{grid-column:2;grid-row:4;font-size:15px;max-width:30ch;margin-top:4px}
+  /* Bajar y correr a la derecha los 4 bloques de texto (deco+número+
+     etiqueta), igual en los 4, sin mover el ícono (sesión 2026-09-19,
+     pedido del usuario en móvil). `position:relative` + `top`/`left`
+     desplaza sin tocar el layout del grid, que sigue centrando el bloque
+     contra el ícono. Solo ≤900px: el escritorio no se toca. */
+  #lam-02 .stat-annot-deco,
+  #lam-02 .stat-annot-num,
+  #lam-02 .stat-annot-lab{position:relative;top:56px;left:12px}
 }
 @media(max-width:480px){
   #lam-02 .stat-annotations{--ic:92px;--gap:40px}
