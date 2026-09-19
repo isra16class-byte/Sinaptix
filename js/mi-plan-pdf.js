@@ -2,9 +2,9 @@
 // Genera el PDF de "Mi plan" 100% en el navegador de quien hace click, con
 // jsPDF cargado bajo demanda (lazy) desde cdnjs. NO usa html2canvas ni
 // captura de pantalla: todo el documento se dibuja con primitivas
-// vectoriales de jsPDF (texto, rect, roundedRect, líneas, polígonos para
-// los sectores de la dona), así que el PDF sale con texto seleccionable,
-// buscable y nítido a cualquier zoom, y pesa ~30 KB en vez de ~1 MB.
+// vectoriales de jsPDF (texto, rect, roundedRect, líneas, anillos), así que
+// el PDF sale con texto seleccionable, buscable y nítido a cualquier zoom,
+// y pesa ~130 KB en vez de ~1 MB.
 //
 // Fuente de datos: exactamente la misma que ya usa pintarMiPlan()
 // (js/mi-plan.js) para renderizar el dashboard — `sinaptix_objetivo`,
@@ -13,9 +13,14 @@
 // nutriConstruirAjustes, nutriConstruirAvisos, gaugeComputeAreas,
 // gaugeColorForPercent, imcCategoria). No hay una segunda fuente de verdad.
 //
-// Referencia visual: docs/mockup-pdf-mi-plan.html (misma paleta, misma
-// jerarquía, mismos bloques). Ver memoria.md → "PDF de Mi plan" para las
-// decisiones de diseño (tipografía, meta del 80%, reparto de la dona).
+// Referencia visual: docs/mockup-pdf-mi-plan.html, que reproduce la
+// referencia HTML que el usuario aprobó "tal cual" (sesión 2026-09-19):
+// banner de resumen ejecutivo, tarjeta de IMC con barra degradada +
+// puntero, tarjeta de 4 anillos de estado, columnas "Nutrientes clave" /
+// "Prioridades" (coloreadas para diferenciarlas, a pedido explícito), día
+// tipo como lista simple, y caja ámbar de ajustes. Ver memoria.md →
+// "PDF de Mi plan" para el historial completo de decisiones de diseño
+// (hubo 2 direcciones visuales antes de esta; esta es la vigente).
 //
 // Este archivo se carga como <script> plano (sin import/export), igual que
 // el resto de js/ del proyecto. Al final expone un bloque guardado para
@@ -32,31 +37,42 @@
   const PDF_ARCHIVO = 'mi-plan-sinaptix.pdf';
   const LOGO_URL = 'img/sinaptix-icon.png';
 
-  // ---------- Paleta (misma de css/styles.css, :root) ----------
-  // Paleta del PDF. OJO: NO es la del sitio. El morado de marca
-  // (--purple/--purple-dark) se probó y se descartó: en papel y en visores
-  // de PDF lee como un lila apagado y le da al documento un aire más
-  // "folleto" que "informe". El documento usa una paleta neutra de
-  // azules/grises con acentos semánticos, que es lo que pedía la
-  // referencia. La marca sigue presente por el logo y la tipografía.
+  // ---------- Paleta ----------
+  // OJO: esta paleta sigue la referencia HTML que el usuario aprobó
+  // "tal cual" (sesión 2026-09-19), NO la nota "sin morado" de la vuelta
+  // anterior. La referencia SÍ usa un acento tipo ciruela/morado oscuro
+  // (#502d4b) para títulos de sección — es intencional, viene del propio
+  // mockup que subió el usuario, y reemplaza la decisión previa. Ver
+  // memoria.md → "PDF de Mi plan" para el historial completo (dos
+  // decisiones de paleta sucesivas, la última manda).
   const C = {
     ink:        [31, 41, 55],     // texto principal
     inkSoft:    [75, 85, 99],     // texto secundario
     inkFaint:   [148, 163, 184],  // rótulos, escalas, pie
-    marca:      [26, 37, 66],     // azul noche: títulos y nombre de marca
-    acento:     [59, 110, 165],   // azul acero: rótulos, barras de acento
-    acentoSuave:[241, 245, 249],  // fondo del panel de objetivo
-    green:      [21, 128, 61],
+    marca:      [26, 37, 66],     // azul noche: SOLO el nombre de marca (SINAPTIX)
+    plum:       [80, 45, 75],     // ciruela oscuro: títulos de sección y de tarjeta
+    acento:     [59, 110, 165],   // azul acero: columna "Nutrientes clave"
+    acentoSuave:[241, 245, 249],
+    green:      [21, 128, 61],    // columna "Prioridades" y banner de resumen
     gold:       [180, 83, 9],
     red:        [159, 19, 57],
     paper:      [255, 255, 255],
     panel:      [248, 250, 252],
     panel2:     [226, 232, 240],
     line:       [203, 213, 225],
-    verde:      [240, 253, 244],  // tinte de la caja "Priorizar"
-    dorado:     [255, 251, 235],  // tinte de la caja "Moderar"
-    rojoSuave:  [254, 242, 242],  // tinte de aviso "alto"
-    rielTimeline:[203, 213, 225]
+    verde:      [240, 253, 244],
+    dorado:     [255, 251, 235],
+    rojoSuave:  [254, 242, 242],
+    rielTimeline:[203, 213, 225],
+    // Banner "Resumen ejecutivo" (verde, estilo "quick-tip" de la referencia)
+    verdeClaro: [240, 253, 244],
+    verdeBorde: [134, 239, 172],
+    // Puntero de la barra de IMC
+    rosaOscuro: [136, 19, 55],
+    // Caja "Ajustado a tu caso particular" (ámbar, estilo "card-highlight")
+    ambarClaro: [255, 251, 227],
+    ambarBorde: [253, 230, 138],
+    ambarTexto: [180, 83, 9]
   };
   // Tipografía: jsPDF solo trae las 14 fuentes estándar del formato PDF.
   // Fraunces e Inter no están ahí y embeberlas como TTF base64 sumaría
@@ -91,14 +107,9 @@
     'Almuerzo': 35,
     'Cena':     25
   };
-  // 4 tonos bien distinguibles también en escala de grises (impresión B/N):
-  // ámbar, esmeralda, azul acero y gris pizarra.
-  const REPARTO_COLOR = {
-    'Desayuno': [217, 119, 6],
-    'Snack':    [5, 150, 105],
-    'Almuerzo': [59, 110, 165],
-    'Cena':     [100, 116, 139]
-  };
+  // (Antes existía REPARTO_COLOR para pintar el timeline + la dona del día
+  // tipo. Con el rediseño "tal cual" la referencia, el día tipo pasó a una
+  // lista simple sin esos colores — ver memoria.md.)
 
   // Qué área del gráfico de barras corresponde a cada objetivo, para
   // destacarla (es "el" área que la persona vino a mejorar).
@@ -421,6 +432,91 @@
   }
 
   // ===================== Bloques del documento =====================
+  // Diseño alineado 1:1 a la referencia HTML que aprobó el usuario
+  // (docs/mockup-pdf-mi-plan.html, que reproduce esa referencia). Ya no es
+  // el diseño de las 2 vueltas anteriores (panel de objetivo grande, dona,
+  // timeline, cajas Priorizar/Moderar): ese quedó descartado a pedido
+  // explícito del usuario ("sigue sin gustarme, mejor lo quiero así, dejalo
+  // tal cual"). No reabrir esa dirección sin que el usuario la pida de
+  // nuevo — ver memoria.md → "PDF de Mi plan" para el historial completo.
+  //
+  // Qué NO se dibuja más, a propósito, porque la referencia no lo tiene:
+  //   - El panel grande "OBJETIVO COGNITIVO PRINCIPAL" (el título del
+  //     plan ahora vive en el banner de resumen + en cada título de
+  //     sección "N. ESTRATEGIA NUTRICIONAL: {plan}").
+  //   - La columna "MODERAR" (el dato sigue en plan.moderar por si se
+  //     quiere reincorporar; nutriPdfModelo() no cambió).
+  //   - Los avisos personalizados (medicación, sueño, estrés+fatiga) y el
+  //     panel legal grande "AVISO". El aviso general sigue en el pie de
+  //     cada página, como en la referencia.
+  //   - El timeline con círculos numerados y la dona de reparto del día
+  //     tipo: pasa a ser una lista simple "Momento: detalle".
+  //   - El QR de "verificación digital": la referencia lo muestra, pero
+  //     acá no hay ningún backend real que emita o valide ese código.
+  //     Ponerlo sería mostrar una promesa de verificación que no existe.
+  //     Si en algún momento hay una URL real de verificación, se agrega.
+
+  // Cuadro de texto con fragmentos en distinto peso (normal/bold) que se
+  // ajustan de línea juntos, palabra por palabra — para el "Tu plan
+  // prioritario está enfocado en **{objetivo}**." del resumen ejecutivo y
+  // los "**Momento:** detalle" del día tipo. jsPDF no tiene texto de
+  // formato mixto nativo (no es HTML); esto lo arma a mano.
+  // Arma la lista de {w, bold, color} a partir de los segmentos, fusionando
+  // un token que es puntuación sola (".", ",", ";"...) con la palabra
+  // anterior — si no, "Concentración" + ".": queda "Concentración ." con un
+  // espacio de más antes del punto, porque cada palabra se tokeniza por
+  // separado. Compartida por parrafoEnfasis y altoParrafoEnfasis para que
+  // ambas midan/dibujen exactamente lo mismo.
+  function tokenizarSegmentos(segmentos){
+    const crudo = [];
+    segmentos.forEach(function(seg){
+      String(seg.texto).split(' ').forEach(function(w){
+        if(w.length) crudo.push({w: w, bold: !!seg.bold, color: seg.color});
+      });
+    });
+    const palabras = [];
+    crudo.forEach(function(p){
+      const anterior = palabras[palabras.length - 1];
+      if(anterior && /^[.,;:)]+$/.test(p.w)){
+        anterior.w += p.w;
+      } else {
+        palabras.push({w: p.w, bold: p.bold, color: p.color});
+      }
+    });
+    return palabras;
+  }
+
+  function parrafoEnfasis(doc, segmentos, x, y, ancho, tam, interlineado){
+    const lh = (tam * 0.3528) * (interlineado || 1.3);
+    const palabras = tokenizarSegmentos(segmentos);
+    let cx = x, cy = y, lineas = 1, primera = true;
+    palabras.forEach(function(p){
+      fuente(doc, F_CUERPO, p.bold ? 'bold' : 'normal', tam);
+      const wAncho = doc.getTextWidth(p.w + ' ');
+      if(cx + wAncho > x + ancho && !primera){ cx = x; cy += lh; lineas++; }
+      setText(doc, p.color || C.ink);
+      doc.text(p.w, cx, cy);
+      cx += wAncho;
+      primera = false;
+    });
+    return lineas * lh;
+  }
+
+  // Alto que va a ocupar parrafoEnfasis, sin dibujar nada (para reservar
+  // espacio con ctx.espacio() antes de dibujar).
+  function altoParrafoEnfasis(doc, segmentos, ancho, tam, interlineado){
+    const lh = (tam * 0.3528) * (interlineado || 1.3);
+    const palabras = tokenizarSegmentos(segmentos);
+    fuente(doc, F_CUERPO, 'normal', tam);
+    let cx = 0, lineas = 1, primera = true;
+    palabras.forEach(function(p){
+      const wAncho = doc.getTextWidth(p.w + ' ');
+      if(cx + wAncho > ancho && !primera){ cx = 0; lineas++; }
+      cx += wAncho;
+      primera = false;
+    });
+    return lineas * lh;
+  }
 
   function dibujarEncabezado(ctx, m){
     const doc = ctx.doc;
@@ -431,14 +527,17 @@
     } else {
       // Fallback vectorial si el PNG no se pudo cargar (offline, 404): un
       // nodo con 2 sinapsis, en la misma familia gráfica del sitio.
-      setFill(doc, C.acento);
+      setFill(doc, C.plum);
       doc.circle(M + 6.5, 17.5, 5.5, 'F');
       setFill(doc, C.gold);
       doc.circle(M + 4.2, 15.6, 1.4, 'F');
       doc.circle(M + 8.9, 19.2, 1.4, 'F');
     }
 
-    fuente(doc, F_TITULO, 'bold', 16);
+    // La referencia usa un único sans-serif en todo el documento (incluida
+    // la marca): F_TITULO (serif) queda reservado por si algún día se
+    // vuelve a un diseño con jerarquía tipográfica de 2 familias.
+    fuente(doc, F_CUERPO, 'bold', 16);
     setText(doc, C.marca);
     doc.text('SINAPTIX', M + 15, 18);
 
@@ -449,17 +548,14 @@
     // Bloque de identificación, alineado al margen derecho.
     fuente(doc, F_CUERPO, 'normal', 7.2);
     setText(doc, C.inkFaint);
-    doc.text('PREPARADO PARA', PAGE_W - M, 14.6, {align:'right'});
+    doc.text('Preparado para', PAGE_W - M, 14.6, {align:'right'});
     fuente(doc, F_CUERPO, 'bold', 10);
-    setText(doc, C.ink);
+    setText(doc, C.marca);
     doc.text(m.nombre || 'Tu plan', PAGE_W - M, 19, {align:'right'});
     fuente(doc, F_CUERPO, 'normal', 7.6);
     setText(doc, C.inkSoft);
     doc.text(pdfFecha(m.fechaReeval || m.fechaPlan), PAGE_W - M, 22.8, {align:'right'});
 
-    // Una sola regla fina en azul noche, a todo el ancho. Antes había además
-    // un tramo dorado grueso a la izquierda: con el encabezado ya más
-    // compacto quedaba pesado y desbalanceado hacia un costado.
     setDraw(doc, C.marca);
     doc.setLineWidth(0.35);
     doc.line(M, 25.6, PAGE_W - M, 25.6);
@@ -471,7 +567,7 @@
     if(ctx.logo){
       doc.addImage(ctx.logo, 'PNG', M, 11.4, 7, 7 * (397/432));
     }
-    fuente(doc, F_TITULO, 'bold', 10);
+    fuente(doc, F_CUERPO, 'bold', 10);
     setText(doc, C.marca);
     doc.text('SINAPTIX', M + (ctx.logo ? 9 : 0), 16.8);
     fuente(doc, F_CUERPO, 'normal', 7.2);
@@ -483,499 +579,315 @@
     ctx.y = Y_INICIO_CONT;
   }
 
-  // Título de sección: número en círculo morado + texto + regla fina.
-  // La numeración es automática (contador del contexto) para que no se
-  // desfase si algún bloque opcional no se dibuja. `altoBloque` es el alto
-  // estimado de lo que viene justo debajo: se reserva junto con el título
-  // para que nunca quede un título colgado al pie de una página y su
-  // contenido arrancando en la siguiente.
+  // Banner "Resumen Ejecutivo" (verde, como el "quick-tip" de la
+  // referencia). El usuario no escribe este texto: se arma solo a partir
+  // de los ajustes ya calculados por nutriConstruirAjustes(), buscando 2
+  // patrones frecuentes (exclusión por alergia, refuerzo en el bloque de
+  // mayor exigencia). Si no aparece ninguno, cae a una frase genérica.
+  function pdfResumenEjecutivo(m){
+    const partes = [];
+    if(m.ajustes.some(function(a){ return /excluye/i.test(a); })){
+      partes.push('exclusión de alérgenos y restricciones declaradas');
+    }
+    if(m.ajustes.some(function(a){ return /exigencia mental/i.test(a); })){
+      partes.push('refuerzo nutricional en tus horas de mayor exigencia mental');
+    }
+    let cola = '';
+    if(partes.length){
+      cola = ' Se introduce ' + partes.join(' y ') + '.';
+    } else if(m.ajustes.length){
+      cola = ' Se ajustó a tu encuesta.';
+    }
+    return {
+      pre: 'Resumen ejecutivo: Tu plan prioritario está enfocado en ',
+      objetivo: m.objetivoTitulo,
+      post: '.' + cola
+    };
+  }
+
+  function dibujarResumenEjecutivo(ctx, m){
+    const doc = ctx.doc;
+    const r = pdfResumenEjecutivo(m);
+    const segmentos = [
+      {texto: r.pre, bold: false},
+      {texto: r.objetivo, bold: true},
+      {texto: r.post, bold: false}
+    ];
+    const tam = 8.4;
+    const anchoTexto = CW - 14;
+    const alto = 6 + altoParrafoEnfasis(doc, segmentos, anchoTexto, tam) + 4;
+
+    ctx.espacio(alto);
+    const y = ctx.y;
+    setFill(doc, C.verdeClaro);
+    setDraw(doc, C.verdeBorde);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M, y, CW, alto, 1.2, 1.2, 'FD');
+    setFill(doc, C.green);
+    doc.rect(M, y, 1.1, alto, 'F');
+
+    // Marca de "tip": un punto relleno con un anillo fino alrededor, en vez
+    // de intentar una bombilla vectorial — a este tamaño (unos milímetros)
+    // una silueta de bombilla con primitivas de jsPDF lee como una forma
+    // rota antes que como un ícono reconocible.
+    const cx = M + 9, cyIco = y + alto / 2;
+    setDraw(doc, C.verdeBorde);
+    doc.setLineWidth(0.5);
+    doc.circle(cx, cyIco, 2.6, 'D');
+    setFill(doc, C.green);
+    doc.circle(cx, cyIco, 1.1, 'F');
+
+    parrafoEnfasis(doc, segmentos, M + 14, y + 6, anchoTexto, tam);
+    ctx.y = y + alto + 5;
+  }
+
+  // Título de sección: versalitas + regla en C.plum (numeración automática
+  // por sección, no reabrir con círculo relleno: ver memoria.md).
   function tituloSeccion(ctx, texto, altoBloque){
     const doc = ctx.doc;
     ctx.seccion += 1;
     const numero = ctx.seccion;
     ctx.espacio(9 + Math.min(altoBloque || 14, Y_LIMITE - Y_INICIO_CONT - 9));
     const y = ctx.y;
-    // Versalitas sobre una regla, en vez del título en serif grande con el
-    // número dentro de un círculo relleno: ese tratamiento competía con el
-    // encabezado y engordaba el documento. Acá el número va como prefijo.
     fuente(doc, F_CUERPO, 'bold', 9);
-    setText(doc, C.marca);
-    doc.text(numero + '.  ' + texto.toUpperCase(), M, y + 2.6);
+    setText(doc, C.plum);
+    doc.text(numero + '. ' + texto.toUpperCase(), M, y + 2.6);
 
-    setDraw(doc, C.marca);
+    setDraw(doc, C.plum);
     doc.setLineWidth(0.45);
     doc.line(M, y + 4.8, PAGE_W - M, y + 4.8);
     ctx.y = y + 9;
   }
 
-  // Panel destacado del objetivo.
-  function dibujarObjetivo(ctx, m){
-    const doc = ctx.doc;
-    fuente(doc, F_CUERPO, 'normal', 8);
-    const enfoque = m.planes[0].enfoque;
-    const lineasEnfoque = doc.splitTextToSize(enfoque, CW - 16);
-    const lhEnfoque = 8 * 0.3528 * 1.25;
-
-    // El título puede venir largo cuando el objetivo resuelve en varios
-    // planes a la vez ("Foco y Concentración + Reducir Fatiga Mental +
-    // ..."), y a una sola línea se salía del panel. Se prueba a 12,5pt; si
-    // no entra en 2 líneas, se reintenta más chico antes de dejarlo pasar.
-    let tituloTam = 12.5;
-    let lineasTitulo = [];
-    for(let intento = 0; intento < 3; intento++){
-      fuente(doc, F_TITULO, 'bold', tituloTam);
-      lineasTitulo = doc.splitTextToSize(m.objetivoTitulo, CW - 14);
-      if(lineasTitulo.length <= 2) break;
-      tituloTam -= 1.5;
-    }
-    const lhTitulo = tituloTam * 0.3528 * 1.15;
-
-    // Acumulador explícito de alto: rótulo + N líneas de título + M líneas
-    // de enfoque + paddings. Antes eran fórmulas fijas que no contemplaban
-    // un título en 2 líneas; ahora el panel crece con el contenido real.
-    const padSup = 5.8, padEntre = 2.2, padInf = 3.5;
-    const alto = padSup + lineasTitulo.length * lhTitulo + padEntre + lineasEnfoque.length * lhEnfoque + padInf;
-
-    ctx.espacio(alto);
-    const y = ctx.y;
-
-    setFill(doc, C.acentoSuave);
-    setDraw(doc, C.panel2);
-    doc.setLineWidth(0.25);
-    doc.roundedRect(M, y, CW, alto, 1.5, 1.5, 'FD');
-    // Barra de acento a la izquierda, a sangre contra el borde del panel:
-    // el radio del panel bajó a 1.5 mm y ya no hace falta despegarla.
-    setFill(doc, C.acento);
-    doc.rect(M, y, 1.2, alto, 'F');
-
-    const x = M + 7;
-    fuente(doc, F_CUERPO, 'bold', 6.6);
-    setText(doc, C.acento);
-    doc.text('OBJETIVO COGNITIVO PRINCIPAL', x, y + 3.6);
-
-    let yy = y + padSup + lhTitulo * 0.78;
-    fuente(doc, F_TITULO, 'bold', tituloTam);
-    setText(doc, C.marca);
-    lineasTitulo.forEach(function(linea){
-      doc.text(linea, x, yy);
-      yy += lhTitulo;
-    });
-
-    yy += padEntre - lhTitulo + lhEnfoque * 0.78;
-    fuente(doc, F_CUERPO, 'normal', 8);
-    setText(doc, C.inkSoft);
-    lineasEnfoque.forEach(function(linea){
-      doc.text(linea, x, yy);
-      yy += lhEnfoque;
-    });
-
-    ctx.y = y + alto + 5;
-  }
-
-  // Tarjeta blanca con borde + título chico en versalitas.
-  function tarjeta(doc, x, y, w, h, titulo){
-    setFill(doc, C.paper);
+  // Título chico de tarjeta de métrica (icono simple + texto), con línea
+  // gris debajo — igual jerarquía que .card-title en la referencia: texto
+  // en C.plum, regla en gris, no en el color de acento de la tarjeta.
+  function tituloTarjeta(doc, x, y, w, texto){
+    fuente(doc, F_CUERPO, 'bold', 7.6);
+    setText(doc, C.plum);
+    doc.text(texto, x, y);
     setDraw(doc, C.line);
     doc.setLineWidth(0.25);
-    doc.roundedRect(x, y, w, h, 1.5, 1.5, 'FD');
-    fuente(doc, F_CUERPO, 'bold', 7);
-    setText(doc, C.marca);
-    doc.text(titulo, x + 5, y + 6.4);
-    setDraw(doc, C.line);
-    doc.setLineWidth(0.2);
-    doc.line(x + 5, y + 8.6, x + w - 5, y + 8.6);
+    doc.line(x, y + 2.2, x + w, y + 2.2);
   }
 
-  // Barras de estado con marca de meta.
-  const BARRA_ROW_H = 6.4; // antes 8.6: la fila no necesita tanto aire vertical
-  function dibujarBarras(ctx, m, x, y, w){
-    const doc = ctx.doc;
-    const alto = 10.5 + m.barras.length * BARRA_ROW_H + 5;
-    tarjeta(doc, x, y, w, alto, 'TU ESTADO ACTUAL');
-
-    const xLabel = x + 5;
-    const xTrack = x + 29;
-    const trackW = w - 29 - 5 - 12;
-    let yy = y + 12.5;
-
-    m.barras.forEach(function(b){
-      fuente(doc, F_CUERPO, b.destacada ? 'bold' : 'normal', 7.8);
-      setText(doc, b.destacada ? C.marca : C.inkSoft);
-      doc.text(b.label, xLabel + (b.destacada ? 2.4 : 0), yy + 1.8);
-      if(b.destacada){
-        setFill(doc, C.acento);
-        doc.circle(xLabel + 0.7, yy + 1.1, 0.7, 'F');
-      }
-
-      // Riel
-      setFill(doc, C.panel2);
-      doc.roundedRect(xTrack, yy, trackW, 2.2, 1.1, 1.1, 'F');
-      // Relleno
-      const wFill = Math.max(2.2, trackW * b.pct / 100);
-      setFill(doc, b.color);
-      doc.roundedRect(xTrack, yy, wFill, 2.2, 1.1, 1.1, 'F');
-
-      // Marca de "antes" (solo si hubo reevaluación): tramo oscuro fino
-      // sobre el riel, en la posición del valor anterior.
-      if(b.antesPct != null){
-        const xa = xTrack + trackW * b.antesPct / 100;
-        setDraw(doc, C.marca);
-        doc.setLineWidth(0.3);
-        doc.line(xa, yy - 0.7, xa, yy + 2.9);
-      }
-
-      // Marca de meta
-      const xm = xTrack + trackW * m.metaPct / 100;
-      setDraw(doc, C.inkFaint);
-      doc.setLineWidth(0.3);
-      doc.setLineDashPattern([0.6, 0.6], 0);
-      doc.line(xm, yy - 1, xm, yy + 3.2);
-      doc.setLineDashPattern([], 0);
-
-      fuente(doc, F_CUERPO, 'bold', 7.8);
-      setText(doc, C.ink);
-      doc.text(b.pct + '%', x + w - 5, yy + 1.8, {align:'right'});
-
-      yy += BARRA_ROW_H;
-    });
-
-    // Leyenda de la tarjeta
-    fuente(doc, F_CUERPO, 'normal', 6.6);
-    setText(doc, C.inkFaint);
-    const leyenda = m.barras[0].antesPct != null
-      ? 'Línea punteada: meta sugerida (' + m.metaPct + '%). Línea llena: valor de la encuesta inicial.'
-      : 'Línea punteada: meta sugerida (' + m.metaPct + '%) para cada área.';
-    doc.text(doc.splitTextToSize(leyenda, w - 10), x + 5, yy + 0.8);
-
-    return alto;
+  // ---------- Tarjeta 1: Antropometría (barra degradada + puntero) ----------
+  const IMC_MIN = 15, IMC_MAX = 40;
+  const IMC_STOPS = [
+    {en: 0,   color: [148, 163, 184]}, // gris — "Bajo"
+    {en: 0.35, color: [5, 150, 105]},  // verde — "Normal"
+    {en: 0.65, color: [217, 119, 6]},  // ámbar — "Sobrepeso"
+    {en: 1,   color: [159, 18, 57]}    // rosa oscuro — "Obesidad"
+  ];
+  function colorEnDegradado(stops, t){
+    let i = 0;
+    while(i < stops.length - 2 && t > stops[i + 1].en) i++;
+    const a = stops[i], b = stops[i + 1];
+    const local = b.en === a.en ? 0 : (t - a.en) / (b.en - a.en);
+    return [0, 1, 2].map(function(k){ return Math.round(a.color[k] + (b.color[k] - a.color[k]) * local); });
   }
 
-  // Barra de IMC por zonas + puntero.
-  function dibujarImc(ctx, m, x, y, w, alto){
+  function dibujarMetricaImc(ctx, m, x, y, w, alto){
     const doc = ctx.doc;
-    tarjeta(doc, x, y, w, alto, 'ANTROPOMETRÍA');
+    const titulo = m.imc
+      ? 'ANTROPOMETRÍA (IMC: ' + m.imc.imc.toFixed(1) + ' KG/M2)'
+      : 'ANTROPOMETRÍA';
+    tituloTarjeta(doc, x, y, w, titulo);
 
     if(!m.imc){
-      fuente(doc, F_CUERPO, 'normal', 8);
+      fuente(doc, F_CUERPO, 'normal', 7.6);
       setText(doc, C.inkFaint);
-      parrafo(doc, 'Todavía no registraste tus datos antropométricos, así que este plan no incluye el ajuste por IMC.', x + 5, y + 12.5, w - 10);
+      parrafo(doc, 'Todavía no registraste tus datos antropométricos, así que este plan no incluye el ajuste por IMC.', x, y + 8, w);
       return;
     }
 
     const info = m.imc;
-    // Número grande + categoría
+    const bx = x, bw = w, by = y + 16, bh = 3.2;
+    const N = 90; // más franjas = degradado más suave, menos bandeado visible
+    for(let i = 0; i < N; i++){
+      const t0 = i / N, t1 = (i + 1) / N;
+      setFill(doc, colorEnDegradado(IMC_STOPS, (t0 + t1) / 2));
+      doc.rect(bx + bw * t0, by, bw * (t1 - t0) + 0.15, bh, 'F');
+    }
+    // Bordes redondeados en los extremos, encimados sobre las tiras para
+    // que el remate no se vea a escuadra.
+    setFill(doc, colorEnDegradado(IMC_STOPS, 0));
+    doc.roundedRect(bx, by, 3, bh, 1.5, 1.5, 'F');
+    doc.rect(bx + 1.5, by, 1.5, bh, 'F');
+    setFill(doc, colorEnDegradado(IMC_STOPS, 1));
+    doc.roundedRect(bx + bw - 3, by, 3, bh, 1.5, 1.5, 'F');
+    doc.rect(bx + bw - 3, by, 1.5, bh, 'F');
+
+    // Puntero: recortado a IMC_MIN/IMC_MAX igual que antes, para que el
+    // pin nunca se salga de la barra con valores extremos.
+    const v = Math.max(IMC_MIN, Math.min(IMC_MAX, info.imc));
+    const t = (v - IMC_MIN) / (IMC_MAX - IMC_MIN);
+    const px = bx + bw * t;
+
     const valor = info.imc.toFixed(1);
-    fuente(doc, F_TITULO, 'bold', 16);
-    setText(doc, C.ink);
-    doc.text(valor, x + 5, y + 15.6);
-    const xUnidad = x + 5 + doc.getTextWidth(valor) + 1.6;
-    // El ² no está garantizado en las fuentes estándar del PDF: se dibuja
-    // como un "2" más chico y elevado en vez de confiar en el glifo.
+    fuente(doc, F_CUERPO, 'bold', 6.6);
+    const badgeW = doc.getTextWidth(valor) + 4;
+    const badgeX = Math.max(bx, Math.min(bx + bw - badgeW, px - badgeW / 2));
+    setFill(doc, C.rosaOscuro);
+    doc.roundedRect(badgeX, by - 7.4, badgeW, 4.6, 1, 1, 'F');
+    setText(doc, C.paper);
+    doc.text(valor, badgeX + badgeW / 2, by - 4.3, {align:'center'});
+    triangulo(doc, px, by - 2.8, 2.6, 2.4, C.rosaOscuro);
+
+    fuente(doc, F_CUERPO, 'normal', 6.4);
+    setText(doc, C.inkFaint);
+    const yEtq = by + bh + 3.4;
+    doc.text('Bajo', bx, yEtq);
+    doc.text('Normal', bx + bw * 0.35, yEtq, {align:'center'});
+    doc.text('Sobrepeso', bx + bw * 0.65, yEtq, {align:'center'});
+    doc.text('Obesidad', bx + bw, yEtq, {align:'right'});
+
+    setDraw(doc, C.line);
+    doc.setLineWidth(0.2);
+    doc.setLineDashPattern([0.6, 0.6], 0);
+    doc.line(x, yEtq + 3, x + w, yEtq + 3);
+    doc.setLineDashPattern([], 0);
     fuente(doc, F_CUERPO, 'normal', 6.6);
     setText(doc, C.inkFaint);
-    doc.text('kg/m', xUnidad, y + 15.6);
-    const xSup = xUnidad + doc.getTextWidth('kg/m');
-    fuente(doc, F_CUERPO, 'normal', 4.4);
-    doc.text('2', xSup, y + 13.9);
-
-    const colorZona = info.zona === 'saludable' ? RAMPA[2] : (info.zona === 'obesidad' ? RAMPA[0] : RAMPA[1]);
-    const etiqueta = info.cat.charAt(0).toUpperCase() + info.cat.slice(1);
-    // Píldora de contorno, no maciza: en un bloque tan chico el relleno
-    // sólido se comía visualmente al número del IMC, que es el dato.
-    fuente(doc, F_CUERPO, 'bold', 6.8);
-    const pillW = doc.getTextWidth(etiqueta) + 5.5;
-    setDraw(doc, colorZona);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(x + w - 5 - pillW, y + 11.4, pillW, 5, 2.5, 2.5, 'D');
-    setText(doc, colorZona);
-    doc.text(etiqueta, x + w - 5 - pillW / 2, y + 14.7, {align:'center'});
-
-    // Barra segmentada 15–40 con los umbrales OMS (18.5 / 25 / 30), los
-    // mismos que usa imcCategoria() y el medidor del dashboard.
-    const bx = x + 5, bw = w - 10, by = y + 21.4, bh = 2.2;
-    const MIN = 15, MAX = 40;
-    const cortes = [
-      {hasta: 18.5, color: RAMPA[1]},
-      {hasta: 25,   color: RAMPA[2]},
-      {hasta: 30,   color: RAMPA[1]},
-      {hasta: MAX,  color: RAMPA[0]}
-    ];
-    let desde = MIN;
-    cortes.forEach(function(seg, i){
-      const x0 = bx + bw * (desde - MIN) / (MAX - MIN);
-      const x1 = bx + bw * (seg.hasta - MIN) / (MAX - MIN);
-      setFill(doc, seg.color);
-      // Solo los extremos llevan punta redondeada, igual que el arco del
-      // medidor del sitio (los cortes internos van a tope, sin costura).
-      if(i === 0 || i === cortes.length - 1){
-        doc.roundedRect(x0, by, x1 - x0, bh, 1.2, 1.2, 'F');
-        if(i === 0) doc.rect(x0 + (x1 - x0) / 2, by, (x1 - x0) / 2, bh, 'F');
-        else doc.rect(x0, by, (x1 - x0) / 2, bh, 'F');
-      } else {
-        doc.rect(x0, by, x1 - x0, bh, 'F');
-      }
-      desde = seg.hasta;
-    });
-
-    // Puntero del valor real (recortado al rango visible del gráfico)
-    const v = Math.max(MIN, Math.min(MAX, info.imc));
-    const px = bx + bw * (v - MIN) / (MAX - MIN);
-    triangulo(doc, px, by - 2, 2.6, 2, C.marca);
-
-    fuente(doc, F_CUERPO, 'normal', 6.2);
-    setText(doc, C.inkFaint);
-    doc.text('15', bx, by + bh + 3);
-    doc.text('18,5', bx + bw * 3.5 / 25, by + bh + 3, {align:'center'});
-    doc.text('25', bx + bw * 10 / 25, by + bh + 3, {align:'center'});
-    doc.text('30', bx + bw * 15 / 25, by + bh + 3, {align:'center'});
-    doc.text('40', bx + bw, by + bh + 3, {align:'right'});
-
-    let yy = by + bh + 7.4;
-    fuente(doc, F_CUERPO, 'normal', 7);
-    setText(doc, C.inkSoft);
-    if(info.peso && info.tallaCm){
-      doc.text(info.peso + ' kg · ' + info.tallaCm + ' cm', x + 5, yy);
-      yy += 3.8;
-    }
-    if(info.rango){
-      setText(doc, C.inkFaint);
-      fuente(doc, F_CUERPO, 'normal', 6.6);
-      doc.text('Peso saludable estimado: ' + info.rango.min + '-' + info.rango.max + ' kg', x + 5, yy);
-    }
+    doc.text(doc.splitTextToSize('Clasificación metabólica de referencia para ajuste de requerimientos.', w), x, yEtq + 6.6, {align:'left'});
   }
 
-  // Nutrientes clave como chips.
-  function dibujarNutrientes(ctx, plan){
+  // ---------- Tarjeta 2: Estado inicial (4 anillos) ----------
+  function anillo(doc, cx, cy, r, grosor, pct, color, fondo){
+    setFill(doc, fondo);
+    doc.circle(cx, cy, r, 'F');
+    if(pct > 0) sectorDona(doc, cx, cy, r, r - grosor, 0, Math.min(pct, 100) * 3.6, color);
+    setFill(doc, C.paper);
+    doc.circle(cx, cy, r - grosor, 'F');
+  }
+
+  function dibujarMetricaAnillos(ctx, m, x, y, w, alto){
     const doc = ctx.doc;
-    ctx.espacio(20);
-    fuente(doc, F_CUERPO, 'bold', 7);
-    setText(doc, C.inkFaint);
-    doc.text('NUTRIENTES CLAVE', M, ctx.y);
-    let y = ctx.y + 2.8;
-    let x = M;
+    tituloTarjeta(doc, x, y, w, 'ESTADO INICIAL');
 
+    const n = m.barras.length;
+    const r = 5.6, grosor = 1.8;
+    const paso = w / n;
+    const cy = y + 8 + r;
+    m.barras.forEach(function(b, i){
+      const cx = x + paso * i + paso / 2;
+      anillo(doc, cx, cy, r, grosor, b.pct, b.color, C.panel2);
+      fuente(doc, F_CUERPO, 'bold', 6.4);
+      setText(doc, b.color);
+      doc.text(b.pct + '%', cx, cy + 1.2, {align:'center'});
+      fuente(doc, F_CUERPO, 'normal', 6.8);
+      setText(doc, C.inkSoft);
+      doc.text(b.label, cx, cy + r + 4, {align:'center'});
+    });
+  }
+
+  // ---------- Estrategia nutricional: 2 columnas coloreadas ----------
+  // A pedido explícito del usuario, "Nutrientes Clave" y "Prioridades" se
+  // diferencian por color (encabezado + viñeta): azul acero para lo
+  // informativo (nutrientes), verde para lo accionable (prioridades). El
+  // texto de cada ítem queda en tinta neutra — solo el encabezado y la
+  // viñeta llevan color, como pidió: "para poder diferenciarlos".
+  function altoColumnaLista(doc, items, w){
     fuente(doc, F_CUERPO, 'normal', 8);
-    plan.nutrientes.forEach(function(n){
-      const w = doc.getTextWidth(n) + 6.5;
-      if(x + w > PAGE_W - M){ x = M; y += 7.2; }
-      if(y + 6 > Y_LIMITE){ ctx.y = y; ctx.espacio(999); y = ctx.y; x = M; }
-      setFill(doc, C.panel);
-      setDraw(doc, C.panel2);
-      doc.setLineWidth(0.25);
-      doc.roundedRect(x, y, w, 5.6, 1, 1, 'FD');
-      setText(doc, C.ink);
-      doc.text(n, x + w / 2, y + 3.8, {align:'center'});
-      x += w + 2.5;
-    });
-    ctx.y = y + 8;
-  }
-
-  // Caja de lista con encabezado de color (Priorizar / Moderar / Ajustes).
-  // Devuelve el alto que ocupó.
-  function altoCajaLista(doc, items, w, tamano){
-    fuente(doc, F_CUERPO, 'normal', tamano || 8);
-    let h = 10;
+    let h = 6;
     items.forEach(function(it){
-      h += altoTexto(doc, doc.splitTextToSize(it, w - 14)) + 1.2;
-    });
-    return h + 2.5;
-  }
-
-  function dibujarCajaLista(doc, x, y, w, titulo, items, colorBase, colorFondo, tamano, hForzado){
-    const h = hForzado || altoCajaLista(doc, items, w, tamano);
-    setFill(doc, colorFondo);
-    setDraw(doc, C.panel2);
-    doc.setLineWidth(0.25);
-    doc.roundedRect(x, y, w, h, 1.5, 1.5, 'FD');
-    // Filete de color a sangre contra el borde izquierdo (antes era una
-    // barra redondeada despegada, que engrosaba la caja sin aportar).
-    setFill(doc, colorBase);
-    doc.rect(x, y, 1, h, 'F');
-
-    fuente(doc, F_CUERPO, 'bold', 7.4);
-    setText(doc, colorBase);
-    doc.text(titulo, x + 5.5, y + 6.2);
-
-    fuente(doc, F_CUERPO, 'normal', tamano || 8);
-    setText(doc, C.ink);
-    let yy = y + 9;
-    items.forEach(function(it){
-      setFill(doc, colorBase);
-      doc.circle(x + 6.4, yy + 1.4, 0.5, 'F');
-      const usado = parrafo(doc, it, x + 9, yy - 0.9, w - 14);
-      yy += usado + 1.2;
+      h += altoTexto(doc, doc.splitTextToSize('•  ' + it, w - 4)) + 0.8;
     });
     return h;
   }
 
-  // Alto de cada ítem del timeline del día tipo. Se calcula aparte de
-  // dibujarDiaTipo para poder reservarlo junto con el título de sección.
-  const DIA_TIPO_ANCHO_TEXTO = 86;
-  function altosDiaTipo(doc, m){
-    fuente(doc, F_CUERPO, 'normal', 8);
-    return m.diaTipo.map(function(it){
-      return Math.max(11, altoTexto(doc, doc.splitTextToSize(it.detalle, DIA_TIPO_ANCHO_TEXTO)) + 6.5);
-    });
-  }
-  function altoDiaTipo(doc, m){
-    const suma = altosDiaTipo(doc, m).reduce(function(a, b){ return a + b; }, 0);
-    // El lado de la dona (dona + leyenda al costado + nota) mide ~44 mm.
-    // Es el alto del bloque en sí, sin el margen que va después.
-    return Math.max(suma, 42);
-  }
-
-  // Timeline del día tipo + dona de reparto.
-  function dibujarDiaTipo(ctx, m){
-    const doc = ctx.doc;
-    const anchoTexto = DIA_TIPO_ANCHO_TEXTO;
-    const xDona = M + 122;
-
-    const altos = altosDiaTipo(doc, m);
-    const altoTl = altos.reduce(function(a, b){ return a + b; }, 0);
-    ctx.espacio(altoDiaTipo(doc, m));
-    const y0 = ctx.y;
-
-    // Riel vertical del timeline: del centro del primer círculo al del
-    // último, para que no sobresalga por arriba ni por abajo.
-    const yUltimo = y0 + altos.slice(0, -1).reduce(function(a, b){ return a + b; }, 0) + 2.5;
-    setDraw(doc, C.rielTimeline);
-    doc.setLineWidth(0.4);
-    doc.line(M + 2.5, y0 + 2.5, M + 2.5, yUltimo);
-
-    let yy = y0;
-    m.diaTipo.forEach(function(it, i){
-      const color = REPARTO_COLOR[it.momento] || C.acento;
-      setFill(doc, color);
-      doc.circle(M + 2.5, yy + 2.5, 2.5, 'F');
-      fuente(doc, F_CUERPO, 'bold', 6);
-      setText(doc, C.paper);
-      doc.text(String(i + 1), M + 2.5, yy + 3.3, {align:'center'});
-
-      fuente(doc, F_CUERPO, 'bold', 8.2);
-      setText(doc, C.marca);
-      doc.text(it.momento, M + 8, yy + 3.4);
-      // El ancho del momento se mide ANTES de cambiar de cuerpo, o el %
-      // queda pegado al texto (se mediría con la tipografía chica).
-      const xPct = M + 8 + doc.getTextWidth(it.momento) + 2.4;
-      fuente(doc, F_CUERPO, 'normal', 6.8);
-      setText(doc, C.inkFaint);
-      doc.text(it.pct + '%', xPct, yy + 3.4);
-
-      fuente(doc, F_CUERPO, 'normal', 8);
-      setText(doc, C.inkSoft);
-      parrafo(doc, it.detalle, M + 8, yy + 4.6, anchoTexto);
-
-      yy += altos[i];
-    });
-
-    // Dona + leyenda al costado (no debajo): así el bloque entero mide
-    // ~44 mm de alto en vez de ~78 y entra junto al timeline sin empujar
-    // la sección a la página siguiente.
-    // Anillo fino (16 -> 11,5 mm de radio = 4,5 mm de grosor). Antes era de
-    // 7,5 mm y leía como un gráfico de torta pesado, no como un dato.
-    const cx = xDona + 16, cy = y0 + 18;
-    let ang = 0;
-    m.diaTipo.forEach(function(it){
-      const barrido = it.pct * 3.6;
-      sectorDona(doc, cx, cy, 16, 11.5, ang, ang + barrido, REPARTO_COLOR[it.momento] || C.acento);
-      ang += barrido;
-    });
-    fuente(doc, F_TITULO, 'bold', 11);
-    setText(doc, C.marca);
-    doc.text(String(m.diaTipo.length), cx, cy + 0.6, {align:'center'});
-    fuente(doc, F_CUERPO, 'normal', 5);
-    setText(doc, C.inkFaint);
-    doc.text('MOMENTOS', cx, cy + 3.8, {align:'center'});
-
-    const xLeyenda = xDona + 35;
-    let ly = cy - 6.6;
-    m.diaTipo.forEach(function(it){
-      setFill(doc, REPARTO_COLOR[it.momento] || C.acento);
-      doc.roundedRect(xLeyenda, ly - 1.7, 2, 2, 0.3, 0.3, 'F');
-      fuente(doc, F_CUERPO, 'normal', 6.8);
-      setText(doc, C.inkSoft);
-      doc.text(it.momento, xLeyenda + 3.4, ly);
-      fuente(doc, F_CUERPO, 'bold', 6.8);
-      setText(doc, C.marca);
-      doc.text(it.pct + '%', PAGE_W - M, ly, {align:'right'});
-      ly += 4.4;
-    });
-
-    fuente(doc, F_CUERPO, 'normal', 6.2);
-    setText(doc, C.inkFaint);
-    const nota = doc.splitTextToSize('Reparto orientativo de la energía del día.', 58);
-    nota.forEach(function(l, i){ doc.text(l, xDona, cy + 20.5 + i * 3); });
-
-    ctx.y = Math.max(yy, cy + 20.5 + nota.length * 3) + 6;
-  }
-
-  function dibujarAvisos(ctx, m){
-    const doc = ctx.doc;
-    if(!m.avisos.length) return;
-    fuente(doc, F_CUERPO, 'normal', 8);
-    const primero = altoTexto(doc, doc.splitTextToSize(m.avisos[0].texto, CW - 20)) + 10;
-    tituloSeccion(ctx, 'A tener en cuenta', primero);
-    m.avisos.forEach(function(a){
-      const alto = a.nivel === 'alto' ? C.red : C.gold;
-      const fondo = a.nivel === 'alto' ? C.rojoSuave : C.dorado;
-      fuente(doc, F_CUERPO, 'normal', 8);
-      const lineas = doc.splitTextToSize(a.texto, CW - 17);
-      const h = altoTexto(doc, lineas) + 5.5;
-      ctx.espacio(h + 2.5);
-      const y = ctx.y;
-      setFill(doc, fondo);
-      setDraw(doc, C.panel2);
-      doc.setLineWidth(0.25);
-      doc.roundedRect(M, y, CW, h, 1.5, 1.5, 'FD');
-      setFill(doc, alto);
-      doc.rect(M, y, 1, h, 'F');
-      // Triángulo de atención
-      triangulo(doc, M + 6.5, y + 5.6, 3.6, -3.4, alto);
-      fuente(doc, F_CUERPO, 'bold', 4.6);
-      setText(doc, C.paper);
-      doc.text('!', M + 6.5, y + 5.2, {align:'center'});
-      setText(doc, C.ink);
-      fuente(doc, F_CUERPO, 'normal', 8);
-      parrafo(doc, a.texto, M + 11.5, y + 1.6, CW - 17);
-      ctx.y = y + h + 2.5;
-    });
-  }
-
-  const TEXTO_LEGAL = 'Este documento es contenido informativo generado a partir de la encuesta que completaste en SINAPTIX. No reemplaza un diagnóstico médico ni nutricional certificado, ni una consulta profesional. Si tenés una condición de salud o tomás medicación de forma regular, validá este plan con tu médico o nutricionista antes de aplicarlo.';
-
-  function dibujarCierre(ctx, m){
-    const doc = ctx.doc;
-    fuente(doc, F_CUERPO, 'normal', 7.4);
-    const lineas = doc.splitTextToSize(TEXTO_LEGAL, CW - 12);
-    const h = 9.5 + altoTexto(doc, lineas) + 9;
-
-    ctx.espacio(h + 4);
-    const y = ctx.y;
-    setFill(doc, C.panel);
-    setDraw(doc, C.panel2);
-    doc.setLineWidth(0.25);
-    doc.roundedRect(M, y, CW, h, 1.5, 1.5, 'FD');
-
-    fuente(doc, F_CUERPO, 'bold', 7);
-    setText(doc, C.marca);
-    doc.text('AVISO', M + 6, y + 6.6);
-
-    fuente(doc, F_CUERPO, 'normal', 7.4);
-    setText(doc, C.inkSoft);
-    const usado = parrafo(doc, TEXTO_LEGAL, M + 6, y + 8, CW - 12);
-
-    // Pie del panel: de dónde salió este documento y cuándo, para que el
-    // PDF se pueda contrastar con el dashboard aunque el plan cambie después.
+  function dibujarColumnaLista(doc, x, y, w, titulo, items, color){
+    fuente(doc, F_CUERPO, 'bold', 7.6);
+    setText(doc, color);
+    doc.text(titulo.toUpperCase(), x, y);
     setDraw(doc, C.panel2);
     doc.setLineWidth(0.3);
-    doc.line(M + 6, y + 10.5 + usado, PAGE_W - M - 6, y + 10.5 + usado);
-    fuente(doc, F_CUERPO, 'normal', 6.8);
-    setText(doc, C.inkFaint);
-    doc.text('Plan generado el ' + pdfFecha(m.fechaPlan) +
-      (m.fechaReeval ? ' · Última reevaluación: ' + pdfFecha(m.fechaReeval) : '') +
-      (m.email ? ' · ' + m.email : ''), M + 6, y + 14.6 + usado);
+    doc.line(x, y + 1.6, x + w, y + 1.6);
 
+    let yy = y + 6;
+    fuente(doc, F_CUERPO, 'normal', 8);
+    items.forEach(function(it){
+      setText(doc, color);
+      doc.text('•', x, yy);
+      setText(doc, C.ink);
+      const usado = parrafo(doc, it, x + 3.6, yy - 2.8, w - 4);
+      yy += usado + 0.8;
+    });
+  }
+
+  function dibujarNutrientesPrioridades(ctx, plan){
+    const doc = ctx.doc;
+    const wCol = (CW - 8) / 2;
+    const h = Math.max(
+      altoColumnaLista(doc, plan.nutrientes, wCol),
+      altoColumnaLista(doc, plan.priorizar, wCol)
+    );
+    ctx.espacio(h);
+    const y = ctx.y;
+    dibujarColumnaLista(doc, M, y, wCol, 'Nutrientes clave', plan.nutrientes, C.acento);
+    dibujarColumnaLista(doc, M + wCol + 8, y, wCol, 'Prioridades', plan.priorizar, C.green);
     ctx.y = y + h + 4;
+  }
+
+  // ---------- Día tipo: lista simple "Momento: detalle" ----------
+  function altoDiaTipoLista(doc, m){
+    let h = 0;
+    m.diaTipo.forEach(function(it){
+      const segmentos = [{texto: it.momento + ':', bold: true}, {texto: it.detalle, bold: false}];
+      h += altoParrafoEnfasis(doc, segmentos, CW, 8) + 1.6;
+    });
+    return h;
+  }
+
+  function dibujarDiaTipoLista(ctx, m){
+    const doc = ctx.doc;
+    let y = ctx.y;
+    m.diaTipo.forEach(function(it){
+      const segmentos = [{texto: it.momento + ':', bold: true}, {texto: it.detalle, bold: false}];
+      const usado = parrafoEnfasis(doc, segmentos, M, y, CW, 8);
+      y += usado + 1.6;
+    });
+    ctx.y = y + 2;
+  }
+
+  // ---------- "Ajustado a tu caso particular": caja ámbar ----------
+  function altoAjusteDestacado(doc, m){
+    fuente(doc, F_CUERPO, 'normal', 8);
+    let h = 8;
+    m.ajustes.forEach(function(a){
+      h += altoTexto(doc, doc.splitTextToSize(a, CW - 20)) + 1;
+    });
+    return h + 3;
+  }
+
+  function dibujarAjusteDestacado(ctx, m){
+    if(!m.ajustes.length) return;
+    const doc = ctx.doc;
+    const h = altoAjusteDestacado(doc, m);
+    ctx.espacio(h + 3);
+    const y = ctx.y;
+
+    setFill(doc, C.ambarClaro);
+    setDraw(doc, C.ambarBorde);
+    doc.setLineWidth(0.25);
+    doc.roundedRect(M, y, CW, h, 1, 1, 'FD');
+    setFill(doc, C.gold);
+    doc.rect(M, y, 1.3, h, 'F');
+
+    fuente(doc, F_CUERPO, 'bold', 8);
+    setText(doc, C.ambarTexto);
+    doc.text('Ajustado a tu caso particular:', M + 7, y + 6.2);
+
+    let yy = y + 10.4;
+    fuente(doc, F_CUERPO, 'normal', 8);
+    m.ajustes.forEach(function(a){
+      setText(doc, C.gold);
+      doc.text('•', M + 7, yy);
+      setText(doc, C.ink);
+      const usado = parrafo(doc, a, M + 10.5, yy - 2.8, CW - 20);
+      yy += usado + 1;
+    });
+    ctx.y = y + h + 5;
   }
 
   function dibujarPies(doc, m){
@@ -983,13 +895,30 @@
     for(let p = 1; p <= total; p++){
       doc.setPage(p);
       setDraw(doc, C.line);
-      doc.setLineWidth(0.3);
+      doc.setLineWidth(0.25);
       doc.line(M, 280, PAGE_W - M, 280);
       fuente(doc, F_CUERPO, 'normal', 6.8);
       setText(doc, C.inkFaint);
-      doc.text('SINAPTIX · Contenido informativo; no reemplaza diagnóstico médico ni nutricional certificado.', M, 284.5);
+      doc.text('Contenido informativo, no reemplaza diagnóstico médico certificado.', M, 284.5);
       doc.text('Página ' + p + ' de ' + total, PAGE_W - M, 284.5, {align:'right'});
     }
+  }
+
+  function crearCtx(doc){
+    return {
+      doc: doc,
+      y: Y_INICIO,
+      logo: null,
+      seccion: 0,
+      // Salto de página: reserva `h` mm; si no entran, abre página nueva
+      // con el encabezado compacto y devuelve true.
+      espacio: function(h){
+        if(this.y + h <= Y_LIMITE) return false;
+        this.doc.addPage();
+        dibujarEncabezadoContinuacion(this);
+        return true;
+      }
+    };
   }
 
   // ===================== Documento completo =====================
@@ -1007,63 +936,53 @@
     ctx.logo = logoDataUrl || null;
     dibujarEncabezado(ctx, m);
 
-    dibujarObjetivo(ctx, m);
+    dibujarResumenEjecutivo(ctx, m);
 
-    // Fila de métricas: barras (izquierda) + IMC (derecha).
-    const wIzq = 108, wDer = CW - wIzq - 4;
-    const altoFila = 10.5 + m.barras.length * BARRA_ROW_H + 5;
+    // Fila de métricas: IMC (izquierda) + anillos de estado (derecha).
+    const wIzq = (CW - 8) / 2, wDer = CW - wIzq - 8;
+    const altoFila = 38;
     ctx.espacio(altoFila);
     const yFila = ctx.y;
-    dibujarBarras(ctx, m, M, yFila, wIzq);
-    dibujarImc(ctx, m, M + wIzq + 4, yFila, wDer, altoFila);
-    ctx.y = yFila + altoFila + 5;
+    setFill(doc, C.panel);
+    setDraw(doc, C.line);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(M, yFila, wIzq, altoFila, 1.5, 1.5, 'FD');
+    doc.roundedRect(M + wIzq + 8, yFila, wDer, altoFila, 1.5, 1.5, 'FD');
+    dibujarMetricaImc(ctx, m, M + 6, yFila + 6, wIzq - 12, altoFila - 10);
+    dibujarMetricaAnillos(ctx, m, M + wIzq + 8 + 6, yFila + 6, wDer - 12, altoFila - 10);
+    ctx.y = yFila + altoFila + 6;
 
     // Estrategia nutricional (un bloque por plan si el objetivo resolvió
     // en más de uno, igual que nutriBuildResumenHTML)
     m.planes.forEach(function(plan){
-      const wCol = (CW - 5) / 2;
-      const hCol = Math.max(
-        altoCajaLista(doc, plan.priorizar, wCol),
-        altoCajaLista(doc, plan.moderar, wCol)
+      const wCol = (CW - 8) / 2;
+      const alto = Math.max(
+        altoColumnaLista(doc, plan.nutrientes, wCol),
+        altoColumnaLista(doc, plan.priorizar, wCol)
       );
+      const segEnfoque = [{texto: plan.enfoque, bold: false}];
+      const altoTexto1 = altoParrafoEnfasis(doc, segEnfoque, CW, 8.4);
       tituloSeccion(ctx, m.planes.length > 1
         ? 'Estrategia nutricional: ' + plan.nombre
-        : 'Estrategia nutricional', 22);
-      if(m.planes.length > 1){
-        fuente(doc, F_CUERPO, 'normal', 8.4);
-        setText(doc, C.inkSoft);
-        ctx.y += parrafo(doc, plan.enfoque, M, ctx.y - 2.5, CW) + 3;
-      }
-      dibujarNutrientes(ctx, plan);
+        : 'Estrategia nutricional', altoTexto1 + alto + 8);
 
-      ctx.espacio(hCol);
-      const yCols = ctx.y;
-      // Las 2 columnas se dibujan con el mismo alto (el del contenido más
-      // largo) para que queden alineadas arriba y abajo, no escalonadas.
-      dibujarCajaLista(doc, M, yCols, wCol, 'PRIORIZAR', plan.priorizar, C.green, C.verde, 8, hCol);
-      dibujarCajaLista(doc, M + wCol + 5, yCols, wCol, 'MODERAR', plan.moderar, C.gold, C.dorado, 8, hCol);
-      ctx.y = yCols + hCol + 6;
+      const usado = parrafoEnfasis(doc, segEnfoque, M, ctx.y, CW, 8.4);
+      ctx.y += usado + 4;
+
+      dibujarNutrientesPrioridades(ctx, plan);
     });
 
     // Día tipo
-    tituloSeccion(ctx, 'Tu día tipo', altoDiaTipo(doc, m));
-    dibujarDiaTipo(ctx, m);
+    tituloSeccion(ctx, 'Estructura de día tipo', altoDiaTipoLista(doc, m));
+    dibujarDiaTipoLista(ctx, m);
 
-    // Ajustes
-    if(m.ajustes.length){
-      const h = altoCajaLista(doc, m.ajustes, CW);
-      tituloSeccion(ctx, 'Ajustado a tu caso', h);
-      ctx.espacio(h);
-      dibujarCajaLista(doc, M, ctx.y, CW, 'QUÉ CAMBIA EN TU PLAN', m.ajustes, C.acento, C.acentoSuave);
-      ctx.y += h + 6;
-    }
+    // Ajustado a tu caso particular
+    dibujarAjusteDestacado(ctx, m);
 
-    // Avisos + cierre
-    dibujarAvisos(ctx, m);
-    dibujarCierre(ctx, m);
     dibujarPies(doc, m);
     return doc;
   }
+
 
   // Punto de entrada del botón. Devuelve una promesa que resuelve con el
   // objeto jsPDF ya construido (el spec de Playwright lo usa para

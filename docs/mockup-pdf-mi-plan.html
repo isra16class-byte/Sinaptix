@@ -1,381 +1,589 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Referencia visual — PDF de "Mi plan" · SINAPTIX</title>
-<!--
-  REFERENCIA VISUAL del PDF que genera js/mi-plan-pdf.js.
+  <meta charset="UTF-8">
+  <title>Referencia visual — PDF de "Mi plan" · SINAPTIX</title>
+  <!--
+    REFERENCIA VISUAL del PDF que genera js/mi-plan-pdf.js.
 
-  Qué es: la maqueta aprobada del documento, en HTML, para poder mirarla y
-  discutirla en el navegador sin generar un PDF. NO se usa en el sitio ni se
-  carga desde ninguna página: es documentación.
+    Este archivo es (casi) el HTML que aprobó el usuario "tal cual" en la
+    sesión 2026-09-19, tras descartar 2 direcciones de diseño anteriores.
+    Ver memoria.md -> "PDF de Mi plan" para el historial completo.
 
-  Diferencias conocidas y deliberadas contra el PDF real:
-  - Tipografía: acá se usan Fraunces + Inter (las del sitio). El PDF usa
-    Times + Helvetica, porque jsPDF solo trae las 14 fuentes estándar del
-    formato y embeber las reales como TTF base64 sumaría ~300 KB. La
-    paleta, la jerarquía y el layout sí son idénticos.
-  - Los datos son de ejemplo. En el PDF salen del plan resuelto real
-    (mismo origen que nutriBuildResumenHTML: sinaptix_objetivo,
-    sinaptix_antropometria y sinaptix_reevaluacion de localStorage).
-  - El PDF pagina solo: los bloques nunca se parten a la mitad y el pie
-    numera "Página X de Y". Acá se muestra una sola hoja.
+    Los 2 cambios respecto del HTML que subió el usuario:
+    1. Los encabezados "NUTRIENTES CLAVE" / "PRIORIDADES" se colorean
+       distinto (azul / verde) -- a pedido explícito del usuario, para
+       poder diferenciarlos. En el HTML original ambos eran del mismo
+       color (el "plum" de las demás secciones).
+    2. Se agregaron 2 etiquetas ROJAS señalando contenido de ESTE mockup
+       que el PDF real (js/mi-plan-pdf.js) NO genera. No son parte del
+       diseño aprobado: son notas para quien lea este archivo.
 
-  Si se cambia el diseño del PDF, actualizar también este archivo (y al
-  revés): son la misma decisión visual escrita dos veces.
--->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  /* OJO: NO es la paleta del sitio. El morado de marca se probó y se
-     descartó para el PDF (ver memoria.md): en papel y en visores lee como
-     un lila apagado y le da aire de folleto, no de informe. Paleta neutra
-     de azules/grises con acentos semánticos. */
-  --paper:#FFFFFF; --ink:#1F2937; --ink-soft:#4B5563; --ink-faint:#94A3B8;
-  --panel:#F8FAFC; --panel-2:#E2E8F0; --line:#CBD5E1;
-  --green:#15803D; --gold:#B45309; --red:#9F1239;
-  --marca:#1A2542; --acento:#3B6EA5; --acento-suave:#F1F5F9;
-  --verde:#F0FDF4; --dorado:#FFFBEB; --rojo-suave:#FEF2F2;
-  --riel:#CBD5E1;
-  /* Rampa semántica de las barras y del IMC */
-  --ramp-bajo:#BE123C; --ramp-medio:#D97706; --ramp-alto:#059669;
-  /* Momentos del día */
-  --m-desayuno:#D97706; --m-snack:#059669; --m-almuerzo:#3B6EA5; --m-cena:#64748B;
-}
-*{box-sizing:border-box}
-body{margin:0;padding:24px;background:#CBCFD6;font-family:'Inter',sans-serif;color:var(--ink)}
-.hoja{
-  width:210mm;min-height:297mm;margin:0 auto;padding:12mm 15mm 16mm;
-  background:var(--paper);box-shadow:0 6px 28px rgba(0,0,0,.28);position:relative;
-}
-.nota-doc{
-  width:210mm;margin:0 auto 16px;padding:10px 14px;border-radius:8px;
-  background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.08);
-  font-size:12px;color:#334155;line-height:1.5;
-}
+    Todo lo demás -- paleta, tipografía (un solo sans-serif, sin fuente
+    serif de display), espaciado, estructura de secciones -- es la
+    referencia real, no una interpretación.
+  -->
+  <style>
+    body {
+      background-color: #cbcfd6;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .pdf-page {
+      background: #ffffff;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 16mm 18mm;
+      box-sizing: border-box;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      color: #2d3748;
+      font-size: 11.5px;
+      line-height: 1.4;
+      position: relative;
+    }
 
-/* ---------- Encabezado ---------- */
-.enc{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:5px}
-.enc-marca{display:flex;align-items:flex-start;gap:5px}
-.enc-marca img{width:13mm;height:auto;display:block}
-.enc-nombre{font-family:'Fraunces',serif;font-weight:800;font-size:16pt;color:var(--marca);line-height:1;margin-top:2px}
-.enc-tagline{font-size:7.6pt;color:var(--ink-faint);margin-top:4px}
-.enc-meta{text-align:right;line-height:1.5}
-.enc-meta .rotulo{font-size:7.2pt;color:var(--ink-faint);letter-spacing:.04em}
-.enc-meta .persona{font-size:10.5pt;font-weight:700}
-.enc-meta .fecha{font-size:7.6pt;color:var(--ink-soft)}
-.regla{height:.35mm;background:var(--marca);margin:1mm 0 6mm}
+    /* ENCABEZADO PEQUEÑO / COMPACTO */
+    .header {
+      border-bottom: 2px solid #502d4b;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Logo reescalado a tamaño pequeño */
+    .brand-logo-svg {
+      width: 30px;
+      height: 30px;
+    }
+    
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1a2542;
+      letter-spacing: 0.5px;
+      line-height: 1;
+    }
+    .brand-tagline {
+      font-size: 8.5px;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-top: 1px;
+    }
 
-/* ---------- Panel de objetivo ---------- */
-.objetivo{background:var(--acento-suave);border:.25mm solid var(--panel-2);border-radius:1.5mm;padding:5mm 7mm 4.5mm;position:relative;overflow:hidden;margin-bottom:5mm}
-.objetivo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1.2mm;background:var(--acento)}
-.objetivo .rotulo{font-size:6.6pt;font-weight:700;color:var(--acento);letter-spacing:.06em;margin-bottom:2mm}
-.objetivo h1{font-family:'Fraunces',serif;font-weight:800;font-size:12.5pt;color:var(--marca);margin:0 0 1.6mm}
-.objetivo p{margin:0;font-size:8.2pt;color:var(--ink-soft);line-height:1.35}
+    .meta-header {
+      text-align: right;
+      font-size: 9px;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+    }
+    .user-badge {
+      font-size: 9px;
+      color: #64748b;
+    }
+    .user-name {
+      font-size: 11px;
+      font-weight: 800;
+      color: #1a2542;
+      line-height: 1;
+    }
+    .plan-pill {
+      background-color: #fdf2f2;
+      color: #881337;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 1px;
+      border: 1px solid #fecdd3;
+    }
 
-/* ---------- Tarjetas de métricas ---------- */
-.metricas{display:grid;grid-template-columns:108mm 1fr;gap:4mm;margin-bottom:4mm;align-items:stretch}
-.tarjeta{border:.25mm solid var(--line);border-radius:1.5mm;padding:3mm 4.5mm 3.5mm}
-.tarjeta h2{font-size:7pt;font-weight:700;color:var(--marca);letter-spacing:.06em;margin:0 0 2.2mm;padding-bottom:2.2mm;border-bottom:.2mm solid var(--line)}
+    /* RESTO DEL DOCUMENTO (TAMAÑOS ORIGINALES) */
+    .quick-tip {
+      background-color: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-left: 5px solid #16a34a;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-.barra{display:grid;grid-template-columns:24mm 1fr 12mm;align-items:center;height:6.4mm}
-.barra .etq{font-size:8.2pt;color:var(--ink-soft)}
-.barra.destacada .etq{font-weight:700;color:var(--marca);position:relative}
-.barra.destacada .etq::before{content:"";position:absolute;left:-2.8mm;top:50%;transform:translateY(-50%);width:1.6mm;height:1.6mm;border-radius:50%;background:var(--acento)}
-.riel{position:relative;height:2.4mm;border-radius:1.2mm;background:var(--panel-2)}
-.relleno{position:absolute;inset:0 auto 0 0;border-radius:1.2mm}
-.meta{position:absolute;top:-1.2mm;bottom:-1.2mm;width:0;border-left:.3mm dashed var(--ink-faint)}
-.barra .pct{font-size:8.2pt;font-weight:700;text-align:right}
-.leyenda{font-size:6.8pt;color:var(--ink-faint);margin-top:2mm}
+    .metrics-grid {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .metric-card {
+      flex: 1;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 12px;
+      background-color: #f8fafc;
+    }
+    .card-title {
+      font-weight: 700;
+      color: #502d4b;
+      font-size: 11px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #cbd5e1;
+      padding-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-.imc-num{font-family:'Fraunces',serif;font-weight:800;font-size:15pt;line-height:1}
-.imc-unidad{font-size:7pt;color:var(--ink-faint)}
-.imc-unidad sup{font-size:4.6pt}
-.imc-fila{display:flex;align-items:center;justify-content:space-between;margin:1.5mm 0 3mm}
-.pill{border-radius:2.7mm;padding:1mm 3mm;font-size:7pt;font-weight:700;border:.3mm solid currentColor}
-.imc-barra{display:flex;height:2.4mm;position:relative}
-.imc-barra span{display:block}
-.imc-barra span:first-child{border-radius:1.2mm 0 0 1.2mm}
-.imc-barra span:last-child{border-radius:0 1.2mm 1.2mm 0}
-.puntero{position:absolute;top:-2.2mm;transform:translateX(-50%);width:0;height:0;
-  border-left:1.4mm solid transparent;border-right:1.4mm solid transparent;border-top:2.2mm solid var(--marca)}
-.escala{display:flex;justify-content:space-between;font-size:6.4pt;color:var(--ink-faint);margin-top:1.5mm}
-.imc-dato{font-size:7pt;color:var(--ink-soft);margin-top:2.2mm}
-.imc-rango{font-size:6.6pt;color:var(--ink-faint);margin-top:0.8mm}
+    .bmi-container {
+      margin: 8px 0;
+      position: relative;
+    }
+    .bmi-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #94a3b8 0%, #059669 35%, #d97706 65%, #9f1239 100%);
+      opacity: 0.85;
+      width: 100%;
+      position: relative;
+    }
+    .bmi-pointer {
+      position: absolute;
+      top: -4px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .bmi-pointer-pin {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid #881337;
+    }
+    .bmi-pointer-badge {
+      background-color: #881337;
+      color: #ffffff;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      white-space: nowrap;
+      margin-top: -17px;
+    }
+    .bmi-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 8px;
+      color: #64748b;
+      margin-top: 5px;
+      font-weight: 600;
+    }
 
-/* ---------- Títulos de sección ---------- */
-.seccion{display:flex;align-items:baseline;gap:2.2mm;margin:0 0 1.5mm;padding-bottom:1.6mm;border-bottom:.45mm solid var(--marca)}
-.seccion .n{font-size:9pt;font-weight:700;color:var(--marca)}
-.seccion h2{font-size:9pt;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--marca);margin:0}
+    .radials-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 2px 0;
+    }
+    .radial-item {
+      text-align: center;
+      width: 48px;
+      position: relative;
+    }
+    .radial-svg-wrap {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+    }
+    .radial-svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .radial-bg {
+      fill: none;
+      stroke: #e2e8f0;
+      stroke-width: 3.5;
+    }
+    .radial-fill {
+      fill: none;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+    }
+    .radial-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #475569;
+    }
+    .radial-label {
+      font-size: 8.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 3px;
+      display: block;
+    }
 
-/* ---------- Nutrientes ---------- */
-.rotulo-bloque{font-size:7pt;font-weight:700;color:var(--ink-faint);letter-spacing:.05em;margin:3.5mm 0 2mm}
-.chips{display:flex;flex-wrap:wrap;gap:2.5mm}
-.chip{background:var(--panel);border:.25mm solid var(--panel-2);border-radius:1mm;
-  padding:1.3mm 3.2mm;font-size:8pt;color:var(--ink)}
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #502d4b;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #502d4b;
+      padding-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-/* ---------- Cajas de lista ---------- */
-.columnas{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-top:4mm}
-.caja{border:.25mm solid var(--panel-2);border-radius:1.5mm;padding:3.5mm 5.5mm 4.5mm;position:relative;overflow:hidden}
-.caja::before{content:"";position:absolute;left:0;top:0;bottom:0;width:1mm}
-.caja h3{font-size:7.4pt;font-weight:700;letter-spacing:.05em;margin:0 0 1.8mm}
-.caja ul{margin:0;padding:0;list-style:none}
-.caja li{font-size:8pt;line-height:1.35;margin-bottom:1.4mm;padding-left:4mm;position:relative}
-.caja li::before{content:"";position:absolute;left:1.2mm;top:1.7mm;width:1mm;height:1mm;border-radius:50%}
-.caja--priorizar{background:var(--verde)}
-.caja--priorizar::before,.caja--priorizar li::before{background:var(--green)}
-.caja--priorizar h3{color:var(--green)}
-.caja--moderar{background:var(--dorado)}
-.caja--moderar::before,.caja--moderar li::before{background:var(--gold)}
-.caja--moderar h3{color:var(--gold)}
-.caja--ajustes{background:var(--acento-suave)}
-.caja--ajustes::before,.caja--ajustes li::before{background:var(--acento)}
-.caja--ajustes h3{color:var(--acento)}
+    .sub-section-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #502d4b;
+      text-transform: uppercase;
+      border-bottom: 2px solid #94a3b8;
+      padding-bottom: 4px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
 
-/* ---------- Día tipo ---------- */
-.dia{display:grid;grid-template-columns:110mm 1fr;gap:6mm;margin-top:4mm}
-.timeline{position:relative}
-.timeline::before{content:"";position:absolute;left:2.4mm;top:2.5mm;bottom:9mm;width:.4mm;background:var(--riel)}
-.hito{display:grid;grid-template-columns:5mm 1fr;gap:2.6mm;margin-bottom:2.6mm;position:relative}
-.hito .n{width:5mm;height:5mm;border-radius:50%;color:#fff;font-size:6pt;font-weight:700;
-  display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
-.hito .momento{font-size:8.2pt;font-weight:700;color:var(--marca)}
-.hito .momento span{font-weight:400;font-size:7pt;color:var(--ink-faint);margin-left:2mm}
-.hito p{margin:.8mm 0 0;font-size:8pt;line-height:1.35;color:var(--ink-soft)}
-.dona-wrap{display:flex;align-items:flex-start;gap:3mm}
-.dona{width:32mm;height:32mm;border-radius:50%;flex:none;position:relative;
-  background:conic-gradient(var(--m-desayuno) 0 30%, var(--m-snack) 30% 40%, var(--m-almuerzo) 40% 75%, var(--m-cena) 75% 100%)}
-.dona::after{content:"";position:absolute;inset:4.5mm;border-radius:50%;background:#fff}
-.dona-centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
-.dona-centro b{font-family:'Fraunces',serif;font-size:11pt;color:var(--marca);line-height:1}
-.dona-centro span{font-size:5.2pt;color:var(--ink-faint);letter-spacing:.08em;margin-top:.8mm}
-.dona-leyenda{flex:1;padding-top:4mm}
-.dona-leyenda div{display:flex;align-items:center;gap:1.6mm;font-size:6.8pt;color:var(--ink-soft);margin-bottom:2mm}
-.dona-leyenda i{width:2mm;height:2mm;border-radius:.3mm;flex:none}
-.dona-leyenda b{margin-left:auto;font-size:6.8pt;color:var(--marca)}
-.dona-nota{font-size:6.2pt;color:var(--ink-faint);margin-top:2mm}
+    .columns-2 {
+      display: flex;
+      gap: 12px;
+    }
+    .col {
+      flex: 1;
+    }
+    /* A pedido explícito del usuario: diferenciar "Nutrientes Clave" de
+       "Prioridades" por color (en el HTML original ambos usaban el mismo
+       #502d4b que el resto de los títulos de sección). */
+    .col-nutrientes .sub-section-title { color: #3b6ea5; border-bottom-color: #cbd5e1; }
+    .col-nutrientes .custom-list li::marker { color: #3b6ea5; }
+    .col-prioridades .sub-section-title { color: #15803d; border-bottom-color: #cbd5e1; }
+    .col-prioridades .custom-list li::marker { color: #15803d; }
 
-/* ---------- Avisos ---------- */
-.aviso{display:flex;gap:3.2mm;border:.25mm solid var(--panel-2);border-left-width:1mm;border-left-style:solid;border-radius:1.5mm;padding:3mm 5.5mm;margin-top:2.5mm;font-size:8pt;line-height:1.35}
-.aviso .ico{flex:none;width:3.8mm;height:3.6mm;margin-top:.6mm;position:relative;isolation:isolate;
-  color:#fff;font-size:5.4pt;font-weight:700;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.3mm}
-.aviso .ico::before{content:"";position:absolute;inset:0;z-index:-1;clip-path:polygon(50% 0,100% 100%,0 100%)}
-.aviso--alto{background:var(--rojo-suave);border-left-color:var(--red)}
-.aviso--alto .ico::before{background:var(--red)}
-.aviso--moderado{background:var(--dorado);border-left-color:var(--gold)}
-.aviso--moderado .ico::before{background:var(--gold)}
+    /* Etiqueta roja: contenido de este mockup que el PDF real no genera. */
+    .nota-no-implementado {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 8px;
+      font-weight: 700;
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px dashed #fca5a5;
+      border-radius: 3px;
+      padding: 2px 6px;
+    }
 
-/* ---------- Cierre y pie ---------- */
-.cierre{background:var(--panel);border:.25mm solid var(--panel-2);border-radius:1.5mm;padding:3.5mm 6mm 4.5mm;margin-top:6mm}
-.cierre h3{font-size:7pt;font-weight:700;color:var(--marca);letter-spacing:.06em;margin:0 0 1.5mm}
-.cierre p{margin:0;font-size:7.4pt;line-height:1.4;color:var(--ink-soft)}
-.cierre .origen{margin-top:3mm;padding-top:2.5mm;border-top:.3mm solid var(--panel-2);font-size:6.8pt;color:var(--ink-faint)}
-.pie{position:absolute;left:15mm;right:15mm;bottom:9mm;padding-top:2mm;border-top:.3mm solid var(--line);
-  display:flex;justify-content:space-between;font-size:6.8pt;color:var(--ink-faint)}
-</style>
+    .custom-list {
+      list-style-type: disc;
+      margin: 4px 0 8px 0;
+      padding-left: 16px;
+    }
+    .custom-list li {
+      margin-bottom: 3px;
+      color: #334155;
+    }
+    .custom-list li::marker {
+      color: #502d4b;
+      font-size: 9px;
+    }
+
+    .card-highlight {
+      background-color: #fffbe3;
+      border: 1px solid #fde68a;
+      border-left: 5px solid #d97706;
+      padding: 8px 12px;
+      margin-top: 10px;
+      border-radius: 2px;
+    }
+    .card-highlight-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #b45309;
+      font-weight: bold;
+    }
+
+    .validation-row {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1.5px solid #94a3b8;
+    }
+
+    .qr-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1.5px dashed #94a3b8;
+    }
+    .qr-code {
+      width: 32px;
+      height: 32px;
+      background: #334155;
+      color: #fff;
+      font-size: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .footer {
+      margin-top: 14px;
+      border-top: 1.5px solid #cbd5e1;
+      padding-top: 6px;
+      font-size: 8.5px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .icon-svg {
+      flex-shrink: 0;
+    }
+  </style>
 </head>
 <body>
 
-<div class="nota-doc">
-  <strong>Referencia visual del PDF de "Mi plan".</strong> No es una página del sitio: es la maqueta aprobada
-  del documento que genera <code>js/mi-plan-pdf.js</code> con jsPDF (vectorial, sin captura de pantalla).
-  Datos de ejemplo. La paleta NO es la del sitio: el morado se descartó para el PDF (ver memoria.md). El PDF real usa Times + Helvetica en vez de Fraunces + Inter —
-  jsPDF solo trae las 14 fuentes estándar del formato— y pagina solo, sin partir bloques.
-</div>
+  <div class="pdf-page">
+    
+    <!-- ENCABEZADO COMPACTO -->
+    <div class="header">
+      <div class="brand-container">
+        <svg class="brand-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+          <path d="M50 25 C30 25 25 40 25 50 C25 62 38 72 50 72 C62 72 75 62 75 50 C75 40 70 25 50 25 Z" fill="#1e293b"/>
+          <path d="M50 18 Q55 10 62 12 Q58 20 50 22 Z" fill="#eab308"/>
+          <path d="M22 72 Q50 68 78 72 L78 76 Q50 72 22 76 Z" fill="#16a34a"/>
+          <circle cx="38" cy="42" r="2.5" fill="#eab308"/>
+          <circle cx="62" cy="48" r="2.5" fill="#eab308"/>
+          <line x1="38" y1="42" x2="44" y2="52" stroke="#eab308" stroke-width="1.5"/>
+          <line x1="62" y1="48" x2="56" y2="38" stroke="#eab308" stroke-width="1.5"/>
+        </svg>
+        <div class="brand-text">
+          <span class="brand">SINAPTIX</span>
+          <span class="brand-tagline">Plan personalizado de neuroalimentación</span>
+        </div>
+      </div>
+      
+      <div class="meta-header">
+        <div class="user-badge">Preparado para</div>
+        <div class="user-name">Renata Ibarra</div>
+        <div>18 de septiembre de 2026</div>
+        <!-- El pill "Semana X" del original no se implementó: la app no
+             tiene un concepto de "semana del plan" en ningún lado. -->
+      </div>
+    </div>
 
-<div class="hoja">
-
-  <!-- ENCABEZADO -->
-  <div class="enc">
-    <div class="enc-marca">
-      <img src="../img/sinaptix-icon.png" alt="">
+    <!-- Resumen de Inicio -->
+    <div class="quick-tip">
+      <svg class="icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
       <div>
-        <div class="enc-nombre">SINAPTIX</div>
-        <div class="enc-tagline">Plan personalizado de neuroalimentación</div>
+        <strong style="color: #15803d;">Resumen Ejecutivo:</strong> Tu plan prioritario está enfocado en <strong>Foco y Concentración</strong>. Se introducen ajustes para exclusión de alérgenos y refuerzo nutricional en horas de mayor demanda cognitiva.
       </div>
-    </div>
-    <div class="enc-meta">
-      <div class="rotulo">PREPARADO PARA</div>
-      <div class="persona">Renata Ibarra</div>
-      <div class="fecha">10 de septiembre de 2026</div>
-    </div>
-  </div>
-  <div class="regla"></div>
-
-  <!-- OBJETIVO -->
-  <div class="objetivo">
-    <div class="rotulo">OBJETIVO COGNITIVO PRINCIPAL</div>
-    <h1>Foco y Concentración</h1>
-    <p>Estabilizar la energía cerebral a lo largo del día y aportar los nutrientes asociados a velocidad
-       de procesamiento y atención sostenida.</p>
-  </div>
-
-  <!-- MÉTRICAS -->
-  <div class="metricas">
-    <div class="tarjeta">
-      <h2>TU ESTADO ACTUAL</h2>
-      <div class="barra destacada">
-        <span class="etq">Foco</span>
-        <span class="riel"><i class="relleno" style="width:40%;background:var(--ramp-medio)"></i><i class="meta" style="left:80%"></i></span>
-        <span class="pct">40%</span>
-      </div>
-      <div class="barra">
-        <span class="etq">Memoria</span>
-        <span class="riel"><i class="relleno" style="width:60%;background:#B98C1B"></i><i class="meta" style="left:80%"></i></span>
-        <span class="pct">60%</span>
-      </div>
-      <div class="barra">
-        <span class="etq">Energía</span>
-        <span class="riel"><i class="relleno" style="width:40%;background:var(--ramp-medio)"></i><i class="meta" style="left:80%"></i></span>
-        <span class="pct">40%</span>
-      </div>
-      <div class="barra">
-        <span class="etq">Calma</span>
-        <span class="riel"><i class="relleno" style="width:20%;background:var(--ramp-bajo)"></i><i class="meta" style="left:80%"></i></span>
-        <span class="pct">20%</span>
-      </div>
-      <div class="leyenda">Línea punteada: meta sugerida (80%) para cada área.</div>
     </div>
 
-    <div class="tarjeta">
-      <h2>ANTROPOMETRÍA</h2>
-      <div class="imc-fila">
-        <div><span class="imc-num">30.9</span> <span class="imc-unidad">kg/m<sup>2</sup></span></div>
-        <span class="pill" style="color:var(--ramp-bajo)">Obesidad</span>
-      </div>
-      <div class="imc-barra">
-        <span style="background:var(--ramp-medio);width:14%"></span>
-        <span style="background:var(--ramp-alto);width:26%"></span>
-        <span style="background:var(--ramp-medio);width:20%"></span>
-        <span style="background:var(--ramp-bajo);width:40%"></span>
-        <i class="puntero" style="left:63.6%"></i>
-      </div>
-      <div class="escala"><span>15</span><span>18,5</span><span>25</span><span>30</span><span>40</span></div>
-      <div class="imc-dato">82 kg · 163 cm</div>
-      <div class="imc-rango">Peso saludable estimado: 49-66 kg</div>
-    </div>
-  </div>
+    <!-- Métricas -->
+    <div class="metrics-grid">
+      
+      <!-- GRAFICO 1: Barra de IMC -->
+      <div class="metric-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="card-title">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#502d4b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11v-2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2"/><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/><path d="M12 7v5"/></svg>
+          Antropometría (IMC: 37.3 kg/m²)
+        </div>
+        
+        <div class="bmi-container">
+          <div class="bmi-bar">
+            <div class="bmi-pointer" style="left: 82%;">
+              <div class="bmi-pointer-badge">37.3</div>
+              <div class="bmi-pointer-pin"></div>
+            </div>
+          </div>
+          <div class="bmi-labels">
+            <span>Bajo</span>
+            <span>Normal</span>
+            <span>Sobrepeso</span>
+            <span>Obesidad</span>
+          </div>
+        </div>
 
-  <!-- ESTRATEGIA -->
-  <div class="seccion"><span class="n">1.</span><h2>Estrategia nutricional</h2></div>
-  <div class="rotulo-bloque">NUTRIENTES CLAVE</div>
-  <div class="chips">
-    <span class="chip">Omega-3 (DHA)</span>
-    <span class="chip">Flavonoides</span>
-    <span class="chip">Colina</span>
-    <span class="chip">Hidratos de carbono de bajo índice glucémico</span>
-    <span class="chip">Hierro</span>
-  </div>
-  <div class="columnas">
-    <div class="caja caja--priorizar">
-      <h3>PRIORIZAR</h3>
-      <ul>
-        <li>Pescados azules (o chía/lino/algas si aplica restricción)</li>
-        <li>Arándanos y frutos rojos</li>
-        <li>Huevo</li>
-        <li>Avena y cereales integrales</li>
-        <li>Frutos secos</li>
-        <li>Agua distribuida en el día</li>
-      </ul>
-    </div>
-    <div class="caja caja--moderar">
-      <h3>MODERAR</h3>
-      <ul>
-        <li>Azúcares simples y bebidas azucaradas</li>
-        <li>Exceso de harinas refinadas</li>
-      </ul>
-    </div>
-  </div>
+        <div style="font-size: 8.5px; color: #64748b; text-align: center; border-top: 1px dashed #cbd5e1; padding-top: 4px;">
+          Clasificación metabólica de referencia para ajuste de requerimientos.
+        </div>
+      </div>
 
-  <!-- DÍA TIPO -->
-  <div class="seccion" style="margin-top:6mm"><span class="n">2.</span><h2>Tu día tipo</h2></div>
-  <div class="dia">
-    <div class="timeline">
-      <div class="hito">
-        <span class="n" style="background:var(--m-desayuno)">1</span>
-        <div>
-          <div class="momento">Desayuno <span>30%</span></div>
-          <p>Avena o cereales integrales con arándanos/frutos rojos y un puñado de frutos secos.</p>
+      <!-- GRAFICO 2: Anillos Radiales -->
+      <div class="metric-card">
+        <div class="card-title">
+          <svg class="icon-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#502d4b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12A10 10 0 1 1 12 2v10z"/></svg>
+          Estado Inicial
         </div>
-      </div>
-      <div class="hito">
-        <span class="n" style="background:var(--m-snack)">2</span>
-        <div>
-          <div class="momento">Snack <span>10%</span></div>
-          <p>Fruta fresca con frutos secos, y agua distribuida durante la mañana.</p>
-        </div>
-      </div>
-      <div class="hito">
-        <span class="n" style="background:var(--m-almuerzo)">3</span>
-        <div>
-          <div class="momento">Almuerzo <span>35%</span></div>
-          <p>Pescado azul (o su alternativa vegetal) con cereales integrales y vegetales variados.</p>
-        </div>
-      </div>
-      <div class="hito">
-        <span class="n" style="background:var(--m-cena)">4</span>
-        <div>
-          <div class="momento">Cena <span>25%</span></div>
-          <p>Plato liviano con huevo, evitando azúcares simples y harinas refinadas antes de dormir.</p>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="dona-wrap">
-        <div class="dona">
-          <div class="dona-centro"><b>4</b><span>MOMENTOS</span></div>
-        </div>
-        <div class="dona-leyenda">
-          <div><i style="background:var(--m-desayuno)"></i>Desayuno<b>30%</b></div>
-          <div><i style="background:var(--m-snack)"></i>Snack<b>10%</b></div>
-          <div><i style="background:var(--m-almuerzo)"></i>Almuerzo<b>35%</b></div>
-          <div><i style="background:var(--m-cena)"></i>Cena<b>25%</b></div>
-        </div>
-      </div>
-      <div class="dona-nota">Reparto orientativo de la energía del día.</div>
-    </div>
-  </div>
+        
+        <div class="radials-container">
+          <div class="radial-item">
+            <div class="radial-svg-wrap">
+              <svg class="radial-svg" viewBox="0 0 36 36">
+                <path class="radial-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="radial-fill" stroke="#9f1239" stroke-dasharray="20, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="radial-value" style="color: #9f1239;">20%</div>
+            </div>
+            <span class="radial-label">Foco</span>
+          </div>
 
-  <!-- AJUSTES -->
-  <div class="seccion" style="margin-top:6mm"><span class="n">3.</span><h2>Ajustado a tu caso</h2></div>
-  <div class="caja caja--ajustes" style="margin-top:4mm">
-    <h3>QUÉ CAMBIA EN TU PLAN</h3>
-    <ul>
-      <li>Se excluye de las recomendaciones: Frutos secos, Mariscos, Lactosa, sustituido por alternativas equivalentes del mismo grupo nutricional.</li>
-      <li>Fuentes animales sustituidas por equivalentes vegetales (legumbres, tofu, semillas, algas).</li>
-      <li>El snack de refuerzo se ubica cerca de tu bloque de mayor exigencia mental (mañana).</li>
+          <div class="radial-item">
+            <div class="radial-svg-wrap">
+              <svg class="radial-svg" viewBox="0 0 36 36">
+                <path class="radial-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="radial-fill" stroke="#9f1239" stroke-dasharray="20, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="radial-value" style="color: #9f1239;">20%</div>
+            </div>
+            <span class="radial-label">Memoria</span>
+          </div>
+
+          <div class="radial-item">
+            <div class="radial-svg-wrap">
+              <svg class="radial-svg" viewBox="0 0 36 36">
+                <path class="radial-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="radial-fill" stroke="#9f1239" stroke-dasharray="20, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="radial-value" style="color: #9f1239;">20%</div>
+            </div>
+            <span class="radial-label">Energía</span>
+          </div>
+
+          <div class="radial-item">
+            <div class="radial-svg-wrap">
+              <svg class="radial-svg" viewBox="0 0 36 36">
+                <path class="radial-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="radial-fill" stroke="#059669" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="radial-value" style="color: #059669;">100%</div>
+            </div>
+            <span class="radial-label">Calma</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Estrategia Nutricional -->
+    <div class="section-title">
+      <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#502d4b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><path d="M12 6v6l4 2"/></svg>
+      1. Estrategia Nutricional: Foco y Concentración
+    </div>
+    <p style="margin-top: 2px; margin-bottom: 6px;">Estabilizar la energía cerebral a lo largo del día y aportar los nutrientes asociados a la velocidad de procesamiento y atención sostenida.</p>
+
+    <div class="columns-2">
+      <div class="col col-nutrientes">
+        <div class="sub-section-title">Nutrientes Clave</div>
+        <ul class="custom-list">
+          <li>Omega-3 (DHA)</li>
+          <li>Flavonoides</li>
+          <li>Colina</li>
+          <li>Hidratos de carbono de bajo índice glucémico</li>
+          <li>Hierro</li>
+        </ul>
+      </div>
+
+      <div class="col col-prioridades">
+        <div class="sub-section-title">Prioridades</div>
+        <ul class="custom-list">
+          <li>Pescados azules / alternativas vegetales</li>
+          <li>Arándanos y frutos rojos</li>
+          <li>Huevo</li>
+          <li>Avena y cereales integrales</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Día Tipo -->
+    <div class="section-title">
+      <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#502d4b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      2. Estructura de Día Tipo
+    </div>
+    <ul class="custom-list">
+      <li><strong>Desayuno:</strong> Avena o cereales integrales con arándanos/frutos rojos y frutos secos.</li>
+      <li><strong>Snack:</strong> Fruta fresca con frutos secos y agua distribuida durante la mañana.</li>
+      <li><strong>Almuerzo:</strong> Pescado azul (o alternativa vegetal) con cereales integrales y vegetales variados.</li>
+      <li><strong>Cena:</strong> Plato liviano con huevo, evitando azúcares simples antes de dormir.</li>
     </ul>
+
+    <!-- Ajuste Personalizado -->
+    <div class="card-highlight">
+      <div class="card-highlight-header">
+        <svg class="icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Ajustado a tu caso particular:</span>
+      </div>
+      <ul class="custom-list" style="margin-bottom: 0; margin-top: 4px;">
+        <li>Se excluyen de las recomendaciones: Frutos secos, Mariscos y Lactosa.</li>
+        <li>Fuentes animales sustituidas por equivalentes vegetales.</li>
+        <li>El snack de refuerzo se ubica cerca de tu bloque de mayor exigencia mental.</li>
+      </ul>
+    </div>
+
+    <!-- Bloque de Validación -->
+    <!-- NO IMPLEMENTADO en el PDF real: no hay backend que emita ni
+         valide un código de verificación, así que mostrar un QR acá
+         sería prometer una verificación que no existe. Se deja en este
+         mockup solo para no editar la referencia más de lo necesario. -->
+    <div class="validation-row">
+      <span class="nota-no-implementado">No implementado en el PDF real (no hay backend de verificación)</span>
+    </div>
+    <div class="validation-row" style="display:none;">
+      <div class="qr-box">
+        <div class="qr-code">QR CODE</div>
+        <div style="font-size: 8.5px; color: #475569;">
+          <strong>Verificación Digital</strong><br>
+          Escanea para validar en plataforma
+        </div>
+      </div>
+    </div>
+    <!-- fin bloque QR oculto -->
+
+    <!-- Pie de página -->
+    <div class="footer">
+      <span>Contenido informativo, no reemplaza diagnóstico médico certificado.</span>
+      <span>Página 1 de 1</span>
+    </div>
+
   </div>
 
-  <!-- AVISOS -->
-  <div class="seccion" style="margin-top:6mm"><span class="n">4.</span><h2>A tener en cuenta</h2></div>
-  <div class="aviso aviso--alto">
-    <span class="ico">!</span>
-    <span>Antes de aplicar este plan, validalo con tu médico o nutricionista: indicaste una condición de salud y/o medicación regular.</span>
-  </div>
-  <div class="aviso aviso--moderado">
-    <span class="ico">!</span>
-    <span>Tu consumo de ultraprocesados es moderado - ir reduciéndolo de a poco ayuda a que el cambio se sostenga.</span>
-  </div>
-
-  <!-- CIERRE -->
-  <div class="cierre">
-    <h3>AVISO</h3>
-    <p>Este documento es contenido informativo generado a partir de la encuesta que completaste en SINAPTIX.
-       No reemplaza un diagnóstico médico ni nutricional certificado, ni una consulta profesional. Si tenés
-       una condición de salud o tomás medicación de forma regular, validá este plan con tu médico o
-       nutricionista antes de aplicarlo.</p>
-    <div class="origen">Plan generado el 10 de septiembre de 2026 · renata@example.com</div>
-  </div>
-
-  <div class="pie">
-    <span>SINAPTIX · Contenido informativo; no reemplaza diagnóstico médico ni nutricional certificado.</span>
-    <span>Página 1 de 2</span>
-  </div>
-
-</div>
 </body>
 </html>

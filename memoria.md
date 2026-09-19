@@ -397,16 +397,14 @@ próximos pasos).
   "Saludable" en la leyenda del IMC. Si se agrega un nutriente nuevo a un
   plan, conviene sumarle etiqueta corta (hay un test que exige ≤26
   caracteres por etiqueta).
-- **PDF de "Mi plan" (`js/mi-plan-pdf.js`, sesión 2026-09-18)**: botón
-  "Descargar mi plan en PDF" (`#btnDescargarPdf`) en la tarjeta "Cierre",
-  junto a "Generar mi plan" y "Cerrar sesión". Genera el documento 100% en
-  el navegador de quien hace click; no toca Netlify Functions ni genera
-  cargos.
+- **PDF de "Mi plan" (`js/mi-plan-pdf.js`)**: botón "Descargar mi plan en
+  PDF" (`#btnDescargarPdf`) en la tarjeta "Cierre", junto a "Generar mi
+  plan" y "Cerrar sesión". Genera el documento 100% en el navegador de
+  quien hace click; no toca Netlify Functions ni genera cargos.
   - **Vectorial, sin html2canvas**: todo se dibuja con primitivas de jsPDF
-    (texto, `rect`/`roundedRect`, líneas, `triangle`, y polígonos para los
-    sectores de la dona — jsPDF no tiene primitiva de arco, se aproxima el
-    arco con segmentos rectos de 3° vía `doc.lines`). Resultado: texto
-    seleccionable y buscable, nítido a cualquier zoom, ~138 KB.
+    (texto, `rect`/`roundedRect`, líneas, `triangle`, anillos con
+    `sectorDona`). Texto seleccionable y buscable, nítido a cualquier
+    zoom, ~134 KB.
   - **jsPDF 3.0.1 por `<script>` desde cdnjs, en lazy load**: se inyecta
     recién al primer click, así que no afecta la carga inicial del sitio.
     Versión fijada (no `latest`) para que el spec de Playwright pueda
@@ -417,87 +415,108 @@ próximos pasos).
   - **Fuente de datos**: el mismo plan resuelto que ya usa
     `nutriBuildResumenHTML` (`sinaptix_objetivo`, `sinaptix_antropometria`
     y `sinaptix_reevaluacion` de `localStorage` + las funciones puras de
-    `js/nutricion-planes.js`). `nutriPdfModelo()` es pura y testeable; el
-    dibujo vive aparte.
+    `js/nutricion-planes.js`). `nutriPdfModelo()` es pura y testeable
+    (21 tests en `tests/mi-plan-pdf.test.js`, sin cambios en esta ronda);
+    el dibujo vive aparte y sí cambió por completo — ver más abajo.
   - ⚠️ **`NUTRI_PLANES` se resuelve por identificador léxico, no por
     `window`**: `nutricion-planes.js` lo declara con `const` en el tope de
     un `<script>` clásico, y los `const`/`let` de nivel superior NO quedan
     colgados de `window` (a diferencia de las `function`). Buscarlo en
     `window` devolvía `undefined` y el PDF salía vacío. Ver
     `depsPorDefecto()`.
-  - ⚠️ **Paleta propia, NO la del sitio**: el morado de marca
-    (`--purple`/`--purple-dark`) se usó en la primera versión y el usuario
-    lo rechazó ("el morado no queda en ese PDF"). En papel y en visores de
-    PDF lee como un lila apagado y le da al documento aire de folleto, no
-    de informe. El PDF usa una paleta neutra —azul noche `#1A2542` para
-    títulos y marca, azul acero `#3B6EA5` para acentos, grises pizarra
-    para texto y reglas— con acentos semánticos. La marca sigue presente
-    por el logo y la tipografía. **No "arreglar" esto volviendo a la
-    paleta del sitio.**
-  - **Rampa semántica propia** (`RAMPA` / `pdfColorPorcentaje`): las barras
-    y las zonas del IMC van rosa `#BE123C` → ámbar `#D97706` → esmeralda
-    `#059669`, no los colores de `gaugeColorForPercent` (terracotas cálidos
-    del sitio, que sobre esta paleta se ven embarrados). Es el mismo
-    criterio, distintos tonos: si cambia el criterio de color del
-    dashboard, revisar también acá.
-  - **Tarjetas de arriba más compactas (sesión 2026-09-18, 2da ronda)**:
-    el usuario marcó que las 2 tarjetas superiores (barras de estado e
-    IMC) y el panel de objetivo se veían "estiradas hacia abajo" — mucho
-    aire vacío al pie. La causa era el alto de cada fila/bloque fijo,
-    mayor del que el contenido necesitaba. Se recalculó todo con un
-    ritmo vertical más apretado: filas de barras de 8,6 → **6,4 mm**
-    (`BARRA_ROW_H`), tarjeta de 4 barras de ~53 → **~41 mm**, y el bloque
-    de IMC reescrito con offsets propios para esa altura (antes tenía
-    ~9-13 mm de aire muerto al pie). El panel de objetivo se reescribió
-    para calcular su alto sumando exactamente lo que ocupan sus líneas de
-    texto (rótulo + N líneas de título + M líneas de enfoque + paddings
-    fijos chicos) en vez de una fórmula con aire fijo de sobra.
-    - De paso se corrigió un bug que ya existía antes de esta ronda: con
-      un objetivo que resuelve en varios planes a la vez ("Foco y
-      Concentración + Reducir Fatiga Mental + ..."), el título a una sola
-      línea se salía del panel por la derecha (medido: ~200 mm de texto
-      contra ~166 mm disponibles). Ahora el título prueba a 12,5pt, si no
-      entra en 2 líneas baja de a 1,5pt, y el alto del panel crece con la
-      cantidad real de líneas.
-    - Con esto, los casos sin antropometría y con reevaluación (1 solo
-      plan) pasan de 2 a **1 página**; el caso más cargado (4 planes
-      combinados) sigue en 3.
-  - **Trazo fino, no grueso**: barras de 2,4 mm (antes 3,4), anillo de la
-    dona de 4,5 mm de grosor (antes 7,5), bordes de 0,25 mm, filetes de
-    color a sangre de 1 mm contra el borde de cada caja, círculos del
-    timeline de r=2,5 mm. Los títulos de sección son versalitas sobre una
-    regla, no serif grande con el número en un círculo relleno: ese
-    tratamiento competía con el encabezado y engordaba el documento.
-  - **Tipografía**: Times + Helvetica en vez de Fraunces + Inter. jsPDF
-    solo trae las 14 fuentes estándar del formato PDF, y embeber las
-    reales como TTF base64 sumaba ~300 KB solo para esta feature. Se
-    conserva el par serif-display / sans-cuerpo del sitio. Paleta,
-    jerarquía y layout sí son idénticos. Además, las fuentes estándar usan
-    WinAnsi: los acentos y la ñ entran bien, pero `pdfTextoSeguro()`
-    normaliza los símbolos que no (— → “ ” … ✓), y **desescapa** el HTML
-    que `nutriConstruirAjustes` había escapado para `innerHTML` (si no, se
-    vería `&amp;` literal).
-  - **Bloques del documento**: encabezado con el logo real
-    (`img/sinaptix-icon.png` vía `addImage`, con fallback vectorial si el
-    `fetch` falla) → panel destacado de objetivo → fila de 2 tarjetas
-    (barras foco/memoria/energía/calma con marca de meta punteada + barra
-    de IMC por zonas OMS con puntero) → estrategia nutricional (chips de
-    nutrientes + cajas Priorizar/Moderar de alto igualado) → día tipo
-    (timeline numerado + dona con leyenda al costado) → ajustes → avisos
-    con color por nivel → panel legal → pie con "Página X de Y".
-  - **Dos números que NO salen de la encuesta** (van rotulados como
-    orientativos en el propio PDF): la meta de las barras, fija en 80% e
-    igual para las 4 áreas, y el reparto de la dona (Desayuno 30 / Snack
-    10 / Almuerzo 35 / Cena 25). Si algún plan estrena un momento nuevo en
-    su `diaTipo`, hay que agregarlo a `REPARTO` — hay un test que lo
-    verifica.
-  - **Paginación**: `ctx.espacio(h)` reserva alto y abre página nueva con
-    encabezado compacto; los títulos de sección reservan también el alto
-    del bloque que viene debajo, para que nunca quede un título colgado al
-    pie. Con el caso más cargado (6 prioridades, 6 ajustes, 5 avisos) el
-    documento sale en 2 páginas.
-  - **Referencia visual**: `docs/mockup-pdf-mi-plan.html`. Si se cambia el
-    diseño del PDF, actualizar los dos.
+
+  ### Diseño vigente (sesión 2026-09-19, 3ra ronda) — referencia del usuario, "tal cual"
+
+  ⚠️ **Esta es la dirección visual vigente y reemplaza las 2 anteriores**
+  (paleta neutra sin morado, luego tarjetas compactas — ambas documentadas
+  más abajo solo como historial). El usuario subió un mockup HTML propio
+  y pidió explícitamente "dejalo tal cual" — no seguir iterando sobre mi
+  diseño. **No volver a la dirección anterior sin que el usuario la pida
+  de nuevo.**
+
+  - **Paleta**: vuelve un acento tipo ciruela oscuro `#502d4b` (`C.plum`)
+    para títulos de sección y de tarjeta — viene del mockup del usuario,
+    no es un error ni una vuelta a `--purple` del sitio (son valores
+    distintos que casualmente se parecen). `C.marca` (azul noche
+    `#1A2542`) queda reservado solo para la palabra "SINAPTIX". Nuevo:
+    verde `#15803D` para el banner de resumen y la columna "Prioridades",
+    azul acero `#3B6EA5` para la columna "Nutrientes clave", ámbar para
+    la caja de ajustes, rosa oscuro `#881337` para el puntero del IMC.
+  - **Tipografía: un solo sans-serif** (Helvetica) en todo el documento,
+    incluida la marca "SINAPTIX". El mockup del usuario usa
+    `'Segoe UI', Arial, sans-serif` en todas partes, sin una fuente serif
+    de display — se sacó `F_TITULO` (Times) de la marca por fidelidad;
+    la constante queda declarada pero sin uso, por si algún día se separan
+    de nuevo las 2 familias tipográficas.
+  - **Bloques del documento** (de arriba a abajo): encabezado compacto →
+    banner verde "Resumen ejecutivo" (1-2 frases autogeneradas, ver
+    `pdfResumenEjecutivo()`) → fila de 2 tarjetas iguales (Antropometría:
+    barra degradada de 4 colores con puntero + valor; Estado inicial: 4
+    anillos de progreso Foco/Memoria/Energía/Calma) → "N. ESTRATEGIA
+    NUTRICIONAL: {plan}" (un bloque por plan si el objetivo resolvió en
+    más de uno) con 2 columnas **coloreadas para diferenciarse** (azul
+    "NUTRIENTES CLAVE" / verde "PRIORIDADES" — pedido explícito del
+    usuario; en su mockup original ambas eran del mismo color) → "N.
+    ESTRUCTURA DE DÍA TIPO" como lista simple "Momento: detalle" (ya no
+    timeline con círculos ni dona) → caja ámbar "Ajustado a tu caso
+    particular" → pie con 1 línea de aviso legal + "Página X de Y".
+  - **`parrafoEnfasis()` / `altoParrafoEnfasis()`** (nuevas): texto con
+    fragmentos en distinto peso (normal/bold) que se ajustan de línea
+    juntos, palabra por palabra — jsPDF no tiene texto de formato mixto
+    nativo. Se usan para "Tu plan... está enfocado en **{objetivo}**." del
+    resumen y "**Momento:** detalle" del día tipo. Comparten
+    `tokenizarSegmentos()`, que fusiona un token de puntuación sola
+    (".", ",") con la palabra anterior — si no, queda un espacio de más
+    antes del punto (bug real, encontrado y corregido en esta sesión).
+  - ⚠️ **Qué se sacó del dibujo, a propósito, porque el mockup del
+    usuario no lo tenía** (los datos siguen en el modelo, por si se
+    reincorporan):
+    - El panel grande "OBJETIVO COGNITIVO PRINCIPAL" (el nombre del plan
+      ahora vive en el banner de resumen + en cada título de sección).
+    - La columna "MODERAR" (queda en `plan.moderar`, sin usar).
+    - Los avisos personalizados (medicación, sueño, estrés+fatiga) y el
+      panel legal grande "AVISO" — el pie de página sigue teniendo el
+      aviso corto en cada hoja.
+    - El timeline con círculos numerados y la dona de reparto del día
+      tipo, y la marca de "meta" en las barras de estado (ahora son
+      anillos sin meta visible).
+  - ⚠️ **Qué NO se implementó aunque el mockup del usuario lo mostraba, y
+    por qué** (esto no es una omisión de fidelidad, es una decisión
+    deliberada — no agregarlo sin resolver antes el problema de fondo):
+    - El **QR "Verificación Digital"**: no existe ningún backend que
+      emita o valide un código así. Ponerlo sería mostrarle a la persona
+      una promesa de verificación que no existe.
+    - El pill **"Semana X"**: la app no tiene ningún concepto de "semana
+      del plan" en ningún lado (se buscó en el código, no está).
+    - Los **íconos** de cada sección/tarjeta (lupa, reloj, escudo, del
+      set lucide del mockup): reconstruirlos a mano con primitivas de
+      jsPDF a ese tamaño (unos mm) lee como una forma rota, no como un
+      ícono reconocible — se probó con una bombilla y no funcionaba, se
+      sacaron todos.
+  - **Bug corregido de paso**: el carácter `²` (para "kg/m²") no está
+    garantizado en las 14 fuentes estándar del PDF (WinAnsi) y se
+    dibujaba como espacio en blanco. Se cambió a "KG/M2" sin superíndice.
+  - **Referencia visual**: `docs/mockup-pdf-mi-plan.html` — es casi
+    literalmente el HTML que subió el usuario, con la diferenciación de
+    color de Nutrientes/Prioridades aplicada y 2 etiquetas rojas marcando
+    el QR y el pill "Semana X" como no implementados (para que quien lea
+    el archivo no asuma que sí lo están). Si se cambia el diseño del PDF,
+    actualizar los dos.
+
+  ### Historial: direcciones de diseño descartadas (no reabrir sin pedido explícito)
+
+  1ra ronda (paleta neutra, sin morado): el morado de marca `--purple` se
+  probó y el usuario lo rechazó ("el morado no queda en ese PDF"). Se pasó
+  a una paleta neutra de azules/grises. 2da ronda (tarjetas compactas): el
+  usuario marcó que las tarjetas de arriba y el panel de objetivo se veían
+  "estiradas hacia abajo"; se recalcularon alturas y se corrigió un bug de
+  overflow en el título del panel de objetivo con múltiples planes
+  combinados. **Ninguna de las 2 decisiones sigue vigente**: la 3ra ronda
+  reemplazó ambas por el mockup del usuario. Quedan acá solo como
+  contexto de por qué el código pasó por esas formas antes de llegar a la
+  actual — si algo de esa lógica (rampa semántica `RAMPA`/
+  `pdfColorPorcentaje`, por ejemplo) sigue viva, está anotado en el bloque
+  de arriba.
 - **Imagen del Hero (`img/hero-cerebro-nutricion.webp`)**: sesión
   2026-09-18, el usuario notó que tardaba bastante en cargar al entrar a
   la web. Causa: era un PNG de 1.2 MB (1024×1024 RGBA) sin comprimir —
@@ -1299,11 +1318,17 @@ próximos pasos).
   debería), y (c) cómo se ve el documento en Acrobat/Preview/visores de
   Android, no solo rasterizado. Si el logo fallara, el PDF igual se genera
   con el fallback vectorial.
-  - Pendiente menor de diseño: cuando la persona no tiene datos
-    antropométricos, la tarjeta "ANTROPOMETRÍA" queda bastante vacía (solo
-    una línea de texto) porque su alto lo fija la tarjeta de barras de al
-    lado. Se dejó así a propósito (mantiene la grilla), pero si molesta,
-    lo natural es que la tarjeta de barras pase a ocupar todo el ancho.
+  - Pendiente del diseño vigente (3ra ronda, 2026-09-19): si el usuario
+    pide en algún momento el QR de verificación o el pill "Semana X" que
+    tenía su mockup, hace falta primero construir el backend real detrás
+    (endpoint de verificación; concepto de "semana del plan" en el
+    modelo de datos) — no maquillarlo con un QR o un número que no
+    signifique nada. Ver la nota roja en `docs/mockup-pdf-mi-plan.html`.
+  - Los íconos de sección/tarjeta del mockup del usuario (lucide) no se
+    reconstruyeron con primitivas de jsPDF — se probó con una bombilla
+    para el banner de resumen y a ese tamaño lee como forma rota. Si en
+    algún momento se agregan íconos reales, lo más simple es embeberlos
+    como PNG pequeños (`addImage`), no como vectores dibujados a mano.
 
 - **Verificar en navegador real (sesión 2026-09-18, escala numerada del
   medidor de IMC + segunda pasada "más estético": riel de fondo, marcas

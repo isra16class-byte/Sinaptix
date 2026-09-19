@@ -11,6 +11,85 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — PDF de "Mi plan": rediseño completo a pedido del usuario ("tal cual" su referencia)
+
+El usuario rechazó las 2 vueltas de diseño anteriores ("sigue sin
+gustarme") y subió su propio mockup HTML, con instrucción explícita:
+"mejor lo quiero así, dejalo tal cual". Pidió un único cambio sobre esa
+referencia: diferenciar por color las secciones "Nutrientes Clave" y
+"Prioridades", que en su mockup usaban el mismo color.
+
+### Qué se reemplazó
+
+Se reescribió toda la capa de dibujo de `js/mi-plan-pdf.js` (no el
+modelo de datos, que sigue igual y sigue pasando sus 21 tests). Quedan
+descartados el panel grande de objetivo, la dona + timeline del día
+tipo, las cajas Priorizar/Moderar, y los avisos personalizados — ninguno
+estaba en la referencia del usuario. En su lugar:
+
+- Encabezado compacto (sin cambios grandes).
+- Banner verde "Resumen ejecutivo": 1-2 frases autogeneradas a partir de
+  los ajustes ya calculados (busca patrones "excluye" / "exigencia
+  mental"; si no encuentra ninguno, cae a una frase genérica). Usa
+  `parrafoEnfasis()`, una función nueva para texto con partes en negrita
+  intercaladas con partes normales que se ajustan de línea juntas — jsPDF
+  no tiene texto de formato mixto nativo.
+- Fila de 2 tarjetas: Antropometría (barra degradada de 4 colores con
+  puntero + valor, en vez del número gigante + barra segmentada de antes)
+  y Estado inicial (4 anillos de progreso Foco/Memoria/Energía/Calma, en
+  vez de barras horizontales con marca de meta).
+- Estrategia nutricional: 2 columnas — **"Nutrientes clave" en azul
+  acero, "Prioridades" en verde**, a pedido explícito del usuario (su
+  mockup las tenía del mismo color).
+- Día tipo: lista simple "Momento: detalle", sin timeline ni dona.
+- "Ajustado a tu caso particular": caja ámbar con acento a la izquierda.
+- Pie: una sola línea de aviso legal (antes había además un panel grande
+  "AVISO" con el texto completo).
+
+### Qué NO se implementó, aunque el mockup del usuario lo mostraba
+
+- El QR "Verificación Digital": no hay ningún backend que emita o valide
+  un código así. Mostrarlo sería una promesa de verificación falsa.
+- El pill "Semana 3": la app no tiene ningún concepto de "semana del
+  plan" en ningún lado.
+- Los íconos de cada sección (lucide, en el mockup del usuario):
+  reconstruidos a mano con primitivas de jsPDF a tamaño de milímetros,
+  leen como una forma rota — se probó con una bombilla para el banner de
+  resumen y se sacó.
+
+Estas 3 omisiones quedan documentadas en `memoria.md` y marcadas con una
+nota roja en `docs/mockup-pdf-mi-plan.html` (que ahora es casi
+literalmente el HTML que subió el usuario, con la diferenciación de
+color aplicada).
+
+### 2 bugs corregidos de paso
+
+- El carácter `²` (kg/m²) no está garantizado en las 14 fuentes estándar
+  del PDF y se dibujaba como espacio en blanco — se cambió a "KG/M2".
+- El resumen ejecutivo autogenerado dejaba un espacio de más antes del
+  punto ("Concentración ." en vez de "Concentración."), porque cada
+  palabra se tokeniza por separado para el ajuste de línea con negrita
+  intercalada. Se agregó `tokenizarSegmentos()`, que fusiona un token de
+  puntuación sola con la palabra anterior.
+
+### Verificación
+
+Se comparó el PDF generado lado a lado con la captura de la referencia
+del usuario (misma estructura, misma jerarquía, mismos colores salvo el
+cambio pedido). Se probaron los casos límite: sin antropometría, con
+reevaluación, objetivo combinado en 4 planes (pagina a 2 hojas sin que
+el resumen ejecutivo ni los títulos se corten). Suite completa: 90/90.
+Rebasado 2 veces sobre el estado actual del repo (otras sesiones
+siguieron trabajando en paralelo sobre Visión, sin tocar
+js/mi-plan-pdf.js).
+
+### Archivos tocados
+
+`js/mi-plan-pdf.js` (reescritura de la capa de dibujo, modelo sin
+cambios), `docs/mockup-pdf-mi-plan.html` (reemplazado por el HTML del
+usuario + diferenciación de color + notas de lo no implementado),
+`memoria.md`, `changelog.md`.
+
 ## 2026-09-19 — Visión: pausa real entre que sale/entra uno y el otro (antes casi no se notaba)
 
 El usuario, tras ver la ronda anterior: "oye casi parece que desaparecen y
