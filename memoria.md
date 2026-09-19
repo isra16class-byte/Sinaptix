@@ -242,6 +242,15 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Título en tarjeta y botones de Cierre (`mi-plan.html`, sesión
+  2026-09-19)**: "Tu progreso con SINAPTIX" vive en `.miplan-titlecard`
+  (ancha y baja, pareja con `.miplan-grid`, 3 íconos de `img/Iconos/` por
+  lado creciendo hacia el título; se ocultan en ≤760px). Se descartó la
+  variante que sobresale (ver changelog para reactivarla en una línea). Los 3
+  botones de Cierre tienen jerarquía: principal (Generar), secundario (PDF) y
+  terciario (Cerrar sesión). ⚠️ Sus íconos son `::before` con `mask`, NO
+  `<svg>` en el HTML: `js/mi-plan-pdf.js` cambia `btn.textContent` y borraría
+  un `<svg>` hijo.
 - **Nota bajo las etiquetas de cambios (`.miplan-cambios-nota`, sesión
   2026-09-19)**: texto fijo de ~2 líneas dentro de `#miPlanCambios` que
   explica que 20 puntos = un nivel de la respuesta. Ocupa el hueco que

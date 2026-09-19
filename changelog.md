@@ -11,6 +11,61 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Mi plan: título en tarjeta con íconos y botones de Cierre rediseñados
+
+El usuario (con capturas y un boceto propio) pidió dos cosas: que los 3
+botones de la tarjeta "Cierre" se vieran más estéticos, y meter el título
+"Tu progreso con SINAPTIX" dentro de una tarjeta angosta, pareja con las dos
+de "Datos clave" o sobresaliendo si quedaba mejor, con íconos a los lados.
+
+### Botones de Cierre
+
+- **Qué estaba mal**: los 3 son `<button>` nativos y `.btn`/`.btn-solid` se
+  escribieron para `<a>` (sin `border:none`), así que el sólido mostraba el
+  borde gris del navegador; el texto quedaba pegado a la izquierda
+  (`.btn` es `inline-flex` y `text-align:center` no centra en flex); y los
+  3 pesaban igual, sin jerarquía.
+- **Ahora** (`css/styles.css`, bloque `.miplan-cierre-btns`): apilados a todo
+  el ancho, texto centrado con ícono y 3 niveles: **principal** "Generar mi
+  plan" (morado degradado con sombra, ícono de destellos), **secundario**
+  "Descargar mi plan en PDF" (claro, borde morado fino, ícono de documento
+  con flecha) y **terciario** "Cerrar sesión" (sin caja, con una línea fina
+  arriba que lo separa como salida de la cuenta; en hover se pone rojo).
+- ⚠️ **Los íconos van como `::before` con `mask` (SVG en data-URI) y NO como
+  `<svg>` dentro del botón, a propósito**: `js/mi-plan-pdf.js` hace
+  `btn.textContent = 'Generando PDF…'` y luego lo restaura, y eso borraría
+  para siempre un `<svg>` hijo. Un pseudo-elemento sobrevive. Verificado:
+  tras el click (camino de error, jsPDF bloqueado) el ícono sigue. No se
+  tocó nada de JS ni del HTML de los botones, y el test e2e del PDF
+  (`textContent.trim() === 'Descargar mi plan en PDF'`) sigue valiendo.
+- Estado `disabled` (mientras genera el PDF): opacidad y cursor `progress`.
+
+### Tarjeta del título
+
+- **`mi-plan.html`**: el `<h2>` pasa a vivir dentro de
+  `.sec-head-center.miplan-titlecard`, con `.miplan-titlecard-icons` a cada
+  lado (`aria-hidden`, `alt` vacío). Se conserva la clase `.sec-head-center`
+  para que sigan valiendo las reglas del título (30-42px, círculo dorado en
+  "SINAPTIX"); las clases `reveal in d1` pasaron del `<h2>` a la tarjeta.
+- **Íconos**: los de `img/Iconos/` que ya usa el sitio (nutrientes y
+  cerebro), 3 por lado, chicos → grandes hacia el título como en el boceto:
+  izquierda antioxidantes / complejo B / omega-3; derecha energía cerebral /
+  hidratación / neuronas. `justify-content:space-evenly` los reparte a lo
+  ancho en vez de amontonarlos junto al título.
+- **Ancho: se dejó PAREJA con las tarjetas de abajo** (mismos bordes que
+  `.miplan-grid`), no sobresaliendo. Se probó la variante ancha (`margin-inline:-40px`
+  en ≥1240px): los íconos no ganan nada y sobra aire en los extremos, además
+  de desalinear el borde con "Datos clave". Si igual se prefiere, es una sola
+  línea: `@media(min-width:1240px){.miplan-titlecard{margin-inline:-40px}}`.
+- **Responsive**: ≤760px los íconos se ocultan (queda el título centrado en
+  la tarjeta); de 761 a ~1000px los íconos escalan con `clamp()`.
+- Fondo blanco → lila muy suave, borde morado fino y sombra suave, para que
+  se lea distinta de las tarjetas pastel de datos. Altura ~120px en desktop.
+- **Verificado con Playwright** (Inter/Fraunces/Caveat reales) a 1600, 1280,
+  900 y 390px: sin scroll horizontal ni errores de consola; estados normal,
+  hover de los 3 botones, error de PDF y sin plan (2 botones). Suite: 85
+  pasan (no hay tests nuevos: es CSS/HTML).
+
 ## 2026-09-19 — Mi plan: nota explicativa bajo las etiquetas de cambios
 
 El usuario vio en su navegador las etiquetas "Qué cambió desde tu
