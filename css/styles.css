@@ -1089,6 +1089,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    nutrientes. En 1 columna (≤900px, mismo corte que .miplan-grid) no hay
    hueco que llenar y repetirían las barras, así que se ocultan. */
 .miplan-cambios{padding-top:18px}
+/* Nota que explica cómo leer las etiquetas (qué significa "+20"): 1 nivel de
+   la escala 1-5 de la encuesta = 20 pts en el % (gaugeComputeAreas). Es texto
+   fijo a propósito y vive dentro de .miplan-cambios, así que hereda su
+   condición (solo con reevaluación y en 2 columnas): es lo que ocupa el
+   hueco que sobraba. Se mantiene en ~2 líneas para no volver a estirar la
+   fila; si se edita, revisar que no crezca la tarjeta. */
+.miplan-cambios-nota{font-family:var(--font-m);font-size:12px;line-height:1.4;color:var(--ink-soft);margin:8px 0 0}
 .miplan-cambios-chip strong{font-weight:700}
 .miplan-cambios-chip.is-sube strong{color:var(--green)}
 .miplan-cambios-chip.is-baja strong{color:#B3261E}
