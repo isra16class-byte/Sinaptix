@@ -1021,9 +1021,12 @@ próximos pasos).
     56px, con aro blanco + sombra; contiene `<span class="quote-avatar-ini">`
     (iniciales) y un `<img>` encima (`img/testimonios/mr.webp` y `js.webp`,
     `object-fit:cover`). Si la foto no existe o no carga, el `onerror` saca
-    el `<img>` y quedan las iniciales. **Las fotos todavía no están en el
-    repo** (ver changelog: se generan con Gemini o se usan fotos reales de
-    clientes con su permiso).
+    el `<img>` y quedan las iniciales. **Las 2 fotos ya están** (retratos
+    generados con Gemini por el usuario, preparados con
+    `scripts/preparar-fotos-testimonios.py`: recorte cuadrado cerrado en la
+    cara, 200×200 `.webp`; los originales de 1024px no se guardaron en el
+    repo). Si se cambian por fotos reales de clientes, correr el script con
+    los nuevos JPG y ajustar `RECORTES` (centro/lado del recorte).
   - **Layout (2026-09-19)**: en ≥901px `.ben-quotes` baja 64px
     (`margin-top`) para alinear con el título en vez del eyebrow, y
     `.ben-audience-grid` tiene 52px de aire bajo el título (antes 26px

@@ -11,6 +11,22 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Beneficios: fotos de perfil de los 2 testimonios
+
+El usuario generó los retratos con Gemini (a partir de los prompts del
+patch anterior) y pidió usarlos: mujer de unos 40 en una oficina para
+**M.R.** (`img/testimonios/mr.webp`) y hombre joven con barba en una
+costanera para **J.S.** (`img/testimonios/js.webp`).
+
+- `scripts/preparar-fotos-testimonios.py`: recorte cuadrado centrado en la
+  cara (M.R. centro 510,410 lado 450; J.S. centro 515,405 lado 500 sobre
+  1024×1024) y salida 200×200 `.webp` q90. Primer intento (lado 560) dejaba
+  la cara en ~50% del círculo de 56px; se cerró para que la llene.
+- Sin cambios de HTML/CSS: el `<img>` ya estaba en el patch anterior y
+  ahora carga (verificado `naturalWidth` = 200 en ambos, captura @3x).
+- Pendiente/decisión del usuario: los testimonios dicen "Verified Client";
+  si son clientes reales conviene reemplazar por sus fotos con permiso.
+
 ## 2026-09-19 — Beneficios: avatares con foto, tarjetas más abajo, sin frutas sobre ellas, más aire bajo el título
 
 Pedido del usuario, 4 cosas en "Para quién es" (`#lam-05`):
