@@ -11,6 +11,28 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Pilares: rayitas finas tipo cuadro sinóptico entre el párrafo y las tarjetas
+
+Pedido del usuario (con captura de `#lam-04`): "rayitas finas saliendo de
+las tarjetas como cuadro sinóptico".
+
+Se interpretó como un árbol de arriba hacia abajo: un tronco corto bajo el
+párrafo, una barra horizontal y 4 bajadas, una por tarjeta, cada una con un
+punto donde toca el borde. Todo con pseudo-elementos (`.pillar-grid::before/
+::after`, `.pillar::before/::after`), sin tocar el HTML. Línea de 1px en
+morado al 38% (`--sinop-line`), punto de 7px al 55%.
+
+- La barra va del centro de la columna 1 al de la 4:
+  `left/right: calc((100% - 54px)/8)` (3 gaps de 18px).
+- `.pillar-grid` `margin-top` 64→76px para dar aire al conector; `.pillar`
+  suma `position:relative`.
+- Hover: la tarjeta sube 4px, la bajada se acorta 4px (`top:-30px`) para no
+  despegarse de la barra.
+- ≤900px (2 o 1 columnas) el conector se oculta: no hay barra única que
+  tenga sentido. No se diseñó una versión mobile (ej. espina vertical a la
+  izquierda) — queda como opción si el usuario la quiere.
+- Verificado con Playwright a 1440, 1100 y 390px.
+
 ## 2026-09-19 — Conócenos: íconos de Correo y Teléfono con forma y color propios, mensajes en negrita
 
 Pedido del usuario (a partir de una captura de la sección): que los

@@ -1753,7 +1753,43 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #lam-04 .lam-text-center{margin-top:74px}
 
 /* ---------- 04 PILARES ---------- */
-.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:64px}
+.pillar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:76px;position:relative;
+  --sinop-line:rgba(113,75,103,.38);--sinop-bar:-34px}
+/* Cuadro sinóptico (pedido del usuario, 2026-09-19): rayitas finas que
+   salen del párrafo y bajan a las 4 tarjetas, como una llave/árbol.
+   Todo con pseudo-elementos, sin markup nuevo:
+   - `.pillar-grid::before` = tronco (punto + línea vertical desde debajo del
+     párrafo hasta la barra).
+   - `.pillar-grid::after` = barra horizontal, del centro de la 1ª columna al
+     centro de la 4ª (cada columna mide (100% − 3 gaps)/4, su mitad es /8).
+   - `.pillar::before` = bajada de cada tarjeta (línea) y `.pillar::after` =
+     punto donde toca la tarjeta.
+   En hover la tarjeta sube 4px: la bajada se acorta 4px (top −30px) para
+   seguir pegada a la barra, que no se mueve. Solo en ≥901px: con 2 o 1
+   columnas las tarjetas no cuelgan de una sola barra, así que se ocultan. */
+.pillar-grid::before{
+  content:"";position:absolute;left:50%;top:-62px;height:28px;width:1px;
+  background:var(--sinop-line);pointer-events:none;
+}
+.pillar-grid::after{
+  content:"";position:absolute;top:var(--sinop-bar);height:1px;
+  left:calc((100% - 54px)/8);right:calc((100% - 54px)/8);
+  background:var(--sinop-line);pointer-events:none;
+}
+.pillar::before{
+  content:"";position:absolute;left:50%;top:-34px;height:34px;width:1px;
+  background:var(--sinop-line);pointer-events:none;
+  transition:top .25s ease,height .25s ease;
+}
+.pillar::after{
+  content:"";position:absolute;left:50%;top:-4px;width:7px;height:7px;margin-left:-3px;
+  border-radius:50%;background:var(--purple);opacity:.55;pointer-events:none;
+}
+.pillar:hover::before{top:-30px;height:30px}
+@media(max-width:900px){
+  .pillar-grid::before,.pillar-grid::after,.pillar::before,.pillar::after{display:none}
+  .pillar-grid{margin-top:64px}
+}
 @media(max-width:900px){.pillar-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.pillar-grid{grid-template-columns:1fr}}
 /* Tarjetas más compactas (antes min-height:250px + padding 34px dejaban
@@ -1764,7 +1800,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    en blanco. */
 .pillar{
   background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
-  padding:28px 26px;min-height:198px;display:flex;flex-direction:column;gap:14px;
+  padding:28px 26px;min-height:198px;display:flex;flex-direction:column;gap:14px;position:relative;
   transition:box-shadow .25s ease,transform .25s ease,border-color .25s ease;
 }
 .pillar:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px);border-color:transparent}

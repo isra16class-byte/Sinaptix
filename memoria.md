@@ -562,6 +562,15 @@ próximos pasos).
   lugar** que antes y el párrafo no pisa el rayón morado del título (sin
   ese ajuste se subía y se superponía al trazo). El asset sigue en uso en
   el Hero y las reglas `.signal-wave{...}` quedan sin uso (no se borraron).
+  **Cuadro sinóptico (2026-09-19)**: rayitas finas (1px, `--sinop-line` =
+  morado al 38%) que salen del párrafo y bajan a las 4 `.pillar`, como
+  árbol/llave. Solo pseudo-elementos, sin markup nuevo: `.pillar-grid::before`
+  (tronco), `.pillar-grid::after` (barra del centro de la col. 1 al de la 4),
+  `.pillar::before` (bajada) y `.pillar::after` (punto de 7px sobre el borde
+  de la tarjeta). `.pillar-grid` pasó a `margin-top:76px` (antes 64) y
+  `.pillar` a `position:relative`. En hover la bajada se acorta 4px para
+  seguir pegada a la barra. Oculto en ≤900px (con 2/1 columnas no hay una
+  barra única). Ver changelog.
   **Frutas/alimentos grandes difuminados de fondo (sesión 2026-09-17)**:
   antes la sección solo tenía 1 `.deco-fruit` (aguacate). Hoy tiene 4,
   todas `.deco-fruit` (ocultas en mobile `<720px` por la regla general,
