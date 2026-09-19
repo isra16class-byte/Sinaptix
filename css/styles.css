@@ -411,7 +411,15 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 #lam-02 .split{align-items:center;gap:130px}
 .vision-stats-col{margin-top:0}
 @media(max-width:900px){
-  .vision-stats-col{margin-top:90px}
+  /* Antes 90px: era el hueco pensado para las tarjetas grandes que tenía
+     esta columna en un diseño anterior (ver historial). Con el rediseño
+     de la grilla de tarjetas compactas de abajo (sesión 2026-09-19,
+     "Visión — sesión 2 mobile") ese valor sumado al gap:44px de `.split`
+     dejaba ~134px de blanco vacío entre los bullets y las estadísticas
+     (el hueco que se ve en la captura del usuario). Se baja a 12px: el
+     `.split{gap:44px}` de abajo ya separa lo suficiente, esto es solo un
+     respiro extra antes del primer ícono. */
+  .vision-stats-col{margin-top:12px}
   #lam-02 .split{gap:44px}
 }
 
@@ -722,6 +730,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-annot-deco{width:70px;height:36px;display:block;margin-bottom:6px}
 .stat-annot-num{font-family:var(--font-d);font-weight:800;font-size:clamp(26px,2.2vw,36px);letter-spacing:-.02em;color:var(--purple-dark)}
 .stat-annot-lab{font-family:var(--font-m);font-size:clamp(12px,1vw,14px);font-weight:500;color:var(--ink-soft);letter-spacing:0;margin-top:4px;max-width:30ch}
+/* Ícono por dato, mismo PNG/WebP que ya usa `.vision-icon` en desktop
+   (cerebro/red neuronal/calendario/acompañamiento) — acá va DENTRO de
+   cada `.stat-annot`, no suelto sobre el fondo, así puede mostrarse en
+   mobile sin depender de `vision-brain-bg`/`.vision-icons` (ocultos
+   ≤900px). Oculto por defecto: solo se muestra en la grilla mobile de
+   abajo, desktop no lo toca en ningún momento (sigue usando los íconos
+   grandes posicionados libremente sobre el fondo). */
+.stat-annot-icon{display:none}
 
 /* Color por dato: mismos 4 colores que ya tenían los íconos SVG de las
    tarjetas (dorado 20%, morado 86B, verde 4–6, azul 1:1). El color se
@@ -732,6 +748,36 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-annot--morado{color:var(--purple)}
 .stat-annot--verde{color:var(--green)}
 .stat-annot--azul{color:var(--navy-bright)}
+
+/* Grilla de tarjetas en mobile/tablet (Visión — sesión 2, "mobile +
+   limpieza" de memoria.md): hasta ahora `#lam-02 .stat-annotations`
+   quedaba en el fallback simple de arriba (columna de 4 puntos sueltos,
+   sin fondo ni ícono, con ~134px de blanco antes del primero por el
+   `margin-top:90px` viejo de `.vision-stats-col`) — se veía "muy simple"
+   (reportado por el usuario con captura a 390px). Se arma acá la versión
+   mobile real: grilla 2×2 de tarjetas con tinte de color, reusando
+   `--vision-card-*` (ya existían para esto, sin uso desde que las
+   tarjetas de caja se reemplazaron por anotaciones sueltas sobre el
+   fondo) y los mismos 4 íconos que ya usa el desktop, ahora dentro de
+   cada tarjeta en vez de sueltos sobre `vision-brain-bg` (oculto acá).
+   El punto+línea punteada (`.stat-annot-deco`) se oculta: apuntaba al
+   ícono correspondiente sobre el fondo, que en mobile no está, así que
+   sin fondo detrás la línea no señala nada (se veía como un punto suelto
+   sin sentido, recortada por el `overflow` del propio SVG). Scope
+   `#lam-02` para no tocar `.stat-box`/`.stat-grid` de "Mi plan", que
+   comparte algunos nombres de variable pero es un componente aparte. */
+@media(max-width:900px){
+  #lam-02 .stat-annotations{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  #lam-02 .stat-annot{border-radius:var(--radius-sm);border:1px solid transparent;padding:16px 14px 14px}
+  #lam-02 .stat-annot--dorado{background:var(--vision-card-dorado);border-color:var(--vision-card-dorado-line)}
+  #lam-02 .stat-annot--morado{background:var(--vision-card-morado);border-color:var(--vision-card-morado-line)}
+  #lam-02 .stat-annot--verde{background:var(--vision-card-verde);border-color:var(--vision-card-verde-line)}
+  #lam-02 .stat-annot--azul{background:var(--vision-card-azul);border-color:var(--vision-card-azul-line)}
+  #lam-02 .stat-annot-icon{display:block;width:34px;height:34px;object-fit:contain;margin-bottom:10px}
+  #lam-02 .stat-annot-deco{display:none}
+  #lam-02 .stat-annot-num{font-size:28px}
+  #lam-02 .stat-annot-lab{font-size:12.5px;max-width:none}
+}
 
 /* Posicionamiento libre solo en desktop. Sesión 2026-09-17 (trigésima
    séptima tanda): las 4 `.stat-annot` dejaron de tener `left/top` en

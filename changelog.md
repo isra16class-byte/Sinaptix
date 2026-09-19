@@ -11,6 +11,60 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: grilla mobile de las 4 estadísticas (se veía "muy simple")
+
+El usuario mandó una captura a 390px de `#lam-02`: sin
+`.vision-brain-bg`/`.vision-icons` (ocultos ≤900px), las 4 `.stat-annot`
+caían en el fallback simple documentado en el propio CSS como temporal
+("evita que se vea roto mientras tanto", nunca se hizo la versión mobile
+real) — columna de puntos de color sueltos, sin ícono ni fondo, con
+~134px de blanco antes del primero (`margin-top:90px` heredado del
+diseño de tarjetas grandes que tuvo esta columna en una etapa anterior,
+sumado al `gap:44px` de `.split`). Pedido del usuario: que no se vea tan
+simple, sin tocar el escritorio.
+
+- **Verificación con Playwright disponible en este entorno** (a
+  diferencia de sesiones anteriores, esta vez sí hay Chromium instalado
+  vía `npx playwright install chromium` + `PLAYWRIGHT_BROWSERS_PATH`):
+  se confirmó el diagnóstico con una captura real a 390px antes de tocar
+  nada, y se verificó el resultado final a 360/390/760/900px (mobile) y
+  1440px (desktop, comparado píxel a píxel contra la captura de antes
+  del cambio — sin diferencias).
+- **Fix, todo dentro de `@media(max-width:900px)` y con selector
+  `#lam-02`** (no toca desktop ni `.stat-box`/`.stat-grid` de "Mi plan",
+  que comparte nombre de variable pero es otro componente):
+  - `.vision-stats-col{margin-top:90px}` → `12px`.
+  - `#lam-02 .stat-annotations` pasa de columna de a 1 a
+    `display:grid;grid-template-columns:1fr 1fr` (2×2).
+  - Cada `.stat-annot` suma fondo + borde con
+    `--vision-card-dorado/morado/verde/azul` (ya existían en `:root`,
+    sin uso desde que las tarjetas de caja de Visión se reemplazaron por
+    anotaciones sueltas sobre el fondo — declaradas justo para este
+    caso).
+  - `.stat-annot-deco` (punto + línea punteada, pensada para apuntar al
+    ícono grande sobre el fondo) se oculta en este rango: sin
+    `vision-brain-bg` detrás no señala nada, se veía como un punto suelto
+    sin sentido.
+- **Ícono nuevo por tarjeta** (`img/decoraciones-neurona/vision-iconos/
+  icon-{cerebro,red-neuronal,calendario,acompanamiento}.webp` — los
+  mismos 4 que ya usa `.vision-icon` en desktop, no se generó ningún
+  asset nuevo): se agregó un `<img class="stat-annot-icon">` dentro de
+  cada `.stat-annot` en `index.html`. La clase queda `display:none` por
+  defecto y solo pasa a `display:block` dentro del mismo
+  `@media(max-width:900px)` de arriba, así que en desktop el `<img>`
+  existe en el DOM pero no se ve ni ocupa espacio — el desktop sigue
+  usando exclusivamente los 4 `.vision-icon` grandes posicionados sobre
+  el fondo, sin cambios.
+- `npm test` sigue en verde (86 tests) — este cambio no tocó JS ni las
+  funciones de `js/nutricion-planes.js`.
+- Pendiente (no de esta sesión): decidir si se limpian las reglas
+  `#lam-02 .stat-box`/`.stat-grid`/`svg/icon-*.svg` de la vieja etapa de
+  tarjetas de caja, que siguen sin uso real acá (`--vision-card-*` ya no
+  aplica a esa limpieza, quedó en uso de nuevo). Tampoco se revisó
+  explícitamente el choque contra `.brain-fruit`/`.deco-blob-berries`/
+  `.deco-scribble` en breakpoints intermedios no capturados, aunque las
+  4 capturas tomadas (360/390/760/900px) no mostraron superposición.
+
 ## 2026-09-19 — Hero: el nav fijo tapaba el título en mobile
 
 El usuario mandó una captura a 390px (DevTools) donde la "P" de "Piensa

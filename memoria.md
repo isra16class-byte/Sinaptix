@@ -242,6 +242,44 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Visión — grilla mobile de las 4 `.stat-annot` (`#lam-02`, sesión
+  2026-09-19)**: resuelve el pendiente que ya estaba anotado como "sesión
+  2 mobile" (ver más abajo, en pendientes). El usuario mandó una captura
+  a 390px: sin `.vision-brain-bg`/`.vision-icons` (ocultos ≤900px), las 4
+  anotaciones caían en el fallback simple (columna de puntos sueltos, sin
+  ícono ni fondo) con ~134px de blanco antes de la primera por el
+  `margin-top:90px` viejo de `.vision-stats-col` (heredado del diseño de
+  tarjetas grandes que tuvo esta columna antes). Se ve "muy simple".
+  - Fix, todo dentro de `@media(max-width:900px)` y con selector
+    `#lam-02` (no toca desktop, ni `.stat-box`/`.stat-grid` de "Mi plan"
+    que comparte nombre de variable): `.vision-stats-col` pasa de
+    `margin-top:90px` a `12px`. `#lam-02 .stat-annotations` pasa a
+    `display:grid;grid-template-columns:1fr 1fr` (2×2, antes columna de
+    a 1). Cada `.stat-annot` suma fondo/borde con
+    `--vision-card-dorado/morado/verde/azul` (ya existían en `:root`,
+    sin uso desde que las tarjetas de caja se reemplazaron por
+    anotaciones sueltas — pensadas justo para esto).
+  - **Ícono nuevo por tarjeta** (`.stat-annot-icon`, `<img>` agregado en
+    `index.html` dentro de cada `.stat-annot`): mismos 4 WebP que ya usa
+    `.vision-icon` en desktop (`icon-cerebro`/`icon-red-neuronal`/
+    `icon-calendario`/`icon-acompanamiento.webp`, ver sección Visión más
+    abajo) — no se generó ningún asset nuevo. Oculto por defecto
+    (`display:none`), solo se muestra `display:block` dentro del mismo
+    `@media(max-width:900px)`, así que en desktop no existe visualmente
+    (sigue con los íconos grandes sueltos sobre el fondo). El
+    `.stat-annot-deco` (punto+línea punteada, pensado para apuntar al
+    ícono sobre el fondo) se oculta en este rango: sin fondo detrás no
+    apunta a nada y se veía como un punto suelto sin sentido.
+  - Verificado con Playwright en este entorno a 360/390/760/900px
+    (mobile, sin blanco de más, tarjetas legibles) y 1440px (desktop
+    comparado píxel a píxel contra la captura de antes del cambio, sin
+    diferencias). `npm test` sigue en verde (86 tests).
+  - Con esto queda resuelto el bullet "Visión — sesión 2 (mobile +
+    limpieza)" de más abajo en cuanto al posicionamiento de las 4
+    `.stat-annot` en mobile. Sigue pendiente, sin tocar en esta sesión:
+    decidir si se limpian `--vision-card-*` (ahora sí en uso, ya no
+    aplica) y las reglas `#lam-02 .stat-box`/`.stat-grid` sin uso real.
+
 - **Hero: hueco para el nav fijo en mobile (`.hero.dark`, sesión
   2026-09-19)**: el nav (`.nav{position:fixed}`) no reserva espacio
   propio en el documento. En desktop no se nota porque el contenido del
@@ -1472,15 +1510,17 @@ próximos pasos).
   nuevo de `.pillar` ya no se sienta vacío, y que el fundido de
   `#lam-05` disimule el corte contra `#lam-04` en pantallas reales
   (no solo en la lógica del gradiente).
-- **Visión — sesión 2 (mobile + limpieza)**: falta decidir y construir el
-  posicionamiento de las 4 `.stat-annot` en mobile (`≤900px`) — el
-  posicionamiento libre de desktop no aplica ahí tal cual, puede requerir
-  una versión apilada (punto + número + etiqueta en línea) u otra
-  solución, no decidido de antemano. Revisar que no choquen con
+- **Visión — sesión 2 (mobile + limpieza)**: el posicionamiento de las 4
+  `.stat-annot` en mobile ya se resolvió (sesión 2026-09-19, grilla 2×2
+  con tinte de color + ícono, ver "Estado actual del diseño" arriba).
+  Falta solo la parte de limpieza: `--vision-card-*` ya está en uso de
+  nuevo (no aplica limpiarlas), pero las reglas `#lam-02 .stat-box`/
+  `.stat-grid`/`svg/icon-*.svg` de la vieja etapa de tarjetas de caja
+  siguen sin uso real en esta sección — decidir si se borran o quedan
+  comentadas. Falta también revisar que la nueva grilla no choque con
   `.brain-fruit`/`.deco-blob-berries`/`.deco-scribble` en ningún
-  breakpoint. Decidir si se limpian las variables/reglas sin uso
-  (`--vision-card-*`, `svg/icon-*.svg` de la etapa de tarjetas) o quedan
-  comentadas. Verificar con Playwright en 1440 y 390px antes de cerrar.
+  breakpoint (no revisado explícitamente en esta sesión, aunque las
+  capturas a 360/390/760/900px no mostraron superposición).
 - **Verificación visual real pendiente** (implementado y revisado a
   mano/con Playwright local, pero no confirmado en un navegador real
   sobre el deploy) en varios frentes:
