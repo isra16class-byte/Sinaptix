@@ -11,6 +11,35 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: el pulso aparece y desaparece (ciclo de 8s, fundido suave)
+
+Pedido del usuario: "puedes hacer que aparezca y desparezca en un cierto
+tiempo?". Se preguntó (`ask_user_input_v0`) por los tiempos y el tipo de
+transición antes de tocar nada: **ciclo corto** (visible ~5s, invisible
+~3s) y **fundido suave** (no corte directo).
+
+- **`css/styles.css`**: `@keyframes veFade` (8s: 0→6.25% fundido de
+  entrada [0→0.5s], 6.25%→56.25% visible fijo [0.5s→4.5s], 56.25%→62.5%
+  fundido de salida [4.5s→5s; hasta acá los ~5s "visible"], 62.5%→100%
+  invisible [5s→8s, los ~3s "desaparece"]) aplicado a `.ve-pulse` (el
+  `<g>` que agrupa las 9 capas de cada pulso), no a cada `.ve-p` — así las
+  8 capas se apagan juntas en la misma proporción en la que ya estaban,
+  sin desarmar el efecto de cola. Sin `--ph` en esta animación: los 2
+  pulsos (a media vuelta uno del otro) aparecen y desaparecen **a la
+  vez**, es la energía en conjunto la que se prende/apaga, no cada
+  cometa por separado. Nueva variable `--ve-fadeT:8s` en `.vision-energy`
+  (mismo patrón que `--ve-T`, por si en algún momento se quiere ajustar
+  sin tocar el keyframe). `.ve-rail` (el riel de fondo) no se ve afectado,
+  sigue siempre visible en su opacidad `.28` — es la pista, no "la
+  energía" que aparece/desaparece.
+  - `.vision-energy.is-paused` ahora pausa también `.ve-pulse` (antes
+    solo pausaba `.ve-p`), para que el fundido no siga corriendo de fondo
+    cuando la sección está fuera de pantalla.
+- Verificado con Playwright: 8 capturas a lo largo de un ciclo completo
+  muestran el fundido de salida, el pulso completamente invisible (solo
+  el riel punteado de fondo) y el fundido de entrada de vuelta. Sin
+  regresión en mobile. `npm test`: 85/86 (de siempre).
+
 ## 2026-09-19 — Visión: el pulso todavía un poco más fino
 
 Segunda vuelta de tuerca sobre el ajuste anterior ("hazlo un poco mas
