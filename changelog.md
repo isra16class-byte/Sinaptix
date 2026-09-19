@@ -11,6 +11,37 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: secuencia exacta al aparecer/desaparecer (1º uno, 2º el otro, no una alternancia corrida)
+
+El usuario aclaró que la ronda anterior (delay de medio ciclo, alternancia
+corrida) no era lo que pedía. Lo que quería: "cuando vayan a desaparecer
+primero desaparezca 1 y luego el otro, luego cuando vayan a aparecer
+primero que aparezca 1 y luego el otro, y de ahí que sigan rodando los 2
+juntos, hasta repetir el proceso". Un solo archivo:
+
+- **`css/styles.css`**: se reemplazó el `animation-delay` corrido (que
+  desplazaba TODO el ciclo del pulso 2 medio período — de ahí la
+  alternancia sin pausa conjunta) por **dos `@keyframes` distintos**,
+  `veFadeA` (pulso 1) y `veFadeB` (pulso 2), asignados por posición
+  (`.ve-pulse:nth-of-type(1)`/`:nth-of-type(2)`, hay exactamente 2 en el
+  SVG). Mismo `--ve-fadeT:8s` de antes, repartido en 5 tramos:
+  0–3.5s los 2 visibles y corriendo juntos (fijo) → 3.5–4s sale 1 → 4–4.5s
+  sale 2 (1 ya invisible) → 4.5–6.5s los 2 invisibles (pausa) → 6.5–7s
+  entra 1 → 7–7.5s entra 2 (1 ya visible) → 7.5–8s los 2 visibles de
+  nuevo, empalma sin salto con el 0% del ciclo siguiente. Por qué 2
+  keyframes y no 1 con delay: un delay corrido desplaza el ciclo entero
+  por igual (sirve para una alternancia pareja, que fue lo que se hizo en
+  la ronda anterior), pero acá hacía falta que estuvieran sincronizados
+  durante el tramo "corriendo juntos" y se separen solo un toque justo en
+  las 2 transiciones — eso pide 2 recorridos de opacidad distintos.
+- **Verificado con Playwright**: se muestreó `getComputedStyle(...)
+  .opacity` de los 2 `.ve-pulse` cada 0.5s a lo largo de ~9s — se ve
+  clarísimo el orden (pulso 1 baja antes que el 2, pulso 1 sube antes que
+  el 2, pausa conjunta con los 2 en 0, y "los 2 en 1" tanto al principio
+  como al final del tramo corrido) — más capturas en los momentos clave
+  (los 2 invisibles, los 2 visibles de nuevo). Sin regresión en mobile.
+  `npm test`: 85/86.
+
 ## 2026-09-19 — Visión: los 2 pulsos aparecen alternados, no juntos
 
 Pedido del usuario sobre el fundido recién agregado: "puedes hacer que

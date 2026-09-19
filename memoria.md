@@ -845,15 +845,22 @@ próximos pasos).
     nuevo a ~78% de eso (4ª ronda, "un poco más fino"): valores actuales
     `7.5/1/1.25/1.4/1.6/1.8/2/2.3/1` para
     glow/t1/t2/t3/t4/t5/t6/body/core, misma proporción entre capas.
-    **Aparece/desaparece (5ª ronda, `@keyframes veFade`, `--ve-fadeT:8s`)**:
+    **Aparece/desaparece (5ª ronda, `--ve-fadeT:8s`)**:
     además de correr sin parar, ahora los 2 pulsos se desvanecen
-    (fundido, no corte) unos ~3s de cada 8s — aplicado en `.ve-pulse` (el
-    `<g>` contenedor), no en cada capa, para no desarmar el degradé de la
-    cola. El riel de fondo (`.ve-rail`) no se ve afectado, queda siempre
-    visible. **Alternados, no juntos (6ª ronda)**: `animation-delay` de
-    `veFade` en `.ve-pulse` usa el mismo `--ph` que ya diferencia a los 2
-    pulsos (0 y `.5`) → medio ciclo (4s) de diferencia entre uno y otro,
-    no aparecen/desaparecen sincronizados.
+    (fundido, no corte) parte de cada ciclo. El riel de fondo
+    (`.ve-rail`) no se ve afectado, queda siempre visible.
+    **Secuencia exacta (6ª→7ª ronda, reemplaza el intento de la 6ª)**: no
+    es una alternancia pareja (eso se probó primero con un
+    `animation-delay` de medio ciclo y no era lo pedido) — es
+    `@keyframes veFadeA`/`veFadeB`, uno por pulso
+    (`.ve-pulse:nth-of-type(1)`/`(2)`), con 5 tramos en los 8s: los 2
+    visibles y corriendo juntos (3.5s) → sale 1 (.5s) → sale 2 (.5s) → los
+    2 invisibles, pausa (2s) → entra 1 (.5s) → entra 2 (.5s) → los 2
+    visibles de nuevo, empalma con el ciclo siguiente. Un delay corrido no
+    alcanzaba porque desplaza TODO el ciclo por igual; acá hacía falta
+    que estuvieran sincronizados en el tramo "juntos" y se separen solo
+    un toque en las 2 transiciones — eso pide 2 recorridos de opacidad
+    distintos, no uno corrido.
     **Sin coordenadas en el CSS ni en el HTML**: el `d` del trazado lo arma
     una IIFE al final de `js/script.js` midiendo los 4 `.vision-icon`
     (`getBoundingClientRect`, esquinas = promedio de los centros de cada

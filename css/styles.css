@@ -544,21 +544,22 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
     overflow:visible;pointer-events:none
   }
   .ve-rail{fill:none;stroke:var(--ve-rail-c);stroke-width:1.2;stroke-dasharray:1 7;stroke-linecap:round;opacity:.28}
-  /* Aparece y desaparece con fundido: --ve-fadeT (8s) = ~5s visible (incluye
-     0.5s de fundido de entrada y 0.5s de salida) + ~3s invisible. Va en el
-     <g class="ve-pulse"> (el contenedor de las 9 capas de cada pulso), no en
-     cada .ve-p, para que las 8 capas se apaguen juntas en la misma
-     proporción en la que ya estaban (la cola no "se despareja" al
-     desvanecerse). Sin `--ph` acá: los 2 pulsos aparecen/desaparecen a la
-     vez, no alternados — es la energía en conjunto la que se prende y
-     apaga, no cada cometa por separado. */
-  .ve-pulse{
-    animation:veFade var(--ve-fadeT) ease-in-out infinite;
-    /* medio ciclo de diferencia entre los 2 pulsos (usa el mismo --ph que ya
-       los separa en el recorrido: 0 y .5) para que no aparezcan/desaparezcan
-       juntos — mientras uno se apaga, el otro ya está por prenderse */
-    animation-delay:calc(var(--ph,0) * var(--ve-fadeT))
-  }
+  /* Aparece y desaparece con fundido, en secuencia (no los 2 a la vez):
+     primero desaparece 1, después el otro; pausa con los 2 invisibles;
+     primero aparece 1, después el otro; quedan corriendo juntos el resto
+     del ciclo, hasta repetir. Va en el <g class="ve-pulse"> (el contenedor
+     de las 9 capas de cada pulso), no en cada .ve-p, para que las 8 capas
+     de cada pulso se apaguen juntas en la misma proporción en la que ya
+     estaban (la cola no "se despareja" al desvanecerse). Los 2 `<g>` usan
+     @keyframes distintos (`veFadeA`/`veFadeB`, ver más abajo) en vez de un
+     solo keyframe con animation-delay, porque un delay corrido desplaza
+     TODO el ciclo por igual (para eso sirvió para alternarlos del todo en
+     la ronda anterior) y acá lo que hace falta es que estén sincronizados
+     durante el tramo "corriendo juntos" y solo se separen un toque justo
+     en las 2 transiciones (desaparecer/aparecer) — eso necesita 2
+     recorridos de opacidad distintos, no uno corrido. */
+  .ve-pulse:nth-of-type(1){animation:veFadeA var(--ve-fadeT) ease-in-out infinite}
+  .ve-pulse:nth-of-type(2){animation:veFadeB var(--ve-fadeT) ease-in-out infinite}
   .ve-p{
     fill:none;stroke-linecap:round;stroke-linejoin:round;
     animation:veRun var(--ve-T) linear infinite, veColor var(--ve-T) linear infinite;
@@ -584,14 +585,23 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   .vision-energy.is-paused .ve-p,.vision-energy.is-paused .ve-pulse{animation-play-state:paused}
 }
 @keyframes veRun{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
-/* 8s: 0→.5s fundido de entrada, .5s→4.5s visible fijo, 4.5s→5s fundido de
-   salida (esos 5s son el "visible"), 5s→8s invisible (el "desaparece"). */
-@keyframes veFade{
-  0%{opacity:0}
-  6.25%{opacity:1}
-  56.25%{opacity:1}
-  62.5%{opacity:0}
-  100%{opacity:0}
+/* 8s, mismo reparto para los 2 (ver .ve-pulse:nth-of-type más arriba):
+   0→3.5s los 2 visibles y corriendo juntos (fijo, sin fundido)
+   3.5→4.0s   sale el pulso 1 (A)          | pulso 2 (B) sigue visible
+   4.0→4.5s   sale el pulso 2 (B)          | pulso 1 (A) ya invisible
+   4.5→6.5s   los 2 invisibles (pausa)
+   6.5→7.0s   entra el pulso 1 (A)         | pulso 2 (B) sigue invisible
+   7.0→7.5s   entra el pulso 2 (B)         | pulso 1 (A) ya visible
+   7.5→8.0s   los 2 visibles de nuevo → empalma con el 0% del ciclo siguiente */
+@keyframes veFadeA{
+  0%,43.75%{opacity:1}
+  50%,81.25%{opacity:0}
+  87.5%,100%{opacity:1}
+}
+@keyframes veFadeB{
+  0%,50%{opacity:1}
+  56.25%,87.5%{opacity:0}
+  93.75%,100%{opacity:1}
 }
 @media(prefers-reduced-motion:reduce){.vision-energy{display:none}}
 
