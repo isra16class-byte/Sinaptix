@@ -11,6 +11,27 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Placeholders del wizard: ejemplo en vez de repetir el label
+
+El usuario notó que en el wizard de nutrición (`#formNutricion`, 8 pasos,
+compartido por `index.html` y `mi-plan.html`) varios campos tenían el
+`placeholder` del input idéntico al `<label>` de arriba ("Talla (cm)" dos
+veces, etc.) — redundante, no aporta nada que el label visible ya no diga.
+
+- **Campos corregidos** (mismo cambio en `index.html` y `mi-plan.html`,
+  7 inputs cada uno): `nutriNombre` → "Ej: María González", `nutriEmail` →
+  "tu@correo.com", `nutriEdad` → "Ej: 28", `nutriPeso` → "Ej: 70",
+  `nutriTalla` → "Ej: 175", `nutriAlergiaOtra` → "Ej: maní, mariscos",
+  `nutriDisgustos` (textarea) → "Ej: brócoli, hígado, pescado". Ahora el
+  placeholder da una pista de formato/ejemplo en vez de repetir el label,
+  mismo criterio que ya usaba `nutriPantallas` ("Horas aprox.").
+- **No tocado a propósito**: `antroPeso`/`antroTalla`/`antroEdad` del modal
+  `#formAntro` (`index.html`, líneas ~1049-1056) tienen `<label class="sr-only">`
+  — ahí el placeholder es el único texto visible, no hay redundancia.
+- **Tests**: `npm test` sigue en 85/86 pass (mismo skip de siempre, e2e de
+  PDF sin Playwright/jsPDF instalados). Sin cambios de lógica, solo texto
+  de `placeholder`.
+
 ## 2026-09-19 — Sacar rayas em-dash del texto dirigido al usuario
 
 El usuario pidió ubicar todas las rayas "—" (típicas de redacción de IA) en
