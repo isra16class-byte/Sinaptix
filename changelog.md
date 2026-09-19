@@ -11,6 +11,34 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Nav mobile: botón "Inicio", menú hamburguesa y barra más alta
+
+El usuario mandó una captura de `mi-plan.html` en el teléfono: no había forma
+de volver a la pantalla principal, pidió unas "3 rayitas" en la barra del logo
+para elegir secciones y una barra un poco más grande. Todo solo para mobile.
+
+- **Causa**: en mobile el nav quedaba con solo el logo (`.nav-links` se ocultan
+  en ≤940px, los `.nav-btn-ghost` —incluido "Cerrar sesión"— en ≤520px).
+- **Cambio** (`css/styles.css` bloque "NAV MOBILE", `mi-plan.html`,
+  `index.html`, nuevo `js/nav-menu.js`), todo dentro de `@media(max-width:720px)`:
+  - Barra de ~51 a 73px (`padding:14px 20px`, logo 36px, texto 18px).
+  - `mi-plan.html`: botón `.nav-back` "‹ Inicio" → `index.html`.
+  - `.nav-toggle` (3 rayitas → X) que despliega `.nav-menu` con Visión, Método,
+    Pilares, Beneficios y Contacto. En `index.html` los links son `#lam-0X`; en
+    `mi-plan.html`, `index.html#lam-0X`.
+  - `#miPlan` y `.hero.dark`: `padding-top` 88 → 110px en ≤720px para que la
+    barra más alta no se coma el aire que había bajo ella.
+- **Descartado**: panel con `backdrop-filter` (un `backdrop-filter` anidado
+  dentro del del nav no se aplica y el contenido de abajo se transparentaba) →
+  fondo blanco sólido. "Cerrar sesión" en el menú: no se pidió, queda en la
+  tarjeta Cierre.
+- **Alternativa no aplicada**: hamburguesa solo en `mi-plan.html`. Se puso
+  también en `index.html` porque tenía el mismo hueco; para sacarla de ahí,
+  borrar el bloque `.nav-toggle`/`.nav-menu` de ese HTML.
+- Verificado con Playwright a 320/360/390/600px (sin desborde) y 800/900/1440px
+  (sin cambios), menú abre/cierra con botón, Esc, toque fuera y al elegir link.
+  `npm test` en verde.
+
 ## 2026-09-19 — Visión (mobile): las estadísticas como el escritorio, de 1 en 1
 
 El usuario mandó una captura a 390px de la grilla 2×2 de tarjetas con

@@ -161,6 +161,9 @@ próximos pasos).
   "PDF de Mi plan" abajo). Se carga en `mi-plan.html` **después** de
   `nutricion-planes.js` (depende de sus funciones puras) y antes de
   `mi-plan.js` (que lo llama desde `pintarMiPlan`).
+- `js/nav-menu.js` — **compartido** (`index.html` y `mi-plan.html`): abre/cierra
+  el menú hamburguesa del nav en mobile (`.nav.is-open`). Se carga antes
+  que el resto de los scripts; sin dependencias.
 - `js/plan-sync.js` — **compartido**: sincroniza `localStorage` con el
   backend (Netlify Functions) cuando hay sesión iniciada. Se carga después
   de `nutricion-wizard.js` y antes de `script.js`/`mi-plan.js`.
@@ -241,6 +244,38 @@ próximos pasos).
   `plan-validacion.mjs`.
 
 ## Estado actual del diseño (resumen)
+
+- **Nav en mobile: barra más alta, botón "Inicio" y menú hamburguesa
+  (`.nav`, `.nav-back`, `.nav-toggle`, `.nav-menu`, sesión 2026-09-19)**: en
+  mobile el nav quedaba solo con el logo (`.nav-links` se ocultan en ≤940px
+  y los botones ghost en ≤520px), así que desde `mi-plan.html` no había
+  cómo volver al sitio ni ir a una sección. **Solo ≤720px** (>720px el
+  botón, el menú y la altura quedan como estaban):
+  - Barra de ~51 a **73px** (`padding:14px 20px`, logo 36px, fuente 18px).
+    Como el nav es `position:fixed` y no reserva espacio, se subió el
+    colchón de `#miPlan` y `.hero.dark` de 88 a **110px** en ≤720px para
+    conservar el mismo aire bajo la barra. Si se cambia la altura del nav,
+    retocar esos 2 valores.
+  - `.nav-back` ("‹ Inicio", link a `index.html`): **solo en `mi-plan.html`**,
+    a la izquierda de la hamburguesa. En desktop ya existe "Volver al sitio".
+  - `.nav-toggle` (`#navToggle`, 44×44, 3 rayitas que pasan a X al abrir;
+    las rayas son un `<span>` + `::before/::after`) abre `.nav-menu`
+    (`#navMenu`, panel blanco sólido a todo el ancho colgado de la barra,
+    animado con `opacity/transform`; oculto con `visibility` para que sus
+    links no entren en el tab cerrado). Fondo **sólido** a propósito: un
+    `backdrop-filter` anidado dentro del del nav no aplica y se
+    transparentaba el contenido de abajo. Ítems: Visión, Método, Pilares,
+    Beneficios, Contacto (en `mi-plan.html` apuntan a `index.html#lam-0X`).
+    Lo maneja `js/nav-menu.js`: cierra al elegir un link, al tocar fuera,
+    con Esc y si la ventana pasa de 720px.
+  - Decisión: el menú lleva solo las secciones. "Cerrar sesión" sigue en la
+    tarjeta Cierre (el `#btnLogoutNav` de la barra está oculto en ≤520px
+    desde antes). También se puso la hamburguesa en `index.html` (mismo
+    problema: sin links en mobile), aunque la captura del pedido era de
+    `mi-plan.html`.
+  - Verificado con Playwright + Chromium y fuentes reales a 320/360/390/600px
+    (sin desborde, el logo no choca con los botones), y 800/900/1440px
+    (sin cambios). **Sin confirmar en un teléfono real todavía.**
 
 - **Formulario del wizard: campos alineados y botones sin desborde
   (`#formNutricion`, `.modal-row`, `.nutri-nav`, sesión 2026-09-19)**: el

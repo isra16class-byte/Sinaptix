@@ -150,6 +150,83 @@ h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em}
 .nav-btn-solid:hover{background:var(--purple-dark);transform:translateY(-1px);box-shadow:var(--shadow)}
 @media(max-width:520px){.nav-btn-ghost{display:none}.nav{padding:12px 20px}.nav .mark{font-size:16px}.nav .mark img{width:26px;height:26px}}
 
+/* ---------- NAV MOBILE: barra más alta, botón "Inicio" y menú hamburguesa ----------
+   (sesión 2026-09-19, pedido del usuario, solo mobile ≤720px). Antes, en
+   mobile el nav quedaba con solo el logo (los `.nav-links` se ocultan en
+   ≤940px y los botones ghost en ≤520px): sin forma de volver al sitio desde
+   `mi-plan.html` ni de ir a una sección. Ahora: barra ~20px más alta (51→73px),
+   `.nav-back` (solo `mi-plan.html`) y `.nav-toggle` que abre `.nav-menu`
+   (js/nav-menu.js). En >720px los 3 quedan ocultos. */
+.nav-back,.nav-toggle,.nav-menu{display:none}
+@media(max-width:720px){
+  .nav{padding:14px 20px}
+  .nav .mark{font-size:18px}
+  .nav .mark img{width:36px;height:36px}
+  .nav-right{gap:10px}
+  .nav-back{
+    display:inline-flex;align-items:center;gap:3px;
+    padding:10px 15px 10px 10px;border-radius:var(--radius-pill);
+    border:1px solid var(--line);color:var(--purple-dark);
+    font-size:13.5px;font-weight:600;line-height:1;white-space:nowrap;
+    transition:border-color .2s ease,color .2s ease,background .2s ease;
+  }
+  .nav-back:active{background:var(--panel)}
+  .nav-toggle{
+    display:inline-flex;align-items:center;justify-content:center;flex:none;
+    width:44px;height:44px;padding:0;border-radius:14px;
+    background:transparent;border:1px solid var(--line);cursor:pointer;
+    color:var(--purple-dark);
+    transition:background .2s ease,border-color .2s ease;
+  }
+  .nav-toggle:active,.nav.is-open .nav-toggle{background:var(--panel);border-color:var(--purple)}
+  /* Las 3 rayitas: la del medio es el propio span; arriba/abajo, sus
+     pseudo-elementos. Al abrir se vuelven una X. */
+  .nav-toggle-bars,.nav-toggle-bars::before,.nav-toggle-bars::after{
+    display:block;width:20px;height:2.5px;border-radius:2px;background:currentColor;
+    transition:transform .25s ease,background .2s ease;
+  }
+  .nav-toggle-bars{position:relative}
+  .nav-toggle-bars::before,.nav-toggle-bars::after{content:'';position:absolute;left:0}
+  .nav-toggle-bars::before{top:-7px}
+  .nav-toggle-bars::after{top:7px}
+  .nav.is-open .nav-toggle-bars{background:transparent}
+  .nav.is-open .nav-toggle-bars::before{transform:translateY(7px) rotate(45deg)}
+  .nav.is-open .nav-toggle-bars::after{transform:translateY(-7px) rotate(-45deg)}
+
+  /* Panel: cuelga de la barra, a todo el ancho. Oculto con `visibility`
+     (no `display`) para poder animarlo y que sus links no entren en el
+     orden de tabulación mientras está cerrado. */
+  .nav-menu{
+    display:flex;flex-direction:column;
+    position:absolute;top:100%;left:0;right:0;
+    padding:6px 20px 14px;
+    background:#fff; /* sólido: un backdrop-filter anidado dentro del del nav no se aplica y se transparentaba el contenido de abajo */
+    border-bottom:1px solid var(--line);
+    box-shadow:0 18px 30px rgba(38,22,31,.12);
+    opacity:0;visibility:hidden;transform:translateY(-8px);
+    transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;
+  }
+  .nav.is-open .nav-menu{
+    opacity:1;visibility:visible;transform:none;
+    transition:opacity .2s ease,transform .2s ease,visibility 0s;
+  }
+  .nav-menu a{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:52px;font-size:16px;font-weight:600;color:var(--ink);
+    border-top:1px solid var(--line);
+  }
+  .nav-menu a:first-child{border-top:0}
+  .nav-menu a::after{
+    content:'';width:8px;height:8px;flex:none;
+    border-right:2px solid var(--purple);border-top:2px solid var(--purple);
+    transform:rotate(45deg);opacity:.7;
+  }
+  .nav-menu a:active{color:var(--purple)}
+}
+@media(prefers-reduced-motion:reduce){
+  .nav-menu,.nav-toggle-bars,.nav-toggle-bars::before,.nav-toggle-bars::after{transition:none}
+}
+
 section{position:relative;padding:130px 0 110px}
 section.dark{background:var(--panel);color:var(--panel-text)}
 section.dark h2,section.dark h3{color:var(--ink)}
@@ -181,6 +258,8 @@ section.tight{padding:100px 0}
      usuario, 2026-09-19). 88px = mismo valor que ya usa `#miPlan` para
      este mismo nav compartido. */
   .hero.dark{padding-top:88px}
+  /* ≤720px el nav mide 73px (no ~51): +22px para conservar el mismo aire. */
+  @media(max-width:720px){.hero.dark{padding-top:110px}}
   /* Espacio entre Hero y Visión (sesión 2026-09-19): con `hero-foot`
      oculto (`@media(max-width:720px){.hero-foot{display:none}}`), la
      imagen queda seguida del padding-bottom heredado de la regla
@@ -1049,6 +1128,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    acá sin necesidad. Se recorta solo en este contexto (no se toca
    `section`/`footer` en general, así que index.html sigue igual). */
 #miPlan{padding:88px 0 40px;min-height:100vh;box-sizing:border-box;overflow:hidden}
+/* Mobile: el nav pasó de ~51 a 73px de alto (ver NAV MOBILE), así que el
+   colchón bajo él sube lo mismo para conservar el aire de antes. */
+@media(max-width:720px){#miPlan{padding-top:110px}}
 /* Las 4 frutas extra de "Mi plan" (sesión 2026-09-18) se muestran SOLO con
    sesión iniciada: cuando la pantalla muestra el login, `#miPlanSinSesion`
    está visible (sin `.hidden`) y esta regla esconde las marcadas con
