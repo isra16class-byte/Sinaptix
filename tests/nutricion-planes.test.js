@@ -26,7 +26,9 @@ function crearLocalStorageMock(){
 global.localStorage = crearLocalStorageMock();
 
 const {
+  NUTRI_PLANES,
   nutriResolverObjetivo,
+  nutriNutrientesClave,
   nutriConstruirAjustes,
   nutriConstruirAvisos,
   nutriGuardarAntropometriaSiFalta,
@@ -67,6 +69,66 @@ test('nutriResolverObjetivo — empate entre escalas devuelve todos los empatado
     concentracion: 4, fatiga: 4, olvidos: 2, estres: 1
   });
   assert.deepStrictEqual(resultado, ['Mejorar concentración', 'Reducir fatiga mental']);
+});
+
+// ===================== nutriNutrientesClave =====================
+// Chips de "Nutrientes clave de tu plan" (tarjeta Antropometría de
+// mi-plan.html). Se comparan contra NUTRI_PLANES en vez de contra textos
+// escritos a mano: si cambia el contenido de un plan, el chip lo sigue.
+
+const LARGO_MAX_CHIP = 26;
+
+test('nutriNutrientesClave — un solo objetivo: los nutrientes de ese plan, sin repetir', () => {
+  const objetivo = 'Manejo de estrés mental';
+  const chips = nutriNutrientesClave({ objetivo });
+  const plan = NUTRI_PLANES[objetivo];
+  assert.equal(chips.length, Math.min(plan.nutrientes.length, 6));
+  assert.equal(new Set(chips).size, chips.length);
+  // Cada chip es el nombre completo o su etiqueta corta: nunca inventa nada.
+  const completos = plan.nutrientes.join(' | ').toLowerCase();
+  chips.forEach(c => {
+    const primeraPalabra = c.split(/[ ,/(]/)[0].toLowerCase();
+    assert.ok(completos.includes(primeraPalabra), 'chip fuera del plan: '+c);
+  });
+});
+
+test('nutriNutrientesClave — cambia según el objetivo de la persona', () => {
+  const foco = nutriNutrientesClave({ objetivo: 'Mejorar concentración' });
+  const fatiga = nutriNutrientesClave({ objetivo: 'Reducir fatiga mental' });
+  const estres = nutriNutrientesClave({ objetivo: 'Manejo de estrés mental' });
+  assert.notDeepStrictEqual(foco, fatiga);
+  assert.notDeepStrictEqual(foco, estres);
+  assert.notDeepStrictEqual(fatiga, estres);
+});
+
+test('nutriNutrientesClave — empate entre planes: intercala y no repite (Hierro está en 2)', () => {
+  const chips = nutriNutrientesClave({
+    objetivo: 'No estoy seguro',
+    concentracion: 4, fatiga: 4, olvidos: 2, estres: 1
+  }, 20);
+  assert.equal(new Set(chips.map(c => c.toLowerCase())).size, chips.length);
+  assert.equal(chips.filter(c => c === 'Hierro').length, 1);
+  // Intercalado: el 1º nutriente de cada plan abre la lista, antes que el
+  // 2º de ninguno (Foco: Omega-3 / Fatiga: B12 y complejo B).
+  assert.deepStrictEqual(chips.slice(0, 2), ['Omega-3', 'B12 y complejo B']);
+});
+
+test('nutriNutrientesClave — respeta el máximo pedido y el default de 6', () => {
+  const d = { objetivo: 'No estoy seguro', concentracion: 4, fatiga: 4, olvidos: 4, estres: 4 };
+  assert.equal(nutriNutrientesClave(d, 3).length, 3);
+  assert.ok(nutriNutrientesClave(d).length <= 6);
+});
+
+test('nutriNutrientesClave — objetivo desconocido devuelve lista vacía (no rompe)', () => {
+  assert.deepStrictEqual(nutriNutrientesClave({ objetivo: 'Algo que no existe' }), []);
+});
+
+test('nutriNutrientesClave — ninguna etiqueta de ningún plan es demasiado larga para un chip', () => {
+  Object.keys(NUTRI_PLANES).forEach(objetivo => {
+    nutriNutrientesClave({ objetivo }, 20).forEach(c => {
+      assert.ok(c.length <= LARGO_MAX_CHIP, objetivo+': \"'+c+'\" ('+c.length+' caracteres)');
+    });
+  });
 });
 
 // ===================== nutriConstruirAjustes =====================

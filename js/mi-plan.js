@@ -164,6 +164,19 @@ if(window.netlifyIdentity){
             miPlanAjustesEl.classList.add('hidden');
           }
         }
+        // Chips de "Nutrientes clave de tu plan" al pie de la tarjeta
+        // Antropometría (sesión 2026-09-18): salen del plan resuelto
+        // (nutriNutrientesClave, js/nutricion-planes.js), no son fijos.
+        const nutriBoxEl = document.getElementById('miPlanNutrientes');
+        const nutriChipsEl = document.getElementById('miPlanNutrientesChips');
+        if(nutriBoxEl && nutriChipsEl){
+          const claves = (o.encuesta && typeof nutriNutrientesClave === 'function')
+            ? nutriNutrientesClave(o.encuesta, 5) : [];
+          nutriChipsEl.innerHTML = claves.map(function(n){
+            return '<li class="miplan-nutri-chip">'+nutriEscaparHTML(n)+'</li>';
+          }).join('');
+          nutriBoxEl.classList.toggle('hidden', !claves.length);
+        }
         if(miPlanCtaEl) miPlanCtaEl.classList.add('hidden');
         // Botón "Descargar mi plan en PDF" (js/mi-plan-pdf.js): solo tiene
         // sentido con un plan ya generado, mismo criterio que el resto del
@@ -177,6 +190,8 @@ if(window.netlifyIdentity){
     } else {
       if(miPlanBarrasEl) miPlanBarrasEl.classList.add('hidden');
       if(miPlanDetalleEl) miPlanDetalleEl.classList.add('hidden');
+      const nutriBoxVacio = document.getElementById('miPlanNutrientes');
+      if(nutriBoxVacio) nutriBoxVacio.classList.add('hidden');
       const miPlanAjustesElVacio = document.getElementById('miPlanAjustes');
       if(miPlanAjustesElVacio) miPlanAjustesElVacio.classList.add('hidden');
       if(miPlanCtaEl) miPlanCtaEl.classList.remove('hidden');

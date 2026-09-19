@@ -76,6 +76,51 @@ function nutriResolverObjetivo(d){
   return Object.keys(escalas).filter(k=>escalas[k]===max);
 }
 
+// Etiquetas cortas para los chips de "Nutrientes clave" de la tarjeta
+// Antropometría de mi-plan.html. Los nombres completos de
+// NUTRI_PLANES[...].nutrientes (los que se ven en el detalle del plan y en el
+// PDF) son largos para un chip ("Hidratos de carbono de bajo índice
+// glucémico"); acá se mapean por texto exacto, y si un nutriente nuevo no
+// está en el mapa se usa tal cual, así que agregar uno a un plan nunca rompe
+// nada — a lo sumo el chip sale más ancho hasta que se le agregue su etiqueta.
+const NUTRI_NUTRIENTE_CORTO = {
+  'Omega-3 (DHA)': 'Omega-3',
+  'Hidratos de carbono de bajo índice glucémico': 'Carbohidratos de bajo IG',
+  'Vitamina B12 y complejo B': 'B12 y complejo B',
+  'Proteína de buena calidad distribuida en el día': 'Proteína de calidad',
+  'Flavonoides / antioxidantes': 'Antioxidantes',
+  'Fibra / probióticos': 'Fibra y probióticos'
+};
+
+// Nutrientes clave del plan ya resuelto, para los chips. Sale de la MISMA
+// fuente que el detalle del plan (nutriResolverObjetivo + NUTRI_PLANES), así
+// que cambia con el objetivo de cada persona y no es relleno fijo. Si el
+// objetivo resuelve en más de un plan ("No estoy seguro" con empate), se
+// intercalan los nutrientes de cada uno (primero de cada plan, después el
+// segundo de cada plan, …) para que todos queden representados si hay que
+// cortar en `max`; se quitan repetidos por etiqueta (Hierro, Colina, etc.
+// aparecen en más de un plan). `max` default 6.
+function nutriNutrientesClave(d, max){
+  const limite = max > 0 ? max : 6;
+  const listas = nutriResolverObjetivo(d)
+    .map(o=>NUTRI_PLANES[o]).filter(Boolean)
+    .map(p=>p.nutrientes);
+  const largo = listas.reduce((m, l)=>Math.max(m, l.length), 0);
+  const vistos = new Set();
+  const etiquetas = [];
+  for(let i = 0; i < largo && etiquetas.length < limite; i++){
+    listas.forEach(l=>{
+      if(i >= l.length || etiquetas.length >= limite) return;
+      const etiqueta = NUTRI_NUTRIENTE_CORTO[l[i]] || l[i];
+      const clave = etiqueta.toLowerCase();
+      if(vistos.has(clave)) return;
+      vistos.add(clave);
+      etiquetas.push(etiqueta);
+    });
+  }
+  return etiquetas;
+}
+
 function nutriConstruirAjustes(d){
   const ajustes = [];
   if(d.alergias.length || d.alergiaOtra){
@@ -680,6 +725,7 @@ if(typeof module !== 'undefined' && module.exports){
     // es dato editorial, no cálculo.
     NUTRI_PLANES,
     nutriResolverObjetivo,
+    nutriNutrientesClave,
     nutriConstruirAjustes,
     nutriConstruirAvisos,
     nutriGuardarAntropometriaSiFalta,

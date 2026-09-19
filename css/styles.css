@@ -1064,6 +1064,27 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    botones de acción por la misma encuesta. */
 .stat-box:has(.miplan-ring.is-complete) .miplan-card-cta{display:none}
 
+/* Chips de "Nutrientes clave de tu plan" al pie de la tarjeta Antropometría
+   (mi-plan.html, pintados por pintarMiPlan() en js/mi-plan.js con
+   nutriNutrientesClave()). margin-top:auto los ancla al fondo de la tarjeta,
+   que es justo el espacio que quedaba vacío cuando el alto lo fija la
+   tarjeta de barras de al lado. Sin punto de color a propósito: el punto
+   verde ya significa "Saludable" en .imc-legend, de acá arriba. */
+.miplan-nutri{margin-top:auto;padding-top:20px}
+.miplan-nutri-title{
+  font-family:var(--font-m);font-size:11.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;
+}
+.miplan-nutri-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+.miplan-nutri-chip{
+  font-family:var(--font-m);font-size:12px;font-weight:600;line-height:1.2;color:var(--ink);
+  background:rgba(255,255,255,.72);border:1px solid rgba(46,125,91,.32);
+  border-radius:999px;padding:6px 12px;
+}
+/* Sin datos antropométricos el CTA sigue visible: va pegado debajo de los
+   chips en vez de repartirse el espacio libre con ellos (dos margin-top:auto). */
+.miplan-nutri:not(.hidden) ~ .miplan-card-cta{margin-top:14px}
+
 /* Fila de íconos decorativos (mismos assets de img/Iconos/ que ya usa el
    resto del sitio para nutrición/cerebro) en la tarjeta ancha de cierre —
    solo visible mientras no hay plan generado todavía (mismo criterio que
