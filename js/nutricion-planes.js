@@ -707,6 +707,37 @@ function nutriBuildBarChartHTML(objetivo, reeval){
   return html;
 }
 
+// Cambios por área entre el diagnóstico inicial (la encuesta guardada en
+// `sinaptix_objetivo`) y la última reevaluación (`sinaptix_reevaluacion`), para
+// las etiquetas "Qué cambió desde tu diagnóstico" de la tarjeta Antropometría
+// de mi-plan.html. Mismo cálculo que el gráfico de barras y gaugeDeltaHtml
+// (gaugeComputeAreas → % → diferencia en puntos), así los tres muestran
+// siempre el mismo número. Sin reevaluación devuelve [] (no hay nada que
+// comparar). `estado` es 'sube' | 'baja' | 'igual' y `texto` ya viene listo
+// para el chip: "+20", "−20" (signo menos real) o "=".
+function nutriCambiosDesdeDiagnostico(objetivo, reeval){
+  const encuesta = objetivo && objetivo.encuesta;
+  if(!encuesta || !reeval) return [];
+  const antes = gaugeComputeAreas(encuesta);
+  const despues = gaugeComputeAreas(reeval);
+  return [
+    {key:'foco', label:'Foco'},
+    {key:'memoria', label:'Memoria'},
+    {key:'energia', label:'Energía'},
+    {key:'calma', label:'Calma'}
+  ].map(function(item){
+    const antesPct = Math.round((antes[item.key]/5)*100);
+    const despuesPct = Math.round((despues[item.key]/5)*100);
+    const delta = despuesPct - antesPct;
+    return {
+      key: item.key, label: item.label,
+      antesPct: antesPct, despuesPct: despuesPct, delta: delta,
+      estado: delta > 0 ? 'sube' : (delta < 0 ? 'baja' : 'igual'),
+      texto: delta > 0 ? '+'+delta : (delta < 0 ? '\u2212'+Math.abs(delta) : '=')
+    };
+  });
+}
+
 // ===================== Exports para tests (Node) =====================
 // Este archivo se carga como <script> plano en index.html/mi-plan.html —
 // ahí `module` no existe, así que este bloque no hace nada en el
@@ -726,6 +757,7 @@ if(typeof module !== 'undefined' && module.exports){
     NUTRI_PLANES,
     nutriResolverObjetivo,
     nutriNutrientesClave,
+    nutriCambiosDesdeDiagnostico,
     nutriConstruirAjustes,
     nutriConstruirAvisos,
     nutriGuardarAntropometriaSiFalta,

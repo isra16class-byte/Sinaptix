@@ -1075,12 +1075,25 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   font-family:var(--font-m);font-size:11.5px;font-weight:700;letter-spacing:.06em;
   text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;
 }
-.miplan-nutri-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
-.miplan-nutri-chip{
+.miplan-nutri-chips,.miplan-cambios-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+.miplan-nutri-chip,.miplan-cambios-chip{
   font-family:var(--font-m);font-size:12px;font-weight:600;line-height:1.2;color:var(--ink);
   background:rgba(255,255,255,.72);border:1px solid rgba(46,125,91,.32);
   border-radius:999px;padding:6px 12px;
 }
+/* Etiquetas "Qué cambió desde tu diagnóstico" (misma forma de chip que los
+   nutrientes; comparten título y reglas de arriba). Colores del delta = los
+   de gaugeDeltaHtml / .gauge-delta-badge, para que digan lo mismo que la
+   tarjeta de barras. Van pegadas debajo de la leyenda del IMC (sin
+   margin-top:auto): el hueco que reparte el alto queda entre ellas y los
+   nutrientes. En 1 columna (≤900px, mismo corte que .miplan-grid) no hay
+   hueco que llenar y repetirían las barras, así que se ocultan. */
+.miplan-cambios{padding-top:18px}
+.miplan-cambios-chip strong{font-weight:700}
+.miplan-cambios-chip.is-sube strong{color:var(--green)}
+.miplan-cambios-chip.is-baja strong{color:#B3261E}
+.miplan-cambios-chip.is-igual strong{color:var(--ink-faint)}
+@media(max-width:900px){.miplan-cambios{display:none}}
 /* Sin datos antropométricos el CTA sigue visible: va pegado debajo de los
    chips en vez de repartirse el espacio libre con ellos (dos margin-top:auto). */
 .miplan-nutri:not(.hidden) ~ .miplan-card-cta{margin-top:14px}

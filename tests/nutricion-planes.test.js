@@ -29,6 +29,7 @@ const {
   NUTRI_PLANES,
   nutriResolverObjetivo,
   nutriNutrientesClave,
+  nutriCambiosDesdeDiagnostico,
   nutriConstruirAjustes,
   nutriConstruirAvisos,
   nutriGuardarAntropometriaSiFalta,
@@ -128,6 +129,45 @@ test('nutriNutrientesClave — ninguna etiqueta de ningún plan es demasiado lar
     nutriNutrientesClave({ objetivo }, 20).forEach(c => {
       assert.ok(c.length <= LARGO_MAX_CHIP, objetivo+': \"'+c+'\" ('+c.length+' caracteres)');
     });
+  });
+});
+
+// ===================== nutriCambiosDesdeDiagnostico =====================
+// Etiquetas "Qué cambió desde tu diagnóstico" (tarjeta Antropometría de
+// mi-plan.html). Escalas de la encuesta: 1-5 donde 5 = peor, así que
+// bajar la respuesta MEJORA el área (gaugeComputeAreas invierte la escala).
+
+const DIAGNOSTICO = { concentracion: 5, olvidos: 3, fatiga: 3, estres: 5 };
+
+test('nutriCambiosDesdeDiagnostico — sin reevaluación no hay nada que comparar', () => {
+  assert.deepStrictEqual(nutriCambiosDesdeDiagnostico({ encuesta: DIAGNOSTICO }, null), []);
+  assert.deepStrictEqual(nutriCambiosDesdeDiagnostico({ encuesta: DIAGNOSTICO }, undefined), []);
+});
+
+test('nutriCambiosDesdeDiagnostico — sin encuesta inicial devuelve [] (no rompe)', () => {
+  assert.deepStrictEqual(nutriCambiosDesdeDiagnostico(null, DIAGNOSTICO), []);
+  assert.deepStrictEqual(nutriCambiosDesdeDiagnostico({}, DIAGNOSTICO), []);
+});
+
+test('nutriCambiosDesdeDiagnostico — mejora, sin cambios y empeora, en el orden de las barras', () => {
+  const reeval = { concentracion: 4, olvidos: 3, fatiga: 4, estres: 4 };
+  const r = nutriCambiosDesdeDiagnostico({ encuesta: DIAGNOSTICO }, reeval);
+  assert.deepStrictEqual(r.map(x => x.label), ['Foco', 'Memoria', 'Energía', 'Calma']);
+  // Foco 20% → 40% (+20), Calma 20% → 40% (+20): mejoran.
+  assert.deepStrictEqual([r[0].antesPct, r[0].despuesPct, r[0].delta, r[0].estado, r[0].texto], [20, 40, 20, 'sube', '+20']);
+  assert.deepStrictEqual([r[3].delta, r[3].estado, r[3].texto], [20, 'sube', '+20']);
+  // Memoria no cambió.
+  assert.deepStrictEqual([r[1].delta, r[1].estado, r[1].texto], [0, 'igual', '=']);
+  // Energía: fatiga 3 → 4 empeora 20 pts (signo menos real, no guion).
+  assert.deepStrictEqual([r[2].delta, r[2].estado, r[2].texto], [-20, 'baja', '\u221220']);
+});
+
+test('nutriCambiosDesdeDiagnostico — coincide con lo que dice gaugeDeltaHtml para cada área', () => {
+  const reeval = { concentracion: 2, olvidos: 5, fatiga: 1, estres: 3 };
+  nutriCambiosDesdeDiagnostico({ encuesta: DIAGNOSTICO }, reeval).forEach(c => {
+    const html = gaugeDeltaHtml(c.antesPct, c.despuesPct);
+    const esperado = c.delta > 0 ? '+'+c.delta+' pts' : (c.delta < 0 ? c.delta+' pts' : 'sin cambios');
+    assert.ok(html.includes(esperado), c.label+': '+html+' no incluye \"'+esperado+'\"');
   });
 });
 

@@ -132,16 +132,19 @@ if(window.netlifyIdentity){
         const o = JSON.parse(objetivo);
         const objetivoEl = document.getElementById('miPlanObjetivo');
         if(objetivoEl) objetivoEl.textContent = o.objetivo;
+        // Si ya se reevaluó desde "Método" (index.html), el gráfico muestra
+        // el estado más reciente y la comparación contra la encuesta
+        // inicial — mismo dato (`sinaptix_reevaluacion`) que usan los
+        // anillos de progreso, ver js/nutricion-planes.js. Se lee acá
+        // arriba (y no dentro del if del gráfico) porque las etiquetas
+        // "Qué cambió desde tu diagnóstico" de la tarjeta Antropometría
+        // usan el mismo dato.
+        let reeval = null;
+        try{
+          const r = localStorage.getItem('sinaptix_reevaluacion');
+          if(r) reeval = JSON.parse(r);
+        }catch(err){ /* dato corrupto: se ignora, se muestra sin comparación */ }
         if(o.encuesta && miPlanBarrasEl && typeof nutriBuildBarChartHTML === 'function'){
-          // Si ya se reevaluó desde "Método" (index.html), el gráfico
-          // muestra el estado más reciente y la comparación contra la
-          // encuesta inicial — mismo dato (`sinaptix_reevaluacion`) que
-          // usan los anillos de progreso, ver js/nutricion-planes.js.
-          let reeval = null;
-          try{
-            const r = localStorage.getItem('sinaptix_reevaluacion');
-            if(r) reeval = JSON.parse(r);
-          }catch(err){ /* dato corrupto: se ignora, se muestra sin comparación */ }
           miPlanBarrasEl.innerHTML = nutriBuildBarChartHTML(o, reeval);
           miPlanBarrasEl.classList.remove('hidden');
         }
@@ -163,6 +166,24 @@ if(window.netlifyIdentity){
             miPlanAjustesListEl.innerHTML = '';
             miPlanAjustesEl.classList.add('hidden');
           }
+        }
+        // Etiquetas "Qué cambió desde tu diagnóstico" (tarjeta Antropometría):
+        // solo con reevaluación guardada. Es justo cuando la tarjeta de
+        // barras de al lado crece (aparecen las líneas "Antes: …") y a la
+        // verde le sobra alto. En 1 columna (≤900px) el CSS las oculta:
+        // ahí no hay hueco y repetirían las barras que quedan debajo.
+        const cambiosBoxEl = document.getElementById('miPlanCambios');
+        const cambiosChipsEl = document.getElementById('miPlanCambiosChips');
+        if(cambiosBoxEl && cambiosChipsEl){
+          const cambios = (typeof nutriCambiosDesdeDiagnostico === 'function')
+            ? nutriCambiosDesdeDiagnostico(o, reeval) : [];
+          cambiosChipsEl.innerHTML = cambios.map(function(c){
+            const detalle = c.label+': de '+c.antesPct+'% a '+c.despuesPct+'%'+
+              (c.delta ? ' ('+(c.delta > 0 ? '+' : '\u2212')+Math.abs(c.delta)+' pts)' : ' (sin cambios)');
+            return '<li class="miplan-cambios-chip is-'+c.estado+'" title="'+detalle+'">'+
+              c.label+' <strong>'+c.texto+'</strong></li>';
+          }).join('');
+          cambiosBoxEl.classList.toggle('hidden', !cambios.length);
         }
         // Chips de "Nutrientes clave de tu plan" al pie de la tarjeta
         // Antropometría (sesión 2026-09-18): salen del plan resuelto
@@ -190,6 +211,8 @@ if(window.netlifyIdentity){
     } else {
       if(miPlanBarrasEl) miPlanBarrasEl.classList.add('hidden');
       if(miPlanDetalleEl) miPlanDetalleEl.classList.add('hidden');
+      const cambiosBoxVacio = document.getElementById('miPlanCambios');
+      if(cambiosBoxVacio) cambiosBoxVacio.classList.add('hidden');
       const nutriBoxVacio = document.getElementById('miPlanNutrientes');
       if(nutriBoxVacio) nutriBoxVacio.classList.add('hidden');
       const miPlanAjustesElVacio = document.getElementById('miPlanAjustes');
