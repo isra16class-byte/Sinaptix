@@ -615,7 +615,18 @@
     ];
     const tam = 8.4;
     const anchoTexto = CW - 14;
-    const alto = 6 + altoParrafoEnfasis(doc, segmentos, anchoTexto, tam) + 4;
+    // altoParrafoEnfasis() devuelve `lineas * interlineado`, que es la
+    // altura entre baselines — correcta para separar líneas, pero cuenta
+    // de más como "alto total del bloque de texto": la primera línea ya
+    // pone su ascendente arriba del padding superior, así que sumar el
+    // interlineado completo de esa primera línea duplicaba ese espacio.
+    // Antes esto dejaba un hueco vacío visible al pie de la caja (más
+    // padding del que se ve arriba) y, de paso, corría el ícono —
+    // centrado contra la caja entera— hacia abajo del centro del texto.
+    const lh = tam * 0.3528 * 1.3;
+    const altoTextoReal = altoParrafoEnfasis(doc, segmentos, anchoTexto, tam) - lh + lh * 0.62;
+    const padSup = 5, padInf = 3.4;
+    const alto = padSup + altoTextoReal + padInf;
 
     ctx.espacio(alto);
     const y = ctx.y;
@@ -629,15 +640,17 @@
     // Marca de "tip": un punto relleno con un anillo fino alrededor, en vez
     // de intentar una bombilla vectorial — a este tamaño (unos milímetros)
     // una silueta de bombilla con primitivas de jsPDF lee como una forma
-    // rota antes que como un ícono reconocible.
-    const cx = M + 9, cyIco = y + alto / 2;
+    // rota antes que como un ícono reconocible. Centrado contra el bloque
+    // de texto (no contra la caja completa), para que quede a la altura
+    // del texto sin importar cuántas líneas ocupe.
+    const cx = M + 9, cyIco = y + padSup + altoTextoReal / 2 - lh * 0.18;
     setDraw(doc, C.verdeBorde);
     doc.setLineWidth(0.5);
     doc.circle(cx, cyIco, 2.6, 'D');
     setFill(doc, C.green);
     doc.circle(cx, cyIco, 1.1, 'F');
 
-    parrafoEnfasis(doc, segmentos, M + 14, y + 6, anchoTexto, tam);
+    parrafoEnfasis(doc, segmentos, M + 14, y + padSup, anchoTexto, tam);
     ctx.y = y + alto + 5;
   }
 
