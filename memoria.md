@@ -799,17 +799,34 @@ próximos pasos).
   cada elemento y de los listones documentadas en el propio script).
   - **Los 4 íconos son archivos individuales** en
     `img/decoraciones-neurona/vision-iconos/` (`icon-cerebro`,
-    `icon-red-neuronal`, `icon-reloj-arena`, `icon-cintas-azules`), no
+    `icon-red-neuronal`, `icon-calendario`, `icon-acompanamiento`), no
     quemados en el fondo — el fondo sin íconos es
-    `fondo-vision-red-sin-iconos.webp`. **Estado actual: revertidos a la
-    versión original tal cual se generaron la primera vez** (sin el
-    agrandado que se probó y descartó en tandas intermedias, sin recortes
-    contra el borde del lienzo). Reproducibles con
+    `fondo-vision-red-sin-iconos.webp`. **Estado actual: cerebro y red
+    neuronal están revertidos a la versión original tal cual se generaron
+    la primera vez** (sin el agrandado que se probó y descartó en tandas
+    intermedias, sin recortes contra el borde del lienzo); **calendario y
+    acompañamiento son nuevos (2026-09-19, ver abajo)**. Reproducibles con
     `scripts/separar-iconos-vision.py` si hace falta volver a generarlos.
     ⚠️ Estas proporciones no son las que calibraron `.vision-icon--*`
     (width/top en `css/styles.css`) — **falta confirmar en navegador real
-    si tapan el texto de las anotaciones de abajo**; si tapa, ajustar
-    `.vision-icon--*`, no las imágenes.
+    si tapan el texto de las anotaciones de abajo** (con Playwright local a
+    1920/1440/1100px no lo hacen); si tapa, ajustar `.vision-icon--*`, no
+    las imágenes.
+  - **Íconos de "4–6" y "1:1" reemplazados (sesión 2026-09-19)**: el reloj
+    de arena (`icon-reloj-arena.webp`, verde) por un **calendario de cristal
+    esmeralda con brote y lapicera** (`icon-calendario.webp`), y el nudo de
+    cintas azules (`icon-cintas-azules.webp`, que no decía "acompañamiento")
+    por **dos bustos de fibras azules con un hilo de luz entre ellos**
+    (`icon-acompanamiento.webp`). Generados con Gemini por el usuario y
+    recortados a RGBA por código (método y prompts en el changelog). Los 2
+    archivos viejos **quedan en el repo sin uso** (los sigue generando
+    `scripts/separar-iconos-vision.py`) por si se quiere volver atrás. CSS:
+    `.vision-icon--azul` no cambió (`left:68%; top:76%; width:32%`);
+    `.vision-icon--verde` pasó de `top:71%; width:22%` a `top:76%;
+    width:33%` (el reloj era angosto, 309×566; el calendario es casi
+    cuadrado y con 22% quedaba diminuto). Con `top:76%` verde y azul
+    comparten línea superior. Sin cambios en mobile (`≤900px`, siguen
+    ocultos).
   - **Los 4 datos ya no son tarjetas** (`.stat-box`, descartado): son 4
     `.stat-annot` (punto de color + número Fraunces + etiqueta corta) con
     posición libre en porcentaje dentro de `.vision-art` (contenedor

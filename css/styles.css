@@ -481,7 +481,7 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   .vision-icon{position:absolute;display:block;height:auto}
   .vision-icon--dorado{left:-5%;top:calc(-14% + var(--vision-pares-shift));width:34%}
   .vision-icon--morado{left:61%;top:calc(-14% + var(--vision-pares-shift));width:34%}
-  .vision-icon--verde{left:0%;top:calc(71% + var(--vision-pares-shift));width:22%}
+  .vision-icon--verde{left:0%;top:calc(76% + var(--vision-pares-shift));width:33%}
   .vision-icon--azul{left:68%;top:calc(76% + var(--vision-pares-shift));width:32%}
 }
 

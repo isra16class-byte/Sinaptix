@@ -11,6 +11,72 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: íconos nuevos para "1:1" (bustos) y "4–6" (calendario)
+
+Pedido del usuario sobre `#lam-02` (con captura): cambiar los íconos
+grandes. Se le dio una opinión antes de tocar nada: cerebro, red neuronal
+y reloj de arena decían lo que el dato decía y ya habían pasado por varias
+tandas de ajuste, así que **solo el nudo azul de "1:1 acompañamiento
+personal" ameritaba cambio** (forma abstracta, la más pesada y saturada de
+las cuatro). Después el usuario pidió también cambiar el reloj de arena por
+"algo como un calendario con unas 2 ojitas" (para "4–6 semanas para notar
+el cambio"). Las imágenes las generó el usuario con Gemini.
+
+- **Azul "1:1" → `img/decoraciones-neurona/vision-iconos/icon-acompanamiento.webp`**
+  (441×390, 69 KB): dos bustos de fibras azules trenzadas, de perfil y
+  enfrentados, unidos por un hilo de luz cian. Reemplaza al nudo de cintas.
+  - **1er intento descartado**: dos figuras de cuerpo casi entero sobre un
+    pedestal. Al recortar se perdía justo el hilo de luz (casi blanco, poca
+    saturación) y las figuras quedaban con la base cortada recta; además eran
+    cuerpos anatómicos realistas, de estilo distinto a los otros 3 íconos. El
+    prompt había dejado libres encuadre y fondo.
+  - **Prompt que sí funcionó** (se cerró explícitamente lo que falló): "bustos
+    humanos abstractos (solo cabeza y hombros)... sin rasgos anatómicos ni
+    género... hilo de luz cian brillante y bien grueso... composición
+    cuadrada, compacto y centrado, mucho margen... fondo blanco puro #FFFFFF
+    liso, sin degradado, sin pedestal, sin piso, sin sombra proyectada, sin
+    reflejo, sin texto".
+  - **Recorte** (Pillow + numpy, no versionado): alfa por saturación
+    (`max(rgb)-min(rgb)`, rampa 10→55) y descontaminación del borde
+    (`F=(C-(1-α)·B)/α` con B=242, el gris del fondo), recorte al bounding box
+    con 20 px de margen, reescalado a 441 px de ancho (el mismo del ícono
+    viejo, para que el 32% del CSS dé el mismo ancho visual), WebP q90.
+    Probado sobre blanco, lila claro y oscuro: sin halo en fondos claros.
+- **Verde "4–6" → `.../vision-iconos/icon-calendario.webp`** (441×454,
+  41 KB): calendario de escritorio de cristal esmeralda con anillas,
+  cuadrícula, un brote al centro y una lapicera al costado. Reemplaza al
+  reloj de arena. Se pidió con "2 ojitas"; Gemini devolvió un brote en vez de
+  ojos y el usuario dijo "pongamos esta" (además suena a crecimiento, que
+  encaja con "notar el cambio"). La lapicera se dejó.
+  - **Recorte por otro método**: el de saturación no servía (cristal
+    translúcido y metal gris de la lapicera con saturación casi nula).
+    Alfa por distancia al blanco (`min(rgb)`, rampa 250→228), misma
+    descontaminación con B=255. Anillas huecas, metal y transparencias del
+    cristal se conservan.
+- **`index.html`**: solo cambian los 2 `src` (`vision-icon--verde` y
+  `vision-icon--azul`).
+- **`css/styles.css`**: `.vision-icon--verde` de `top:calc(71% + shift);
+  width:22%` a `top:calc(76% + shift); width:33%`. El reloj era angosto
+  (309×566) y el calendario es casi cuadrado: a 22% quedaba diminuto, y a
+  28% seguía chico al lado del cerebro/neurona (34%). Con 33% y `top:76%`
+  (el mismo de `--azul`) verde y azul comparten línea superior. `--azul` no
+  cambió. `--vision-pares-shift` y las `.stat-annot` no se tocaron.
+- Los 2 archivos viejos (`icon-reloj-arena.webp`, `icon-cintas-azules.webp`)
+  **se dejaron en el repo sin uso**: los sigue generando
+  `scripts/separar-iconos-vision.py` y sirven para volver atrás.
+- **Verificado** con Playwright/Chromium a 1920/1440/1100px, esperando a que
+  termine la animación de entrada (una primera captura salió a mitad de
+  fade y engañaba con los colores): no tapan los textos de las anotaciones
+  ni los conectores punteados. En ≤900px los íconos siguen ocultos (sin
+  cambios). A 1100px "86B neuronas..." se corta contra el borde derecho: es
+  el desborde preexistente de esa columna (las `.stat-annot` no se tocaron).
+  Falta la confirmación de siempre sobre un navegador real/deploy.
+- El bloque nuevo es más saturado que cerebro y neurona (pastel); si
+  desentona se le baja saturación o tamaño con una línea de CSS/`filter`.
+- `npm test`: 85 pass / 1 skipped (e2e del PDF), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — Login de "Mi plan": más espigas (sobre todo a la izquierda) + frutilla y uva
 
 Pedido del usuario sobre la pantalla de login (`#miPlanSinSesion`): "más de
