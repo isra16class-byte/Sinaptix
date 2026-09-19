@@ -11,6 +11,22 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: el pulso más fino (destacaba demasiado)
+
+Pedido del usuario tras ver el resultado del ajuste anterior: "quedo bien,
+ahora quiero que lo hagas mas finos porque destaca bastante, (no toques nada
+mas)". Cambio puntual, un solo archivo:
+
+- **`css/styles.css`**: los 8 `stroke-width` del pulso (halo + 6 capas de
+  cola + cuerpo + núcleo) bajan a ~60% del valor anterior, misma
+  proporción entre capas (así la cola se sigue viendo graduada, solo que
+  más angosta). De `16/2.2/2.6/3/3.4/3.8/4.2/5/2.2` a
+  `9.5/1.3/1.6/1.8/2/2.3/2.5/3/1.3`. No se tocó nada más: ni colores, ni
+  opacidades, ni el orden en el DOM, ni la duración, ni `.ve-rail` (el
+  riel de fondo).
+- Verificado con Playwright: se ve claramente más discreto sin perder el
+  efecto de cola ni el color por ícono. `npm test`: 85/86 (de siempre).
+
 ## 2026-09-19 — Visión: el pulso pasa por detrás de los íconos y toma su color real (no el de los datos)
 
 Dos ajustes pedidos por el usuario sobre la entrada anterior de hoy mismo,
