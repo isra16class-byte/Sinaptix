@@ -11,6 +11,25 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Ajuste a mano del usuario: frutas de las tarjetas de comentarios (commit `6fbec2b`, sin patch de esta sesión)
+
+El usuario retocó a mano (no vía patch de esta sesión) el resultado del
+punto anterior y confirmó que así quedó bien. Documentado acá porque el
+commit no traía entrada de changelog/memoria propia.
+
+- Tarjeta de M.R.: se sacan arándanos y nuez, queda **solo el kiwi**,
+  agrandado (72→96px) y más desplazado (`top:-16px;left:-20px` →
+  `top:-34px;left:-42px`).
+- Tarjeta de J.S.: las 3 frutas se mantienen pero mucho más grandes y
+  desplazadas — palta 78→132px (`right:-22px`→`right:-100px`), frutilla
+  62→82px, almendras 84→**156px** con `bottom:-150px;right:-166px` (antes
+  `-18px;-18px`): quedan bien afuera del rectángulo de la tarjeta, ya no
+  "apenas asomando" como en el planteo original — decisión del usuario,
+  visto directo en su navegador.
+- Ajuste de espaciado suelto en Conócenos: el párrafo bajo el título pasa
+  de `margin-bottom:22px` a `margin-top:-18px;margin-bottom:40px`.
+- Sin cambios de CSS — todo el ajuste es de valores inline en `index.html`.
+
 ## 2026-09-19 — Beneficios: 6 frutas asomando por los lados de las tarjetas de comentarios
 
 Pedido del usuario, mismo día en que se habían sacado las 3 frutas de

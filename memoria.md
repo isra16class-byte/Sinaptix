@@ -1033,29 +1033,35 @@ próximos pasos).
     (arándanos, kiwi, almendras, clase `.ben-quote-fruit`) se sacaron del
     HTML en una sesión anterior — **reemplazado más tarde, ver bullet
     siguiente**.
-  - **6 frutas por los lados de las 2 tarjetas (2026-09-19, mismo día,
-    pedido posterior del usuario)**: vuelve `.ben-quote-fruit`, ahora con
-    6 en vez de 3 (3 por tarjeta), pensadas para asomar detrás del vidrio
-    esmerilado en vez de sobre él. Van como `<img>` **antes** de
-    `.quote-card` dentro de cada `.quote-card-wrap` (sin z-index propio,
-    así el fondo semitransparente + blur de la tarjeta las tapa a medias
-    y solo asoma la punta) — mismo mecanismo que la versión de 3 del
-    2026-09-18, ver `.ben-quote-fruit{filter:none}` en el CSS (sin eso se
-    ven como estampitas con sombra propia encima, no "saliendo" de atrás).
-    Tarjeta 1 (M.R.): kiwi arriba-izquierda, arándanos/berries a la
-    derecha a media altura, nuez abajo-izquierda. Tarjeta 2 (J.S.):
-    palta/avocado arriba-derecha, frutilla a la izquierda a media altura,
-    almendras abajo-derecha. Assets: `svg/deco-blob-{kiwi,berries,walnut,
-    avocado,strawberry,almonds}.svg` (los mismos `deco-blob-*` que ya usa
-    el resto del sitio). Se ocultan solas en ≤720px (regla general de
-    `.deco-fruit`). **No verificado en navegador real ni con Playwright**
-    (sin browser instalable en este entorno, ver nota de siempre) — solo
-    con una previsualización aproximada armada a mano en este entorno
-    (SVG rasterizado + blur simulado, no el CSS real). Revisar en
-    especial que no queden pegadas a `.quote-avatar`/el texto en anchos
-    intermedios (~1000–1100px, donde la columna de tarjetas es más
-    angosta) y que la nuez/almendras (las más grandes, 80–84px) no se
-    corten contra el borde de `.wrap`.
+  - **Frutas por los lados de las tarjetas de comentarios (2026-09-19,
+    mismo día, pedido posterior del usuario — cantidad final 4, no 6)**: vuelve `.ben-quote-fruit`, pensadas
+    para asomar detrás del vidrio esmerilado en vez de sobre él. Van como
+    `<img>` **antes** de `.quote-card` dentro de cada `.quote-card-wrap`
+    (sin z-index propio, así el fondo semitransparente + blur de la
+    tarjeta las tapa a medias y solo asoma la punta) — mismo mecanismo
+    que la versión de 3 del 2026-09-18, ver `.ben-quote-fruit{filter:none}`
+    en el CSS (sin eso se ven como estampitas con sombra propia encima,
+    no "saliendo" de atrás).
+    - **Primer intento (3 por tarjeta, igual de tamaño/offset)**:
+      reemplazado por el usuario a mano el mismo día, ver siguiente
+      bullet — no quedan en el HTML.
+    - **Ajuste final a mano del usuario** (commit `6fbec2b`, sin patch de
+      esta sesión — el usuario edita directo, no siempre pasa por el
+      flujo de `.patch`): confirmado visualmente por el usuario ("quedó
+      bien"). Tarjeta 1 (M.R.): **una sola fruta**, kiwi arriba-izquierda,
+      96px, `top:-34px;left:-42px`. Tarjeta 2 (J.S.): las 3 originales
+      pero bastante más grandes y desplazadas — palta arriba-derecha
+      132px `top:-38px;right:-100px`, frutilla a la izquierda a media
+      altura 82px `top:40%;left:-44px`, almendras abajo-derecha **156px**
+      `bottom:-150px;right:-166px` (con ese offset quedan bien afuera del
+      rectángulo de la tarjeta, ya no "asomando apenas" — el usuario lo
+      quiso así). Assets: `svg/deco-blob-{kiwi,avocado,strawberry,
+      almonds}.svg` (se sacaron `berries`/`walnut` de esta sección, siguen
+      en uso en otras). Se ocultan solas en ≤720px (regla general de
+      `.deco-fruit`).
+    - **Sin verificar con Playwright** en ningún momento (sin browser
+      instalable en este entorno) — el ajuste final lo validó el usuario
+      directo en su navegador, no hace falta repetirlo.
   - **Avatares con foto (2026-09-19)**: `.quote-avatar` pasó de 42px a
     56px, con aro blanco + sombra; contiene `<span class="quote-avatar-ini">`
     (iniciales) y un `<img>` encima (`img/testimonios/mr.webp` y `js.webp`,
