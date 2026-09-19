@@ -793,19 +793,32 @@ próximos pasos).
     arriba, hasta donde dice © 2026 SINAPTIX…", "mismo color de las otras
     secciones que tienen el color morado". Es `#lam-07::before`
     (`css/styles.css`, junto a `#lam-07 footer{text-align:left}`): franja
-    a todo el ancho pegada al borde inferior de la sección
-    (`linear-gradient(0deg,var(--panel) 0, rgba(247,241,245,.6) 45%, …0
-    100%)`, `--panel` = el lavanda de Visión/Método/Beneficios/Conócenos,
-    no un morado nuevo), `z-index:0` detrás del `.wrap` y de las frutas.
-    Altura `--closing-foot-h`: `175px` desktop, `205px` en `≤900px` (el pie
-    se parte en 2 filas). Medido con Playwright: la línea superior del pie
-    queda a 157px del borde inferior en desktop, 187px a 800px y 167px a
-    390px (`padding-bottom` de la sección baja a 70px en `≤720px`), así el
-    texto del pie queda dentro del tinte con ~15–20px de margen. Si se
-    cambia el `padding-bottom` de `#lam-07` o el texto/estructura del
-    `<footer>`, hay que re-medir y ajustar solo `--closing-foot-h`. Se hizo
-    en un pseudo-elemento de la sección y no en el `<footer>` porque este
-    vive dentro de `.wrap` (1180px) y no llega a los bordes.
+    a todo el ancho pegada al borde inferior de la sección, a **color
+    pleno** `--panel` (#F7F1F5, el lavanda de Visión/Método/Beneficios/
+    Conócenos, no un morado nuevo) detrás de las 2 filas del pie, y recién
+    arriba se desvanece a blanco:
+    `linear-gradient(0deg, var(--panel) 0, var(--panel) var(--closing-foot-solid), rgba(247,241,245,0) 100%)`.
+    Variables locales de `#lam-07`: `--closing-foot-solid` (tramo sólido:
+    `135px` desktop, `165px` en `≤900px`) y `--closing-foot-h` (alto total:
+    `240px` / `270px`). `z-index:0` detrás del `.wrap` y de las frutas.
+    Se hizo en un pseudo-elemento de la sección y no en el `<footer>`
+    porque este vive dentro de `.wrap` (1180px) y no llega a los bordes.
+    Medidas (Playwright): las filas de texto del pie quedan a 110–130px
+    del borde inferior en desktop y hasta 160px en `≤900px` (el pie se
+    parte en 2 filas; `padding-bottom` de la sección baja a 70px en
+    `≤720px`); el subtítulo termina ~257px sobre el borde (`margin-top`
+    del footer 100px + línea del pie a 157px), por eso `--closing-foot-h`
+    se queda debajo de eso para no tocarlo. Si cambia el `padding-bottom`
+    de `#lam-07` o el texto/estructura del `<footer>`, re-medir y ajustar
+    solo esas 2 variables.
+    ⚠️ **No volver a un degradado lineal continuo desde el borde**: la
+    primera versión (mismo color, `--panel` a 0 y transparente a 175px,
+    con un punto medio a alfa .6) se desvanecía tan rápido que a la altura
+    del texto del pie quedaba ~20% del color y el usuario lo veía
+    "todavía blanco" en su navegador. El color en sí ya era el correcto;
+    el problema era la intensidad en la zona del texto. Si se quiere más
+    marcado todavía, la opción es `--panel-2` (#F1E5EC) en la base, pero
+    ya no sería el mismo color que el resto de las secciones moradas.
 - **Collage de redes en `#lam-06` "Conócenos" (sesión 2026-09-18, integrado
   en HTML/CSS propio)**: nueva columna derecha con una composición tipo
   "app showcase" — perfil de TikTok, teléfono con Instagram, correo y

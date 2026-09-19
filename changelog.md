@@ -11,6 +11,36 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-18 — `#lam-07` Cierre: el lila del pie ahora llega a color pleno detrás del texto
+
+Reporte del usuario, con captura de su navegador, sobre el patch anterior
+(entrada de abajo): "sigue blanco jaja el pie de la web sigue blanco".
+Confirmó el resultado con "ahí sí".
+
+- **Causa**: el color ya era el correcto (`--panel`, `rgb(247,241,245)`,
+  idéntico a `#lam-02/03/05/06`), pero el degradado del patch anterior se
+  desvanecía de forma lineal desde el borde inferior hasta la línea del pie
+  (175px, con un punto medio a alfa .6), así que a la altura de las 2 filas
+  de texto (110–130px sobre el borde) el tinte era ~20% y se leía blanco.
+- **`css/styles.css`** (`#lam-07::before` y sus variables): pasa a un tramo
+  **sólido** de `--panel` que cubre el texto del pie
+  (`--closing-foot-solid`: `135px`, `165px` en `≤900px`) y el desvanecido
+  a blanco va **por encima** de él, hasta `--closing-foot-h` (`240px`,
+  `270px` en `≤900px`; antes `175px`/`205px`). El techo del degradado queda
+  por debajo del subtítulo "Diseñamos tu plan…" (termina ~257px sobre el
+  borde), sin tocarlo.
+- **Medido** (Playwright, 1425px, fuentes locales): píxel junto al texto del
+  pie = `(247, 241, 245)` (= `--panel` puro); a 200px del borde
+  `(251, 249, 251)`; a 235px `(255, 254, 255)`; en el borde inferior
+  `(247, 241, 245)`. Revisado a 1425/1911/800/390px. Sin cambios de
+  `scrollWidth` (1632 a 1425px, 2118 a 1911px, 390px sin desborde).
+- No se tocó HTML ni JS. Se reescribió el bullet "Pie con degradado lila"
+  de `memoria.md` (incluye la advertencia de no volver al degradado lineal).
+- `npm test`: 75 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-18 — `#lam-07` Cierre: pie con degradado lila de abajo hacia arriba
 
 Pedido del usuario: "que la parte final de la web esté como moradito

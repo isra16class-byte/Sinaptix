@@ -1888,26 +1888,33 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:17px}
 #lam-07 footer{text-align:left}
 /* Sesión 2026-09-18 (pedido: "la parte final de la web como moradito
-   difuminado, de abajo hacia arriba, hasta donde dice © 2026 SINAPTIX…"):
-   franja lila que nace en el borde inferior de la página y se desvanece
-   hacia arriba hasta la altura del pie (© 2026 / "Contenido informativo…").
-   Color = `--panel` (#F7F1F5), el mismo lavanda de las secciones moradas
-   (Visión, Método, Beneficios, Conócenos) — no un morado nuevo. Es un
-   pseudo-elemento de la sección a todo el ancho (el `<footer>` vive dentro
-   de `.wrap` de 1180px, no sirve para sangrar a los bordes), con
+   difuminado, de abajo hacia arriba, hasta donde dice © 2026 SINAPTIX…",
+   "mismo color de las otras secciones que tienen el color morado"):
+   franja lila que nace en el borde inferior de la página, se mantiene a
+   COLOR PLENO detrás de las 2 filas del pie y recién arriba se desvanece a
+   blanco. Color = `--panel` (#F7F1F5), el mismo lavanda de las secciones
+   moradas (Visión, Método, Beneficios, Conócenos) — no un morado nuevo.
+   ⚠️ Primera versión (patch anterior): el degradado se desvanecía de forma
+   lineal desde el borde inferior hasta la línea del pie, así que a la
+   altura del texto solo quedaba ~20% del color y el usuario lo veía
+   "todavía blanco". Por eso ahora hay un tramo SÓLIDO (`--closing-foot-solid`)
+   que cubre el texto del pie y el difuminado va por encima.
+   Es un pseudo-elemento de la sección a todo el ancho (el `<footer>` vive
+   dentro de `.wrap` de 1180px, no sirve para sangrar a los bordes), con
    `z-index:0` para quedar detrás del `.wrap` (z-index 1) y por debajo de
-   las frutas (que van antes en el DOM). Altura = pie + `padding-bottom` de
-   la sección, medida con Playwright: la línea superior del pie queda a
-   157px del borde inferior (desktop), 187px (≤900px, el pie se parte en 2
-   filas) y 167px (≤720px, `padding-bottom:70px`); `--closing-foot-h` deja
-   ~15–20px de margen sobre esa línea para que el texto quede dentro del
-   tinte. Ajustar solo ese valor si se cambia el padding o el texto del pie. */
-#lam-07{--closing-foot-h:175px}
-@media(max-width:900px){#lam-07{--closing-foot-h:205px}}
+   las frutas (que van antes en el DOM). Medidas (Playwright): las filas de
+   texto del pie quedan a 110–130px del borde inferior en desktop y hasta
+   160px en ≤900px (el pie se parte en 2 filas); el subtítulo termina ~257px
+   sobre el borde (footer `margin-top:100px` + línea del pie a 157px), así
+   que `--closing-foot-h` (240/270px) se queda debajo para no tocarlo. Si
+   cambia el `padding-bottom` de `#lam-07` o el texto/estructura del
+   `<footer>`, re-medir y ajustar solo estas 2 variables. */
+#lam-07{--closing-foot-solid:135px;--closing-foot-h:240px}
+@media(max-width:900px){#lam-07{--closing-foot-solid:165px;--closing-foot-h:270px}}
 #lam-07::before{
   content:"";position:absolute;left:0;right:0;bottom:0;height:var(--closing-foot-h);
   z-index:0;pointer-events:none;
-  background:linear-gradient(0deg,var(--panel) 0,rgba(247,241,245,.6) 45%,rgba(247,241,245,0) 100%);
+  background:linear-gradient(0deg,var(--panel) 0,var(--panel) var(--closing-foot-solid),rgba(247,241,245,0) 100%);
 }
 
 footer{
