@@ -200,9 +200,13 @@ h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em}
     display:flex;flex-direction:column;
     position:absolute;top:100%;left:0;right:0;
     padding:6px 20px 14px;
-    background:#fff; /* sólido: un backdrop-filter anidado dentro del del nav no se aplica y se transparentaba el contenido de abajo */
-    border-bottom:1px solid var(--line);
-    box-shadow:0 18px 30px rgba(38,22,31,.12);
+    /* Blanco con tinte morado translúcido (pedido del usuario): la base es
+       blanco y el morado entra como lavado suave hacia abajo + borde y
+       sombra en --purple. Se evita poner `backdrop-filter` acá: anidado
+       dentro del del nav no se aplica (ya pasó antes). */
+    background:linear-gradient(180deg,rgba(255,255,255,.94) 0%,rgba(222,203,224,.95) 100%);
+    border-bottom:1px solid rgba(113,75,103,.45);
+    box-shadow:0 18px 30px rgba(113,75,103,.28);
     opacity:0;visibility:hidden;transform:translateY(-8px);
     transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;
   }
@@ -214,6 +218,8 @@ h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em}
     display:flex;align-items:center;justify-content:space-between;
     min-height:52px;font-size:16px;font-weight:600;color:var(--ink);
     border-top:1px solid var(--line);
+    border-radius:12px;
+    transition:background .18s ease,color .18s ease,transform .12s ease;
   }
   .nav-menu a:first-child{border-top:0}
   .nav-menu a::after{
@@ -221,7 +227,28 @@ h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em}
     border-right:2px solid var(--purple);border-top:2px solid var(--purple);
     transform:rotate(45deg);opacity:.7;
   }
-  .nav-menu a:active{color:var(--purple)}
+  /* Efecto al presionar los links del panel (sesión 2026-09-19, pedido del
+     usuario): fondo morado suave + el link se achica un poco. `transform`
+     (no `padding`) para no mover el layout del panel. */
+  .nav-menu a:active{
+    color:var(--purple);
+    background:rgba(113,75,103,.16);
+    transform:scale(.97);
+  }
+}
+/* Botones del nav más chicos en mobile (sesión 2026-09-19, pedido del
+   usuario): "Acceder" (`.nav-btn-solid`) y la hamburguesa (`.nav-toggle`,
+   con sus 3 rayitas y los desplazamientos de la X). Va después del bloque
+   de ≤720px de arriba para pisarlo con la misma especificidad. Solo
+   mobile: el nav de escritorio no se toca. */
+@media(max-width:720px){
+  .nav-btn-solid{padding:8px 15px;font-size:12.5px}
+  .nav-toggle{width:36px;height:36px;border-radius:12px}
+  .nav-toggle-bars,.nav-toggle-bars::before,.nav-toggle-bars::after{width:17px;height:2.2px}
+  .nav-toggle-bars::before{top:-6px}
+  .nav-toggle-bars::after{top:6px}
+  .nav.is-open .nav-toggle-bars::before{transform:translateY(6px) rotate(45deg)}
+  .nav.is-open .nav-toggle-bars::after{transform:translateY(-6px) rotate(-45deg)}
 }
 @media(prefers-reduced-motion:reduce){
   .nav-menu,.nav-toggle-bars,.nav-toggle-bars::before,.nav-toggle-bars::after{transition:none}
