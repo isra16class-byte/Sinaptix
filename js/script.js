@@ -77,17 +77,22 @@
     el.classList.remove('open');
     document.body.style.overflow='';
   }
-  document.getElementById('btnNutricion').addEventListener('click', ()=>{
-    resetNutriWizard();
-    openModal('modalNutricion');
-  });
+  // Abrir la encuesta desde estos dos botones: si ya hay un plan guardado en
+  // este navegador, generar otro lo reemplaza, así que primero se avisa
+  // (js/plan-aviso.js). Sin plan guardado, abre directo como siempre.
+  function abrirEncuestaNutricion(){
+    const abrir = ()=>{
+      resetNutriWizard();
+      openModal('modalNutricion');
+    };
+    if(typeof planAvisoConfirmar === 'function') planAvisoConfirmar(abrir);
+    else abrir();
+  }
+  document.getElementById('btnNutricion').addEventListener('click', abrirEncuestaNutricion);
   // Botón "Descubrir mi plan personalizado" del bloque de cierre (#lam-07):
   // misma acción que #btnNutricion, id propio porque un id no puede
   // repetirse en el documento.
-  document.getElementById('btnNutricionCierre').addEventListener('click', ()=>{
-    resetNutriWizard();
-    openModal('modalNutricion');
-  });
+  document.getElementById('btnNutricionCierre').addEventListener('click', abrirEncuestaNutricion);
   document.getElementById('btnAntropometria').addEventListener('click', ()=>openModal('modalAntropometria'));
   document.querySelectorAll('[data-close]').forEach(b=>{
     b.addEventListener('click', e=>closeModal(e.target.closest('.modal-overlay')));

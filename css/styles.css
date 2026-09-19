@@ -2613,6 +2613,21 @@ footer .f-brand img{width:20px;height:20px;object-fit:contain;opacity:.85}
    de arriba en vez de un CTA grande nuevo. */
 .nutri-login-btn{align-self:flex-start;margin-top:10px;padding:11px 24px;font-size:13.5px}
 
+/* Aviso "Ya tenés un plan" (js/plan-aviso.js): se muestra antes de abrir la
+   encuesta cuando ya hay un plan guardado, porque volver a generarlo lo
+   reemplaza. Reusa .modal-overlay/.modal-card; acá solo el ancho (más chico
+   que el de los formularios) y los dos botones, que se reparten la fila por
+   igual para que en móvil (hasta 320px) queden grandes y a mano. */
+.aviso-plan-card{max-width:420px}
+.aviso-plan-card .modal-text{margin-bottom:22px}
+.aviso-plan-btns{display:flex;gap:12px}
+.aviso-plan-btns .btn{flex:1 1 0;min-width:0;justify-content:center;padding:14px 18px}
+/* Un <button class="btn btn-solid"> muestra el borde nativo del navegador (el
+   mismo pendiente anotado en memoria.md para los demás botones sólidos): acá se
+   le pone un borde transparente del mismo grosor que el de .btn-ghost para
+   que los dos botones midan igual. */
+.aviso-plan-btns .btn-solid{border:1.5px solid transparent}
+
 /* ---------- ENCUESTA DE NUTRICIÓN ESPECIALIZADA (wizard) ---------- */
 .modal-card-wide{max-width:560px}
 

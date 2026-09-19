@@ -161,6 +161,11 @@ próximos pasos).
   "PDF de Mi plan" abajo). Se carga en `mi-plan.html` **después** de
   `nutricion-planes.js` (depende de sus funciones puras) y antes de
   `mi-plan.js` (que lo llama desde `pintarMiPlan`).
+- `js/plan-aviso.js` — **compartido** (`index.html` y `mi-plan.html`): aviso
+  "Ya tenés un plan" antes de volver a abrir la encuesta y rótulo del botón
+  de Mi plan ("Generar" / "Actualizar mi plan"). Se carga antes de
+  `mi-plan.js` / `script.js`; sin dependencias (tests en
+  `tests/plan-aviso.test.js`).
 - `js/nav-menu.js` — **compartido** (`index.html` y `mi-plan.html`): abre/cierra
   el menú hamburguesa del nav en mobile (`.nav.is-open`). Se carga antes
   que el resto de los scripts; sin dependencias.
@@ -247,6 +252,36 @@ próximos pasos).
   `plan-validacion.mjs`.
 
 ## Estado actual del diseño (resumen)
+
+- **Aviso antes de reemplazar un plan ya generado (`js/plan-aviso.js`,
+  sesión 2026-09-19, pedido del usuario)**: volver a completar la encuesta
+  guarda el plan nuevo ENCIMA del anterior (`sinaptix_objetivo` en
+  localStorage y, con sesión, el upsert de `netlify/functions/plan.mjs`, que
+  no guarda historial), y los botones que abren la encuesta no avisaban.
+  Ahora:
+  - "Hay plan guardado" = `sinaptix_objetivo` presente y con JSON de objeto
+    válido (mismo criterio que `pintarMiPlan`; dato corrupto = sin plan).
+  - `mi-plan.html`: `#btnAbrirNutricionMiPlan` dice **"Actualizar mi plan"**
+    si hay plan y "Generar mi plan" si no (se decide en `pintarMiPlan`, que
+    corre en cada carga y al terminar la encuesta).
+  - Con plan, al tocar ese botón (y `#btnNutricion` / `#btnNutricionCierre`
+    en `index.html`) sale un modal propio (`role="alertdialog"`, clases
+    `.modal-overlay` / `.modal-card` + `.aviso-plan-*`): **Cancelar** (foco
+    inicial, la opción segura) o **Continuar**, que recién ahí abre la
+    encuesta. Cierra también con la ×, Esc y clic afuera; Tab queda atrapado
+    dentro; el foco vuelve al botón al cancelar. El modal se crea al abrir y
+    se quita del DOM al cerrar (no deja botones invisibles en el tab).
+  - Sin plan guardado todo funciona como antes (sin aviso). En `index.html`
+    los rótulos no cambian ("Descubrir mi plan personalizado" es copy de
+    cierre). El aviso en `index.html` mira solo el localStorage de ese
+    navegador: si el plan está en el servidor pero es un navegador nuevo sin
+    sesión, no aparece (igual que el resto del sitio).
+  - Lo que sigue pasando: el plan viejo NO se guarda en ningún lado. Historial
+    de planes anteriores queda como idea aparte (implica tocar la tabla y
+    `plan.mjs`); no se hizo.
+  - `.aviso-plan-btns .btn-solid` lleva `border:1.5px solid transparent` porque
+    un `<button class="btn btn-solid">` muestra el borde nativo; es el mismo
+    pendiente de los demás botones sólidos, resuelto solo para este modal.
 
 - **Nav en mobile: barra más alta, botón "Inicio" y menú hamburguesa
   (`.nav`, `.nav-back`, `.nav-toggle`, `.nav-menu`, sesión 2026-09-19)**: en

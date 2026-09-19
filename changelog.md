@@ -11,6 +11,37 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Aviso antes de reemplazar un plan ya generado
+
+El usuario preguntó qué pasa si genera su plan otra vez: el anterior se pisa y
+el botón no avisaba nada. Se verificó en el código (la encuesta guarda en
+`sinaptix_objetivo` y `plan.mjs` hace upsert sin historial) y se pidió resolver
+solo el aviso, sin guardar historial.
+
+- **Cambio** (nuevo `js/plan-aviso.js`, `js/mi-plan.js`, `js/script.js`,
+  `mi-plan.html`, `index.html`, `css/styles.css` bloque `.aviso-plan-*`):
+  - `mi-plan.html`: el botón `#btnAbrirNutricionMiPlan` dice "Actualizar mi
+    plan" si ya hay un plan guardado y "Generar mi plan" si no.
+  - Con plan guardado, ese botón y `#btnNutricion` / `#btnNutricionCierre` de
+    `index.html` abren primero un aviso ("Ya tenés un plan. ¿Querés generar uno
+    nuevo?") con Cancelar / Continuar; recién Continuar abre la encuesta. Sin
+    plan, abren directo como antes.
+  - Modal propio con las clases de los demás modales, en vez de `confirm()`.
+    Foco inicial en Cancelar, cierre con ×/Esc/clic afuera, Tab atrapado, foco
+    devuelto al botón, y el nodo se quita del DOM al cerrar.
+- **Criterio de "hay plan"**: `sinaptix_objetivo` con JSON de objeto válido,
+  el mismo que usa `pintarMiPlan`. En `index.html` se mira solo el localStorage
+  de ese navegador.
+- **No se hizo**: historial de planes anteriores (tocaría la tabla y
+  `plan.mjs`). Sigue siendo una idea aparte.
+- **Detalle**: el botón sólido del aviso mostraba el borde nativo del
+  navegador; se le puso `border:1.5px solid transparent` solo a ese modal (el
+  pendiente general de los demás `.btn-solid` sigue abierto).
+- Verificado con Playwright + Chromium y fuentes reales a 320/390/1440px, con
+  y sin plan, en las dos páginas (aviso, Cancelar, Esc, clic afuera, Continuar,
+  peso prellenado intacto, sin desborde). Tests: `tests/plan-aviso.test.js`;
+  `npm test` en verde.
+
 ## 2026-09-19 — README.md más corto + nota vieja del collage corregida en memoria.md
 
 El usuario pidió sacar del `README.md` las secciones "Flujo de

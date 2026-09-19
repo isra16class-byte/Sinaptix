@@ -126,6 +126,10 @@ if(window.netlifyIdentity){
     const miPlanDetalleEl = document.getElementById('miPlanDetalle');
     const miPlanCtaEl = document.getElementById('miPlanCta');
     const miPlanBarrasEl = document.getElementById('miPlanBarras');
+    // El botón que abre la encuesta dice "Actualizar mi plan" si ya hay uno
+    // guardado y "Generar mi plan" si no (js/plan-aviso.js). Se decide acá
+    // porque pintarMiPlan corre en cada carga y después de enviar la encuesta.
+    if(typeof planAvisoActualizarBoton === 'function') planAvisoActualizarBoton(btnAbrirNutricionMiPlan);
     const objetivo = localStorage.getItem('sinaptix_objetivo');
     if(objetivo){
       try{
@@ -620,12 +624,18 @@ if(window.netlifyIdentity){
   // no hace falta contemplar el caso "sin sesión" en este flujo.
   if(btnAbrirNutricionMiPlan){
     btnAbrirNutricionMiPlan.addEventListener('click', function(){
-      resetNutriWizard();
-      if(conSesionEl) conSesionEl.classList.add('hidden');
-      if(nutriInlineEl){
-        nutriInlineEl.classList.remove('hidden');
-        nutriInlineEl.scrollIntoView({behavior:'smooth', block:'start'});
-      }
+      const abrirEncuesta = function(){
+        resetNutriWizard();
+        if(conSesionEl) conSesionEl.classList.add('hidden');
+        if(nutriInlineEl){
+          nutriInlineEl.classList.remove('hidden');
+          nutriInlineEl.scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      };
+      // Si ya hay un plan guardado, generar otro lo reemplaza: se avisa
+      // antes (js/plan-aviso.js). Sin plan, se abre directo como siempre.
+      if(typeof planAvisoConfirmar === 'function') planAvisoConfirmar(abrirEncuesta);
+      else abrirEncuesta();
     });
   }
   if(nutriInlineVolver){
