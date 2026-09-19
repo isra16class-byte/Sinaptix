@@ -1121,6 +1121,19 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
      `.miplan-titlecard` (nada se recorta: `line-height` no recorta). */
   line-height:clamp(34.5px,4.485vw,48.3px);
 }
+/* Sesión 2026-09-19 (pedido del usuario): el título de "Mi plan" más chico
+   y, en conjunto, el círculo que encierra "SINAPTIX" — el círculo es un
+   `::after` con medidas en % de la palabra (`.miplan-brand-circled`), así
+   que baja solo al bajar el `font-size`. `line-height` vuelve a ser
+   1.15 × el tamaño nuevo para que la tarjeta no crezca de alto.
+   Solo ≤900px: el escritorio queda con el `clamp(32px,4.35vw,48px)` de
+   más arriba (el usuario pidió expresamente no tocarlo). */
+@media(max-width:900px){
+  #miPlanConSesion .miplan-titlecard .lam-title{
+    font-size:clamp(29px,3.9vw,43px);
+    line-height:clamp(33px,4.5vw,49px);
+  }
+}
 #miPlan .miplan-subhead{margin-bottom:12px}
 #miPlan .stat-box,
 #miPlan .bar-chart-card,
