@@ -11,6 +11,34 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión (mobile): las estadísticas como el escritorio, de 1 en 1
+
+El usuario mandó una captura a 390px de la grilla 2×2 de tarjetas con
+tinte de color (patch anterior `c63676e`) y dijo que no le gustaban:
+quería algo parecido a la sección del escritorio, "de 1 en 1".
+
+- **Qué es el escritorio** (referencia): 4 íconos 3D grandes unidos por la
+  red, cada uno con su anotación (punto de color + línea punteada que
+  apunta al ícono, número en Fraunces, etiqueta). En ≤900px el fondo y los
+  íconos grandes se ocultan, así que las anotaciones necesitaban diseño
+  propio.
+- **Cambio** (solo `css/styles.css`, sin tocar `index.html`: el `<img>`
+  `.stat-annot-icon` y el `.stat-annot-deco` ya estaban dentro de cada
+  anotación): se reemplaza el bloque `@media(max-width:900px)` de tarjetas
+  por una fila por dato — ícono 3D grande a la izquierda (112px; 92px en
+  ≤480; 80px en ≤360) y a la derecha el `.stat-annot-deco` del escritorio
+  + número + etiqueta, centrados contra el ícono. `--gap` mide lo que la
+  línea punteada para que su punta toque el ícono. Un hilo punteado
+  vertical (`.stat-annotations::before`) une los 4 íconos por detrás.
+  Detalle en `memoria.md` → "Visión — anotaciones en mobile".
+- **Descartado**: las tarjetas (`--vision-card-*`) — no reintroducir.
+  **Decisión de interpretación**: "de 1 en 1" se leyó como una anotación por
+  fila (columna única), no como una lista de bullets sin íconos.
+- **Verificación**: 320/360/390/480/600/800/900px con fuentes reales
+  (sin desborde horizontal propio, etiquetas en 1-2 líneas) y 1440px
+  comparado píxel a píxel contra antes del cambio: 0 píxeles distintos.
+  `npm test`: 85 pasan, 1 salteado. Falta mirarlo en un teléfono real.
+
 ## 2026-09-19 — Wizard de nutrición: campos alineados y botones sin desborde en mobile
 
 El usuario mandó 3 capturas: el modal de `index.html` a 390px en un

@@ -768,34 +768,65 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .stat-annot--verde{color:var(--green)}
 .stat-annot--azul{color:var(--navy-bright)}
 
-/* Grilla de tarjetas en mobile/tablet (Visión — sesión 2, "mobile +
-   limpieza" de memoria.md): hasta ahora `#lam-02 .stat-annotations`
-   quedaba en el fallback simple de arriba (columna de 4 puntos sueltos,
-   sin fondo ni ícono, con ~134px de blanco antes del primero por el
-   `margin-top:90px` viejo de `.vision-stats-col`) — se veía "muy simple"
-   (reportado por el usuario con captura a 390px). Se arma acá la versión
-   mobile real: grilla 2×2 de tarjetas con tinte de color, reusando
-   `--vision-card-*` (ya existían para esto, sin uso desde que las
-   tarjetas de caja se reemplazaron por anotaciones sueltas sobre el
-   fondo) y los mismos 4 íconos que ya usa el desktop, ahora dentro de
-   cada tarjeta en vez de sueltos sobre `vision-brain-bg` (oculto acá).
-   El punto+línea punteada (`.stat-annot-deco`) se oculta: apuntaba al
-   ícono correspondiente sobre el fondo, que en mobile no está, así que
-   sin fondo detrás la línea no señala nada (se veía como un punto suelto
-   sin sentido, recortada por el `overflow` del propio SVG). Scope
-   `#lam-02` para no tocar `.stat-box`/`.stat-grid` de "Mi plan", que
-   comparte algunos nombres de variable pero es un componente aparte. */
+/* Anotaciones de Visión en mobile/tablet: el escritorio en una columna
+   (sesión 2026-09-19). Reemplaza la grilla 2×2 de tarjetas con tinte de
+   color (`--vision-card-*`) que el usuario vio en una captura a 390px y
+   no le gustó: pidió algo parecido a la sección del escritorio, "de 1 en
+   1". El escritorio son 4 íconos 3D grandes unidos por la red, cada uno
+   con su anotación (punto de color + línea punteada que apunta al ícono,
+   número en Fraunces y etiqueta). Acá es lo mismo pero una fila por dato:
+   - ícono 3D grande a la izquierda (`.stat-annot-icon`, los mismos 4 WebP
+     del escritorio, ver `.vision-icon`);
+   - a la derecha, verticalmente centrado contra el ícono, el mismo
+     `.stat-annot-deco` del escritorio (punto+línea en el color del dato,
+     con `overflow:visible` porque la línea sale del viewBox hacia la
+     izquierda) y debajo número y etiqueta. El hueco entre ícono y texto
+     (`--gap`) mide lo que mide la línea punteada, para que su punta
+     llegue justo al borde del ícono;
+   - un hilo punteado vertical (`.stat-annotations::before`) une los 4
+     íconos, pasando POR DETRÁS de ellos (z-index), a modo de la red que
+     los conecta en el escritorio.
+   Sin fondo, sin borde, sin tarjetas. Tamaños en 2 escalones (>480px y
+   ≤480px) porque a 320-360px el texto se queda sin ancho. Scope `#lam-02`
+   para no tocar `.stat-box`/`.stat-grid` de "Mi plan". `--vision-card-*`
+   y `.stat-box` quedaron sin uso en esta sección. */
 @media(max-width:900px){
-  #lam-02 .stat-annotations{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  #lam-02 .stat-annot{border-radius:var(--radius-sm);border:1px solid transparent;padding:16px 14px 14px}
-  #lam-02 .stat-annot--dorado{background:var(--vision-card-dorado);border-color:var(--vision-card-dorado-line)}
-  #lam-02 .stat-annot--morado{background:var(--vision-card-morado);border-color:var(--vision-card-morado-line)}
-  #lam-02 .stat-annot--verde{background:var(--vision-card-verde);border-color:var(--vision-card-verde-line)}
-  #lam-02 .stat-annot--azul{background:var(--vision-card-azul);border-color:var(--vision-card-azul-line)}
-  #lam-02 .stat-annot-icon{display:block;width:34px;height:34px;object-fit:contain;margin-bottom:10px}
-  #lam-02 .stat-annot-deco{display:none}
-  #lam-02 .stat-annot-num{font-size:28px}
-  #lam-02 .stat-annot-lab{font-size:12.5px;max-width:none}
+  #lam-02 .stat-annotations{--ic:112px;--gap:64px;position:relative;gap:6px}
+  #lam-02 .stat-annotations::before{
+    content:'';position:absolute;z-index:0;pointer-events:none;
+    left:calc(var(--ic) / 2 - .75px);top:calc(var(--ic) / 2);bottom:calc(var(--ic) / 2);
+    border-left:1.5px dashed rgba(75,46,69,.28);
+  }
+  #lam-02 .stat-annot{
+    display:grid;
+    grid-template-columns:var(--ic) minmax(0,1fr);
+    /* filas 1 y 5 elásticas: centran el bloque de texto contra el ícono */
+    grid-template-rows:minmax(0,1fr) auto auto auto minmax(0,1fr);
+    column-gap:var(--gap);
+    padding:12px 0;
+  }
+  #lam-02 .stat-annot-icon{
+    display:block;position:relative;z-index:1;
+    grid-column:1;grid-row:1 / -1;align-self:center;
+    width:var(--ic);height:var(--ic);object-fit:contain;
+  }
+  #lam-02 .stat-annot-deco{grid-column:2;grid-row:2;width:90px;height:36px;margin-bottom:4px;overflow:visible}
+  #lam-02 .stat-annot-num{grid-column:2;grid-row:3;font-size:36px;line-height:1.15}
+  #lam-02 .stat-annot-lab{grid-column:2;grid-row:4;font-size:15px;max-width:30ch;margin-top:4px}
+}
+@media(max-width:480px){
+  #lam-02 .stat-annotations{--ic:92px;--gap:40px}
+  #lam-02 .stat-annot-deco{width:62px;height:25px;margin-bottom:3px}
+  #lam-02 .stat-annot-num{font-size:32px}
+  #lam-02 .stat-annot-lab{font-size:14px}
+}
+/* ≤360px (Android chicos): un escalón más para que el texto no quede en
+   una columna de ~110px. La punta de la línea punteada sigue tocando el
+   borde del ícono (deco 56px → línea de ~41px ≈ `--gap`). */
+@media(max-width:360px){
+  #lam-02 .stat-annotations{--ic:80px;--gap:36px}
+  #lam-02 .stat-annot-deco{width:56px;height:23px}
+  #lam-02 .stat-annot-num{font-size:30px}
 }
 
 /* Posicionamiento libre solo en desktop. Sesión 2026-09-17 (trigésima
