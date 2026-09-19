@@ -824,8 +824,9 @@ próximos pasos).
     `.vision-icon--azul` no cambió (`left:68%; top:76%; width:32%`);
     `.vision-icon--verde` pasó de `top:71%; width:22%` a `top:76%;
     width:33%` (el reloj era angosto, 309×566; el calendario es casi
-    cuadrado y con 22% quedaba diminuto). Con `top:76%` verde y azul
-    comparten línea superior. Sin cambios en mobile (`≤900px`, siguen
+    cuadrado y con 22% quedaba diminuto) y después a **`width:29%`** el
+    2026-09-19 (ver el bullet de `--vision-pares-shift`/`--vision-bajos-shift`
+    más abajo). Con `top:76%` verde y azul comparten línea superior. Sin cambios en mobile (`≤900px`, siguen
     ocultos).
   - **Los 4 datos ya no son tarjetas** (`.stat-box`, descartado): son 4
     `.stat-annot` (punto de color + número Fraunces + etiqueta corta) con
@@ -835,13 +836,24 @@ próximos pasos).
     (`<900px`) queda con fallback simple en columna, sin diseñar (ver
     "Pendientes conocidos", sesión 2). Colores por dato: dorado 20%,
     morado 86B, verde 4–6, azul 1:1 — mismos 4 de siempre.
-    **Subida uniforme (2026-09-18)**: `--vision-pares-shift` (definido en
-    `.vision-art`) = `-11%` de la altura de `.vision-art` (≈33px a
-    1440px), aplicado con `top:calc(<original> + var(--vision-pares-shift))`
-    a los 4 `.vision-icon--*` y a los 4 `.stat-annot--*`, para que los 4
-    pares ícono+texto se muevan juntos (pedido del usuario, en 2 tandas:
-    `-6.5%` y después "un poco más"). Los `left` y los `width` no se
-    tocaron. Para volver a subirlos/bajarlos, cambiar solo ese valor.
+    **Subida uniforme (2026-09-18, retocada el 2026-09-19)**:
+    `--vision-pares-shift` (definido en `.vision-art`) = `-17%` de la altura
+    de `.vision-art` (≈51px a 1440px, donde `.vision-art` mide 297px de
+    alto), aplicado con
+    `top:calc(<original> + var(--vision-pares-shift))` a los 4
+    `.vision-icon--*` y a los 4 `.stat-annot--*`, para que los 4 pares
+    ícono+texto se muevan juntos (pedidos del usuario en 3 tandas: `-6.5%`,
+    "un poco más" → `-11%`, y "más arriba los 4 textos y los 4 íconos en
+    conjunto" → `-17%`). Los `left` y los `width` no se tocaron.
+    **`--vision-bajos-shift` (2026-09-19)**: segundo valor, `5%` (≈15px a
+    1440px), que se suma solo a la **fila de abajo** — `.vision-icon--verde`
+    y `.vision-icon--azul` con sus `.stat-annot--verde`/`--azul` — (pedido:
+    "hacé un poquito más abajo los íconos de la libreta verde y el de los 2
+    hombres azules, bajalos en conjunto con su respectivo texto"). Para
+    mover todo junto se cambia `--vision-pares-shift`; para mover solo la
+    fila de abajo, `--vision-bajos-shift`. `width` de la libreta verde
+    (`.vision-icon--verde`): de `33%` a **`29%`** el 2026-09-19 (160 → 141px
+    a 1440px), mismo `left:0%` y mismo `top`.
   - Subtítulos de los 3 bullets de texto (`.vision-bullets strong`) en
     `--purple` (antes casi negro), para combinar con "alimenta" del
     título.

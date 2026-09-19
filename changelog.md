@@ -283,6 +283,40 @@ Tres pedidos del usuario en la misma sesión, todos sobre `mi-plan.html`.
 
 Actualiza memoria.md y changelog.md.
 
+## 2026-09-19 — Visión: los 4 pares más arriba, la libreta verde más chica y la fila de abajo más abajo
+
+Pedidos del usuario sobre los 4 íconos con sus anotaciones de `#lam-02`
+("Nuestra visión"), en dos tandas.
+
+- **Más arriba, en conjunto**: pedido "hacé más arriba los 4 textos y los 4
+  íconos en conjunto". `--vision-pares-shift` (variable de `.vision-art`, en
+  % de su altura) pasa de `-11%` a **`-17%`**: a 1440px (`.vision-art` mide
+  297px de alto) son 51px en total en vez de 33px, o sea 18px más arriba.
+  Medido: íconos de arriba 256 → 238, de abajo 523 → 505, anotaciones
+  389 → 372 y 680 → 662. Los 8 elementos se mueven juntos y, como el
+  desplazamiento es el mismo para íconos y textos, la separación entre
+  ambos no cambia.
+- **La libreta verde, un poco más chica**: pedido "hacé un poquito más
+  chicos los íconos de la libreta verde". `.vision-icon--verde`
+  (`icon-calendario.webp`) pasa de `width:33%` a **`29%`**: 160px → 141px a
+  1440px (−19px), mismo `left:0%` y mismo `top` (encoge desde su esquina
+  superior izquierda).
+- **Fila de abajo más abajo, con sus textos**: pedido "hacé un poquito más
+  abajo los íconos de la libreta verde y el de los 2 hombres azules,
+  bajalos en conjunto con su respectivo texto". Se agrega una segunda
+  variable, **`--vision-bajos-shift:5%`**, que se suma (además de
+  `--vision-pares-shift`) a los 2 íconos de la fila de abajo
+  (`.vision-icon--verde` y `.vision-icon--azul`) y a sus 2 anotaciones
+  (`.stat-annot--verde` y `.stat-annot--azul`). A 1440px el 5% ≈ 15px:
+  íconos 505 → 520 y textos 662 → 677, sin tocar la fila de arriba
+  (cerebro/20% en 238 y red neuronal/86B en 372). Queda parametrizado en dos
+  valores independientes: `--vision-pares-shift` mueve los 8 elementos y
+  `--vision-bajos-shift` solo la fila de abajo.
+- `npm test`: 85 pass / 1 skipped (el e2e de Playwright del PDF, no
+  instalado), 0 fail.
+
+Actualiza memoria.md y changelog.md.
+
 ## 2026-09-19 — Ajustes de decoración: Pilares sin la onda azul, uva en lugar de la hoja, login sin uva/almendras y collage más chico
 
 Tanda de pedidos del usuario, todos de decoración/espaciado, sin tocar

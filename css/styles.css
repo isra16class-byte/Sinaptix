@@ -476,13 +476,13 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
      de más abajo) basta cambiar este número. Valor final pedido por el
      usuario: `-11%` ≈ 33px a 1440px (se probó `-6.5%` ≈ 19px primero y
      después pidió "un poco más"). */
-  .vision-art{--vision-pares-shift:-11%}
+  .vision-art{--vision-pares-shift:-17%;--vision-bajos-shift:5%}
   .vision-icons{display:block;position:absolute;inset:0;pointer-events:none}
   .vision-icon{position:absolute;display:block;height:auto}
   .vision-icon--dorado{left:-5%;top:calc(-14% + var(--vision-pares-shift));width:34%}
   .vision-icon--morado{left:61%;top:calc(-14% + var(--vision-pares-shift));width:34%}
-  .vision-icon--verde{left:0%;top:calc(76% + var(--vision-pares-shift));width:33%}
-  .vision-icon--azul{left:68%;top:calc(76% + var(--vision-pares-shift));width:32%}
+  .vision-icon--verde{left:0%;top:calc(76% + var(--vision-pares-shift) + var(--vision-bajos-shift));width:29%}
+  .vision-icon--azul{left:68%;top:calc(76% + var(--vision-pares-shift) + var(--vision-bajos-shift));width:32%}
 }
 
 #lam-02 .stat-box{
@@ -640,8 +640,8 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
      íconos, la misma distancia. */
   #lam-02 .stat-annot--dorado{left:55%;top:calc(31% + var(--vision-pares-shift))}
   #lam-02 .stat-annot--morado{left:119%;top:calc(31% + var(--vision-pares-shift))}
-  #lam-02 .stat-annot--verde{left:55%;top:calc(129% + var(--vision-pares-shift))}
-  #lam-02 .stat-annot--azul{left:119%;top:calc(129% + var(--vision-pares-shift))}
+  #lam-02 .stat-annot--verde{left:55%;top:calc(129% + var(--vision-pares-shift) + var(--vision-bajos-shift))}
+  #lam-02 .stat-annot--azul{left:119%;top:calc(129% + var(--vision-pares-shift) + var(--vision-bajos-shift))}
   #lam-02 .stat-annot-deco{width:90px;height:36px;margin-left:0;transform:none;overflow:visible}
 }
 
