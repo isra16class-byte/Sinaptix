@@ -841,9 +841,10 @@ próximos pasos).
     (halo con `feGaussianBlur`, 6 capas de cola que se desvanecen, cuerpo,
     núcleo claro) animados con
     `stroke-dashoffset` (`@keyframes veRun`, 7 s por vuelta = `--ve-T`).
-    Grosor (`stroke-width`) bajado a ~60% el 2026-09-19 (3ª ronda, "destacaba
-    bastante"): `9.5/1.3/1.6/1.8/2/2.3/2.5/3/1.3` para
-    glow/t1/t2/t3/t4/t5/t6/body/core, misma proporción entre capas que antes.
+    Grosor (`stroke-width`) bajado a ~60% el 2026-09-19 (3ª ronda) y de
+    nuevo a ~78% de eso (4ª ronda, "un poco más fino"): valores actuales
+    `7.5/1/1.25/1.4/1.6/1.8/2/2.3/1` para
+    glow/t1/t2/t3/t4/t5/t6/body/core, misma proporción entre capas.
     **Sin coordenadas en el CSS ni en el HTML**: el `d` del trazado lo arma
     una IIFE al final de `js/script.js` midiendo los 4 `.vision-icon`
     (`getBoundingClientRect`, esquinas = promedio de los centros de cada

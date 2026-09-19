@@ -11,6 +11,17 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: el pulso todavía un poco más fino
+
+Segunda vuelta de tuerca sobre el ajuste anterior ("hazlo un poco mas
+fino"). Mismo archivo, mismo criterio (proporción entre capas intacta):
+
+- **`css/styles.css`**: `stroke-width` baja de nuevo, esta vez a ~78% del
+  valor anterior: de `9.5/1.3/1.6/1.8/2/2.3/2.5/3/1.3` a
+  `7.5/1/1.25/1.4/1.6/1.8/2/2.3/1` (glow/t1/t2/t3/t4/t5/t6/body/core). No
+  se tocó nada más.
+- Verificado con Playwright. `npm test`: 85/86 (de siempre).
+
 ## 2026-09-19 — Visión: el pulso más fino (destacaba demasiado)
 
 Pedido del usuario tras ver el resultado del ajuste anterior: "quedo bien,
