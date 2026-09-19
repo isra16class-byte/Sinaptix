@@ -849,18 +849,23 @@ próximos pasos).
     además de correr sin parar, ahora los 2 pulsos se desvanecen
     (fundido, no corte) parte de cada ciclo. El riel de fondo
     (`.ve-rail`) no se ve afectado, queda siempre visible.
-    **Secuencia exacta (6ª→7ª ronda, reemplaza el intento de la 6ª)**: no
+    **Secuencia exacta (6ª→7ª→8ª ronda)**: no
     es una alternancia pareja (eso se probó primero con un
     `animation-delay` de medio ciclo y no era lo pedido) — es
     `@keyframes veFadeA`/`veFadeB`, uno por pulso
-    (`.ve-pulse:nth-of-type(1)`/`(2)`), con 5 tramos en los 8s: los 2
-    visibles y corriendo juntos (3.5s) → sale 1 (.5s) → sale 2 (.5s) → los
-    2 invisibles, pausa (2s) → entra 1 (.5s) → entra 2 (.5s) → los 2
-    visibles de nuevo, empalma con el ciclo siguiente. Un delay corrido no
-    alcanzaba porque desplaza TODO el ciclo por igual; acá hacía falta
-    que estuvieran sincronizados en el tramo "juntos" y se separen solo
-    un toque en las 2 transiciones — eso pide 2 recorridos de opacidad
-    distintos, no uno corrido.
+    (`.ve-pulse:nth-of-type(1)`/`(2)`). **Ojo con el timing**: la 6ª
+    ronda encadenaba las 2 transiciones sin pausa entre medio (una
+    terminaba justo donde arrancaba la otra) y por eso se veía "casi
+    simultáneo" — la 7ª ronda metió 0.6s de pausa real entre que uno
+    termina de salir/entrar y el otro arranca. Reparto final en los 8s:
+    los 2 visibles y corriendo juntos (3s) → sale 1 (.6s) → pausa con
+    solo 1 afuera (.6s) → sale 2 (.6s) → los 2 invisibles (1.4s) → entra
+    1 (.6s) → pausa con solo 1 adentro (.6s) → entra 2 (.6s), empalma con
+    el ciclo siguiente. Un delay corrido no alcanzaba porque desplaza
+    TODO el ciclo por igual; acá hacía falta que estuvieran sincronizados
+    en el tramo "juntos" y se separen con una pausa real en las 2
+    transiciones — eso pide 2 recorridos de opacidad distintos, no uno
+    corrido.
     **Sin coordenadas en el CSS ni en el HTML**: el `d` del trazado lo arma
     una IIFE al final de `js/script.js` midiendo los 4 `.vision-icon`
     (`getBoundingClientRect`, esquinas = promedio de los centros de cada

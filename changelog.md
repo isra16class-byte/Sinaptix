@@ -11,6 +11,31 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Visión: pausa real entre que sale/entra uno y el otro (antes casi no se notaba)
+
+El usuario, tras ver la ronda anterior: "oye casi parece que desaparecen y
+aparecen al mismo tiempo". Tenía razón: el keyframe de A terminaba
+exactamente en el mismo % en que arrancaba el de B (`50%`↔`50%`,
+`87.5%`↔`87.5%`), sin ningún respiro entre uno y otro — 0.5s + 0.5s
+pegados se percibían casi como un solo fundido de 1s en vez de dos pasos
+distintos. Un solo archivo:
+
+- **`css/styles.css`**: mismos `@keyframes veFadeA`/`veFadeB` de la ronda
+  anterior, pero ahora con una pausa de 0.6s metida entre el final de uno
+  y el arranque del otro (tanto al desaparecer como al aparecer), así hay
+  un tramo donde de verdad se ve "solo 1 está afuera" antes de que el
+  otro empiece a irse. Reparto nuevo en los mismos 8s: 0–3.0s los 2
+  juntos → 3.0–3.6s sale 1 → 3.6–4.2s **pausa, solo 1 está afuera, 2
+  sigue** → 4.2–4.8s sale 2 → 4.8–6.2s los 2 invisibles (pausa larga) →
+  6.2–6.8s entra 1 → 6.8–7.4s **pausa, solo 1 está adentro, 2 sigue
+  afuera** → 7.4–8.0s entra 2, empalma con el ciclo siguiente.
+- **Verificado con Playwright**: se muestreó opacidad cada 0.3s (antes
+  cada 0.5s, insuficiente para ver el respiro) — ahora hay 3 muestras
+  seguidas con `A=0,B=1` y otras con `A=1,B=0`, un tramo sólido, no un
+  instante. Capturas en esos 2 momentos confirman visualmente que se ve
+  un solo pulso a la vez, con una pausa perceptible antes del segundo.
+  Sin regresión en mobile. `npm test`: 85/86.
+
 ## 2026-09-19 — Visión: secuencia exacta al aparecer/desaparecer (1º uno, 2º el otro, no una alternancia corrida)
 
 El usuario aclaró que la ronda anterior (delay de medio ciclo, alternancia

@@ -585,23 +585,28 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   .vision-energy.is-paused .ve-p,.vision-energy.is-paused .ve-pulse{animation-play-state:paused}
 }
 @keyframes veRun{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
-/* 8s, mismo reparto para los 2 (ver .ve-pulse:nth-of-type más arriba):
-   0→3.5s los 2 visibles y corriendo juntos (fijo, sin fundido)
-   3.5→4.0s   sale el pulso 1 (A)          | pulso 2 (B) sigue visible
-   4.0→4.5s   sale el pulso 2 (B)          | pulso 1 (A) ya invisible
-   4.5→6.5s   los 2 invisibles (pausa)
-   6.5→7.0s   entra el pulso 1 (A)         | pulso 2 (B) sigue invisible
-   7.0→7.5s   entra el pulso 2 (B)         | pulso 1 (A) ya visible
-   7.5→8.0s   los 2 visibles de nuevo → empalma con el 0% del ciclo siguiente */
+/* 8s, mismo reparto para los 2 (ver .ve-pulse:nth-of-type más arriba). A
+   diferencia del primer intento, acá hay una pausa real entre que uno
+   termina de salir/entrar y el otro arranca (antes quedaban pegados,
+   0.5s+0.5s consecutivos sin respiro, y por eso se veía casi simultáneo):
+   0→3.0s     los 2 visibles y corriendo juntos (fijo, sin fundido)
+   3.0→3.6s   sale el pulso 1 (A)               | B sigue visible
+   3.6→4.2s   A ya invisible, B TODAVÍA visible  (pausa con solo 1 afuera)
+   4.2→4.8s   sale el pulso 2 (B)               | A ya invisible
+   4.8→6.2s   los 2 invisibles (pausa larga)
+   6.2→6.8s   entra el pulso 1 (A)              | B sigue invisible
+   6.8→7.4s   A ya visible, B TODAVÍA invisible  (pausa con solo 1 adentro)
+   7.4→8.0s   entra el pulso 2 (B) → al llegar a 1 empalma con el 0% del
+              ciclo siguiente (los 2 visibles de nuevo) */
 @keyframes veFadeA{
-  0%,43.75%{opacity:1}
-  50%,81.25%{opacity:0}
-  87.5%,100%{opacity:1}
+  0%,37.5%{opacity:1}
+  45%,77.5%{opacity:0}
+  85%,100%{opacity:1}
 }
 @keyframes veFadeB{
-  0%,50%{opacity:1}
-  56.25%,87.5%{opacity:0}
-  93.75%,100%{opacity:1}
+  0%,52.5%{opacity:1}
+  60%,92.5%{opacity:0}
+  100%{opacity:1}
 }
 @media(prefers-reduced-motion:reduce){.vision-energy{display:none}}
 
