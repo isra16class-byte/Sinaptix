@@ -11,6 +11,34 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Timeline "Cómo trabajamos" (Método) más chico en mobile
+
+El usuario mandó una captura real a 390px del flujo de 4 pasos
+(`.timeline`/`.tl-item` de `#lam-03`) pidiendo achicarlo un poco: círculo
+numerado de 56px, título en 22px y 56px de espacio entre pasos se veían
+grandes en esa columna angosta.
+
+- **Fix, solo dentro de `@media(max-width:900px)`** (nueva, no existían
+  overrides mobile para el timeline hasta ahora — desktop sin cambios,
+  ninguna queja sobre ese tamaño ahí):
+  - `.tl-num`: 56px → 44px de diámetro, `font-size` 15px → 13px,
+    `top:-4px` → `-2px` (para seguir centrado verticalmente contra la
+    primera línea del título, que también se achica).
+  - `.tl-line{left:22px}` (antes 27px — recalculado a la mitad exacta
+    del nuevo diámetro del círculo, si no la línea queda desalineada
+    del centro).
+  - `.tl-item{padding-left:60px;padding-bottom:40px}` (antes 76px/56px
+    — menos hueco a la izquierda para el círculo más chico, y menos aire
+    vertical entre un paso y el siguiente).
+  - `.tl-item h3{font-size:18px}` (antes 22px) y
+    `.tl-item p{font-size:14px}` (antes 15.5px).
+- Verificado con Playwright: captura del timeline completo a 390px
+  antes/después (visiblemente más compacto, ~4 pasos entran con menos
+  scroll) y a 1440px comparado contra la captura previa al cambio — el
+  desktop no se movió un píxel (el override vive solo en el media
+  query).
+- `npm test` sigue en verde (86 tests) — cambio puramente de CSS.
+
 ## 2026-09-19 — Hero→Visión: menos espacio en blanco entre la sección 1 y 2 en mobile
 
 El usuario mandó una captura real (390px, navegador propio, no

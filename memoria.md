@@ -242,6 +242,19 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Timeline "Cómo trabajamos" más chico en mobile (`.tl-*`, `#lam-03`,
+  sesión 2026-09-19)**: el usuario mandó una captura a 390px pidiendo
+  achicar el flujo de 4 pasos (lo vio grande: círculo de 56px, título
+  22px, 56px de aire entre pasos). Escalado ~20% hacia abajo, solo
+  dentro de `@media(max-width:900px)` (desktop sin cambios, sin queja
+  ahí): `.tl-num` 56→44px (`top:-4px`→`-2px` para seguir centrado contra
+  un título más chico, `font-size` 15→13px), `.tl-line{left:22px}`
+  (mitad del círculo nuevo, antes 27px = mitad de 56px),
+  `.tl-item{padding-left:60px;padding-bottom:40px}` (antes 76/56),
+  `.tl-item h3{font-size:18px}` (antes 22px), `.tl-item p{font-size:14px}`
+  (antes 15.5px). Verificado con Playwright a 390px (antes/después) y
+  1440px (desktop, sin diferencias contra la captura previa al cambio).
+
 - **Espacio Hero→Visión en mobile (`.hero.dark`/`#lam-02`, sesión
   2026-09-19)**: con `.hero-foot` oculto (`≤720px`), la imagen del hero
   quedaba seguida del `padding-bottom` genérico de `section` (70/110px

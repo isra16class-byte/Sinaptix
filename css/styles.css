@@ -1714,6 +1714,22 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 .tl-item h3{font-size:22px;margin-bottom:8px}
 .tl-item p{color:var(--panel-text);max-width:56ch;font-size:15.5px}
 
+/* Flujo "Cómo trabajamos" más chico en mobile (sesión 2026-09-19): a
+   390px el usuario lo vio grande (círculo de 56px, título 22px, mucho
+   padding-bottom entre pasos) y pidió achicarlo un poco. Escalado ~20%
+   hacia abajo, solo ≤900px (desktop sin cambios, no hubo queja ahí):
+   círculo 56→44px (y su `top:-4px` deja de calzar con un título más
+   chico, se ajusta a `-2px`), `.tl-line` recalculada a la mitad del
+   nuevo círculo (22px, antes 27), `padding-left` del texto acorde
+   (60px, antes 76) y menos aire entre pasos (40px, antes 56). */
+@media(max-width:900px){
+  .tl-line{left:22px}
+  .tl-item{padding-left:60px;padding-bottom:40px}
+  .tl-num{width:44px;height:44px;top:-2px;font-size:13px}
+  .tl-item h3{font-size:18px}
+  .tl-item p{font-size:14px}
+}
+
 .method-cta{display:flex;gap:16px;flex-wrap:wrap;margin-top:58px;padding-top:44px;border-top:1px solid var(--panel-line)}
 
 /* Primera vuelta: esta tarjeta era un cuadro blanco puro (--paper) con
