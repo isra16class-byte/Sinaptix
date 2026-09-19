@@ -11,6 +11,37 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Beneficios: 6 frutas asomando por los lados de las tarjetas de comentarios
+
+Pedido del usuario, mismo día en que se habían sacado las 3 frutas de
+las esquinas de las tarjetas de testimonios (`.ben-quote-fruit`): "ponele
+unas 6 frutas por los lados de los comentarios, ya que la tarjeta es
+medio transparente capaz quede bien, que se vean entre metidas".
+
+- Vuelve `.ben-quote-fruit`, ahora 6 en vez de 3 (antes: arándanos/kiwi/
+  almendras, una por esquina entre las 2 tarjetas). Reparto nuevo, 3 por
+  tarjeta, alternando esquina y lado medio: tarjeta de M.R. — kiwi
+  arriba-izquierda, arándanos a la derecha a media altura, nuez
+  abajo-izquierda; tarjeta de J.S. — palta arriba-derecha, frutilla a la
+  izquierda a media altura, almendras abajo-derecha. Mismos assets
+  `svg/deco-blob-*.svg` de siempre (sin generar ninguno nuevo).
+- Mismo mecanismo que la versión de 3 (sesión 2026-09-18): el `<img>` va
+  **antes** de `.quote-card` en el DOM y sin z-index propio, así el fondo
+  `rgba(255,255,255,.55)` + `backdrop-filter:blur(10px)` de la tarjeta lo
+  tapa a medias — solo asoma la punta que sobresale del borde. Se
+  mantiene `.ben-quote-fruit{filter:none}` para sacarle la sombra propia
+  de `.deco-fruit` (con sombra se ven como estampitas pegadas encima, no
+  "saliendo de atrás del vidrio" — bug real ya encontrado y corregido una
+  vez con este mismo componente).
+- **No se pudo verificar con Playwright ni en navegador real** (sin
+  browser instalable en este entorno, ver nota de siempre en
+  `memoria.md`). Se armó una previsualización aproximada dentro de este
+  entorno (rasterizando los SVG con `cairosvg` y simulando el blur con
+  Pillow, no el CSS real de la página) solo para chequear que la
+  distribución no quedara amontonada — no reemplaza confirmarlo en el
+  sitio real. Pendiente sobre todo: que no se corten contra `.wrap` a
+  anchos intermedios (~1000–1100px) y que no choquen con `.quote-avatar`.
+
 ## 2026-09-19 — Beneficios: íconos de "Para quién es" en morado/negro
 
 El usuario vio los 4 íconos 3D a color de la ronda anterior y pidió que

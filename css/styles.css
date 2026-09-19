@@ -1883,9 +1883,17 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    menos con el título. Solo desktop: en 1 columna ya van debajo de la lista. */
 @media(min-width:901px){.ben-quotes{margin-top:64px}}
 .quote-card-wrap{position:relative}
-/* `.ben-quote-fruit` (baya, kiwi y almendras pegadas a las esquinas de las
-   tarjetas) se sacó del HTML el 2026-09-19: ninguna fruta va sobre las
-   tarjetas de comentarios. */
+/* `.ben-quote-fruit` (6 frutas, 3 por tarjeta, sesión 2026-09-19 —
+   vuelven al pedido del usuario tras haberse sacado antes): van ANTES de
+   `.quote-card` en el DOM y sin z-index propio, así el fondo
+   semitransparente + `backdrop-filter` de la tarjeta las tapa a medias —
+   solo asoma la punta que sobresale del borde. `filter:none` les saca la
+   sombra propia que trae `.deco-fruit` de fábrica (pensada para frutas
+   grandes flotando solas): con sombra se ven como estampitas pegadas
+   encima en vez de "asomando desde atrás del vidrio" (mismo problema ya
+   resuelto una vez en 2026-09-18, ver changelog). Se ocultan solas en
+   ≤720px junto con el resto de `.deco-fruit`. */
+.ben-quote-fruit{filter:none}
 
 /* ---------- 06 CONOCENOS (antes "Contacto") ---------- */
 /* .contact-wrap era grid de 2 columnas (info + .contact-form). El
