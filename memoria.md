@@ -242,6 +242,22 @@ próximos pasos).
 
 ## Estado actual del diseño (resumen)
 
+- **Hero: hueco para el nav fijo en mobile (`.hero.dark`, sesión
+  2026-09-19)**: el nav (`.nav{position:fixed}`) no reserva espacio
+  propio en el documento. En desktop no se nota porque el contenido del
+  hero entra holgado dentro de `min-height:100vh` y el
+  `display:flex;align-items:center` lo centra bien debajo del nav; en
+  mobile el título ocupa más líneas y la imagen queda apilada debajo del
+  texto, así que el contenido total supera los 100vh, deja de haber
+  margen para centrar y el título queda pegado arriba, tapado por el nav
+  (reportado por el usuario con una captura a 390px). Fix: dentro del
+  `@media(max-width:900px)` que ya colapsa `.hero-grid` a 1 columna, se
+  agregó `.hero.dark{padding-top:88px}` — mismo valor que ya usa
+  `#miPlan` para este mismo nav compartido. Sin cambios en desktop.
+  **No verificado en navegador real ni con Playwright** (sin browser
+  instalable en este entorno): el cálculo sale de sumar el padding y la
+  altura de línea/botón del nav a mano, no de medirlo en pantalla.
+
 - **Decoración solo del login (`mi-plan.html`, sesión 2026-09-19)**: clase
   `.deco-solo-login` (espejo de `.deco-solo-sesion`; oculta con
   `#miPlan:has(#miPlanSinSesion.hidden)`). 5 espigas (`svg/deco-espiga.svg`)

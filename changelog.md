@@ -11,6 +11,30 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — Hero: el nav fijo tapaba el título en mobile
+
+El usuario mandó una captura a 390px (DevTools) donde la "P" de "Piensa
+con claridad." queda pegada/tapada contra el borde inferior del nav.
+
+- Causa: `.nav{position:fixed}` no reserva espacio en el flujo del
+  documento. `.hero.dark` centra su contenido con
+  `display:flex;align-items:center` dentro de `min-height:100vh`; en
+  desktop el contenido entra holgado y el centrado lo deja bien abajo del
+  nav, pero en mobile el título ocupa más líneas y la imagen queda
+  apilada debajo del texto — el contenido total supera los 100vh, ya no
+  hay margen para centrar y el bloque queda pegado arriba, debajo del nav
+  fijo.
+- Fix, solo mobile: dentro del `@media(max-width:900px)` que ya colapsa
+  `.hero-grid` a 1 columna, se agregó `.hero.dark{padding-top:88px}` —
+  mismo valor que ya usa `#miPlan` para este mismo nav compartido (ver
+  `css/styles.css`). Cero cambios fuera de ese media query, así que
+  desktop queda intacto.
+- **Sin verificar en navegador real ni con Playwright** (sin browser
+  instalable en este entorno): el valor sale de sumar a mano el padding y
+  la altura de línea/botón del nav, no de medirlo en pantalla. Si al
+  probarlo en el navegador real queda de más o de menos, es solo cuestión
+  de ajustar ese número.
+
 ## 2026-09-19 — Ajuste a mano del usuario: frutas de las tarjetas de comentarios (commit `6fbec2b`, sin patch de esta sesión)
 
 El usuario retocó a mano (no vía patch de esta sesión) el resultado del

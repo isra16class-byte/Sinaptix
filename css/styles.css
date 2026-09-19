@@ -171,7 +171,17 @@ section.tight{padding:100px 0}
     radial-gradient(120% 90% at 85% 0%,var(--panel) 0%,var(--paper) 60%);
 }
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;width:100%}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}
+  /* El nav es `position:fixed` y no reserva espacio propio: en desktop no
+     se nota porque el contenido del hero entra holgado y el
+     `align-items:center` lo deja bien abajo del nav, pero en mobile el
+     título ocupa más líneas + la imagen apilada hace que el contenido sea
+     más alto que 100vh, así que deja de haber margen para centrar y el
+     título queda pegado arriba, tapado por el nav (ver captura del
+     usuario, 2026-09-19). 88px = mismo valor que ya usa `#miPlan` para
+     este mismo nav compartido. */
+  .hero.dark{padding-top:88px}
+}
 .hero h1{
   font-family:var(--font-hand);
   font-weight:700;
