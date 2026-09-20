@@ -148,7 +148,13 @@ h1,h2,h3{font-family:var(--font-d);font-weight:800;letter-spacing:-.02em}
 .nav-btn-ghost:hover{border-color:var(--purple);color:var(--purple)}
 .nav-btn-solid{background:var(--purple);color:#fff;font-weight:600}
 .nav-btn-solid:hover{background:var(--purple-dark);transform:translateY(-1px);box-shadow:var(--shadow)}
-@media(max-width:520px){.nav-btn-ghost{display:none}.nav{padding:12px 20px}.nav .mark{font-size:16px}.nav .mark img{width:26px;height:26px}}
+/* Con sesión iniciada, en mobile el nav se quedaba sin ningún botón:
+   "Acceder" lo oculta js/script.js (setLoginButton) y el ghost "Mi plan"
+   caía en el `display:none` de acá abajo. `:not(.hidden)` muestra el
+   botón solo cuando el JS ya lo habilitó (sesión iniciada); sin sesión el
+   `.hidden` (display:none !important) sigue ganando. Pedido del usuario,
+   sesión 2026-09-20. */
+@media(max-width:520px){.nav-btn-ghost{display:none}#btnMiPlanNav:not(.hidden){display:inline-flex}.nav{padding:12px 20px}.nav .mark{font-size:16px}.nav .mark img{width:26px;height:26px}}
 
 /* ---------- NAV MOBILE: barra más alta, botón "Inicio" y menú hamburguesa ----------
    (sesión 2026-09-19, pedido del usuario, solo mobile ≤720px). Antes, en
