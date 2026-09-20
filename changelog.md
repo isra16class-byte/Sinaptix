@@ -11,6 +11,80 @@
 > rediseño del dashboard, la animación de los anillos de Método, y el
 > proceso completo de Visión).
 
+## 2026-09-19 — "Actualizar mi plan": el IMC no se actualizaba y los anillos quedaban con la reevaluación vieja
+
+El usuario reprodujo 2 fallos al usar "Actualizar mi plan" con un plan y
+antropometría ya guardados. Regla de "No estoy seguro" (empate de las 4
+escalas → salen los 4 objetivos) sin tocar, es a propósito.
+
+- **FALLO 1 — IMC pegado al valor viejo**: al enviar la encuesta, el
+  peso/talla/edad/sexo nuevos solo se guardaban en
+  `sinaptix_objetivo.encuesta`. `sinaptix_antropometria` (IMC del
+  dashboard, medidor de Método, PDF) solo se guardaba si no existía
+  (`nutriGuardarAntropometriaSiFalta`, `js/nutricion-planes.js`).
+  Reproducido con antropometría 250kg/181cm (IMC 76.31) y un plan
+  regenerado con 70kg/170cm: la encuesta guardaba 70/170 pero el IMC
+  seguía en 76.31.
+  - **Cambio**: la función se renombró a
+    `nutriGuardarOActualizarAntropometria`. Si hay un registro previo y
+    peso/talla/edad/sexo de la encuesta DIFIEREN de los guardados, lo
+    actualiza (recalcula IMC y fecha, `planSyncGuardar('antropometria',
+    ...)`). Si son iguales (la encuesta los prellena desde ahí), no toca
+    nada, para no correr la fecha de una medición que no cambió. Sin
+    registro previo, se guarda como antes. Datos inválidos/fuera de rango
+    y un registro previo corrupto (JSON inválido) no pisan nada.
+  - Los 2 submit de la encuesta (`js/script.js` ~línea 200, `js/mi-plan.js`
+    ~línea 640) llaman a la función renombrada.
+- **FALLO 2 — anillos/estado de un plan anterior**: `nutriPdfModelo`
+  (`js/mi-plan-pdf.js`) calcula los anillos con `gaugeComputeAreas(reeval
+  || d)` — si quedaba una `sinaptix_reevaluacion` de un plan anterior, los
+  anillos mostraban esa reevaluación en vez del plan nuevo. Reproducido
+  viendo Memoria/Calma al 100% con objetivos ("Sostener memoria", "Manejo
+  de estrés") de un plan que ya no era el vigente.
+  - **Decisión del usuario**: generar un plan nuevo borra la reevaluación
+    anterior (es un punto de partida nuevo).
+  - **Cambio**: los 2 submit de la encuesta ahora hacen
+    `localStorage.removeItem('sinaptix_reevaluacion')` +
+    `planSyncGuardar('reevaluacion', null)`.
+  - **Servidor**: `netlify/functions/plan-validacion.mjs` suma
+    `esDatosValido(tipo, datos)` — `datos: null` solo es válido para tipo
+    `'reevaluacion'` (para `'antropometria'`/`'objetivo'` se rechaza con
+    400: no tienen ningún flujo que los borre). `plan.mjs` valida con ella
+    antes del upsert. El `GET` de `plan.mjs` no necesitó cambios: la
+    columna es `jsonb`, así que `datos: null` guarda un JSON `null` (no un
+    SQL `NULL`) y el chequeo que ya existía (`fila.reevaluacion != null`)
+    ya lo trataba como "sin dato" — `planSyncCargar` no podía resucitarlo.
+- **Aviso actualizado** (`js/plan-aviso.js`): como borrar la reevaluación
+  es destructivo, el texto de "Ya tenés un plan" ahora también dice que
+  generar un plan nuevo reinicia la comparación de "Actualizar mi estado"
+  (antes solo avisaba que reemplazaba el plan). Voseo, sin rayas em-dash,
+  2 frases cortas.
+- **No se tocó**: el resto del flujo del aviso/botón "Actualizar mi plan"/
+  prellenado de peso y talla, ni el caso sin sesión (`planSyncGuardar` no
+  hace nada sin sesión, el dato queda igual en localStorage).
+- **Tests**: `tests/nutricion-planes.test.js` — el bloque de
+  `nutriGuardarAntropometriaSiFalta` se reemplazó por 6 tests de
+  `nutriGuardarOActualizarAntropometria` (sin dato previo, fuera de rango,
+  actualiza con datos distintos, no toca con datos iguales, datos
+  inválidos no pisan un registro existente, registro previo corrupto).
+  `tests/plan-validacion.test.mjs` — 3 tests nuevos de `esDatosValido`.
+  `npm test` en verde (102 tests con Playwright/jsPDF instalados
+  temporalmente para correr `tests/mi-plan-pdf.e2e.test.mjs`; sin ellos,
+  98, con ese archivo salteado como siempre — ninguno de los 2 quedó en
+  `package.json`, a propósito, ver `tests/mi-plan-pdf.e2e.test.mjs`).
+- **Verificado con Playwright + Chromium** (`PLAYWRIGHT_BROWSERS_PATH=
+  /opt/pw-browsers`, mismo mock de `netlifyIdentity`/`/.netlify/functions`
+  que `tests/mi-plan-pdf.e2e.test.mjs`, no un archivo de `tests/` sino un
+  script ad hoc de esta sesión con datos de prueba embebidos): con
+  antropometría 250kg/181cm, un plan y una reevaluación guardados, se
+  regeneró con 70kg/170cm tanto en `mi-plan.html` (390px) como en el flujo
+  de `index.html`. En los 2: IMC pasó a 24.2 (`70/(1.70²)`),
+  `sinaptix_reevaluacion` quedó en `null` y "Tu estado actual" mostró 40%
+  en las 4 barras (de la encuesta nueva, sin el "Antes 40% / Ahora 100%"
+  que traía la reevaluación vieja). Capturas de antes/después incluidas
+  en el mensaje de esta sesión; **pendiente la confirmación visual
+  explícita del usuario** antes de dar esto por cerrado.
+
 ## 2026-09-19 — Aviso antes de reemplazar un plan ya generado
 
 El usuario preguntó qué pasa si genera su plan otra vez: el anterior se pisa y

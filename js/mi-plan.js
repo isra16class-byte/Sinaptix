@@ -652,13 +652,23 @@ if(window.netlifyIdentity){
       const d = nutriCollectData();
       const objetivos = nutriResolverObjetivo(d);
 
-      // Si no había datos antropométricos guardados todavía, pero acá se
-      // completó peso y talla (paso 2), los usamos para no pedirlos de
-      // nuevo en "Registrar datos antropométricos" — así el medidor de IMC
-      // de "Mi plan" puede aparecer ni bien se pinta de nuevo más abajo, sin
-      // que la persona tenga que volver a index.html a completarlos aparte.
-      // Ver nutriGuardarAntropometriaSiFalta en js/nutricion-planes.js.
-      nutriGuardarAntropometriaSiFalta(d);
+      // Si no había datos antropométricos guardados todavía, los tomamos de
+      // acá (peso/talla, paso 2) para no pedirlos de nuevo en "Registrar
+      // datos antropométricos". Si ya había y esta encuesta trae un
+      // peso/talla/edad/sexo distinto (el caso típico de "Actualizar mi
+      // plan"), se actualiza para que el IMC no quede pegado al valor
+      // viejo — ver nutriGuardarOActualizarAntropometria en
+      // js/nutricion-planes.js.
+      nutriGuardarOActualizarAntropometria(d);
+
+      // Al generar un plan nuevo, la reevaluación anterior deja de ser
+      // válida (los anillos que muestra son de un plan que ya no es el
+      // vigente) — se borra en localStorage y en el servidor (`datos:
+      // null` para 'reevaluacion', ver netlify/functions/plan.mjs /
+      // plan-validacion.mjs y js/plan-sync.js). Sin esto, planSyncCargar
+      // podía traerla de vuelta del servidor al iniciar sesión de nuevo.
+      localStorage.removeItem('sinaptix_reevaluacion');
+      if(typeof planSyncGuardar === 'function') planSyncGuardar('reevaluacion', null);
 
       const datosObjetivo = {
         objetivo: objetivos.join(' + '),

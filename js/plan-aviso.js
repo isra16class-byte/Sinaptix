@@ -9,6 +9,13 @@
    las mismas clases de los demás modales (`.modal-overlay`, `.modal-card`).
    Sin plan guardado, el botón hace lo de siempre, sin aviso.
 
+   El texto del aviso (sesión 2026-09-19, FALLO 2) avisa también que generar
+   un plan nuevo borra la reevaluación anterior (sinaptix_reevaluacion) y
+   por lo tanto reinicia la comparación de "Actualizar mi estado" — antes
+   solo decía que reemplazaba el plan, y ese borrado es destructivo y no
+   estaba avisado. Ver js/script.js / js/mi-plan.js (submit de la encuesta)
+   y memoria.md para el detalle del borrado en sí.
+
    Qué cuenta como "plan guardado": lo mismo que ya pinta el dashboard de
    `mi-plan.html` (pintarMiPlan en js/mi-plan.js): `sinaptix_objetivo` presente
    y con un JSON válido. Si el dato está corrupto, se trata como "sin plan",
@@ -74,7 +81,7 @@
         '<button type="button" class="modal-close" data-aviso-cancelar aria-label="Cerrar">×</button>' +
         '<span class="eyebrow" style="color:var(--purple)">Ya tenés un plan</span>' +
         '<h3 id="avisoPlanTitulo">¿Querés generar uno nuevo?</h3>' +
-        '<p class="modal-text" id="avisoPlanTexto">Ya tenés un plan guardado. Si generás uno nuevo, reemplaza al actual y no vas a poder recuperarlo.</p>' +
+        '<p class="modal-text" id="avisoPlanTexto">Ya tenés un plan guardado. Si generás uno nuevo, reemplaza al actual y también reinicia la comparación de "Actualizar mi estado".</p>' +
         '<div class="aviso-plan-btns">' +
           '<button type="button" class="btn btn-ghost" data-aviso-cancelar>Cancelar</button>' +
           '<button type="button" class="btn btn-solid" data-aviso-continuar>Continuar</button>' +

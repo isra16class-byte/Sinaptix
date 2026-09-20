@@ -203,7 +203,7 @@ próximos pasos).
 
 ## Tests
 
-- **`tests/nutricion-planes.test.js`** — 54 tests con `node --test`
+- **`tests/nutricion-planes.test.js`** — 62 tests con `node --test`
   (nativo de Node, sin dependencias nuevas) sobre las funciones de
   cálculo puro de `js/nutricion-planes.js` (resolución de objetivo,
   ajustes/avisos, antropometría, categoría/gauge de IMC, gauges de
@@ -214,9 +214,19 @@ próximos pasos).
   (sin `export`/`import`); al final tiene un bloque guardado
   (`if(typeof module!=='undefined'...)`) que solo corre bajo Node. El
   test mockea `localStorage` in-memory antes de requerir el módulo.
-- **`tests/plan-validacion.test.mjs`** — 5 tests ESM sobre
-  `netlify/functions/plan-validacion.mjs` (`esTipoValido`). El resto de
-  `plan.mjs` (auth real, SQL real) sigue **sin testear** — solo
+  - **`nutriGuardarOActualizarAntropometria`** (renombrada el 2026-09-19
+    desde `nutriGuardarAntropometriaSiFalta`, ver "Actualizar mi plan" más
+    abajo): 6 tests — sin dato previo guarda igual que antes, datos fuera
+    de rango no guardan nada, peso/talla distintos ACTUALIZAN un registro
+    existente (antes no lo hacía, era el FALLO 1), mismos datos no tocan
+    nada (no corre la fecha), datos inválidos no pisan un registro
+    existente, y un registro previo corrupto se trata como si no hubiera
+    nada guardado.
+- **`tests/plan-validacion.test.mjs`** — 8 tests ESM sobre
+  `netlify/functions/plan-validacion.mjs` (`esTipoValido`, `esDatosValido`
+  — esta última agregada el 2026-09-19, ver "Actualizar mi plan" más
+  abajo: `datos: null` solo es válido para tipo `'reevaluacion'`). El
+  resto de `plan.mjs` (auth real, SQL real) sigue **sin testear** — solo
   verificable contra un deploy real de Netlify.
 - **`tests/mi-plan-pdf.test.js`** — 21 tests con `node --test` sobre las
   funciones puras de `js/mi-plan-pdf.js` (el modelo de datos del PDF). El
@@ -252,6 +262,75 @@ próximos pasos).
   `plan-validacion.mjs`.
 
 ## Estado actual del diseño (resumen)
+
+- **"Actualizar mi plan" — 2 fallos corregidos (`js/nutricion-planes.js`,
+  `js/script.js`, `js/mi-plan.js`, `js/plan-aviso.js`,
+  `netlify/functions/plan-validacion.mjs`/`plan.mjs`, sesión 2026-09-19,
+  reportados por el usuario)**:
+  - **FALLO 1 — el IMC no se actualizaba.** Al enviar la encuesta, el
+    peso/talla/edad/sexo nuevos solo se guardaban en
+    `sinaptix_objetivo.encuesta`; `sinaptix_antropometria` (de donde salen
+    el IMC del dashboard, el medidor de Método y el PDF) solo se
+    guardaba si NO existía. Con antropometría ya cargada, "Actualizar mi
+    plan" con un peso/talla nuevos dejaba el IMC pegado al valor viejo
+    (reproducido con 250kg/181cm → IMC 76.31 pegado tras regenerar con
+    70kg/170cm). `nutriGuardarAntropometriaSiFalta` se renombró a
+    **`nutriGuardarOActualizarAntropometria`**: si hay un registro previo
+    y peso/talla/edad/sexo de la encuesta DIFIEREN, lo actualiza
+    (recalcula IMC y fecha) y lo sincroniza al servidor
+    (`planSyncGuardar('antropometria', ...)`); si son IGUALES (la encuesta
+    los prellena desde ahí, ver `nutricion-wizard.js`), no toca nada, para
+    no correr la fecha de una medición que no cambió en los hechos. Datos
+    inválidos/fuera de rango o un registro previo corrupto se comportan
+    igual que antes (no pisan nada / se tratan como si no hubiera nada
+    guardado). Los 2 submit de la encuesta (`js/script.js` e
+    `js/mi-plan.js`) llaman a la función renombrada.
+  - **FALLO 2 — los anillos/estado quedaban con una reevaluación vieja.**
+    `nutriPdfModelo` (y el resto de lo que lee `sinaptix_reevaluacion`)
+    calcula los anillos con esa reevaluación si existe, aunque sea de un
+    plan anterior — reproducido viendo Memoria/Calma al 100% con objetivos
+    de un plan viejo tras generar uno nuevo. Decisión del usuario: generar
+    un plan nuevo borra la reevaluación anterior (es un punto de partida
+    nuevo). Los 2 submit de la encuesta ahora hacen
+    `localStorage.removeItem('sinaptix_reevaluacion')` +
+    `planSyncGuardar('reevaluacion', null)`. Del lado del servidor,
+    `netlify/functions/plan-validacion.mjs` suma **`esDatosValido(tipo,
+    datos)`**: `datos: null` solo es válido para tipo `'reevaluacion'`
+    (para los otros 2 tipos se rechaza con 400, no tienen ningún flujo que
+    los borre y un `null` ahí sería casi seguro un bug). `plan.mjs` valida
+    con ella antes del upsert. El `GET` de `plan.mjs` **no necesitó
+    ningún cambio**: como la columna es `jsonb`, guardar `datos: null` deja
+    un JSON `null` en la fila (no un SQL `NULL`), y el driver de pg lo
+    deserializa como `null` en JS — el chequeo que ya existía
+    (`fila.reevaluacion != null`) ya lo trata como "sin dato" y no lo
+    devuelve, así que `planSyncCargar` (que solo escribe lo que el
+    servidor manda) no puede resucitarlo.
+  - **Aviso actualizado**: como borrar la reevaluación es destructivo, el
+    texto de "Ya tenés un plan" (`js/plan-aviso.js`) ahora también avisa
+    que generar un plan nuevo reinicia la comparación de "Actualizar mi
+    estado" (antes solo decía que reemplazaba el plan).
+  - **No se tocó**: la regla de "No estoy seguro" (si las 4 escalas
+    empatan, salen los 4 objetivos — es a propósito, `nutriResolverObjetivo`
+    sin cambios), el resto del flujo del aviso/botón "Actualizar mi plan"/
+    prellenado de peso y talla, ni el caso sin sesión (`planSyncGuardar` no
+    hace nada sin sesión, el dato queda igual en localStorage).
+  - **Verificado con Playwright + Chromium** (`PLAYWRIGHT_BROWSERS_PATH=
+    /opt/pw-browsers`, mismo mock de `netlifyIdentity`/`/.netlify/functions`
+    que `tests/mi-plan-pdf.e2e.test.mjs`): con antropometría 250kg/181cm,
+    un plan y una reevaluación guardados, se regeneró con 70kg/170cm en
+    `mi-plan.html` a 390px y en el flujo de `index.html` — en los 2 el
+    IMC pasó a 24.2, `sinaptix_reevaluacion` desapareció (local y, en el
+    caso de `index.html`, antes de la redirección a `mi-plan.html` que ya
+    hacía ese flujo) y las barras de "Tu estado actual" salieron 40% en
+    las 4 (de la encuesta nueva, no del 100% que traía la reevaluación
+    vieja). **Pendiente la confirmación visual explícita del usuario**
+    sobre las capturas (ver mensaje de la sesión) antes de dar esto por
+    cerrado — no se asume conforme solo porque el script terminó en
+    verde. El script de verificación no quedó en `tests/` (era ad hoc
+    para esta sesión, con datos de prueba embebidos) — si se quiere una
+    regresión permanente para este flujo, falta portarlo a un test
+    `node:test` con el mismo criterio de skip-si-falta-Playwright que
+    `tests/mi-plan-pdf.e2e.test.mjs`.
 
 - **Aviso antes de reemplazar un plan ya generado (`js/plan-aviso.js`,
   sesión 2026-09-19, pedido del usuario)**: volver a completar la encuesta

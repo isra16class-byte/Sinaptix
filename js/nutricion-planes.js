@@ -550,22 +550,31 @@ function imcGaugeTrackHtml(){
   return '<path class="imc-gauge-track" d="'+IMC_GAUGE_TRACK_D+'"/>';
 }
 
-// ===================== Guardar antropometría automáticamente desde la encuesta =====================
-// Si la persona todavía no tiene "datos antropométricos" guardados
+// ===================== Guardar/actualizar antropometría desde la encuesta =====================
+// La encuesta de nutrición (paso 2, ver nutricion-wizard.js) pide peso/
+// talla/edad/sexo. Esos mismos datos alimentan "datos antropométricos"
 // (sinaptix_antropometria — normalmente se registran aparte en
-// #modalAntropometria) pero sí completó peso y talla en el paso 2 de la
-// encuesta de nutrición (son campos opcionales ahí, ver nutricion-wizard.js),
-// aprovechamos esos mismos datos para no pedírselos dos veces: así "Mi plan"
-// puede mostrar el medidor de IMC apenas se genera el plan, sin que la
-// persona tenga que ir aparte a "Registrar datos antropométricos" a mano.
+// #modalAntropometria), de donde salen el IMC del dashboard, el medidor de
+// Método y el PDF, para no pedírselos dos veces.
 // Se llama desde el submit de la encuesta tanto en js/script.js
 // (index.html) como en js/mi-plan.js (mi-plan.html), justo antes de guardar
-// sinaptix_objetivo. Si ya existe un registro previo de antropometría, no
-// se toca (para no pisar una medición hecha a propósito, más reciente o más
-// precisa, con ese formulario dedicado).
-function nutriGuardarAntropometriaSiFalta(d){
-  if(localStorage.getItem('sinaptix_antropometria')) return false;
-
+// sinaptix_objetivo.
+//
+// Antes (nutriGuardarAntropometriaSiFalta, renombrada acá) solo guardaba si
+// NO había un registro previo: si la persona ya tenía antropometría
+// cargada, "Actualizar mi plan" con un peso/talla nuevos en la encuesta no
+// tocaba nada y el IMC (dashboard, medidor de Método, PDF) quedaba pegado
+// al valor viejo — bug reportado con antropometría en 250kg/181cm (IMC
+// 76.31) y un plan regenerado con 70kg/170cm, donde el IMC seguía en 76.31.
+//
+// Ahora, si hay un registro previo:
+// - si peso/talla/edad/sexo de la encuesta DIFIEREN de los guardados, se
+//   actualiza sinaptix_antropometria (recalculando el IMC y la fecha);
+// - si son IGUALES (la encuesta los prellena desde acá, ver
+//   nutricion-wizard.js), no se toca nada, para no correr la fecha de una
+//   medición que en los hechos no cambió.
+// Si no había antropometría, se guarda como antes.
+function nutriGuardarOActualizarAntropometria(d){
   const peso = parseFloat(d.peso);
   const tallaCm = parseFloat(d.talla);
   const edad = parseInt(d.edad, 10);
@@ -573,13 +582,29 @@ function nutriGuardarAntropometriaSiFalta(d){
 
   // Mismos rangos de validación que #formAntro en js/script.js y el paso 2
   // del wizard (NUTRI_RANGOS, más arriba en este archivo) — si algo no
-  // luce como un dato real (vacío, fuera de rango), no se guarda nada: se
-  // deja que la persona lo complete cuando quiera desde el formulario
-  // dedicado, en vez de guardar un IMC basado en datos incompletos.
+  // luce como un dato real (vacío, fuera de rango), no se toca nada: se
+  // deja que la persona lo complete/corrija cuando quiera desde el
+  // formulario dedicado, en vez de guardar/actualizar un IMC con datos
+  // incompletos.
   if(!peso || nutriValidarRango('peso', peso)) return false;
   if(!tallaCm || nutriValidarRango('talla', tallaCm)) return false;
   if(!edad || nutriValidarRango('edad', edad)) return false;
   if(!sexo) return false;
+
+  let existente = null;
+  const existenteRaw = localStorage.getItem('sinaptix_antropometria');
+  if(existenteRaw){
+    try{ existente = JSON.parse(existenteRaw); }
+    catch(err){ existente = null; } // dato corrupto: se trata como si no hubiera nada guardado
+  }
+
+  if(existente &&
+     parseFloat(existente.peso) === peso &&
+     parseFloat(existente.tallaCm) === tallaCm &&
+     parseInt(existente.edad, 10) === edad &&
+     existente.sexo === sexo){
+    return false; // mismos datos que ya había: no se toca (ni el IMC ni la fecha)
+  }
 
   const talla = tallaCm/100;
   const imc = peso/(talla*talla);
@@ -587,9 +612,7 @@ function nutriGuardarAntropometriaSiFalta(d){
   const datosAntro = {peso, tallaCm, edad, sexo, imc, fecha: new Date().toISOString()};
   localStorage.setItem('sinaptix_antropometria', JSON.stringify(datosAntro));
   // Mismo espejo hacia el servidor que #formAntro (ver js/plan-sync.js y
-  // js/script.js) — sin sesión no hace nada, y esta función ya tenía este
-  // único efecto secundario de localStorage antes de que existiera
-  // plan-sync.js, así que agregar el de red acá es consistente con eso.
+  // js/script.js) — sin sesión no hace nada.
   if(typeof planSyncGuardar === 'function') planSyncGuardar('antropometria', datosAntro);
   return true;
 }
@@ -773,7 +796,7 @@ if(typeof module !== 'undefined' && module.exports){
     nutriCambiosDesdeDiagnostico,
     nutriConstruirAjustes,
     nutriConstruirAvisos,
-    nutriGuardarAntropometriaSiFalta,
+    nutriGuardarOActualizarAntropometria,
     imcCategoria,
     imcGaugeAngulo,
     imcGaugeAgujaDeg,

@@ -31,7 +31,12 @@
 // POST -> body {tipo: 'antropometria'|'objetivo'|'reevaluacion', datos}
 //         guarda/actualiza SOLO ese bloque, sin tocar los otros dos que ya
 //         tuviera guardados ese usuario (cada formulario del sitio llama a
-//         esto en momentos distintos).
+//         esto en momentos distintos). `datos: null` para tipo
+//         'reevaluacion' la borra (guarda un JSON null en la columna,
+//         válido en jsonb, no un SQL NULL): el GET de arriba ya la
+//         considera "sin dato" en ese caso (`fila.reevaluacion != null`),
+//         así que no hace falta ningún cambio ahí. Ver esDatosValido() en
+//         plan-validacion.mjs — solo 'reevaluacion' admite `null`.
 //
 // La tabla `mi_plan` NO se crea acá: vive en
 // netlify/database/migrations/20260913231933_create_mi_plan.sql, que
@@ -39,7 +44,7 @@
 // corre DDL).
 import { getUser } from '@netlify/identity';
 import { getDatabase } from '@netlify/database';
-import { TIPOS_VALIDOS, esTipoValido } from './plan-validacion.mjs';
+import { TIPOS_VALIDOS, esTipoValido, esDatosValido } from './plan-validacion.mjs';
 
 export default async (req, context) => {
   const user = await getUser();
@@ -82,6 +87,9 @@ export default async (req, context) => {
     const datos = body.datos;
     if(!esTipoValido(tipo)){
       return Response.json({error: 'tipo inválido. Debe ser uno de: '+TIPOS_VALIDOS.join(', ')}, {status: 400});
+    }
+    if(!esDatosValido(tipo, datos)){
+      return Response.json({error: 'datos inválido para el tipo dado.'}, {status: 400});
     }
 
     // El nombre de columna (`tipo`) no se puede bindear como parámetro de

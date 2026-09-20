@@ -10,7 +10,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 
-// nutriGuardarAntropometriaSiFalta usa `localStorage` como variable
+// nutriGuardarOActualizarAntropometria usa `localStorage` como variable
 // global (pensado para el navegador) — se mockea acá antes de requerir
 // el módulo para que la referencia libre a `localStorage` la encuentre
 // en el scope global de Node.
@@ -32,7 +32,7 @@ const {
   nutriCambiosDesdeDiagnostico,
   nutriConstruirAjustes,
   nutriConstruirAvisos,
-  nutriGuardarAntropometriaSiFalta,
+  nutriGuardarOActualizarAntropometria,
   imcCategoria,
   imcGaugeAngulo,
   imcGaugeAgujaDeg,
@@ -410,32 +410,69 @@ test('gaugeDeltaHtml — delta positivo, negativo y cero', () => {
   assert.match(gaugeDeltaHtml(50, 50), /sin cambios/);
 });
 
-// ===================== nutriGuardarAntropometriaSiFalta =====================
+// ===================== nutriGuardarOActualizarAntropometria =====================
 
-test('nutriGuardarAntropometriaSiFalta — no pisa un dato ya guardado', () => {
+test('nutriGuardarOActualizarAntropometria — sin dato previo, guarda el IMC calculado', () => {
   global.localStorage.clear();
-  global.localStorage.setItem('sinaptix_antropometria', JSON.stringify({ imc: 1 }));
-  const resultado = nutriGuardarAntropometriaSiFalta({ peso: 70, talla: 175, edad: 30, sexo: 'Masculino' });
-  assert.strictEqual(resultado, false);
-  assert.strictEqual(JSON.parse(global.localStorage.getItem('sinaptix_antropometria')).imc, 1);
-});
-
-test('nutriGuardarAntropometriaSiFalta — datos fuera de rango no guardan nada', () => {
-  global.localStorage.clear();
-  assert.strictEqual(nutriGuardarAntropometriaSiFalta({ peso: 0, talla: 175, edad: 30, sexo: 'Masculino' }), false);
-  assert.strictEqual(nutriGuardarAntropometriaSiFalta({ peso: 70, talla: 300, edad: 30, sexo: 'Masculino' }), false);
-  assert.strictEqual(nutriGuardarAntropometriaSiFalta({ peso: 70, talla: 175, edad: 150, sexo: 'Masculino' }), false);
-  assert.strictEqual(nutriGuardarAntropometriaSiFalta({ peso: 70, talla: 175, edad: 30, sexo: '' }), false);
-  assert.strictEqual(global.localStorage.getItem('sinaptix_antropometria'), null);
-});
-
-test('nutriGuardarAntropometriaSiFalta — datos válidos guardan el IMC calculado', () => {
-  global.localStorage.clear();
-  const resultado = nutriGuardarAntropometriaSiFalta({ peso: 70, talla: 175, edad: 30, sexo: 'Masculino' });
+  const resultado = nutriGuardarOActualizarAntropometria({ peso: 70, talla: 175, edad: 30, sexo: 'Masculino' });
   assert.strictEqual(resultado, true);
   const guardado = JSON.parse(global.localStorage.getItem('sinaptix_antropometria'));
   const imcEsperado = 70 / (1.75 * 1.75);
   assert.ok(Math.abs(guardado.imc - imcEsperado) < 0.0001);
+});
+
+test('nutriGuardarOActualizarAntropometria — datos fuera de rango no guardan nada', () => {
+  global.localStorage.clear();
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 0, talla: 175, edad: 30, sexo: 'Masculino' }), false);
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 70, talla: 300, edad: 30, sexo: 'Masculino' }), false);
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 70, talla: 175, edad: 150, sexo: 'Masculino' }), false);
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 70, talla: 175, edad: 30, sexo: '' }), false);
+  assert.strictEqual(global.localStorage.getItem('sinaptix_antropometria'), null);
+});
+
+test('nutriGuardarOActualizarAntropometria — peso/talla distintos ACTUALIZAN el registro existente (FALLO 1)', () => {
+  global.localStorage.clear();
+  global.localStorage.setItem('sinaptix_antropometria', JSON.stringify({
+    peso: 250, tallaCm: 181, edad: 40, sexo: 'Masculino', imc: 76.31, fecha: '2026-01-01T00:00:00.000Z'
+  }));
+  const resultado = nutriGuardarOActualizarAntropometria({ peso: 70, talla: 170, edad: 40, sexo: 'Masculino' });
+  assert.strictEqual(resultado, true);
+  const guardado = JSON.parse(global.localStorage.getItem('sinaptix_antropometria'));
+  assert.strictEqual(guardado.peso, 70);
+  assert.strictEqual(guardado.tallaCm, 170);
+  const imcEsperado = 70 / (1.70 * 1.70);
+  assert.ok(Math.abs(guardado.imc - imcEsperado) < 0.0001);
+  assert.notStrictEqual(guardado.fecha, '2026-01-01T00:00:00.000Z');
+});
+
+test('nutriGuardarOActualizarAntropometria — mismos peso/talla/edad/sexo NO tocan el registro (no corre la fecha)', () => {
+  global.localStorage.clear();
+  const original = { peso: 70, tallaCm: 175, edad: 30, sexo: 'Masculino', imc: 22.86, fecha: '2026-01-01T00:00:00.000Z' };
+  global.localStorage.setItem('sinaptix_antropometria', JSON.stringify(original));
+  // La encuesta prellena estos mismos valores (ver nutricion-wizard.js): no
+  // deben tocar ni el IMC ni la fecha guardados.
+  const resultado = nutriGuardarOActualizarAntropometria({ peso: 70, talla: 175, edad: 30, sexo: 'Masculino' });
+  assert.strictEqual(resultado, false);
+  assert.deepStrictEqual(JSON.parse(global.localStorage.getItem('sinaptix_antropometria')), original);
+});
+
+test('nutriGuardarOActualizarAntropometria — datos inválidos no pisan un registro existente', () => {
+  global.localStorage.clear();
+  const original = { peso: 70, tallaCm: 175, edad: 30, sexo: 'Masculino', imc: 22.86, fecha: '2026-01-01T00:00:00.000Z' };
+  global.localStorage.setItem('sinaptix_antropometria', JSON.stringify(original));
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 0, talla: 170, edad: 30, sexo: 'Masculino' }), false);
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 70, talla: 400, edad: 30, sexo: 'Masculino' }), false);
+  assert.strictEqual(nutriGuardarOActualizarAntropometria({ peso: 70, talla: 170, edad: 30, sexo: '' }), false);
+  assert.deepStrictEqual(JSON.parse(global.localStorage.getItem('sinaptix_antropometria')), original);
+});
+
+test('nutriGuardarOActualizarAntropometria — registro previo corrupto se trata como si no hubiera nada', () => {
+  global.localStorage.clear();
+  global.localStorage.setItem('sinaptix_antropometria', '{no es json valido');
+  const resultado = nutriGuardarOActualizarAntropometria({ peso: 70, talla: 175, edad: 30, sexo: 'Masculino' });
+  assert.strictEqual(resultado, true);
+  const guardado = JSON.parse(global.localStorage.getItem('sinaptix_antropometria'));
+  assert.strictEqual(guardado.peso, 70);
 });
 
 // ===================== NUTRI_RANGOS / nutriValidarRango =====================
