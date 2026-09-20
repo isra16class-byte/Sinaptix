@@ -98,6 +98,13 @@ a{color:inherit;text-decoration:none}
 .deco-scribble{opacity:.85}
 @media(max-width:720px){.deco-scribble{display:none}}
 
+/* Onda de "señal" del hero (`svg/signal-wave.svg`, index.html). Es la única
+   `.deco` que no es fruta ni espiga, así que no la alcanzaba ninguna de las
+   2 reglas de arriba y en mobile caía justo al lado de los botones del hero.
+   Se oculta solo ≤720px (pedido del usuario, sesión 2026-09-20); en
+   desktop queda como estaba. */
+@media(max-width:720px){img.deco[src="svg/signal-wave.svg"]{display:none}}
+
 .eyebrow{
   font-family:var(--font-m);
   font-size:14px;
@@ -372,7 +379,20 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
   50%{transform:translate(-50%,-50%) translateY(-16px)}
 }
 @media(prefers-reduced-motion:reduce){.brain-fruit{animation:none}}
-@media(max-width:640px){.brain-fruit{display:none}}
+/* Frutas alrededor del cerebro del hero (`.brain-fruit`: nuez, cereza,
+   arándanos, uvas y fresa alrededor de `.brain-art`). ≤640px quedaban
+   ocultas; ahora se muestran más chicas, como en desktop pero en versión
+   reducida (pedido del usuario, sesión 2026-09-20). El `!important` es
+   porque cada tamaño viene inline en index.html (uno por fruta), así el
+   escritorio no se toca. */
+@media(max-width:640px){
+  .brain-fruit{display:block}
+  .brain-fruit.bf1{width:32px!important}
+  .brain-fruit.bf2{width:28px!important}
+  .brain-fruit.bf3{width:38px!important}
+  .brain-fruit.bf4{width:40px!important}
+  .brain-fruit.bf5{width:25px!important}
+}
 .pulse-dot{animation:travel 5.5s linear infinite}
 @keyframes travel{
   0%{offset-distance:0%}
@@ -2492,6 +2512,22 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
    (`.deco-fruit` ya las oculta en <720px; esto es lo mismo, más temprano.) */
 @media(max-width:1000px){#lam-07 .closing-fruit--side{display:none}}
 @media(max-width:860px){#lam-07 .closing-fruit{display:none}}
+/* Vuelven en mobile, chicas (sesión 2026-09-20, pedido del usuario): con el
+   título de cierre ya achicado (ver `.closing-title-line1/2` más abajo)
+   entran 6 versiones reducidas, 2 arriba y 2 abajo en las esquinas + 2 en
+   los costados, todas contra los bordes de la sección. `!important` porque
+   posición y tamaño vienen inline en index.html (y así el escritorio, que
+   ya se ve bien, no se toca). `left/top:auto` desactiva el anclaje inline
+   de los que ahora van desde la derecha/abajo. */
+@media(max-width:720px){
+  #lam-07 .closing-fruit{display:block;opacity:.9}
+  #lam-07 .closing-fruit:nth-of-type(1){left:10px!important;top:7%!important;width:30px!important}
+  #lam-07 .closing-fruit:nth-of-type(2){left:auto!important;right:10px!important;top:5%!important;width:32px!important}
+  #lam-07 .closing-fruit:nth-of-type(3){left:3%!important;top:38%!important;width:28px!important}
+  #lam-07 .closing-fruit:nth-of-type(4){right:3%!important;top:40%!important;width:26px!important}
+  #lam-07 .closing-fruit:nth-of-type(5){left:12px!important;top:auto!important;bottom:11%!important;width:30px!important}
+  #lam-07 .closing-fruit:nth-of-type(6){left:auto!important;right:12px!important;top:auto!important;bottom:9%!important;width:26px!important}
+}
 .closing-sparks{display:block;width:100%;height:auto}
 .closing-title{
   position:relative;z-index:1;
@@ -2502,6 +2538,14 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 .closing-title-line1{display:block;font-size:clamp(60px,8.3vw,98px);color:var(--ink)}
 .closing-title-line2{display:block;margin-top:2px;font-size:clamp(60px,8.7vw,106px);color:var(--closing-teal)}
+/* Título de cierre más chico en mobile (sesión 2026-09-20, pedido del
+   usuario): ≤720px el `clamp` de arriba queda pegado a sus mínimos (60px en
+   las 2 líneas), así que se bajan a mano. Solo mobile: el escritorio sigue
+   con el clamp original. */
+@media(max-width:720px){
+  .closing-title-line1{font-size:47px}
+  .closing-title-line2{font-size:49px}
+}
 /* El bloque de cierre (título, botón, flecha y pie) se agranda ~15% en
    conjunto respecto de los valores base del sitio; el botón se sobreescribe
    acá para no tocar `.btn` global. */
@@ -2521,6 +2565,9 @@ section.dark .btn-ghost,.hero .btn-ghost{border-color:var(--panel-line)}
 }
 @media(prefers-reduced-motion:reduce){.closing-arrow{animation:none}}
 .closing-sub{margin:14px auto 0;max-width:34ch;color:var(--ink-soft);font-size:17px}
+/* Subtítulo de cierre más chico en mobile (sesión 2026-09-20, pedido del
+   usuario). Solo ≤720px: el escritorio sigue con 17px. */
+@media(max-width:720px){.closing-sub{font-size:13px}}
 #lam-07 footer{text-align:left}
 /* Sesión 2026-09-18 (pedido: "la parte final de la web como moradito
    difuminado, de abajo hacia arriba, hasta donde dice © 2026 SINAPTIX…",
